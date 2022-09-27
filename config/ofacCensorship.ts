@@ -1,11 +1,12 @@
+// TODO: What are these actual values
 const ofacCensorshipLookup: Record<string, boolean> = {
   Flashbots: true,
   "BloXroute Max Profit": false,
-  "BloXroute Ethical": true,
+  "BloXroute Ethical": false,
   Blocknative: true,
   "BloXroute Regulated": true,
-  Manifold: true,
-  Eden: true,
+  Manifold: false,
+  Eden: false,
 };
 
 /**

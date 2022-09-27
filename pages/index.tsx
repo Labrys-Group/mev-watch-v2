@@ -1,15 +1,9 @@
-import axios from "axios";
-import { RelayStats } from "../types/relays";
-import { parse } from "node-html-parser";
-import { isRelayerOfacCompliant } from "../config/ofacCensorship";
 import { Stack, Text } from "@chakra-ui/react";
 import { formatNumberForDisplay, parseStringToNumber } from "../helpers/parser";
+import { RelayerResponseData } from "../types/relays";
+import { getRelayerStats } from "../helpers/getRelayerStats";
 
-type PageData =
-  | { success: true; relayStats: RelayStats[] }
-  | { success: false };
-
-const Home = (props: PageData) => {
+const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
   return (
@@ -39,7 +33,7 @@ const Home = (props: PageData) => {
           <Text w={80}>{formatNumberForDisplay(item.numBlocks)}</Text>
           <Text w={80}>{formatNumberForDisplay(item.totalValueETH)}</Text>
           <Text w={80}>{formatNumberForDisplay(item.avgBlockValue)}</Text>
-          <Text w={80}>{item.ofacCompliant ? "Snitch" : "King"}</Text>
+          <Text w={80}>{item.ofacCompliant ? "Yes" : "No"}</Text>
         </Stack>
       ))}
     </Stack>
@@ -48,67 +42,12 @@ const Home = (props: PageData) => {
 
 export default Home;
 
-export async function getServerSideProps(): Promise<{ props: PageData }> {
-  const { data: mevBoostWebpage } = await axios.get(
-    "https://www.mevboost.org/"
-  );
-  const root = parse(mevBoostWebpage);
-  const rankingTable = root.querySelector(".ranking-table");
-
-  // Any nodes without children can be ignored as we are after the table element which has multiple children
-  const validNodes = rankingTable?.childNodes.filter(
-    (node) => node.childNodes.length > 0
-  );
-
-  if (!validNodes) {
-    // TODO: Sentry
-    return {
-      props: {
-        success: false,
-      },
-    };
-  }
-
-  const relayStats: RelayStats[] = [];
-
-  validNodes[0].childNodes.forEach((node) => {
-    // We only want the text element nodes here because all other nodeType's seem to be irrelevant for the data we are after
-    if (node.nodeType !== 1) return;
-
-    // Skip the first element because it is a newline character (\n)
-    const [, name, numBlocks, totalValueETH, avgBlockValue] =
-      node.childNodes.map((childNode) => childNode.textContent);
-
-    if (!name || !numBlocks || !totalValueETH || !avgBlockValue) {
-      // TODO: sentry
-
-      return;
-    }
-
-    // This checks if the current row is for column titles
-    if (name === "Relay") return;
-
-    const ofacCompliant = isRelayerOfacCompliant(name);
-
-    // This means our ofac compliance config is missing the entry for this relayer name
-    if (ofacCompliant === null) {
-      // TODO: Sentry
-
-      return;
-    }
-
-    relayStats.push({
-      name,
-      ofacCompliant,
-      avgBlockValue: parseStringToNumber(avgBlockValue),
-      numBlocks: parseStringToNumber(numBlocks),
-      totalValueETH: parseStringToNumber(totalValueETH),
-    });
-  });
-
-  console.log(relayStats);
+export async function getServerSideProps(): Promise<{
+  props: RelayerResponseData;
+}> {
+  const relayerStats = await getRelayerStats();
 
   return {
-    props: { success: true, relayStats },
+    props: relayerStats,
   };
 }

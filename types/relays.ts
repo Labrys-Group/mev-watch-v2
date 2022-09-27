@@ -5,3 +5,7 @@ export interface RelayStats {
   avgBlockValue: number;
   ofacCompliant: boolean;
 }
+
+export type RelayerResponseData =
+  | { success: true; relayStats: RelayStats[] }
+  | { success: false };
