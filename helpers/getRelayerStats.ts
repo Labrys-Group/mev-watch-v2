@@ -1,7 +1,7 @@
 import axios from "axios";
 import parse from "node-html-parser";
 import { isRelayerOfacCompliant } from "../config/ofacCensorship";
-import { GenericResponse, RelayerResponseData } from "../types/relays";
+import { GenericResponse } from "../types/relays";
 import { RelayStats } from "../types/relays";
 import { parseStringToNumber } from "./parser";
 

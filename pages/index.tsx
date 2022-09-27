@@ -4,15 +4,18 @@ import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "../constants/common";
 import { ProviderSingleton } from "../constants/provider";
+import { OfacBarChart } from "../components/OfacBarChart";
 
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
   return (
     <Stack flexDirection={"column"}>
-      <Stack>
-        <Text>BLOCKS SINCE MERGE: {props.response.numBlocksSinceMerge}</Text>
-      </Stack>
+      <OfacBarChart
+        numBlocksSinceMerge={props.response.numBlocksSinceMerge}
+        relayStats={props.response.relayStats}
+      />
+
       {/* Table to demonstrate correctness, can be removed */}
       <Stack alignItems={"center"} flexDirection={"row"}>
         <Text w={250} fontWeight={"bold"}>
