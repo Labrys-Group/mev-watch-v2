@@ -1,0 +1,1 @@
+export const BLOCK_NUMBER_OF_MERGE = 15537394;

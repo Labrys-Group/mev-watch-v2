@@ -6,6 +6,11 @@ export interface RelayStats {
   ofacCompliant: boolean;
 }
 
-export type RelayerResponseData =
-  | { success: true; relayStats: RelayStats[] }
-  | { success: false };
+export type GenericResponse<T> =
+  | { success: false }
+  | { success: true; response: T };
+
+export type RelayerResponseData = GenericResponse<{
+  relayStats: RelayStats[];
+  numBlocksSinceMerge: number;
+}>;

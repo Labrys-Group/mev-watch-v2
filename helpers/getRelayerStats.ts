@@ -1,7 +1,7 @@
 import axios from "axios";
 import parse from "node-html-parser";
 import { isRelayerOfacCompliant } from "../config/ofacCensorship";
-import { RelayerResponseData } from "../types/relays";
+import { GenericResponse, RelayerResponseData } from "../types/relays";
 import { RelayStats } from "../types/relays";
 import { parseStringToNumber } from "./parser";
 
@@ -9,7 +9,9 @@ import { parseStringToNumber } from "./parser";
  * This method scrapes the mevboost.org webpage to extract the relayer stats.This mostly utilizes node-html-parser to parse the webpage and extract the relevant data
  * @returns The parsed data or an invalid response
  */
-export const getRelayerStats = async (): Promise<RelayerResponseData> => {
+export const getRelayerStats = async (): Promise<
+  GenericResponse<RelayStats[]>
+> => {
   const { data: mevBoostWebpage } = await axios.get(
     "https://www.mevboost.org/"
   );
@@ -69,6 +71,6 @@ export const getRelayerStats = async (): Promise<RelayerResponseData> => {
 
   return {
     success: true,
-    relayStats,
+    response: relayStats,
   };
 };
