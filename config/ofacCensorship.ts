@@ -6,7 +6,7 @@ const ofacCensorshipLookup: Record<string, boolean> = {
   Blocknative: true,
   "BloXroute Regulated": true,
   Manifold: false,
-  Eden: false,
+  Eden: true,
 };
 
 /**
