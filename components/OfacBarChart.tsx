@@ -12,7 +12,15 @@ import {
 import { Bar } from "react-chartjs-2";
 import { RelayStats } from "../types/relays";
 import { ofacBarChartOptions } from "../config/barChart";
-import { Box, Button, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  Stack,
+  Switch,
+  useBoolean,
+  Text,
+} from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
@@ -70,7 +78,7 @@ export const OfacBarChart = ({
   relayStats: RelayStats[];
   numBlocksSinceMerge: number;
 }) => {
-  const [isIncludingAllBlocks, setIncludingAllBlocks] = useState(false);
+  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(false);
 
   const barChartData: ChartData<"bar", number[], string> = useMemo(() => {
     const totalBlocksFromRelays = sumBy(relayStats, (stats) => stats.numBlocks);
@@ -91,13 +99,17 @@ export const OfacBarChart = ({
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
 
   return (
-    <Stack p={20}>
-      <Button
-        onClick={() => setIncludingAllBlocks(!isIncludingAllBlocks)}
-        w={80}
-      >
-        {isIncludingAllBlocks ? "Exclude" : "Include"} all Blocks
-      </Button>
+    <Stack py="20px" w="100%">
+      <HStack justifyContent="flex-end">
+        <Switch
+          onChange={setIsIncludingAllBlocks.toggle}
+          isChecked={isIncludingAllBlocks}
+          colorScheme="teal"
+        />
+        <Text color="#fff" w="130px" textAlign="end">
+          {isIncludingAllBlocks ? "Exclude" : "Include"} all Blocks
+        </Text>
+      </HStack>
       <Box h={200}>
         <Bar options={ofacBarChartOptions} data={barChartData} />
       </Box>
