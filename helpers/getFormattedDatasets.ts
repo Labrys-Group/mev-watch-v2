@@ -9,6 +9,7 @@ const getFormattedDatasets = (
 ): DatasetEntry[] =>
   relaysStats.map((relay, index) => {
     const percentageOfBlocks = relay.numBlocks / totalBlocks;
+    console.log("THIS", percentageOfBlocks);
     const colorGradient = !isOfacCompliant ? greenGradient : redGradient;
     const backgroundColor = combineRelays
       ? colorGradient[0]

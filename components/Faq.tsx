@@ -6,21 +6,48 @@ import {
   Text,
   Box,
   AccordionPanel,
+  Code,
+  useToast,
 } from "@chakra-ui/react";
 import { AiOutlineRight, AiOutlineDown } from "react-icons/ai";
 import ReactMarkdown from "react-markdown";
+import { useState } from "react";
 
 const markdownStyles = {
   h3: ({ node, ...props }: { node: any }) => (
     <p style={{ margin: "10px 0" }} {...props} />
   ),
   a: ({ node, ...props }: { node: any }) => (
-    <a
-      target="_blank"
-      style={{ color: "#15bfe3", textDecoration: "underline" }}
-      {...props}
-    />
+    <a target="_blank" style={{ color: "#00FFA7" }} {...props} />
   ),
+  code: ({ node, ...props }: { node: any }) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const toast = useToast();
+    return (
+      <Code
+        p="15px"
+        w="100%"
+        bgColor="gray.700"
+        fontSize="15px"
+        color="brightGreen.500"
+        // overflowWrap="break-word"
+        cursor="pointer"
+        mt="5px"
+        mb="20px"
+        onClick={(e) => {
+          navigator.clipboard.writeText((props as any).children[0]);
+          toast({
+            title: "Copied",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+            position: "top",
+          });
+        }}
+        {...props}
+      />
+    );
+  },
 };
 
 const faqs: { title: string; content: string }[] = [
@@ -40,9 +67,15 @@ const faqs: { title: string; content: string }[] = [
     title: "What can I do as a Validator?",
     content: `Consider not including any relays in your mev-boost configuration that censor transactions. Current major mev-boost relays that don’t censor include:  
     - [BloXroute Max Profit](https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com)  
+
+\`\`\`https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com\`\`\`
     - [BloxRoute Ethical](https://0xad0a8bb54565c2211cee576363f3a347089d2f07cf72679d16911d740262694cadb62d7fd7483f27afd714ca0f1b9118@bloxroute.ethical.blxrbdn.com)  
+
+\`\`\`https://0xad0a8bb54565c2211cee576363f3a347089d2f07cf72679d16911d740262694cadb62d7fd7483f27afd714ca0f1b9118@bloxroute.ethical.blxrbdn.com\`\`\`
     - [Manifold](https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com)  
-    `,
+
+\`\`\`https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com\`\`\`
+`,
   },
   {
     title: "How is OFAC compliance (censorship) status determined?",
@@ -50,7 +83,7 @@ const faqs: { title: string; content: string }[] = [
 ### If you are a relay operator and believe your relay’s compliance with OFAC has been miscategorised, please reach out and we will update its OFAC compliance status.`,
   },
   {
-    title: "Is Labrys aginst regulation?",
+    title: "Is Labrys against regulation?",
     content:
       "No. Regulation is inevitable as the crypto industry matures. All persons and entities within the United States, all U.S. incorporated entities and their foreign branches who operate Ethereum POS validators should seek their own advice on whether their validators must produce OFAC compliant blocks. However, ensuring that Ethereum remains credibly neutral on the global stage is important. All persons and entities operating validators outside of the U.S. should consider running non-censoring relays for the benefit of the network.",
   },
@@ -58,7 +91,7 @@ const faqs: { title: string; content: string }[] = [
 
 const Faq = () => {
   return (
-    <Accordion allowMultiple w="100%" mt="30px">
+    <Accordion allowMultiple defaultIndex={undefined} w="100%" mt="30px">
       {faqs.map((faq) => (
         <AccordionItem key={faq.title} py="10px">
           {({ isExpanded }) => (

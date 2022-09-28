@@ -1,8 +1,21 @@
 import { ReactNode } from "react";
-import { Flex, chakra, Box, VStack, Image, Link, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  chakra,
+  Box,
+  VStack,
+  HStack,
+  Image,
+  Link,
+  Text,
+} from "@chakra-ui/react";
 import { AiTwotoneHeart } from "react-icons/ai";
+import { BsTwitter } from "react-icons/bs";
 
 import { useRouter } from "next/router";
+import { StyledBtn, StyledLink } from "../styles/StyledComponents";
+
+import { GoPrimitiveDot } from "react-icons/go";
 
 const MainContainer = ({ children }: { children: ReactNode }) => {
   const LABRYS_LINK = "https://labrys.io";
@@ -13,9 +26,9 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
       <Background>
         <BodyContainer>{children}</BodyContainer>
         <Footer>
-          <Link color="white" href="/terms-of-use">
+          <StyledLink color="white" href="/terms-of-use">
             {router.pathname === "/terms-of-use" ? "" : "Terms of Use"}
-          </Link>
+          </StyledLink>
           <Link href={LABRYS_LINK} target="_blank">
             <VStack align="center">
               <Flex alignItems="center">
@@ -37,6 +50,11 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
               />
             </VStack>
           </Link>
+          <StyledBtn
+            aria-label="labrys-twitter"
+            icon={<BsTwitter />}
+            onClick={() => window.open("")}
+          />
         </Footer>
       </Background>
     </ImgBackground>
