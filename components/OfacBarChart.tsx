@@ -59,7 +59,6 @@ const OfacBarChart = ({
 
     const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
 
-    console.log("TOTAL", totalBlocksFromRelays, numBlocksSinceMerge);
     return {
       labels: [""],
       datasets: isIncludingAllBlocks
