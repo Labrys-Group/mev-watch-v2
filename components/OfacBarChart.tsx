@@ -29,7 +29,6 @@ import { IoWarning } from "react-icons/io5";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
-import getCombinedRelay from "../helpers/getCombinedRelay";
 import getPercentage from "../helpers/getPercentage";
 import { greenGradient, redGradient } from "../styles/chartColor";
 
@@ -49,7 +48,7 @@ const OfacBarChart = ({
   relayStats: RelayStats[];
   numBlocksSinceMerge: number;
 }) => {
-  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(false);
+  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
 
   const barChartData: ChartData<"bar", number[], string> = useMemo(() => {
     const totalBlocksFromRelays = sumBy(relayStats, (stats) => stats.numBlocks);
@@ -101,7 +100,7 @@ const OfacBarChart = ({
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
 
   return (
-    <Flex flexDir="column" w="100%" mt="100px" h="40vh">
+    <Flex flexDir="column" w="100%" my="20px">
       <HStack justifyContent="flex-end" mb="5px">
         <Switch
           onChange={setIsIncludingAllBlocks.toggle}
@@ -135,14 +134,17 @@ const OfacBarChart = ({
               : "( mev-boost relay blocks only )"}
           </Text>
           <Bar options={ofacBarChartOptions} data={barChartData} />
-          
         </VStack>
         <HStack justify="center" mt="45px">
-            <IoWarning color="orange" size={24} />
-            <PercentBlocksText>
-              {percentageCensoring}% of mev-boost blocks censoring
-            </PercentBlocksText>
-          </HStack>
+          <IoWarning color="orange" size={24} />
+          <PercentBlocksText>
+            {`${percentageCensoring}${
+              isIncludingAllBlocks
+                ? "% of all blocks being censored"
+                : "% of mev-boost blocks censoring"
+            }`}
+          </PercentBlocksText>
+        </HStack>
       </Box>
     </Flex>
   );

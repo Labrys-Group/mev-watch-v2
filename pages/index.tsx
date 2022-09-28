@@ -1,83 +1,41 @@
-import {
-  Text,
-  Flex,
-  VStack,
-  chakra,
-  Box,
-  Image,
-  HStack,
-  Link,
-} from "@chakra-ui/react";
+import { Text, Flex, chakra, Link } from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "../constants/common";
 import { ProviderSingleton } from "../constants/provider";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
-
-import { AiTwotoneHeart } from "react-icons/ai";
-
-const LABRYS_LINK = "https://labrys.io";
+import { Title, DefaultText } from "../styles/StyledComponents";
+import { useRouter } from "next/router";
 
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
   return (
-    <Box
-      backgroundImage="/gradientBg.png"
-      backgroundPosition="center"
-      backgroundSize="cover"
-      w="100vw"
-      minH="100vh"
-      minW="600px"
-    >
-      <MainContainer>
-        <BodyContainer>
-          <Title>MEV Watch</Title>
-          <SubTitle>
-            Some MEV-Boost relays are regulated under OFAC and will censor
-            certain transactions.
-          </SubTitle>
-          <SubTitle>
-            Use this tool to observe the effect it&#39;s having on Ethereum
-            blocks
-          </SubTitle>
-          <OfacBarChart
-            numBlocksSinceMerge={props.response.numBlocksSinceMerge}
-            relayStats={props.response.relayStats}
-          />
+    <>
+      <Title>MEV Watch</Title>
+      <DefaultText w="500px" textAlign="center">
+        Some MEV-Boost relays are regulated under OFAC and will censor certain
+        transactions. Use this tool to observe the effect it&#39;s having on
+        Ethereum blocks.
+      </DefaultText>
 
-          <Note>
-            <Text fontWeight="bold" color="#00FFA7">
-              Protocol level censorship = Bad
-            </Text>
-            <SubTitle color="#fff" textAlign="left" w="auto">
-              Keep Ethereum credibly neutral by adopting a non-censoring
-              mev-boost relay.
-            </SubTitle>
-          </Note>
-          <Faq />
-        </BodyContainer>
-        <Footer>
-          <Link href={LABRYS_LINK} target="_blank">
-            <VStack align="center">
-            <Flex alignItems="center">
-              <Text color="#fff" mb="10px" whiteSpace="nowrap">
-                Made with
-              </Text>
-              <Box mx="10px" mb="7px">
-                <AiTwotoneHeart color="red" size="20px" />
-              </Box>
-              <Text color="#fff" mb="10px" whiteSpace="nowrap">
-                by Labrys
-              </Text>
-            </Flex>
-            <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
-            </VStack>
-          </Link>
-        </Footer>
-      </MainContainer>
-    </Box>
+      <OfacBarChart
+        numBlocksSinceMerge={props.response.numBlocksSinceMerge}
+        relayStats={props.response.relayStats}
+      />
+
+      <Note>
+        <Text fontWeight="bold" color="#00FFA7">
+          Protocol level censorship = Bad
+        </Text>
+        <DefaultText>
+          Keep Ethereum credibly neutral by adopting a non-censoring mev-boost
+          relay.
+        </DefaultText>
+      </Note>
+      <Faq />
+    </>
   );
 };
 
@@ -108,66 +66,10 @@ export async function getServerSideProps(): Promise<{
   };
 }
 
-const MainContainer = chakra(Flex, {
-  baseStyle: {
-    flexDirection: "column",
-    margin: "0 auto",
-    backgroundColor: "#0000007e",
-    minHeight: "100vh",
-    width: "100%",
-  },
-});
-
-const BodyContainer = chakra(Flex, {
-  baseStyle: {
-    minWidth: "600px",
-    maxWidth: "1000px",
-    width: "100%",
-    minHeight: "calc(100vh - 180px)",
-    flexDirection: "column",
-    margin: "0 auto",
-    alignItems: "center",
-    paddingTop: "80px",
-    paddingX: "20px",
-  },
-});
-
-const Title = chakra(Text, {
-  baseStyle: {
-    fontFamily: "GT-America-Extended-Bold",
-    textAlign: "center",
-    fontSize: "3rem",
-    fontWeight: "bold",
-    background:
-      "linear-gradient(to right, #00FFD3 0%, #71FFE0 50%, #FFFF00 100%)",
-    "-webkit-background-clip": "text",
-    "-webkit-text-fill-color": "transparent",
-  },
-});
-
-const SubTitle = chakra(Text, {
-  baseStyle: {
-    fontFamily: "GT-America-Mono-Medium",
-    textAlign: "center",
-    noOfLines: 2,
-    width: "500px",
-    color: "#fff",
-    marginBottom: "10px",
-  },
-});
-
 const Note = chakra(Flex, {
   baseStyle: {
     flexDirection: "column",
     width: "100%",
-    marginTop: "50px",
-    marginBottom: "20px",
-  },
-});
-
-const Footer = chakra(VStack, {
-  baseStyle: {
-    paddingTop: "50px",
-    paddingBottom: "30px",
+    marginY: "20px",
   },
 });
