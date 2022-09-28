@@ -106,7 +106,7 @@ const OfacBarChart = ({
         <Switch
           onChange={setIsIncludingAllBlocks.toggle}
           isChecked={isIncludingAllBlocks}
-          colorScheme="teal"
+          colorScheme="brightGreen"
         />
         <Text color="#fff" w="140px" textAlign="end" whiteSpace="nowrap">
           Include all Blocks
