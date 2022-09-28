@@ -53,7 +53,11 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
           <StyledBtn
             aria-label="labrys-twitter"
             icon={<BsTwitter />}
-            onClick={() => window.open("")}
+            onClick={() =>
+              window.open(
+                "https://twitter.com/intent/tweet?text=Some%20MEV-Boost%20relays%20are%20regulated%20under%20OFAC%20and%20will%20censor%20certain%20transactions.%0AUse%20this%20tool%20to%20observe%20the%20effect%20it%27s%20having%20on%20Ethereum%20blocks.%0Ahttps%3A%2F%2Fwww.mevwatch.info%2F"
+              )
+            }
           />
         </Footer>
       </Background>
