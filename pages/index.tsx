@@ -23,61 +23,31 @@ const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
   return (
-    <Box
-      backgroundImage="/gradientBg.png"
-      backgroundPosition="center"
-      backgroundSize="cover"
-      w="100vw"
-      minH="100vh"
-      minW="600px"
-    >
-      <MainContainer>
-        <BodyContainer>
-          <Title>MEV Watch</Title>
-          <SubTitle>
-            Some MEV-Boost relays are regulated under OFAC and will censor
-            certain transactions.
-          </SubTitle>
-          <SubTitle>
-            Use this tool to observe the effect it&#39;s having on Ethereum
-            blocks
-          </SubTitle>
-          <OfacBarChart
-            numBlocksSinceMerge={props.response.numBlocksSinceMerge}
-            relayStats={props.response.relayStats}
-          />
+    <>
+      <Title>MEV Watch</Title>
+      <SubTitle>
+        Some MEV-Boost relays are regulated under OFAC and will censor certain
+        transactions.
+      </SubTitle>
+      <SubTitle>
+        Use this tool to observe the effect it&#39;s having on Ethereum blocks
+      </SubTitle>
+      <OfacBarChart
+        numBlocksSinceMerge={props.response.numBlocksSinceMerge}
+        relayStats={props.response.relayStats}
+      />
 
-          <Note>
-            <Text fontWeight="bold" color="#00FFA7">
-              Protocol level censorship = Bad
-            </Text>
-            <SubTitle color="#fff" textAlign="left" w="auto">
-              Keep Ethereum credibly neutral by adopting a non-censoring
-              mev-boost relay.
-            </SubTitle>
-          </Note>
-          <Faq />
-        </BodyContainer>
-        <Footer>
-          <Link href={LABRYS_LINK} target="_blank">
-            <VStack align="center">
-            <Flex alignItems="center">
-              <Text color="#fff" mb="10px" whiteSpace="nowrap">
-                Made with
-              </Text>
-              <Box mx="10px" mb="7px">
-                <AiTwotoneHeart color="red" size="20px" />
-              </Box>
-              <Text color="#fff" mb="10px" whiteSpace="nowrap">
-                by Labrys
-              </Text>
-            </Flex>
-            <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
-            </VStack>
-          </Link>
-        </Footer>
-      </MainContainer>
-    </Box>
+      <Note>
+        <Text fontWeight="bold" color="#00FFA7">
+          Protocol level censorship = Bad
+        </Text>
+        <SubTitle color="#fff" textAlign="left" w="auto">
+          Keep Ethereum credibly neutral by adopting a non-censoring mev-boost
+          relay.
+        </SubTitle>
+      </Note>
+      <Faq />
+    </>
   );
 };
 
