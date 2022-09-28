@@ -19,6 +19,8 @@ import { AiTwotoneHeart } from "react-icons/ai";
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
+  console.log(props);
+
   return (
     <Box
       backgroundImage="/gradientBg.png"
