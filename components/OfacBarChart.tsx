@@ -24,8 +24,7 @@ import {
   chakra,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
-import { IoWarning} from "react-icons/io5";
-
+import { IoWarning } from "react-icons/io5";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
@@ -90,6 +89,17 @@ const OfacBarChart = ({
     };
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
 
+  const percentageCensoring = useMemo(() => {
+    const totalBlocksFromRelays = sumBy(relayStats, (stats) => stats.numBlocks);
+
+    const totalBlocks = isIncludingAllBlocks
+      ? numBlocksSinceMerge
+      : totalBlocksFromRelays;
+
+    const { isOfac } = sortAndDivideOfacRelays(relayStats);
+    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
+  }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
+
   return (
     <Flex flexDir="column" w="100%" mt="100px" h="40vh">
       <HStack justifyContent="flex-end" mb="5px">
@@ -104,13 +114,13 @@ const OfacBarChart = ({
       </HStack>
 
       <Box
-        h="260px"
+        h="270px"
         bg="#0f0f0f"
         borderRadius="10px"
         border="1px solid #393939"
-        p="20px 20px 130px"
+        p="20px 20px"
       >
-        <VStack mb="20px" h="70px">
+        <VStack h="155px">
           <Text
             color="#fff"
             textAlign="center"
@@ -124,17 +134,19 @@ const OfacBarChart = ({
               ? "( all post-merge blocks )"
               : "( mev-boost relay blocks only )"}
           </Text>
+          <Bar options={ofacBarChartOptions} data={barChartData} />
+          
         </VStack>
-        <Bar options={ofacBarChartOptions} data={barChartData} />
-        <HStack justify="center">
-        <IoWarning color="orange" size={24} />
-        <PercentBlocksText>__% of mev-boost blocks censoring</PercentBlocksText>
-        </HStack>
+        <HStack justify="center" mt="45px">
+            <IoWarning color="orange" size={24} />
+            <PercentBlocksText>
+              {percentageCensoring}% of mev-boost blocks censoring
+            </PercentBlocksText>
+          </HStack>
       </Box>
     </Flex>
   );
 };
-
 
 const PercentBlocksText = chakra(Text, {
   baseStyle: {
