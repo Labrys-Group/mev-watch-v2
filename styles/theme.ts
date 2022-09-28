@@ -5,7 +5,7 @@ const fonts = {
   body: "Lexend Deca",
 };
 
-const colors = {
+export const colors = {
   brightGreen: {
     50: "#E5FFF6",
     100: "#B8FFE6",
