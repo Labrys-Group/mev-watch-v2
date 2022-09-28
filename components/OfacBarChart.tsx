@@ -59,7 +59,6 @@ const OfacBarChart = ({
 
     const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
 
-    console.log("TOTAL", totalBlocksFromRelays, numBlocksSinceMerge);
     return {
       labels: [""],
       datasets: isIncludingAllBlocks
@@ -113,7 +112,7 @@ const OfacBarChart = ({
       </HStack>
 
       <Box
-        h="270px"
+        h="300px"
         bg="#0f0f0f"
         borderRadius="10px"
         border="1px solid #393939"
@@ -135,7 +134,7 @@ const OfacBarChart = ({
           </Text>
           <Bar options={ofacBarChartOptions} data={barChartData} />
         </VStack>
-        <HStack justify="center" mt="45px">
+        <HStack justify="center" mt="80px">
           <IoWarning color="orange" size={24} />
           <PercentBlocksText>
             {`${percentageCensoring}${
