@@ -7,6 +7,11 @@ const axisProps = {
   grid: {
     color: "#fff",
   },
+  ticks: {
+    callback: function (val: string | number, index: number) {
+      return val;
+    },
+  },
 };
 
 export const ofacBarChartOptions: ChartOptions<"bar"> = {
