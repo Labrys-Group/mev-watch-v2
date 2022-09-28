@@ -15,11 +15,11 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
     legend: {
       onClick: () => null,
     },
-    tooltip: {
-      titleFont: {
-        size: 0,
-      },
-    },
+    // tooltip: {
+    //   titleFont: {
+    //     size: 0,
+    //   },
+    // },
   },
   maintainAspectRatio: false,
   responsive: true,

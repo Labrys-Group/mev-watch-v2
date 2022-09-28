@@ -32,6 +32,7 @@ import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
 import getCombinedRelay from "../helpers/getCombinedRelay";
 import getPercentage from "../helpers/getPercentage";
+import { greenGradient, redGradient } from "../styles/chartColor";
 
 ChartJS.register(
   CategoryScale,
@@ -54,27 +55,27 @@ const OfacBarChart = ({
   const barChartData: ChartData<"bar", number[], string> = useMemo(() => {
     const totalBlocksFromRelays = sumBy(relayStats, (stats) => stats.numBlocks);
 
-    const totalBlocks =
-      totalBlocksFromRelays + (isIncludingAllBlocks ? numBlocksSinceMerge : 0);
+    const totalBlocks = isIncludingAllBlocks
+      ? numBlocksSinceMerge
+      : totalBlocksFromRelays;
 
     const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
 
+    console.log("TOTAL", totalBlocksFromRelays, numBlocksSinceMerge);
     return {
-      labels: ["OFAC"],
+      labels: [""],
       datasets: isIncludingAllBlocks
         ? [
-            ...getFormattedDatasets(
-              [getCombinedRelay(isOfac, "OFAC Compliant")],
-              true,
-              totalBlocks,
-              true
-            ),
-            ...getFormattedDatasets(
-              [getCombinedRelay(notOfac, "Not OFAC Compliant")],
-              false,
-              totalBlocks,
-              true
-            ),
+            {
+              label: "OFAC Compliant",
+              backgroundColor: redGradient[0],
+              data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
+            },
+            {
+              label: "Not OFAC Compliant",
+              backgroundColor: greenGradient[0],
+              data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
+            },
             {
               label: "Non-MEV-Boost",
               backgroundColor: "#CBCBCB",
@@ -116,7 +117,7 @@ const OfacBarChart = ({
             fontWeight="bold"
             fontSize="1.5rem"
           >
-            % of Post-Merge OFAC Compliant Blocks
+            Post-Merge OFAC Compliant Blocks
           </Text>
           <Text color="#fff" textAlign="center" fontSize="1rem">
             {isIncludingAllBlocks
