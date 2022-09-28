@@ -6,6 +6,7 @@ import {
   Box,
   Image,
   HStack,
+  Link,
 } from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
@@ -15,6 +16,8 @@ import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 
 import { AiTwotoneHeart } from "react-icons/ai";
+
+const LABRYS_LINK = "https://labrys.io";
 
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
@@ -56,18 +59,22 @@ const Home = (props: RelayerResponseData) => {
           <Faq />
         </BodyContainer>
         <Footer>
-          <Flex alignItems="center">
-            <Text color="#fff" mb="10px" whiteSpace="nowrap">
-              Made with
-            </Text>
-            <Box mx="10px" mb="7px">
-              <AiTwotoneHeart color="red" size="20px" />
-            </Box>
-            <Text color="#fff" mb="10px" whiteSpace="nowrap">
-              by Labrys
-            </Text>
-          </Flex>
-          <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
+          <Link href={LABRYS_LINK} target="_blank">
+            <VStack align="center">
+            <Flex alignItems="center">
+              <Text color="#fff" mb="10px" whiteSpace="nowrap">
+                Made with
+              </Text>
+              <Box mx="10px" mb="7px">
+                <AiTwotoneHeart color="red" size="20px" />
+              </Box>
+              <Text color="#fff" mb="10px" whiteSpace="nowrap">
+                by Labrys
+              </Text>
+            </Flex>
+            <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
+            </VStack>
+          </Link>
         </Footer>
       </MainContainer>
     </Box>
