@@ -6,13 +6,21 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "../styles/theme";
 import MainContainer from "../components/MainContainer";
 
+import Head from "next/head";
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider theme={theme}>
-      <MainContainer>
-        <Component {...pageProps} />
-      </MainContainer>
-    </ChakraProvider>
+    <>
+      <Head>
+        <title>MEV Watch</title>
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </Head>
+      <ChakraProvider theme={theme}>
+        <MainContainer>
+          <Component {...pageProps} />
+        </MainContainer>
+      </ChakraProvider>
+    </>
   );
 }
 
