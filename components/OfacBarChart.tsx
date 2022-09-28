@@ -65,7 +65,7 @@ const OfacBarChart = ({
             {
               label: "Non-MEV-Boost",
               backgroundColor: "#CBCBCB",
-              data: [100 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
+              data: [1 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
             },
           ]
         : [
