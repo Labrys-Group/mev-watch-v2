@@ -2,13 +2,20 @@ import { ReactNode } from "react";
 import { Flex, chakra, Box, VStack, Image, Link, Text } from "@chakra-ui/react";
 import { AiTwotoneHeart } from "react-icons/ai";
 
+import { useRouter } from "next/router";
+
 const MainContainer = ({ children }: { children: ReactNode }) => {
   const LABRYS_LINK = "https://labrys.io";
+
+  const router = useRouter();
   return (
     <ImgBackground>
       <Background>
         <BodyContainer>{children}</BodyContainer>
         <Footer>
+          <Link color="white" href="/terms-of-use">
+            {router.pathname === "/terms-of-use" ? "" : "Terms of Use"}
+          </Link>
           <Link href={LABRYS_LINK} target="_blank">
             <VStack align="center">
               <Flex alignItems="center">
@@ -63,18 +70,17 @@ const BodyContainer = chakra(Flex, {
     minWidth: "600px",
     maxWidth: "1000px",
     width: "100%",
-    minHeight: "calc(100vh - 180px)",
+    minHeight: "calc(100vh - 200px)",
     flexDirection: "column",
     margin: "0 auto",
     alignItems: "center",
-    paddingTop: "80px",
+    paddingTop: "40px",
     paddingX: "20px",
   },
 });
 
 const Footer = chakra(VStack, {
   baseStyle: {
-    paddingTop: "50px",
-    paddingBottom: "30px",
+    paddingY: "30px",
   },
 });

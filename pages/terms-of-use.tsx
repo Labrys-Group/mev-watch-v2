@@ -8,6 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { IoIosArrowBack } from "react-icons/io";
+import { Title, StyledListItem, DefaultText } from "../styles/StyledComponents";
 
 const Disclaimer = () => {
   const router = useRouter();
@@ -19,9 +20,9 @@ const Disclaimer = () => {
         icon={<IoIosArrowBack size="2rem" />}
         onClick={() => router.push("/")}
       />
-      <DefaultText fontSize="3rem" fontWeight="bold" textAlign="center">
+      <Title fontSize="3rem" fontWeight="bold" textAlign="center">
         Disclaimer
-      </DefaultText>
+      </Title>
       <DefaultText>
         The information provided on this website does not, and is not intended
         to, constitute legal or financial advice. All information, content, and
@@ -85,23 +86,7 @@ const BackBtn = chakra(IconButton, {
     color: "#fff",
     _hover: {
       background: "transparent",
-      color: "green",
+      color: "brightGreen.500",
     },
-  },
-});
-
-const DefaultText = chakra(Text, {
-  baseStyle: {
-    fontSize: "16px",
-    marginBottom: "20px",
-    color: "#fff",
-  },
-});
-
-const StyledListItem = chakra(ListItem, {
-  baseStyle: {
-    fontSize: "16px",
-    margin: "0 0 10px 20px",
-    color: "#fff",
   },
 });

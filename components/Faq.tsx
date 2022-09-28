@@ -25,6 +25,11 @@ const markdownStyles = {
 
 const faqs: { title: string; content: string }[] = [
   {
+    title: "What is OFAC?",
+    content: `###  It stands for Office of Foreign Assets Control. It’s a financial intelligence and enforcement agency of the U.S. Treasury Department. It administers and enforces economic and trade sanctions in support of U.S. national security and foreign policy objectives.  
+###  In early August 2022, OFAC released this [statement](https://home.treasury.gov/news/press-releases/jy0916), effectively sanctioning Tornado Cash and several Ethereum addresses associated with it.`,
+  },
+  {
     title: "What is this metric?",
     content: `###  This metric tracks the percentage of blocks built by OFAC compliant mev-boost relays since the Merge (as a percentage of mev-boost proposed blocks or all blocks). 
 ### The Ethereum Merge that occurred on September 15, 2022, has enabled the rise of mev-boost due to the wider distribution of block proposers compared to a small set of miners in charge of block production under PoW. Mev-boost is a service that Ethereum POS Validators have the option to run to outsource their block production duties to the highest bidder, effectively increasing their APR. When setting up mev-boost, Validators add to their config which relays they would like to accept blocks from.    
