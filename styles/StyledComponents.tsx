@@ -1,4 +1,4 @@
-import { Text, ListItem, chakra } from "@chakra-ui/react";
+import { Text, ListItem, chakra, IconButton, Link } from "@chakra-ui/react";
 
 export const Title = chakra(Text, {
   baseStyle: {
@@ -29,5 +29,30 @@ export const DefaultText = chakra(Text, {
     fontFamily: "GT-America-Mono-Medium",
     color: "#fff",
     marginBottom: "20px",
+  },
+});
+
+export const StyledBtn = chakra(IconButton, {
+  baseStyle: {
+    position: "relative",
+    background: "transparent",
+    top: "0px",
+    left: "0px",
+    color: "#fff",
+    _hover: {
+      background: "transparent",
+      color: "brightGreen.500",
+    },
+  },
+});
+
+export const StyledLink = chakra(Link, {
+  baseStyle: {
+    color: "#fff",
+    marginX: "10px",
+    _hover: {
+      textDecor: "none",
+      color: "brightGreen.500",
+    },
   },
 });

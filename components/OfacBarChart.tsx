@@ -112,13 +112,13 @@ const OfacBarChart = ({
       </HStack>
 
       <Box
-        h="300px"
+        h="290px"
         bg="#0f0f0f"
         borderRadius="10px"
         border="1px solid #393939"
         p="20px 20px"
       >
-        <VStack h="155px">
+        <VStack h="140px">
           <Text
             color="#fff"
             textAlign="center"
@@ -135,12 +135,12 @@ const OfacBarChart = ({
           <Bar options={ofacBarChartOptions} data={barChartData} />
         </VStack>
         <HStack justify="center" mt="80px">
-          <IoWarning color="orange" size={24} />
+          <IoWarning color="#ff0" size={24} />
           <PercentBlocksText>
             {`${percentageCensoring}${
               isIncludingAllBlocks
-                ? "% of all blocks being censored"
-                : "% of mev-boost blocks censoring"
+                ? "% of all blocks being OFAC compliant"
+                : "% of mev-boost OFAC compliant blocks"
             }`}
           </PercentBlocksText>
         </HStack>

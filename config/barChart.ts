@@ -36,6 +36,9 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
           // Upscale the x-axis so that it correctly represents the percentage values, otherwise it will limit at 1%
           return `${parseFloat(val.toString()) * 100}%`;
         },
+        format: {
+          style: "percent",
+        },
       },
     },
     y: {
