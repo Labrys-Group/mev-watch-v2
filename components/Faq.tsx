@@ -7,13 +7,17 @@ import {
   Box,
   AccordionPanel,
 } from "@chakra-ui/react";
+import { ReactNode } from "react";
 import { AiOutlineRight, AiOutlineDown } from "react-icons/ai";
 import ReactMarkdown from "react-markdown";
 
 const faqs: { title: string; content: string }[] = [
   {
     title: "What is this metric?",
-    content: "Not implemented",
+    content: `This metric tracks the percentage of blocks built by OFAC compliant mev-boost relays since the Merge (as a percentage of mev-boost proposed blocks or all blocks).  
+    The Ethereum Merge that occurred on September 15, 2022, has enabled the rise of mev-boost due to the wider distribution of block proposers compared to a small set of miners in charge of block production under PoW. Mev-boost is a service that Ethereum POS Validators have the option to run to outsource their block production duties to the highest bidder, effectively increasing their APR. When setting up mev-boost, Validators add to their config which relays they would like to accept blocks from.  
+    There are currently seven major mev-boost relays including Flashbots, BloXroute Max Profit, BloXroute Ethical, BloXroute Regulated, BlockNative, Manifold and Eden. Of the 7 available major relays only 3 do not censor according to OFAC compliance requirements. OFAC compliant relays will not include any transactions that interact with the Tornado Cash smart contract or other sanctioned wallet addresses as designated by OFAC.  
+    Not all blocks built by OFAC compliant relays are censoring, however, all blocks built by OFAC compliant relays will censor when non-compliant transactions are broadcast to the network.`,
   },
   {
     title: "What can I do as a Validator?",
@@ -21,12 +25,15 @@ const faqs: { title: string; content: string }[] = [
   },
   {
     title: "How is OFAC compliance (censorship) status determined?",
-    content: "Not implemented",
+    content: `You can find a list of available mev relays and their OFAC status [here](https://github.com/remyroy/ethstaker/blob/main/MEV-relay-list.md).  
+    
+      If you are a relay operator and believe your relay’s compliance with OFAC has been miscategorised, please reach out and we will update its OFAC compliance status.
+      `,
   },
   {
     title: "Is Labrys aginst regulation?",
     content:
-      "No. Regulation is inevitable as the crypto industry matures. All persons and entities within the United States, all U.S. incorporated entities and their foreign branches who operate Ethereum POS validators should seek their own advice on whether their validators must produce OFAC compliant blocks.However, ensuring that Ethereum remains credibly neutral on the global stage is important. All persons and entities operating validators outside of the U.S. should consider running non-censoring relays for the benefit of the network.",
+      "No. Regulation is inevitable as the crypto industry matures. All persons and entities within the United States, all U.S. incorporated entities and their foreign branches who operate Ethereum POS validators should seek their own advice on whether their validators must produce OFAC compliant blocks. However, ensuring that Ethereum remains credibly neutral on the global stage is important. All persons and entities operating validators outside of the U.S. should consider running non-censoring relays for the benefit of the network.",
   },
 ];
 
@@ -51,6 +58,7 @@ const Faq = () => {
               </AccordionButton>
               <AccordionPanel>
                 <Box color="white" ml="40px">
+                  {/* {faq.content} */}
                   <ReactMarkdown>{faq.content}</ReactMarkdown>
                 </Box>
               </AccordionPanel>

@@ -30,10 +30,14 @@ const Home = (props: RelayerResponseData) => {
     >
       <MainContainer>
         <BodyContainer>
-          <Title>MEV-Boost Relay Observer</Title>
+          <Title>MEV-Boost Relay Watch</Title>
           <SubTitle>
             Some MEV-Boost relays have declared compliance with OFAC sanctions
             and will censor certain transactions.
+          </SubTitle>
+          <SubTitle>
+            Use this tool to observe the effect it&#39;s having on Ethereum
+            blocks
           </SubTitle>
           <OfacBarChart
             numBlocksSinceMerge={props.response.numBlocksSinceMerge}
@@ -139,6 +143,7 @@ const SubTitle = chakra(Text, {
     noOfLines: 2,
     width: "500px",
     color: "#fff",
+    marginBottom: "20px",
   },
 });
 
