@@ -24,6 +24,9 @@ import {
   chakra,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
+import { IoWarning} from "react-icons/io5";
+
+
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
@@ -122,12 +125,21 @@ const OfacBarChart = ({
           </Text>
         </VStack>
         <Bar options={ofacBarChartOptions} data={barChartData} />
-        {/* <Text textAlign="center" color="white">
-          of mev-boost blocks censoring
-        </Text> */}
+        <HStack justify="center">
+        <IoWarning color="orange" size={24} />
+        <PercentBlocksText>__% of mev-boost blocks censoring</PercentBlocksText>
+        </HStack>
       </Box>
     </Flex>
   );
 };
+
+
+const PercentBlocksText = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    color: "white",
+  },
+});
 
 export default OfacBarChart;
