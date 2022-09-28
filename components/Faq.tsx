@@ -11,9 +11,15 @@ import { AiOutlineRight, AiOutlineDown } from "react-icons/ai";
 import ReactMarkdown from "react-markdown";
 
 const markdownStyles = {
-  h3: ({ node, ...props }: { node: any }) => <p style={{ margin: "10px 0"}} {...props} />,
+  h3: ({ node, ...props }: { node: any }) => (
+    <p style={{ margin: "10px 0" }} {...props} />
+  ),
   a: ({ node, ...props }: { node: any }) => (
-    <a style={{ color: "#15bfe3", textDecoration: "underline" }} {...props} />
+    <a
+      target="_blank"
+      style={{ color: "#15bfe3", textDecoration: "underline" }}
+      {...props}
+    />
   ),
 };
 
@@ -35,9 +41,8 @@ const faqs: { title: string; content: string }[] = [
   },
   {
     title: "How is OFAC compliance (censorship) status determined?",
-    content: `You can find a list of available mev relays and their OFAC status [here](https://github.com/remyroy/ethstaker/blob/main/MEV-relay-list.md).  
-    If you are a relay operator and believe your relay’s compliance with OFAC has been miscategorised, please reach out and we will update its OFAC compliance status.
-      `,
+    content: `### You can find a list of available mev relays and their OFAC status [here](https://github.com/remyroy/ethstaker/blob/main/MEV-relay-list.md).  
+### If you are a relay operator and believe your relay’s compliance with OFAC has been miscategorised, please reach out and we will update its OFAC compliance status.`,
   },
   {
     title: "Is Labrys aginst regulation?",
