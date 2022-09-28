@@ -4,9 +4,9 @@ const axisProps = {
   stacked: true,
   beginAtZero: true,
   max: 1,
-  grid: {
-    // color: "#fff",
-  },
+  // grid: {
+  //   // color: "#fff",
+  // },
 };
 
 export const ofacBarChartOptions: ChartOptions<"bar"> = {
@@ -14,6 +14,11 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
   plugins: {
     legend: {
       onClick: () => null,
+    },
+    tooltip: {
+      titleFont: {
+        size: 0,
+      },
     },
   },
   maintainAspectRatio: false,
