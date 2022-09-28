@@ -29,14 +29,14 @@ const Home = (props: RelayerResponseData) => {
       backgroundSize="cover"
       w="100vw"
       minH="100vh"
-      minW="700px"
+      minW="600px"
     >
       <MainContainer>
         <BodyContainer>
-          <Title>MEV-Boost Relay Watch</Title>
+          <Title>MEV Watch</Title>
           <SubTitle>
-            Some MEV-Boost relays have declared compliance with OFAC sanctions
-            and will censor certain transactions.
+            Some MEV-Boost relays are regulated under OFAC and will censor
+            certain transactions.
           </SubTitle>
           <SubTitle>
             Use this tool to observe the effect it&#39;s having on Ethereum
@@ -53,7 +53,7 @@ const Home = (props: RelayerResponseData) => {
             </Text>
             <SubTitle color="#fff" textAlign="left" w="auto">
               Keep Ethereum credibly neutral by adopting a non-censoring
-              mev-boost rely.
+              mev-boost relay.
             </SubTitle>
           </Note>
           <Faq />
@@ -120,7 +120,7 @@ const MainContainer = chakra(Flex, {
 
 const BodyContainer = chakra(Flex, {
   baseStyle: {
-    minWidth: "700px",
+    minWidth: "600px",
     maxWidth: "1000px",
     width: "100%",
     minHeight: "calc(100vh - 180px)",
@@ -152,7 +152,7 @@ const SubTitle = chakra(Text, {
     noOfLines: 2,
     width: "500px",
     color: "#fff",
-    marginBottom: "20px",
+    marginBottom: "10px",
   },
 });
 

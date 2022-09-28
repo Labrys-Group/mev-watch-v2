@@ -12,7 +12,17 @@ import {
 import { Bar } from "react-chartjs-2";
 import { RelayStats } from "../types/relays";
 import { ofacBarChartOptions } from "../config/barChart";
-import { Box, HStack, Stack, Switch, useBoolean, Text } from "@chakra-ui/react";
+import {
+  Box,
+  HStack,
+  Stack,
+  Switch,
+  useBoolean,
+  Text,
+  VStack,
+  Flex,
+  chakra,
+} from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
@@ -51,13 +61,13 @@ const OfacBarChart = ({
       datasets: isIncludingAllBlocks
         ? [
             ...getFormattedDatasets(
-              [getCombinedRelay(isOfac, "Censoring Relays")],
+              [getCombinedRelay(isOfac, "OFAC Compliant")],
               true,
               totalBlocks,
               true
             ),
             ...getFormattedDatasets(
-              [getCombinedRelay(notOfac, "Non-Censoring")],
+              [getCombinedRelay(notOfac, "Not OFAC Compliant")],
               false,
               totalBlocks,
               true
@@ -77,38 +87,46 @@ const OfacBarChart = ({
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
 
   return (
-    <Stack w="100%" my="20px">
-      <HStack justifyContent="flex-end" mb="20px">
+    <Flex flexDir="column" w="100%" mt="100px" h="40vh">
+      <HStack justifyContent="flex-end" mb="5px">
         <Switch
           onChange={setIsIncludingAllBlocks.toggle}
           isChecked={isIncludingAllBlocks}
           colorScheme="teal"
         />
-        <Text color="#fff" w="130px" textAlign="end">
+        <Text color="#fff" w="140px" textAlign="end" whiteSpace="nowrap">
           Include all Blocks
         </Text>
       </HStack>
 
       <Box
-        h="230px"
+        h="260px"
         bg="#0f0f0f"
-        my="20px"
         borderRadius="10px"
         border="1px solid #393939"
-        p="20px 20px 70px"
+        p="20px 20px 130px"
       >
-        <Text
-          color="#fff"
-          textAlign="center"
-          fontWeight="bold"
-          fontSize="1.5rem"
-          mb="10px"
-        >
-          OFAC Censoring Blocks
-        </Text>
+        <VStack mb="20px" h="70px">
+          <Text
+            color="#fff"
+            textAlign="center"
+            fontWeight="bold"
+            fontSize="1.5rem"
+          >
+            % of Post-Merge OFAC Compliant Blocks
+          </Text>
+          <Text color="#fff" textAlign="center" fontSize="1rem">
+            {isIncludingAllBlocks
+              ? "( all post-merge blocks )"
+              : "( mev-boost relay blocks only )"}
+          </Text>
+        </VStack>
         <Bar options={ofacBarChartOptions} data={barChartData} />
+        {/* <Text textAlign="center" color="white">
+          of mev-boost blocks censoring
+        </Text> */}
       </Box>
-    </Stack>
+    </Flex>
   );
 };
 

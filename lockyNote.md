@@ -14,7 +14,9 @@
 - Consider not including any relays in your mev-boost configuration that censor transactions. Current major mev-boost relays that don’t censor include: - [BloXroute Max Profit](https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com)
   ​ - [BloxRoute Ethical](https://0xad0a8bb54565c2211cee576363f3a347089d2f07cf72679d16911d740262694cadb62d7fd7483f27afd714ca0f1b9118@bloxroute.ethical.blxrbdn.com)
   ​ - [Manifold](https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com)
-  ​
+  ​<span style="color:blue">
+  [Manifold](https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com)
+  </span>.
 
 ## How is OFAC compliance status determined?
 
