@@ -9,8 +9,6 @@ import OfacBarChart from "../components/OfacBarChart";
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
-  console.log(props);
-
   return (
     <Box
       backgroundImage="/gradientBg.png"
