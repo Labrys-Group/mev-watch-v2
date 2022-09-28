@@ -84,7 +84,7 @@ const OfacBarChart = ({
           isChecked={isIncludingAllBlocks}
           colorScheme="teal"
         />
-        <Text color="#fff" w="130px" textAlign="end">
+        <Text color="#fff" w="150px" textAlign="end">
           {isIncludingAllBlocks ? "Include" : "Exclude"} all Blocks
         </Text>
       </HStack>
