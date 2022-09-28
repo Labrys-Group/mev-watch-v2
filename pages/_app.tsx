@@ -7,6 +7,7 @@ import { theme } from "../styles/theme";
 import MainContainer from "../components/MainContainer";
 
 import Head from "next/head";
+import Script from "next/script";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -27,6 +28,19 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="og:image:width" content="1233" />
         <meta name="og:image:height" content="1233" />
       </Head>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-542FSGYLE8"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-542FSGYLE8');
+        `}
+      </Script>
       <ChakraProvider theme={theme}>
         <MainContainer>
           <Component {...pageProps} />
