@@ -1,47 +1,54 @@
-import { Stack, Text } from "@chakra-ui/react";
-import { formatNumberForDisplay } from "../helpers/parser";
+import { Text, Flex, VStack, chakra, Box, Image } from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "../constants/common";
 import { ProviderSingleton } from "../constants/provider";
+import Faq from "../components/Faq";
+import OfacBarChart from "../components/OfacBarChart";
 
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
   return (
-    <Stack flexDirection={"column"}>
-      <Stack>
-        <Text>BLOCKS SINCE MERGE: {props.response.numBlocksSinceMerge}</Text>
-      </Stack>
-      {/* Table to demonstrate correctness, can be removed */}
-      <Stack alignItems={"center"} flexDirection={"row"}>
-        <Text w={250} fontWeight={"bold"}>
-          Relay
-        </Text>
-        <Text w={80} fontWeight={"bold"}>
-          # Blocks
-        </Text>
-        <Text w={80} fontWeight={"bold"}>
-          Total Value (ETH)
-        </Text>
-        <Text w={80} fontWeight={"bold"}>
-          Avg. Block Value
-        </Text>
-        <Text w={80} fontWeight={"bold"}>
-          OFAC Compliant
-        </Text>
-      </Stack>
+    <Box
+      backgroundImage="/gradientBg.png"
+      backgroundPosition="center"
+      backgroundSize="cover"
+      w="100vw"
+      minH="100vh"
+      minW="700px"
+    >
+      <MainContainer>
+        <BodyContainer>
+          <Title>MEV-Boost Relay Observer</Title>
+          <SubTitle>
+            Some MEV-Boost relays have declared compliance with OFAC sanctions
+            and will censor certain transactions.
+          </SubTitle>
+          <OfacBarChart
+            numBlocksSinceMerge={props.response.numBlocksSinceMerge}
+            relayStats={props.response.relayStats}
+          />
 
-      {props.response.relayStats.map((item) => (
-        <Stack alignItems={"center"} flexDirection={"row"} key={item.name}>
-          <Text w={250}>{item.name}</Text>
-          <Text w={80}>{formatNumberForDisplay(item.numBlocks)}</Text>
-          <Text w={80}>{formatNumberForDisplay(item.totalValueETH)}</Text>
-          <Text w={80}>{formatNumberForDisplay(item.avgBlockValue)}</Text>
-          <Text w={80}>{item.ofacCompliant ? "Yes" : "No"}</Text>
-        </Stack>
-      ))}
-    </Stack>
+          <Note>
+            <Text fontWeight="bold" color="#00FFA7">
+              Protocol level censorship = Bad
+            </Text>
+            <Text color="#fff">
+              Keep Ethereum credibly neutral by adopting a non-censoring
+              mev-boost rely.
+            </Text>
+          </Note>
+          <Faq />
+        </BodyContainer>
+        <Footer>
+          <Text color="#fff" mb="10px">
+            Made by Labrys
+          </Text>
+          <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
+        </Footer>
+      </MainContainer>
+    </Box>
   );
 };
 
@@ -71,3 +78,64 @@ export async function getServerSideProps(): Promise<{
     },
   };
 }
+
+const MainContainer = chakra(Flex, {
+  baseStyle: {
+    flexDirection: "column",
+    margin: "0 auto",
+    backgroundColor: "#0000007e",
+    minHeight: "100vh",
+    width: "100%",
+  },
+});
+
+const BodyContainer = chakra(Flex, {
+  baseStyle: {
+    minWidth: "700px",
+    maxWidth: "1000px",
+    width: "100%",
+    minHeight: "calc(100vh - 180px)",
+    flexDirection: "column",
+    margin: "0 auto",
+    alignItems: "center",
+    paddingTop: "80px",
+    paddingX: "20px",
+  },
+});
+
+const Title = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    fontSize: "3rem",
+    fontWeight: "bold",
+    background:
+      "linear-gradient(to right, #00FFD3 0%, #71FFE0 50%, #FFFF00 100%)",
+    "-webkit-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+  },
+});
+
+const SubTitle = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    noOfLines: 2,
+    width: "500px",
+    color: "#fff",
+  },
+});
+
+const Note = chakra(Flex, {
+  baseStyle: {
+    flexDirection: "column",
+    width: "100%",
+    marginTop: "50px",
+    marginBottom: "20px",
+  },
+});
+
+const Footer = chakra(VStack, {
+  baseStyle: {
+    paddingTop: "50px",
+    paddingBottom: "30px",
+  },
+});

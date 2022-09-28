@@ -1,9 +1,9 @@
 export interface RelayStats {
   name: string;
   numBlocks: number;
-  totalValueETH: number;
-  avgBlockValue: number;
-  ofacCompliant: boolean;
+  totalValueETH?: number;
+  avgBlockValue?: number;
+  ofacCompliant?: boolean;
 }
 
 export type GenericResponse<T> =
@@ -14,3 +14,9 @@ export type RelayerResponseData = GenericResponse<{
   relayStats: RelayStats[];
   numBlocksSinceMerge: number;
 }>;
+
+export interface DatasetEntry {
+  label: string;
+  backgroundColor: string;
+  data: number[];
+}

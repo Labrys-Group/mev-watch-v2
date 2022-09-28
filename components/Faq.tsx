@@ -26,7 +26,7 @@ const faqs: { title: string; content: string }[] = [
 
 const Faq = () => {
   return (
-    <Accordion allowMultiple w="100%" maxW="700px" mt="30px">
+    <Accordion allowMultiple w="100%" mt="30px">
       {faqs.map((faq) => (
         <AccordionItem key={faq.title} py="10px">
           {({ isExpanded }) => (
