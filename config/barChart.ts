@@ -5,7 +5,7 @@ const axisProps = {
   beginAtZero: true,
   max: 100,
   grid: {
-    color: "rgba(0, 0, 0, 0)",
+    color: "#fff",
   },
 };
 
@@ -18,6 +18,7 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
   },
   maintainAspectRatio: false,
   responsive: true,
+  color: "#fff",
   scales: {
     x: axisProps,
     y: {

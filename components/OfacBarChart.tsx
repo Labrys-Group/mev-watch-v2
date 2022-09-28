@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,17 +12,13 @@ import {
 import { Bar } from "react-chartjs-2";
 import { RelayStats } from "../types/relays";
 import { ofacBarChartOptions } from "../config/barChart";
-import {
-  Box,
-  Button,
-  HStack,
-  Stack,
-  Switch,
-  useBoolean,
-  Text,
-} from "@chakra-ui/react";
+import { Box, HStack, Stack, Switch, useBoolean, Text } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
+
+import getFormattedDatasets from "../helpers/getFormattedDatasets";
+import getCombinedRelay from "../helpers/getCombinedRelay";
+import getPercentage from "../helpers/getPercentage";
 
 ChartJS.register(
   CategoryScale,
@@ -33,45 +29,7 @@ ChartJS.register(
   Legend
 );
 
-interface DatasetEntry {
-  label: string;
-  backgroundColor: string;
-  data: number[];
-}
-
-const getBackgroundColor = (
-  isOfacCompliant: boolean,
-  index: number,
-  total: number
-) => {
-  // Adjusting the opacity of the row based on its index and the rows are ordered by numBlocks
-  const opacity = 1.2 - index / total;
-
-  return isOfacCompliant
-    ? `rgba(255, 0, 0, ${opacity})`
-    : `rgba(0, 255, 0, ${opacity})`;
-};
-
-const getFormattedDatasets = (
-  relayStats: RelayStats[],
-  totalBlocks: number,
-  isOfacCompliant: boolean
-): DatasetEntry[] =>
-  relayStats.map((relay, idx) => {
-    const percentageOfBlocks = (relay.numBlocks / totalBlocks) * 100;
-
-    return {
-      label: relay.name,
-      backgroundColor: getBackgroundColor(
-        isOfacCompliant,
-        idx,
-        relayStats.length
-      ),
-      data: [percentageOfBlocks],
-    };
-  });
-
-export const OfacBarChart = ({
+const OfacBarChart = ({
   relayStats,
   numBlocksSinceMerge,
 }: {
@@ -90,29 +48,67 @@ export const OfacBarChart = ({
 
     return {
       labels: ["OFAC"],
-      datasets: [
-        // Display all the OFAC compliant relays first and then the non-OFAC relays
-        ...getFormattedDatasets(isOfac, totalBlocks, true),
-        ...getFormattedDatasets(notOfac, totalBlocks, false),
-      ],
+      datasets: isIncludingAllBlocks
+        ? [
+            ...getFormattedDatasets(
+              [getCombinedRelay(isOfac, "Censoring Relays")],
+              true,
+              totalBlocks,
+              true
+            ),
+            ...getFormattedDatasets(
+              [getCombinedRelay(notOfac, "Non-Censoring")],
+              false,
+              totalBlocks,
+              true
+            ),
+            {
+              label: "Non-MEV-Boost",
+              backgroundColor: "#CBCBCB",
+              data: [100 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
+            },
+          ]
+        : [
+            // Display all the OFAC compliant relays first and then the non-OFAC relays
+            ...getFormattedDatasets(isOfac, true, totalBlocks, false),
+            ...getFormattedDatasets(notOfac, false, totalBlocks, false),
+          ],
     };
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
 
   return (
-    <Stack py="20px" w="100%">
-      <HStack justifyContent="flex-end">
+    <Stack w="100%" my="20px">
+      <HStack justifyContent="flex-end" mb="20px">
         <Switch
           onChange={setIsIncludingAllBlocks.toggle}
           isChecked={isIncludingAllBlocks}
           colorScheme="teal"
         />
         <Text color="#fff" w="130px" textAlign="end">
-          {isIncludingAllBlocks ? "Exclude" : "Include"} all Blocks
+          {isIncludingAllBlocks ? "Include" : "Exclude"} all Blocks
         </Text>
       </HStack>
-      <Box h={200}>
+
+      <Box
+        h="230px"
+        bg="#0f0f0f"
+        my="20px"
+        borderRadius="10px"
+        border="1px solid #393939"
+        p="20px 20px 70px"
+      >
+        <Text
+          color="#fff"
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="1.5rem"
+        >
+          OFAC Censoring Blocks
+        </Text>
         <Bar options={ofacBarChartOptions} data={barChartData} />
       </Box>
     </Stack>
   );
 };
+
+export default OfacBarChart;

@@ -4,9 +4,9 @@ import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "../constants/common";
 import { ProviderSingleton } from "../constants/provider";
 import Faq from "../components/Faq";
-import { OfacBarChart } from "../components/OfacBarChart";
+import OfacBarChart from "../components/OfacBarChart";
 
-const Styled = (props: RelayerResponseData) => {
+const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
 
   return (
@@ -14,9 +14,12 @@ const Styled = (props: RelayerResponseData) => {
       backgroundImage="/gradientBg.png"
       backgroundPosition="center"
       backgroundSize="cover"
+      w="100vw"
+      minH="100vh"
+      minW="700px"
     >
-      <Box backgroundColor="#0000008f">
-        <MainContainer>
+      <MainContainer>
+        <BodyContainer>
           <Title>MEV-Boost Relay Observer</Title>
           <SubTitle>
             Some MEV-Boost relays have declared compliance with OFAC sanctions
@@ -37,19 +40,19 @@ const Styled = (props: RelayerResponseData) => {
             </Text>
           </Note>
           <Faq />
-          <Footer>
-            <Text color="#fff" mb="10px">
-              Made by Labrys
-            </Text>
-            <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
-          </Footer>
-        </MainContainer>
-      </Box>
+        </BodyContainer>
+        <Footer>
+          <Text color="#fff" mb="10px">
+            Made by Labrys
+          </Text>
+          <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
+        </Footer>
+      </MainContainer>
     </Box>
   );
 };
 
-export default Styled;
+export default Home;
 
 export async function getServerSideProps(): Promise<{
   props: RelayerResponseData;
@@ -78,12 +81,25 @@ export async function getServerSideProps(): Promise<{
 
 const MainContainer = chakra(Flex, {
   baseStyle: {
-    maxWidth: "1000px",
     flexDirection: "column",
-    margin: "auto",
+    margin: "0 auto",
+    backgroundColor: "#0000007e",
+    minHeight: "100vh",
+    width: "100%",
+  },
+});
+
+const BodyContainer = chakra(Flex, {
+  baseStyle: {
+    minWidth: "700px",
+    maxWidth: "1000px",
+    width: "100%",
+    minHeight: "calc(100vh - 180px)",
+    flexDirection: "column",
+    margin: "0 auto",
     alignItems: "center",
     paddingTop: "80px",
-    height: "100vh",
+    paddingX: "20px",
   },
 });
 
@@ -119,7 +135,7 @@ const Note = chakra(Flex, {
 
 const Footer = chakra(VStack, {
   baseStyle: {
-    position: "absolute",
-    bottom: "50px",
+    paddingTop: "50px",
+    paddingBottom: "30px",
   },
 });
