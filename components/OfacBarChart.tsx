@@ -84,8 +84,8 @@ const OfacBarChart = ({
           isChecked={isIncludingAllBlocks}
           colorScheme="teal"
         />
-        <Text color="#fff" w="150px" textAlign="end">
-          {isIncludingAllBlocks ? "Include" : "Exclude"} all Blocks
+        <Text color="#fff" w="130px" textAlign="end">
+          Include all Blocks
         </Text>
       </HStack>
 
@@ -102,6 +102,7 @@ const OfacBarChart = ({
           textAlign="center"
           fontWeight="bold"
           fontSize="1.5rem"
+          mb="10px"
         >
           OFAC Censoring Blocks
         </Text>
