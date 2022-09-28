@@ -5,7 +5,7 @@ const axisProps = {
   beginAtZero: true,
   max: 1,
   grid: {
-    color: "#fff",
+    // color: "#fff",
   },
 };
 

@@ -1,10 +1,20 @@
-import { Text, Flex, VStack, chakra, Box, Image } from "@chakra-ui/react";
+import {
+  Text,
+  Flex,
+  VStack,
+  chakra,
+  Box,
+  Image,
+  HStack,
+} from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "../constants/common";
 import { ProviderSingleton } from "../constants/provider";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
+
+import { AiTwotoneHeart } from "react-icons/ai";
 
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
@@ -34,17 +44,25 @@ const Home = (props: RelayerResponseData) => {
             <Text fontWeight="bold" color="#00FFA7">
               Protocol level censorship = Bad
             </Text>
-            <Text color="#fff">
+            <SubTitle color="#fff" textAlign="left" w="auto">
               Keep Ethereum credibly neutral by adopting a non-censoring
               mev-boost rely.
-            </Text>
+            </SubTitle>
           </Note>
           <Faq />
         </BodyContainer>
         <Footer>
-          <Text color="#fff" mb="10px">
-            Made by Labrys
-          </Text>
+          <Flex alignItems="center">
+            <Text color="#fff" mb="10px" whiteSpace="nowrap">
+              Made with
+            </Text>
+            <Box mx="10px" mb="7px">
+              <AiTwotoneHeart color="red" size="20px" />
+            </Box>
+            <Text color="#fff" mb="10px" whiteSpace="nowrap">
+              by Labrys
+            </Text>
+          </Flex>
           <Image src="/LabrysLogo.png" alt="Labrys" height={50} width={70} />
         </Footer>
       </MainContainer>
@@ -105,6 +123,7 @@ const BodyContainer = chakra(Flex, {
 
 const Title = chakra(Text, {
   baseStyle: {
+    fontFamily: "GT-America-Extended-Bold",
     textAlign: "center",
     fontSize: "3rem",
     fontWeight: "bold",
@@ -117,6 +136,7 @@ const Title = chakra(Text, {
 
 const SubTitle = chakra(Text, {
   baseStyle: {
+    fontFamily: "GT-America-Mono-Medium",
     textAlign: "center",
     noOfLines: 2,
     width: "500px",
