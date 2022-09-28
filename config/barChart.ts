@@ -3,7 +3,7 @@ import { ChartOptions } from "chart.js";
 const axisProps = {
   stacked: true,
   beginAtZero: true,
-  max: 100,
+  max: 1,
   grid: {
     // color: "#fff",
   },
@@ -20,7 +20,18 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
   responsive: true,
   color: "#fff",
   scales: {
-    x: axisProps,
+    x: {
+      ...axisProps,
+      ticks: {
+        callback: function (val: string | number, index: number) {
+          // Upscale the x-axis so that it correctly represents the percentage values, otherwise it will limit at 1%
+          return `${parseFloat(val.toString()) * 100}%`;
+        },
+        format: {
+          style: "percent",
+        },
+      },
+    },
     y: {
       ...axisProps,
       display: false,

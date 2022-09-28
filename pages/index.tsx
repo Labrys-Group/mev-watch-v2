@@ -48,10 +48,10 @@ const Home = (props: RelayerResponseData) => {
             <Text fontWeight="bold" color="#00FFA7">
               Protocol level censorship = Bad
             </Text>
-            <Text color="#fff">
+            <SubTitle color="#fff" textAlign="left" w="auto">
               Keep Ethereum credibly neutral by adopting a non-censoring
               mev-boost rely.
-            </Text>
+            </SubTitle>
           </Note>
           <Faq />
         </BodyContainer>
@@ -127,6 +127,7 @@ const BodyContainer = chakra(Flex, {
 
 const Title = chakra(Text, {
   baseStyle: {
+    fontFamily: "GT-America-Extended-Bold",
     textAlign: "center",
     fontSize: "3rem",
     fontWeight: "bold",
@@ -139,6 +140,7 @@ const Title = chakra(Text, {
 
 const SubTitle = chakra(Text, {
   baseStyle: {
+    fontFamily: "GT-America-Mono-Medium",
     textAlign: "center",
     noOfLines: 2,
     width: "500px",
