@@ -1,11 +1,10 @@
+import sumBy from "lodash/sumBy";
 import { RelayStats } from "../types/relays";
 
-const getPercentage = (relays: RelayStats[], totalBlocks: number) => {
-  let blocks = 0;
+const getPercentage = (relaysStats: RelayStats[], totalBlocks: number) => {
+  const blocks = sumBy(relaysStats, (relay) => relay.numBlocks);
 
-  relays.forEach((relay) => (blocks += relay.numBlocks));
-
-  return (blocks / totalBlocks) * 100;
+  return blocks / totalBlocks;
 };
 
 export default getPercentage;
