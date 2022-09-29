@@ -6,10 +6,9 @@ import { ProviderSingleton } from "../constants/provider";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import { Title, DefaultText } from "../styles/StyledComponents";
-import { useRouter } from "next/router";
 
 const Home = (props: RelayerResponseData) => {
-  if (!props.success) return <>Error Display</>;
+  if (!props.success) return <></>;
 
   return (
     <>

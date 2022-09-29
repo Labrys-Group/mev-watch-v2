@@ -1,19 +1,19 @@
-import { greenGradient, redGradient } from "../styles/chartColor";
+import { colors } from "../styles/theme";
+import { ColorGradient } from "../types";
 import { DatasetEntry, RelayStats } from "../types/relays";
 
 const getFormattedDatasets = (
   relaysStats: RelayStats[],
   isOfacCompliant: boolean,
-  totalBlocks: number,
-  combineRelays: boolean
+  totalBlocks: number
 ): DatasetEntry[] =>
   relaysStats.map((relay, index) => {
     const percentageOfBlocks = relay.numBlocks / totalBlocks;
-    console.log("THIS", percentageOfBlocks);
-    const colorGradient = !isOfacCompliant ? greenGradient : redGradient;
-    const backgroundColor = combineRelays
-      ? colorGradient[0]
-      : colorGradient[index];
+    const gradient = (index * 100 + 500) as ColorGradient;
+
+    const backgroundColor = isOfacCompliant
+      ? colors.red[gradient]
+      : colors.brightGreen[gradient];
 
     return {
       label: relay.name,

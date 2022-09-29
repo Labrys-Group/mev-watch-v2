@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-import "../styles/Home.module.css";
 
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -37,10 +36,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
-
+          
           gtag('config', 'G-542FSGYLE8');
-        `}
+          `}
       </Script>
+
       <ChakraProvider theme={theme}>
         <MainContainer>
           <Component {...pageProps} />

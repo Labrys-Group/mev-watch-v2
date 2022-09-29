@@ -15,7 +15,6 @@ import { ofacBarChartOptions } from "../config/barChart";
 import {
   Box,
   HStack,
-  Stack,
   Switch,
   useBoolean,
   Text,
@@ -30,7 +29,7 @@ import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
 import getPercentage from "../helpers/getPercentage";
-import { greenGradient, redGradient } from "../styles/chartColor";
+import { colors } from "../styles/theme";
 
 ChartJS.register(
   CategoryScale,
@@ -41,13 +40,13 @@ ChartJS.register(
   Legend
 );
 
-const OfacBarChart = ({
-  relayStats,
-  numBlocksSinceMerge,
-}: {
+interface OfacBarChartProps {
   relayStats: RelayStats[];
   numBlocksSinceMerge: number;
-}) => {
+}
+
+const OfacBarChart = (props: OfacBarChartProps) => {
+  const { relayStats, numBlocksSinceMerge } = props;
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
 
   const barChartData: ChartData<"bar", number[], string> = useMemo(() => {
@@ -65,12 +64,12 @@ const OfacBarChart = ({
         ? [
             {
               label: "OFAC Compliant",
-              backgroundColor: redGradient[0],
+              backgroundColor: colors.red[500],
               data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
             },
             {
               label: "Not OFAC Compliant",
-              backgroundColor: greenGradient[0],
+              backgroundColor: colors.brightGreen[500],
               data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
             },
             {
@@ -81,8 +80,8 @@ const OfacBarChart = ({
           ]
         : [
             // Display all the OFAC compliant relays first and then the non-OFAC relays
-            ...getFormattedDatasets(isOfac, true, totalBlocks, false),
-            ...getFormattedDatasets(notOfac, false, totalBlocks, false),
+            ...getFormattedDatasets(isOfac, true, totalBlocks),
+            ...getFormattedDatasets(notOfac, false, totalBlocks),
           ],
     };
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
