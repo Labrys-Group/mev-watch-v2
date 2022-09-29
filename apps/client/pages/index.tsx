@@ -1,7 +1,7 @@
 import { Text, Flex, chakra, Link } from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
-import { BLOCK_NUMBER_OF_MERGE } from "../constants/common";
+import { BLOCK_NUMBER_OF_MERGE } from "consts";
 import { ProviderSingleton } from "../constants/provider";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";

@@ -17,7 +17,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      // TODO: Not ideal work around here, resolves type issues in some files
+      "consts": [
+        "../../packages/consts/src"
+      ],
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -26,5 +32,5 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

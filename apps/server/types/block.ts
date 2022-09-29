@@ -10,10 +10,10 @@ export interface RawBlock {
 }
 
 export interface Block {
-  number: number;
+  blockNumber: number;
   hash: string;
   parentHash: string;
-  miner: string;
+  relayAddress: string;
   gasLimit: number;
   gasUsed: number;
   timestamp: number;

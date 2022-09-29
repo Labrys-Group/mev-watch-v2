@@ -1,4 +1,4 @@
-import { connect } from "database";
+import { connect, BlockStatsModel } from "database";
 import { ProviderSingleton } from "utils";
 
 import { RawBlock, Block } from "../types";
@@ -7,21 +7,29 @@ import { RawBlock, Block } from "../types";
 const parseHexString = (value: string) => parseInt(value, 16);
 
 const parseRawBlock = (rawBlock: RawBlock): Block => ({
-  ...rawBlock,
-  number: parseHexString(rawBlock.number),
-  gasLimit: parseHexString(rawBlock.gasLimit),
+  hash: rawBlock.hash,
+  // Remapping this name to something more familiar
+  relayAddress: rawBlock.miner,
+  parentHash: rawBlock.parentHash,
+  baseFeePerGas: rawBlock.baseFeePerGas,
   gasUsed: parseHexString(rawBlock.gasUsed),
+  gasLimit: parseHexString(rawBlock.gasLimit),
+  blockNumber: parseHexString(rawBlock.number),
   timestamp: parseHexString(rawBlock.timestamp),
 });
 
-connect();
+const main = async () => {
+  await connect();
+  // Directly using the subscribe method on the provider here as ethers provider.on("block") method actually deletes all of the block data apart from the number ...weird
+  ProviderSingleton.websocketProvider._subscribe(
+    "block",
+    ["newHeads"],
+    async (rawBlock: RawBlock) => {
+      const block = parseRawBlock(rawBlock);
 
-// Directly using the subscribe method on the provider here as ethers provider.on("block") method actually deletes all of the block data apart from the number ...weird
-// ProviderSingleton.websocketProvider._subscribe(
-//   "block",
-//   ["newHeads"],
-//   (rawBlock: RawBlock) => {
-//     const block = parseRawBlock(rawBlock);
-//     console.log(block);
-//   }
-// );
+      await BlockStatsModel.create(block);
+    }
+  );
+};
+
+main();
