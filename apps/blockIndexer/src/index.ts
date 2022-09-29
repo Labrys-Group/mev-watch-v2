@@ -47,7 +47,9 @@ const main = async () => {
       const block = parseRawBlock(rawBlock);
       await BlockStatsModel.create(block);
 
-      console.log(`Processed block ${block.blockNumber}`);
+      console.log(
+        `Processed block ${block.blockNumber} @ ${new Date().toUTCString()}`
+      );
     }
   );
 };

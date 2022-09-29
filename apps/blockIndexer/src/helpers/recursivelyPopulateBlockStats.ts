@@ -53,6 +53,7 @@ export const recursivelyPopulateBlockData = async (
       return;
     }
 
+    console.log("Finished recursive block data updating \n");
     return;
   }
 
