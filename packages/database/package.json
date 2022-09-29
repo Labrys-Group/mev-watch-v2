@@ -1,0 +1,21 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --project tsconfig.build.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@typegoose/typegoose": "^9.7.1",
+    "mongoose": "^6.2.9"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.3",
+    "tsconfig": "*"
+  }
+}

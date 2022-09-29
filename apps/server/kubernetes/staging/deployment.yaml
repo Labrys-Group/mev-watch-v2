@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-template-server
+spec:
+  template:
+    spec:
+      containers:
+        - name: repo-template-server
+          image: <image-name> # from the Artefact registry push step

@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: repo-template-managed-cert
+spec:
+  domains:
+    - "https://project-slug.labrys.group" # `production_url` from Terraform output

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-template-server
+spec:
+  selector:
+    matchLabels:
+      app: repo-template-server
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: repo-template-server
+    spec:
+      containers:
+        - name: repo-template-server
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: env
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 3

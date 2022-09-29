@@ -1,0 +1,9 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: repo-template-server-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: project-slug-staging-ip # `staging_ip_name` from Terraform output
+spec:
+  rules:
+    - host: "https://project-slug-staging.labrys.group" # `staging_url` from Terraform output

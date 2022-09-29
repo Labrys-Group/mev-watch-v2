@@ -1,0 +1,6 @@
+bases:
+  - ../base
+patchesStrategicMerge:
+  - deployment.yaml
+  - managedCertificate.yaml
+  - ingress.yaml
