@@ -1,5 +1,5 @@
 {
-  "name": "database",
+  "name": "utils",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -11,12 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@typegoose/typegoose": "^9.7.1",
-    "dotenv": "^16.0.2",
-    "mongoose": "^6.2.9"
-  },
-  "devDependencies": {
-    "tsconfig": "*",
-    "typescript": "^4.6.3"
+    "ethers": "^5.7.1"
   }
 }

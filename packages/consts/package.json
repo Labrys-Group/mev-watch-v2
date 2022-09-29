@@ -12,5 +12,8 @@
   "license": "ISC",
   "files": [
     "labrysAscii.js"
-  ]
+  ],
+  "dependencies": {
+    "ethers": "^5.7.1"
+  }
 }
