@@ -1,3 +1,5 @@
+import { BlockStats } from "database";
+
 export interface RawBlock {
   number: string; // Hex string
   hash: string;
@@ -9,13 +11,8 @@ export interface RawBlock {
   baseFeePerGas: string; // Hex string
 }
 
-export interface Block {
-  blockNumber: number;
+export interface ProcessedBlock extends BlockStats {
   hash: string;
   parentHash: string;
-  relayAddress: string;
   gasLimit: number;
-  gasUsed: number;
-  timestamp: number;
-  baseFeePerGas: string;
 }

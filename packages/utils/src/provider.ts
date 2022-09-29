@@ -1,9 +1,13 @@
 import { ethers } from "ethers";
 
-const apiKey = "82e55c9bb5284d6d8a109daad92d0b29";
+// Real key
+// const apiKey = "82e55c9bb5284d6d8a109daad92d0b29";
+const apiKey = "f7d929e14e3e4a5990e88be8a1758c21";
 
 export class ProviderSingleton {
   static #provider: ethers.providers.InfuraProvider | null = null;
+
+  static #batchProvider: ethers.providers.JsonRpcBatchProvider | null = null;
 
   static #websocketProvider: ethers.providers.InfuraWebSocketProvider | null =
     null;
@@ -29,5 +33,15 @@ export class ProviderSingleton {
     }
 
     return this.#websocketProvider;
+  }
+
+  static get batchProvider() {
+    if (!this.#batchProvider) {
+      this.#batchProvider = new ethers.providers.JsonRpcBatchProvider(
+        `https://mainnet.infura.io/v3/${apiKey}`
+      );
+    }
+
+    return this.#batchProvider;
   }
 }

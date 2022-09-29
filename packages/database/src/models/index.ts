@@ -1,2 +1,2 @@
-export * from "./Relayers";
+export * from "./Relayer";
 export * from "./BlockStats";

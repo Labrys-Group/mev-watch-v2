@@ -1,19 +1,17 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 
 export class BlockStats {
+  // This could've optionally been a ref to the Relayer class but it's likely we will have to retrospectively add relayers and that will then require parsing all the old data and updating records
   @prop({ required: true })
-  // TODO: Petition to change to a ref
   public relayAddress!: string;
 
   @prop({ required: true })
   public blockNumber!: number;
 
-  // TODO: Block fees??
-
   @prop({ required: true })
   public gasUsed!: number;
 
-  @prop({ default: Date.now() })
+  @prop({ required: true })
   // Using ts as a field name enables mongoDB to recognize this model as a time-series model
   public ts!: Date;
 }
