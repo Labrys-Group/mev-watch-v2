@@ -49,14 +49,12 @@ export const recursivelyPopulateBlockData = async (
     const currentBlockNumber = await provider.getBlockNumber();
 
     if (currentBlockNumber > fromBlock) {
-      console.log("HERE");
-      await recursivelyPopulateBlockData(finalBlockNumber, currentBlockNumber);
-    } else {
+      await recursivelyPopulateBlockData(fromBlock, currentBlockNumber);
       return;
     }
-  }
 
-  console.log("22");
+    return;
+  }
 
   await recursivelyPopulateBlockData(fromBlock, finalBlockNumber);
 };

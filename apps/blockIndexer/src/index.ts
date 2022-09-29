@@ -32,23 +32,24 @@ const main = async () => {
     })
     .limit(1);
 
-  console.log(lastBlockStatsInserted);
-
+  console.log("Updating database to have all blocks\n");
   await recursivelyPopulateBlockData(
     lastBlockStatsInserted?.blockNumber ?? BLOCK_NUMBER_OF_MERGE,
     currentBlockNumber
   );
 
-  // // Directly using the subscribe method on the provider here as ethers provider.on("block") method actually deletes all of the block data apart from the number ...weird
-  // ProviderSingleton.websocketProvider._subscribe(
-  //   "block",
-  //   ["newHeads"],
-  //   async (rawBlock: RawBlock) => {
-  //     const block = parseRawBlock(rawBlock);
+  console.log("Starting WSS connection for new blocks\n");
+  // Directly using the subscribe method on the provider here as ethers provider.on("block") method actually deletes all of the block data apart from the number ...weird
+  ProviderSingleton.websocketProvider._subscribe(
+    "block",
+    ["newHeads"],
+    async (rawBlock: RawBlock) => {
+      const block = parseRawBlock(rawBlock);
+      await BlockStatsModel.create(block);
 
-  //     await BlockStatsModel.create(block);
-  //   }
-  // );
+      console.log(`Processed block ${block.blockNumber}`);
+    }
+  );
 };
 
 main();

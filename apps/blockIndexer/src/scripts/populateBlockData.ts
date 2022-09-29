@@ -11,6 +11,8 @@ const main = async (initialiseBlockNumber: number) => {
   const finalBlockNumber = await provider.getBlockNumber();
 
   await recursivelyPopulateBlockData(initialiseBlockNumber, finalBlockNumber);
+
+  console.log("Done!");
 };
 
 main(15638929);
