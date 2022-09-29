@@ -1,5 +1,3 @@
-import labrysAscii from "./labrysAscii";
-
-export { labrysAscii };
-
+export * as labrysAscii from "./labrysAscii";
 export * from "./block";
+export * from "./relayers";

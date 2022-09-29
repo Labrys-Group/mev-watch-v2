@@ -23,6 +23,9 @@
       "consts": [
         "../../packages/consts/src"
       ],
+      "database": [
+        "../../packages/database/src"
+      ],
     }
   },
   "include": [

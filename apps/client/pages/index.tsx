@@ -1,4 +1,4 @@
-import { Text, Flex, chakra, Link } from "@chakra-ui/react";
+import { Text, Flex, chakra } from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "consts";
@@ -6,7 +6,6 @@ import { ProviderSingleton } from "../constants/provider";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import { Title, DefaultText } from "../styles/StyledComponents";
-import { useRouter } from "next/router";
 
 const Home = (props: RelayerResponseData) => {
   if (!props.success) return <>Error Display</>;
