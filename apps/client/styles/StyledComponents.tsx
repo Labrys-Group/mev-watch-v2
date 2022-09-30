@@ -39,6 +39,13 @@ export const DefaultText = chakra(Text, {
   },
 });
 
+export const LabrysGreenText = chakra(Text, {
+  baseStyle: {
+    fontFamily: "GT-America-Mono-Medium",
+    color: "#00FFA7",
+  },
+});
+
 export const StyledIconBtn = chakra(IconButton, {
   baseStyle: {
     position: "relative",

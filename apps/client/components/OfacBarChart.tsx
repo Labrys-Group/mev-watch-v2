@@ -14,7 +14,6 @@ import { useQuery } from "react-query";
 
 import { ofacBarChartOptions } from "../config/barChart";
 import {
-  Box,
   HStack,
   Switch,
   useBoolean,
@@ -22,6 +21,7 @@ import {
   VStack,
   Flex,
   chakra,
+  Button,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
@@ -33,7 +33,8 @@ import getPercentage from "../helpers/getPercentage";
 import axios from "axios";
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
 import { colors } from "../styles/theme";
-import { DefaultText } from "../styles/StyledComponents";
+import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
+import { timeFrames } from "consts";
 
 ChartJS.register(
   CategoryScale,
@@ -126,51 +127,57 @@ const OfacBarChart = () => {
   }
 
   return (
-    <Flex flexDir="column" w="100%" my="40px">
-      <HStack justifyContent="flex-end" m="0 10px 5px 0">
-        <Switch
-          size="sm"
-          onChange={setIsIncludingAllBlocks.toggle}
-          isChecked={isIncludingAllBlocks}
-          colorScheme="brightGreen"
-        />
-        <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+    <Flex
+      flexDir="column"
+      w="100%"
+      bg="#0f0f0f"
+      borderRadius="10px"
+      border="1px solid #393939"
+      p="30px 20px"
+      my="40px"
+    >
+      <VStack h="200px" border="1px solid red">
+        <Text
+          color="white"
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="1.5rem"
+        >
+          Post-Merge OFAC Compliant Blocks
+        </Text>
+        <Bar options={ofacBarChartOptions} data={barChartData} />
+      </VStack>
+
+      <HStack justify="center" mt="80px" border="1px solid red">
+        <IoWarning color="#ff0" size={24} />
+        <PercentBlocksText>
+          {`${percentageCensoring}${
+            isIncludingAllBlocks
+              ? "% enforced OFAC compliance"
+              : "% (relayed blocks) enforcing OFAC compliance"
+          }`}
+        </PercentBlocksText>
       </HStack>
 
-      <Box
-        h="290px"
-        bg="#0f0f0f"
-        borderRadius="10px"
-        border="1px solid #393939"
-        p="20px 20px"
-      >
-        <VStack h="140px">
-          <Text
-            color="white"
-            textAlign="center"
-            fontWeight="bold"
-            fontSize="1.5rem"
-          >
-            Post-Merge OFAC Compliant Blocks
-          </Text>
-          <Text color="white" textAlign="center" fontSize="1rem">
-            {isIncludingAllBlocks
-              ? "( all post-merge blocks )"
-              : "( mev-boost relay blocks only )"}
-          </Text>
-          <Bar options={ofacBarChartOptions} data={barChartData} />
-        </VStack>
-        <HStack justify="center" mt="80px">
-          <IoWarning color="#ff0" size={24} />
-          <PercentBlocksText>
-            {`${percentageCensoring}${
-              isIncludingAllBlocks
-                ? "% enforced OFAC compliance"
-                : "% (relayed blocks) enforcing OFAC compliance"
-            }`}
-          </PercentBlocksText>
+      <HStack justifyContent="space-between" border="1px solid red" py="20px">
+        <HStack>
+          <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
+          {timeFrames.map((timeFrame) => (
+            <Button onClick={() => alert(timeFrame.value)}>
+              {timeFrame.labe}
+            </Button>
+          ))}
         </HStack>
-      </Box>
+        <HStack>
+          <Switch
+            size="sm"
+            onChange={setIsIncludingAllBlocks.toggle}
+            isChecked={isIncludingAllBlocks}
+            colorScheme="brightGreen"
+          />
+          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+        </HStack>
+      </HStack>
     </Flex>
   );
 };
