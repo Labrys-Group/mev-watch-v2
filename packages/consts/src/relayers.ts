@@ -14,12 +14,12 @@ export const relayerData: Relayer[] = [
   {
     addresses: ["0x199d5ed7f45f4ee35960cf22eade2076e95b253f"],
     name: "BloXroute:: Regulated",
-    isOfacCensoring: false,
+    isOfacCensoring: true,
   },
   {
     addresses: ["0xaab27b150451726ec7738aa1d0a94505c8729bd1"],
     name: "Eden Network",
-    isOfacCensoring: false,
+    isOfacCensoring: true,
   },
   {
     addresses: [
@@ -36,6 +36,6 @@ export const relayerData: Relayer[] = [
       "0x690b9a9e9aa1c9db991c7721a92d351db4fac990",
     ],
     name: "Flashbots",
-    isOfacCensoring: false,
+    isOfacCensoring: true,
   },
 ];

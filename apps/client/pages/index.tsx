@@ -1,5 +1,4 @@
 import { Text, Flex, chakra } from "@chakra-ui/react";
-import { RelayerResponseData } from "../types/relays";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import { Title, DefaultText, StyledBtn } from "../styles/StyledComponents";

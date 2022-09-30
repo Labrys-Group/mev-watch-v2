@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,10 +11,10 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useQuery } from "react-query";
+import axios from "axios";
 
 import { ofacBarChartOptions } from "../config/barChart";
 import {
-  Box,
   HStack,
   Switch,
   useBoolean,
@@ -22,18 +22,18 @@ import {
   VStack,
   Flex,
   chakra,
+  Button,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
-import getFormattedDatasets from "../helpers/getFormattedDatasets";
-import getPercentage from "../helpers/getPercentage";
-import axios from "axios";
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
-import { colors } from "../styles/theme";
-import { DefaultText } from "../styles/StyledComponents";
+import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
+import { getBarChartData } from "../helpers/getBarChartData";
+
+import { timeFrames } from "consts";
 
 ChartJS.register(
   CategoryScale,
@@ -44,9 +44,24 @@ ChartJS.register(
   Legend
 );
 
+interface DateRange {
+  startTime: number;
+  endTime: number;
+}
+
+const getNowInUnix = () => Math.floor(Date.now() / 1000);
+
 const OfacBarChart = () => {
-  const { data: blockStatsResponse, isLoading } = useQuery(["todos"], () =>
-    axios.get<GetBlockStatsResponse>("/api/blockStats")
+  const [dateRange, setDateRange] = useState<DateRange>({
+    startTime: 0,
+    endTime: getNowInUnix(),
+  });
+
+  const { data: blockStatsResponse } = useQuery(["todos", dateRange], () =>
+    axios.post<GetBlockStatsResponse>("/api/blockStats", {
+      startTime: dateRange.startTime,
+      endTime: dateRange.endTime,
+    })
   );
 
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
@@ -55,47 +70,11 @@ const OfacBarChart = () => {
     useMemo(() => {
       if (!blockStatsResponse) return null;
 
-      const {
-        data: { relayStats, totalBlocks },
-      } = blockStatsResponse;
-
-      const totalBlocksFromRelays = sumBy(
-        relayStats,
-        (stats) => stats.numBlocks
+      return getBarChartData(
+        blockStatsResponse.data.relayStats,
+        blockStatsResponse.data.totalBlocks,
+        isIncludingAllBlocks
       );
-
-      // const totalBlocks = isIncludingAllBlocks
-      //   ? numBlocksSinceMerge
-      //   : totalBlocksFromRelays;
-
-      const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
-
-      return {
-        labels: [""],
-        datasets: isIncludingAllBlocks
-          ? [
-              {
-                label: "OFAC Compliant",
-                backgroundColor: colors.brightRed[500],
-                data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
-              },
-              {
-                label: "Not OFAC Compliant",
-                backgroundColor: colors.brightGreen[500],
-                data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
-              },
-              {
-                label: "Non-MEV-Boost",
-                backgroundColor: "#CBCBCB",
-                data: [1 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
-              },
-            ]
-          : [
-              // Display all the OFAC compliant relays first and then the non-OFAC relays
-              ...getFormattedDatasets(isOfac, true, totalBlocks),
-              ...getFormattedDatasets(notOfac, false, totalBlocks),
-            ],
-      };
     }, [isIncludingAllBlocks, blockStatsResponse]);
 
   const percentageCensoring = useMemo(() => {
@@ -106,71 +85,72 @@ const OfacBarChart = () => {
       (stats) => stats.numBlocks
     );
 
-    // const totalBlocks = isIncludingAllBlocks
-    //   ? numBlocksSinceMerge
-    //   : totalBlocksFromRelays;
+    const totalBlocks = isIncludingAllBlocks
+      ? blockStatsResponse.data.totalBlocks
+      : totalBlocksFromRelays;
 
     const { isOfac } = sortAndDivideOfacRelays(
       blockStatsResponse.data.relayStats
     );
-    return Math.floor(
-      (100 * sumBy(isOfac, (o) => o.numBlocks)) /
-        blockStatsResponse.data.totalBlocks
-    );
+    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [isIncludingAllBlocks, blockStatsResponse]);
-
-  // TODO: Loader
 
   if (!barChartData) {
     return <Flex>Loading...</Flex>;
   }
 
   return (
-    <Flex flexDir="column" w="100%" my="40px">
-      <HStack justifyContent="flex-end" m="0 10px 5px 0">
-        <Switch
-          size="sm"
-          onChange={setIsIncludingAllBlocks.toggle}
-          isChecked={isIncludingAllBlocks}
-          colorScheme="brightGreen"
-        />
-        <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+    <Flex
+      flexDir="column"
+      w="100%"
+      bg="#0f0f0f"
+      borderRadius="10px"
+      border="1px solid #393939"
+      p="30px 20px"
+      my="40px"
+    >
+      <VStack h="200px" border="1px solid red">
+        <Text
+          color="white"
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="1.5rem"
+        >
+          Post-Merge OFAC Compliant Blocks
+        </Text>
+        <Bar options={ofacBarChartOptions} data={barChartData} />
+      </VStack>
+
+      <HStack justify="center" mt="80px" border="1px solid red">
+        <IoWarning color="#ff0" size={24} />
+        <PercentBlocksText>
+          {`${percentageCensoring}${
+            isIncludingAllBlocks
+              ? "% enforced OFAC compliance"
+              : "% (relayed blocks) enforcing OFAC compliance"
+          }`}
+        </PercentBlocksText>
       </HStack>
 
-      <Box
-        h="290px"
-        bg="#0f0f0f"
-        borderRadius="10px"
-        border="1px solid #393939"
-        p="20px 20px"
-      >
-        <VStack h="140px">
-          <Text
-            color="white"
-            textAlign="center"
-            fontWeight="bold"
-            fontSize="1.5rem"
-          >
-            Post-Merge OFAC Compliant Blocks
-          </Text>
-          <Text color="white" textAlign="center" fontSize="1rem">
-            {isIncludingAllBlocks
-              ? "( all post-merge blocks )"
-              : "( mev-boost relay blocks only )"}
-          </Text>
-          <Bar options={ofacBarChartOptions} data={barChartData} />
-        </VStack>
-        <HStack justify="center" mt="80px">
-          <IoWarning color="#ff0" size={24} />
-          <PercentBlocksText>
-            {`${percentageCensoring}${
-              isIncludingAllBlocks
-                ? "% enforced OFAC compliance"
-                : "% (relayed blocks) enforcing OFAC compliance"
-            }`}
-          </PercentBlocksText>
+      <HStack justifyContent="space-between" border="1px solid red" py="20px">
+        <HStack>
+          <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
+          {timeFrames.map((timeFrame) => (
+            <Button onClick={() => alert(timeFrame.value)}>
+              {timeFrame.labe}
+            </Button>
+          ))}
         </HStack>
-      </Box>
+        <HStack>
+          <Switch
+            size="sm"
+            onChange={setIsIncludingAllBlocks.toggle}
+            isChecked={isIncludingAllBlocks}
+            colorScheme="brightGreen"
+          />
+          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+        </HStack>
+      </HStack>
     </Flex>
   );
 };

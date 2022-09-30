@@ -1,5 +1,6 @@
 export interface RelayStats {
   name: string;
+  address: string;
   numBlocks: number;
   isOfacCensoring: boolean;
 }

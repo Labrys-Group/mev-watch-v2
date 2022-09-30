@@ -6,7 +6,7 @@ import { BlockStatsModel, connect, RelayerModel } from "database/dist";
 import { TypedNextApiRequest } from "../../types/api";
 import { processRelayStats } from "../../helpers/api/processRelayStats";
 import { maxBy, minBy } from "lodash";
-import { RelayStats } from "../../types/relays";
+import { RelayStats } from "../../types";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -58,6 +58,8 @@ export default async (
     ?.blockNumber as number;
 
   const totalBlocks = lastBlockNumber - firstBlockNumber;
+
+  console.log("Total blocks: ", totalBlocks);
 
   const relayers = await RelayerModel.find();
 

@@ -1,10 +1,10 @@
 import type { NextApiRequest } from "next";
 
 // Not sure why this field is just set to any by the NextApiRequest
-export type TypedNextApiRequest<Params = any, Body = any> = Omit<
+export type TypedNextApiRequest<Query = any, Body = any> = Omit<
   NextApiRequest,
-  "body" | "params"
+  "body" | "query"
 > & {
-  params: Params;
   body: Body;
+  query: Query;
 };

@@ -1,5 +1,5 @@
 import { Relayer, BlockStats } from "database";
-import { Dictionary, keyBy, groupBy, forEach, sumBy } from "lodash";
+import { Dictionary, keyBy, groupBy, forEach, sumBy, map } from "lodash";
 import { RelayStats } from "../../types/relays";
 
 type ExpandedRelayer = Omit<Relayer, "addresses"> & { address: string };
@@ -22,7 +22,7 @@ const getRelayerMapping = (
     }
   }
 
-  return keyBy(expandedRelayers, (relayer) => relayer.address);
+  return keyBy(expandedRelayers, (relayer) => relayer.address.toLowerCase());
 };
 
 export const processRelayStats = (
@@ -38,27 +38,30 @@ export const processRelayStats = (
 
   const relayStats: RelayStats[] = [];
 
-  forEach(groupedStats, (allRelayStats, relayAddress) => {
-    const totalNumBlocks = sumBy(
-      allRelayStats,
-      (relayStats) => relayStats.blockNumber
-    );
-
+  forEach(groupedStats, (allRelayBlocks, relayAddress) => {
     const foundRelayer: ExpandedRelayer | undefined =
-      relayerMapping[relayAddress];
+      relayerMapping[relayAddress.toLowerCase()];
 
-    if (!foundRelayer) {
-      // TODO: How to handle
-    } else {
+    if (foundRelayer) {
       relayStats.push({
         name: foundRelayer.name,
-        numBlocks: totalNumBlocks,
+        numBlocks: allRelayBlocks.length,
+        address: relayAddress,
         isOfacCensoring: foundRelayer.isOfacCensoring,
       });
     }
   });
 
-  // TODO: We need to aggregate the relayers with names again, we will have duplicate name entries
+  const groupedRelayStatsByName = groupBy(relayStats, (relay) => relay.name);
 
-  return relayStats;
+  return map(groupedRelayStatsByName, (relayStats, relayName): RelayStats => {
+    const firstRelayStats = relayStats[0];
+
+    return {
+      address: firstRelayStats.address,
+      name: relayName,
+      isOfacCensoring: firstRelayStats.isOfacCensoring,
+      numBlocks: sumBy(relayStats, (stats) => stats.numBlocks),
+    };
+  });
 };
