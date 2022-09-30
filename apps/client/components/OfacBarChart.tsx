@@ -57,7 +57,7 @@ const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
   const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
-    timeFrames[0]
+    timeFrames[timeFrames.length - 1]
   );
 
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -65,11 +65,13 @@ const OfacBarChart = () => {
     endTime: getNowInUnix(),
   });
 
-  const { data: blockStatsResponse } = useQuery(["todos", dateRange], () =>
-    axios.post<GetBlockStatsResponse>("/api/blockStats", {
-      startTime: dateRange.startTime,
-      endTime: dateRange.endTime,
-    })
+  const { data: blockStatsResponse } = useQuery(
+    ["todos", selectedTimeFrame.value],
+    () =>
+      axios.post<GetBlockStatsResponse>("/api/blockStats", {
+        startTime: selectedTimeFrame.value,
+        endTime: getNowInUnix(),
+      })
   );
 
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
@@ -104,7 +106,11 @@ const OfacBarChart = () => {
   }, [isIncludingAllBlocks, blockStatsResponse]);
 
   if (!barChartData) {
-    return <Flex>Loading...</Flex>;
+    return (
+      <Flex>
+        <Text>Loading...</Text>
+      </Flex>
+    );
   }
 
   return (

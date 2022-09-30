@@ -1,5 +1,5 @@
-import sub from "date-fns/sub";
 import getUnixTime from "date-fns/getUnixTime";
+import sub from "date-fns/sub";
 
 // TODO: theres a duplicate type, fix it later
 export interface TimeFrame {
