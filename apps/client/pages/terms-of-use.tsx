@@ -1,11 +1,4 @@
-import {
-  ListItem,
-  OrderedList,
-  Text,
-  chakra,
-  IconButton,
-  Box,
-} from "@chakra-ui/react";
+import { OrderedList, chakra, IconButton, Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { IoIosArrowBack } from "react-icons/io";
 import { Title, StyledListItem, DefaultText } from "../styles/StyledComponents";

@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-import "../styles/Home.module.css";
 
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -26,7 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Some MEV-Boost relays are regulated under OFAC and will censor certain transactions. Use this tool to observe the effect it's having on Ethereum blocks."
         />
         <meta name="twitter:creator" content="@labrys_io" />
-        <meta name="twitter:title" content="Labrys MEV Watch" />
+        <meta name="twitter:title" content="MEV Watch" />
         <meta name="og:image" content="https://www.mevwatch.info/preview.png" />
         <meta name="og:image:width" content="1233" />
         <meta name="og:image:height" content="1233" />
@@ -40,10 +39,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
-
+          
           gtag('config', 'G-542FSGYLE8');
-        `}
+          `}
       </Script>
+
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <MainContainer>

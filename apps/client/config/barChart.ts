@@ -25,7 +25,7 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
   },
   maintainAspectRatio: false,
   responsive: true,
-  color: "#fff",
+  color: "white",
   scales: {
     x: {
       ...axisProps,

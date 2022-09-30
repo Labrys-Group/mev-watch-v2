@@ -10,16 +10,12 @@ import {
   ChartData,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import {
-  RelayerResponseData,
-  RelayStats,
-  WebScrapedRelayStats,
-} from "../types/relays";
+import { useQuery } from "react-query";
+
 import { ofacBarChartOptions } from "../config/barChart";
 import {
   Box,
   HStack,
-  Stack,
   Switch,
   useBoolean,
   Text,
@@ -34,10 +30,10 @@ import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
 import getPercentage from "../helpers/getPercentage";
-import { greenGradient, redGradient } from "../styles/chartColor";
-import { useQuery } from "react-query";
 import axios from "axios";
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
+import { colors } from "../styles/theme";
+import { DefaultText } from "../styles/StyledComponents";
 
 ChartJS.register(
   CategoryScale,
@@ -80,12 +76,12 @@ const OfacBarChart = () => {
           ? [
               {
                 label: "OFAC Compliant",
-                backgroundColor: redGradient[0],
+                backgroundColor: colors.brightRed[500],
                 data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
               },
               {
                 label: "Not OFAC Compliant",
-                backgroundColor: greenGradient[0],
+                backgroundColor: colors.brightGreen[500],
                 data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
               },
               {
@@ -96,8 +92,8 @@ const OfacBarChart = () => {
             ]
           : [
               // Display all the OFAC compliant relays first and then the non-OFAC relays
-              ...getFormattedDatasets(isOfac, true, totalBlocks, false),
-              ...getFormattedDatasets(notOfac, false, totalBlocks, false),
+              ...getFormattedDatasets(isOfac, true, totalBlocks),
+              ...getFormattedDatasets(notOfac, false, totalBlocks),
             ],
       };
     }, [isIncludingAllBlocks, blockStatsResponse]);
@@ -130,16 +126,15 @@ const OfacBarChart = () => {
   }
 
   return (
-    <Flex flexDir="column" w="100%" my="20px">
-      <HStack justifyContent="flex-end" mb="5px">
+    <Flex flexDir="column" w="100%" my="40px">
+      <HStack justifyContent="flex-end" m="0 10px 5px 0">
         <Switch
+          size="sm"
           onChange={setIsIncludingAllBlocks.toggle}
           isChecked={isIncludingAllBlocks}
           colorScheme="brightGreen"
         />
-        <Text color="#fff" w="140px" textAlign="end" whiteSpace="nowrap">
-          Include all Blocks
-        </Text>
+        <DefaultText fontSize="14px">Include all Blocks</DefaultText>
       </HStack>
 
       <Box
@@ -151,14 +146,14 @@ const OfacBarChart = () => {
       >
         <VStack h="140px">
           <Text
-            color="#fff"
+            color="white"
             textAlign="center"
             fontWeight="bold"
             fontSize="1.5rem"
           >
             Post-Merge OFAC Compliant Blocks
           </Text>
-          <Text color="#fff" textAlign="center" fontSize="1rem">
+          <Text color="white" textAlign="center" fontSize="1rem">
             {isIncludingAllBlocks
               ? "( all post-merge blocks )"
               : "( mev-boost relay blocks only )"}
@@ -170,8 +165,8 @@ const OfacBarChart = () => {
           <PercentBlocksText>
             {`${percentageCensoring}${
               isIncludingAllBlocks
-                ? "% of all blocks being OFAC compliant"
-                : "% of mev-boost OFAC compliant blocks"
+                ? "% enforced OFAC compliance"
+                : "% (relayed blocks) enforcing OFAC compliance"
             }`}
           </PercentBlocksText>
         </HStack>
