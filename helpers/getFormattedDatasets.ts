@@ -12,7 +12,7 @@ const getFormattedDatasets = (
     const gradient = (index * 100 + 500) as ColorGradient;
 
     const backgroundColor = isOfacCompliant
-      ? colors.red[gradient]
+      ? colors.brightRed[gradient]
       : colors.brightGreen[gradient];
 
     return {

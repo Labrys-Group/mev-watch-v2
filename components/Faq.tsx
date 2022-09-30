@@ -14,9 +14,9 @@ import markdownStyles from "../styles/markdownStyles";
 
 const Faq = () => {
   return (
-    <Accordion allowMultiple defaultIndex={undefined} w="100%" mt="30px">
+    <Accordion allowMultiple defaultIndex={[-1]} w="100%" mt="30px">
       {faqs.map((faq) => (
-        <AccordionItem key={faq.title} py="10px" borderColor="#6d6d6d">
+        <AccordionItem key={faq.title} py="10px" borderColor="whiteAlpha.400">
           {({ isExpanded }) => (
             <Box>
               <AccordionButton>
@@ -26,7 +26,7 @@ const Faq = () => {
                   <AiOutlineRight color="#fff" />
                 )}
                 <Flex ml="20px">
-                  <Text fontWeight="bold" color="#fff" textAlign="left">
+                  <Text fontWeight="bold" color="white" textAlign="left">
                     {faq.title}
                   </Text>
                 </Flex>

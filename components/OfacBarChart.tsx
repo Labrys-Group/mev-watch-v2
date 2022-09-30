@@ -30,6 +30,7 @@ import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
 import getPercentage from "../helpers/getPercentage";
 import { colors } from "../styles/theme";
+import { DefaultText } from "../styles/StyledComponents";
 
 ChartJS.register(
   CategoryScale,
@@ -64,7 +65,7 @@ const OfacBarChart = (props: OfacBarChartProps) => {
         ? [
             {
               label: "OFAC Compliant",
-              backgroundColor: colors.red[500],
+              backgroundColor: colors.brightRed[500],
               data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
             },
             {
@@ -98,16 +99,15 @@ const OfacBarChart = (props: OfacBarChartProps) => {
   }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
 
   return (
-    <Flex flexDir="column" w="100%" my="20px">
-      <HStack justifyContent="flex-end" mb="5px">
+    <Flex flexDir="column" w="100%" my="40px">
+      <HStack justifyContent="flex-end" m="0 10px 5px 0">
         <Switch
+          size="sm"
           onChange={setIsIncludingAllBlocks.toggle}
           isChecked={isIncludingAllBlocks}
           colorScheme="brightGreen"
         />
-        <Text color="#fff" w="140px" textAlign="end" whiteSpace="nowrap">
-          Include all Blocks
-        </Text>
+        <DefaultText fontSize="14px">Include all Blocks</DefaultText>
       </HStack>
 
       <Box
@@ -119,14 +119,14 @@ const OfacBarChart = (props: OfacBarChartProps) => {
       >
         <VStack h="140px">
           <Text
-            color="#fff"
+            color="white"
             textAlign="center"
             fontWeight="bold"
             fontSize="1.5rem"
           >
             Post-Merge OFAC Compliant Blocks
           </Text>
-          <Text color="#fff" textAlign="center" fontSize="1rem">
+          <Text color="white" textAlign="center" fontSize="1rem">
             {isIncludingAllBlocks
               ? "( all post-merge blocks )"
               : "( mev-boost relay blocks only )"}
@@ -138,8 +138,8 @@ const OfacBarChart = (props: OfacBarChartProps) => {
           <PercentBlocksText>
             {`${percentageCensoring}${
               isIncludingAllBlocks
-                ? "% of all blocks being OFAC compliant"
-                : "% of mev-boost OFAC compliant blocks"
+                ? "% enforced OFAC compliance"
+                : "% (relayed blocks) enforcing OFAC compliance"
             }`}
           </PercentBlocksText>
         </HStack>

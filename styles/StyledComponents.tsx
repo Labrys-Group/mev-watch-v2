@@ -1,4 +1,11 @@
-import { Text, ListItem, chakra, IconButton, Link } from "@chakra-ui/react";
+import {
+  Text,
+  ListItem,
+  chakra,
+  Button,
+  IconButton,
+  Link,
+} from "@chakra-ui/react";
 
 export const Title = chakra(Text, {
   baseStyle: {
@@ -19,7 +26,7 @@ export const StyledListItem = chakra(ListItem, {
     fontSize: "16px",
     margin: "0 0 20px 20px",
     fontFamily: "GT-America-Mono-Medium",
-    color: "#fff",
+    color: "white",
   },
 });
 
@@ -27,18 +34,18 @@ export const DefaultText = chakra(Text, {
   baseStyle: {
     fontSize: "16px",
     fontFamily: "GT-America-Mono-Medium",
-    color: "#fff",
+    color: "white",
     marginBottom: "20px",
   },
 });
 
-export const StyledBtn = chakra(IconButton, {
+export const StyledIconBtn = chakra(IconButton, {
   baseStyle: {
     position: "relative",
     background: "transparent",
     top: "0px",
     left: "0px",
-    color: "#fff",
+    color: "white",
     _hover: {
       background: "transparent",
       color: "brightGreen.500",
@@ -46,9 +53,27 @@ export const StyledBtn = chakra(IconButton, {
   },
 });
 
+export const StyledBtn = chakra(Button, {
+  baseStyle: {
+    position: "relative",
+    background: "transparent",
+    border: "1px solid #00FFA7",
+    top: "0px",
+    left: "0px",
+    color: "white",
+    margin: "0 5px",
+    fontSize: "14px",
+    padding: "-5px 10px",
+    _hover: {
+      background: "#00FFA7",
+      color: "black",
+    },
+  },
+});
+
 export const StyledLink = chakra(Link, {
   baseStyle: {
-    color: "#fff",
+    color: "white",
     marginX: "10px",
     _hover: {
       textDecor: "none",

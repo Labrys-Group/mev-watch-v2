@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Some MEV-Boost relays are regulated under OFAC and will censor certain transactions. Use this tool to observe the effect it's having on Ethereum blocks."
         />
         <meta name="twitter:creator" content="@labrys_io" />
-        <meta name="twitter:title" content="Labrys MEV Watch" />
+        <meta name="twitter:title" content="MEV Watch" />
         <meta name="og:image" content="https://www.mevwatch.info/preview.png" />
         <meta name="og:image:width" content="1233" />
         <meta name="og:image:height" content="1233" />

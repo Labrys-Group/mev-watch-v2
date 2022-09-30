@@ -14,5 +14,5 @@ type ColorLookup = Record<ColorGradient, string>;
 
 export interface ColorTheme {
   brightGreen: ColorLookup;
-  red: ColorLookup;
+  brightRed: ColorLookup;
 }
