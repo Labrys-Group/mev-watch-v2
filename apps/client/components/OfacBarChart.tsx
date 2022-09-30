@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,6 +11,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useQuery } from "react-query";
+import axios from "axios";
 
 import { ofacBarChartOptions } from "../config/barChart";
 import {
@@ -28,12 +29,10 @@ import { IoWarning } from "react-icons/io5";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
-import getFormattedDatasets from "../helpers/getFormattedDatasets";
-import getPercentage from "../helpers/getPercentage";
-import axios from "axios";
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
-import { colors } from "../styles/theme";
 import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
+import { getBarChartData } from "../helpers/getBarChartData";
+
 import { timeFrames } from "consts";
 
 ChartJS.register(
@@ -45,9 +44,24 @@ ChartJS.register(
   Legend
 );
 
+interface DateRange {
+  startTime: number;
+  endTime: number;
+}
+
+const getNowInUnix = () => Math.floor(Date.now() / 1000);
+
 const OfacBarChart = () => {
-  const { data: blockStatsResponse, isLoading } = useQuery(["todos"], () =>
-    axios.get<GetBlockStatsResponse>("/api/blockStats")
+  const [dateRange, setDateRange] = useState<DateRange>({
+    startTime: 0,
+    endTime: getNowInUnix(),
+  });
+
+  const { data: blockStatsResponse } = useQuery(["todos", dateRange], () =>
+    axios.post<GetBlockStatsResponse>("/api/blockStats", {
+      startTime: dateRange.startTime,
+      endTime: dateRange.endTime,
+    })
   );
 
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
@@ -56,47 +70,11 @@ const OfacBarChart = () => {
     useMemo(() => {
       if (!blockStatsResponse) return null;
 
-      const {
-        data: { relayStats, totalBlocks },
-      } = blockStatsResponse;
-
-      const totalBlocksFromRelays = sumBy(
-        relayStats,
-        (stats) => stats.numBlocks
+      return getBarChartData(
+        blockStatsResponse.data.relayStats,
+        blockStatsResponse.data.totalBlocks,
+        isIncludingAllBlocks
       );
-
-      // const totalBlocks = isIncludingAllBlocks
-      //   ? numBlocksSinceMerge
-      //   : totalBlocksFromRelays;
-
-      const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
-
-      return {
-        labels: [""],
-        datasets: isIncludingAllBlocks
-          ? [
-              {
-                label: "OFAC Compliant",
-                backgroundColor: colors.brightRed[500],
-                data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
-              },
-              {
-                label: "Not OFAC Compliant",
-                backgroundColor: colors.brightGreen[500],
-                data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
-              },
-              {
-                label: "Non-MEV-Boost",
-                backgroundColor: "#CBCBCB",
-                data: [1 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
-              },
-            ]
-          : [
-              // Display all the OFAC compliant relays first and then the non-OFAC relays
-              ...getFormattedDatasets(isOfac, true, totalBlocks),
-              ...getFormattedDatasets(notOfac, false, totalBlocks),
-            ],
-      };
     }, [isIncludingAllBlocks, blockStatsResponse]);
 
   const percentageCensoring = useMemo(() => {
@@ -107,20 +85,15 @@ const OfacBarChart = () => {
       (stats) => stats.numBlocks
     );
 
-    // const totalBlocks = isIncludingAllBlocks
-    //   ? numBlocksSinceMerge
-    //   : totalBlocksFromRelays;
+    const totalBlocks = isIncludingAllBlocks
+      ? blockStatsResponse.data.totalBlocks
+      : totalBlocksFromRelays;
 
     const { isOfac } = sortAndDivideOfacRelays(
       blockStatsResponse.data.relayStats
     );
-    return Math.floor(
-      (100 * sumBy(isOfac, (o) => o.numBlocks)) /
-        blockStatsResponse.data.totalBlocks
-    );
+    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [isIncludingAllBlocks, blockStatsResponse]);
-
-  // TODO: Loader
 
   if (!barChartData) {
     return <Flex>Loading...</Flex>;

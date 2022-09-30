@@ -5,7 +5,7 @@ export class BlockStats {
   @prop({ required: true })
   public relayAddress!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, unique: true })
   public blockNumber!: number;
 
   @prop({ required: true })

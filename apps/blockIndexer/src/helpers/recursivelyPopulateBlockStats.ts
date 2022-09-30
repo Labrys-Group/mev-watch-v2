@@ -7,7 +7,7 @@ import { ProcessedBlock } from "../types";
 
 const provider = ProviderSingleton.batchProvider;
 
-const MAX_BATCH_SIZE = 100;
+const MAX_BATCH_SIZE = 500;
 
 const parseProviderBlock = (block: Block): ProcessedBlock => ({
   hash: block.hash,
