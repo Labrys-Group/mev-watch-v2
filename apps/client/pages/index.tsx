@@ -2,7 +2,7 @@ import { Text, Flex, chakra } from "@chakra-ui/react";
 import { RelayerResponseData } from "../types/relays";
 import { getRelayerStats } from "../helpers/getRelayerStats";
 import { BLOCK_NUMBER_OF_MERGE } from "consts";
-import { ProviderSingleton } from "../constants/provider";
+import { ProviderSingleton } from "utils";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import { Title, DefaultText } from "../styles/StyledComponents";

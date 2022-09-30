@@ -1,3 +1,4 @@
+import { BLOCK_NUMBER_OF_MERGE } from "consts";
 import { connect } from "database";
 import { ProviderSingleton } from "utils";
 
@@ -15,4 +16,4 @@ const main = async (initialiseBlockNumber: number) => {
   console.log("Done!");
 };
 
-main(15638929);
+main(BLOCK_NUMBER_OF_MERGE);

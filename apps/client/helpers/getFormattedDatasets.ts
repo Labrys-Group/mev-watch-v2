@@ -1,8 +1,8 @@
 import { greenGradient, redGradient } from "../styles/chartColor";
-import { DatasetEntry, RelayStats } from "../types/relays";
+import { DatasetEntry, WebScrapedRelayStats } from "../types/relays";
 
 const getFormattedDatasets = (
-  relaysStats: RelayStats[],
+  relaysStats: WebScrapedRelayStats[],
   isOfacCompliant: boolean,
   totalBlocks: number,
   combineRelays: boolean

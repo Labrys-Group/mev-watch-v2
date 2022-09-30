@@ -9,6 +9,9 @@ export const connect = async () => {
   if (!process.env.MONGO_URI)
     throw new Error("Missing Mongo DB Uri connection string");
 
-  await mongoose.connect(process.env.MONGO_URI);
+  if (!mongoose.connections[0].readyState) {
+    await mongoose.connect(process.env.MONGO_URI);
+  }
+
   console.log("MongoDB connected");
 };

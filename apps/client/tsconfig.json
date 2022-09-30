@@ -26,6 +26,9 @@
       "database": [
         "../../packages/database/src"
       ],
+      "utils": [
+        "../../packages/utils/src"
+      ],
     }
   },
   "include": [

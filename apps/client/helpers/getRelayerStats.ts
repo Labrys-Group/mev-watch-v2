@@ -2,7 +2,7 @@ import axios from "axios";
 import parse from "node-html-parser";
 import { isRelayerOfacCompliant } from "../config/ofacCensorship";
 import { GenericResponse } from "../types/relays";
-import { RelayStats } from "../types/relays";
+import { WebScrapedRelayStats } from "../types/relays";
 import { parseStringToNumber } from "./parser";
 
 /**
@@ -10,7 +10,7 @@ import { parseStringToNumber } from "./parser";
  * @returns The parsed data or an invalid response
  */
 export const getRelayerStats = async (): Promise<
-  GenericResponse<RelayStats[]>
+  GenericResponse<WebScrapedRelayStats[]>
 > => {
   const { data: mevBoostWebpage } = await axios.get(
     "https://www.mevboost.org/"
@@ -31,7 +31,7 @@ export const getRelayerStats = async (): Promise<
     };
   }
 
-  const relayStats: RelayStats[] = [];
+  const relayStats: WebScrapedRelayStats[] = [];
 
   validNodes[0].childNodes.forEach((node) => {
     // We only want the text element nodes here because all other nodeType's seem to be irrelevant for the data we are after

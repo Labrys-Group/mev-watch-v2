@@ -1,17 +1,17 @@
 import { orderBy } from "lodash";
-import { RelayStats } from "../types/relays";
+import { WebScrapedRelayStats } from "../types/relays";
 
 /**
  * Split the relays up into OFAC and non-OFAC, this simplifies the presentation of the relayData
  */
 export const sortAndDivideOfacRelays = (
-  relayStats: RelayStats[]
-): { isOfac: RelayStats[]; notOfac: RelayStats[] } => {
+  relayStats: WebScrapedRelayStats[]
+): { isOfac: WebScrapedRelayStats[]; notOfac: WebScrapedRelayStats[] } => {
   const sortedRelayStats = orderBy(relayStats, ["numBlocks"], "desc");
 
   return sortedRelayStats.reduce<{
-    isOfac: RelayStats[];
-    notOfac: RelayStats[];
+    isOfac: WebScrapedRelayStats[];
+    notOfac: WebScrapedRelayStats[];
   }>(
     (allRelays, currentRelay) => {
       if (currentRelay.ofacCompliant) {

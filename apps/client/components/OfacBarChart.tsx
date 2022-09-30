@@ -10,7 +10,7 @@ import {
   ChartData,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { RelayStats } from "../types/relays";
+import { WebScrapedRelayStats } from "../types/relays";
 import { ofacBarChartOptions } from "../config/barChart";
 import {
   Box,
@@ -45,7 +45,7 @@ const OfacBarChart = ({
   relayStats,
   numBlocksSinceMerge,
 }: {
-  relayStats: RelayStats[];
+  relayStats: WebScrapedRelayStats[];
   numBlocksSinceMerge: number;
 }) => {
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
