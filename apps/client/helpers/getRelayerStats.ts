@@ -28,6 +28,7 @@ export const getWebScrapedRelayerStats = async (): Promise<
     // TODO: Sentry
     return {
       success: false,
+      error: "No valid nodes",
     };
   }
 

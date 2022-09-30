@@ -9,7 +9,8 @@ import {
 } from "@chakra-ui/react";
 import { AiOutlineRight, AiOutlineDown } from "react-icons/ai";
 import ReactMarkdown from "react-markdown";
-import faqs from "../constants/faqContents";
+import { faqs } from "consts/dist";
+
 import markdownStyles from "../styles/markdownStyles";
 
 const Faq = () => {
