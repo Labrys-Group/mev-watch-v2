@@ -48,17 +48,6 @@ ChartJS.register(
   Legend
 );
 
-// {
-//   relayStats,
-//   numBlocksSinceMerge,
-// }: {
-//   relayStats: WebScrapedRelayStats[];
-//   numBlocksSinceMerge: number;
-// }
-
-// const relayStats: RelayStats[] = [];
-// const numBlocksSinceMerge: number = 0;
-
 const OfacBarChart = () => {
   const { data: blockStatsResponse, isLoading } = useQuery(["todos"], () =>
     axios.get<GetBlockStatsResponse>("/api/blockStats")
