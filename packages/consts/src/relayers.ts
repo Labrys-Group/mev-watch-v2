@@ -22,11 +22,6 @@ export const relayerData: Relayer[] = [
     isOfacCensoring: false,
   },
   {
-    addresses: ["0x690b9a9e9aa1c9db991c7721a92d351db4fac990"],
-    name: "Manifold Finance: Builder",
-    isOfacCensoring: false,
-  },
-  {
     addresses: [
       "0xdafea492d9c6733ae3d56b7ed1adb60692c98bc5",
       "0xb64a30399f7f6b0c154c2e7af0a3ec7b0a5b131a",
@@ -38,6 +33,7 @@ export const relayerData: Relayer[] = [
       "0xa7fdca7aa0b69927a34ec48ddcfe3d4c66ff0d94",
       "0xb646d87963da1fb9d192ddba775f24f33e857128",
       "0xc1612dc56c3e7e00d86c668df03904b7e59616c5",
+      "0x690b9a9e9aa1c9db991c7721a92d351db4fac990",
     ],
     name: "Flashbots",
     isOfacCensoring: false,
