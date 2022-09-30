@@ -1,0 +1,35 @@
+variables:
+  BASE_REPOSITORY: australia-southeast1-docker.pkg.dev/mev-watch/docker
+
+#################
+# Build Servers #
+#################
+
+.build_template:
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  script:
+    # log in to GCP service account
+    - echo $DEPLOY_KEY_FILE_PRODUCTION > service-account.json
+    - docker login -u _json_key -p "$(cat service-account.json)" https://australia-southeast1-docker.pkg.dev
+    - docker pull $LATEST_IMAGE_TAG || true # pull the previous image to use as cache
+    - docker build --cache-from $LATEST_IMAGE_TAG -t $LATEST_IMAGE_TAG -t $IMAGE_TAG -f $DOCKERFILE . # build the new image #
+    - docker push $IMAGE_TAG # push the new image
+    - docker push $LATEST_IMAGE_TAG
+
+build_production:
+  extends: .build_template
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feat/updated-data-fetching"' # TODO: change to main
+      changes:
+        - apps/blockIndexer/**/*
+        - packages/**/*
+  before_script:
+    - apk add nodejs npm
+    - npx turbo prune --scope=server --docker
+  variables:
+    IMAGE_TAG: $BASE_REPOSITORY/block-indexer:$CI_COMMIT_SHORT_SHA
+    LATEST_IMAGE_TAG: $BASE_REPOSITORY/block-indexer:latest
+    DOCKERFILE: apps/blockIndexer/Dockerfile
