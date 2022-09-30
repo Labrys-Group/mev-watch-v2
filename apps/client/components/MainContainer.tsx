@@ -54,7 +54,7 @@ export default MainContainer;
 
 const ImgBackground = chakra(Flex, {
   baseStyle: {
-    backgroundImage: "/gradientBg.png",
+    backgroundImage: "/mevinfo_background.png",
     backgroundPosition: "center",
     backgroundSize: "cover",
     width: "100vw",
@@ -67,7 +67,7 @@ const Background = chakra(Flex, {
   baseStyle: {
     flexDirection: "column",
     margin: "0 auto",
-    backgroundColor: "#0000007e",
+    // backgroundColor: "#0000007e",
     minHeight: "100vh",
     width: "100%",
   },

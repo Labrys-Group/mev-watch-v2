@@ -23,12 +23,11 @@ import {
   Flex,
   chakra,
   Button,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
-
-import getUnixTime from "date-fns/getUnixTime";
-import sub from "date-fns/sub";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
@@ -105,14 +104,7 @@ const OfacBarChart = () => {
     return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [isIncludingAllBlocks, blockStatsResponse]);
 
-  if (!barChartData) {
-    return (
-      <Flex>
-        <Text>Loading...</Text>
-      </Flex>
-    );
-  }
-
+  console.log("tHIS", barChartData);
   return (
     <Flex
       flexDir="column"
@@ -122,6 +114,7 @@ const OfacBarChart = () => {
       border="1px solid #393939"
       p="20px"
       my="40px"
+      boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
       <VStack h="130px">
         <Text
@@ -132,21 +125,31 @@ const OfacBarChart = () => {
         >
           Post-Merge OFAC Compliant Blocks
         </Text>
-        <Bar options={ofacBarChartOptions} data={barChartData} />
+        {barChartData ? (
+          <Bar options={ofacBarChartOptions} data={barChartData} />
+        ) : (
+          <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
+            <Spinner color="#00FFA7" size="xl" />
+          </Flex>
+        )}
       </VStack>
 
-      <HStack justify="center" mt="40px">
-        <IoWarning color="#ff0" size={24} />
-        <PercentBlocksText>
-          {`${percentageCensoring}${
-            isIncludingAllBlocks
-              ? "% enforced OFAC compliance"
-              : "% (relayed blocks) enforcing OFAC compliance"
-          }`}
-        </PercentBlocksText>
+      <HStack justify="center" mt="40px" h="20px">
+        {barChartData && (
+          <>
+            <IoWarning color="#ff0" size={24} />
+            <PercentBlocksText>
+              {`${percentageCensoring}${
+                isIncludingAllBlocks
+                  ? "% enforced OFAC compliance"
+                  : "% (relayed blocks) enforcing OFAC compliance"
+              }`}
+            </PercentBlocksText>
+          </>
+        )}
       </HStack>
 
-      <HStack justifyContent="space-between" py="20px" mx="15px">
+      <HStack justifyContent="space-between" p="20px 0px 5px" mx="15px">
         <HStack>
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
           {timeFrames.map((timeFrame, index) => (
