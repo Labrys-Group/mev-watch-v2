@@ -27,6 +27,9 @@ import {
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
 
+import getUnixTime from "date-fns/getUnixTime";
+import sub from "date-fns/sub";
+
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
@@ -34,6 +37,7 @@ import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
 import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";
+import { TimeFrame } from "../types";
 
 ChartJS.register(
   CategoryScale,
@@ -52,6 +56,10 @@ interface DateRange {
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
+  const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
+    timeFrames[0]
+  );
+
   const [dateRange, setDateRange] = useState<DateRange>({
     startTime: 0,
     endTime: getNowInUnix(),
@@ -106,10 +114,10 @@ const OfacBarChart = () => {
       bg="#0f0f0f"
       borderRadius="10px"
       border="1px solid #393939"
-      p="30px 20px"
+      p="20px"
       my="40px"
     >
-      <VStack h="200px" border="1px solid red">
+      <VStack h="130px">
         <Text
           color="white"
           textAlign="center"
@@ -121,7 +129,7 @@ const OfacBarChart = () => {
         <Bar options={ofacBarChartOptions} data={barChartData} />
       </VStack>
 
-      <HStack justify="center" mt="80px" border="1px solid red">
+      <HStack justify="center" mt="40px">
         <IoWarning color="#ff0" size={24} />
         <PercentBlocksText>
           {`${percentageCensoring}${
@@ -132,13 +140,22 @@ const OfacBarChart = () => {
         </PercentBlocksText>
       </HStack>
 
-      <HStack justifyContent="space-between" border="1px solid red" py="20px">
+      <HStack justifyContent="space-between" py="20px" mx="15px">
         <HStack>
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
-          {timeFrames.map((timeFrame) => (
-            <Button onClick={() => alert(timeFrame.value)}>
-              {timeFrame.labe}
-            </Button>
+          {timeFrames.map((timeFrame, index) => (
+            <TimeFrameBtn
+              onClick={() => setSelectedTimeFrame(timeFrames[index])}
+              size="sm"
+              borderColor={
+                timeFrame === selectedTimeFrame ? "#00FFA7" : "transparent"
+              }
+              background={
+                timeFrame === selectedTimeFrame ? "#ffffff3c" : "transparent"
+              }
+            >
+              {timeFrame.label}
+            </TimeFrameBtn>
           ))}
         </HStack>
         <HStack>
@@ -155,6 +172,8 @@ const OfacBarChart = () => {
   );
 };
 
+export default OfacBarChart;
+
 const PercentBlocksText = chakra(Text, {
   baseStyle: {
     textAlign: "center",
@@ -162,4 +181,16 @@ const PercentBlocksText = chakra(Text, {
   },
 });
 
-export default OfacBarChart;
+const TimeFrameBtn = chakra(Button, {
+  baseStyle: {
+    borderRadius: "2px",
+    borderWidth: "1px",
+    color: "white",
+    fontSize: "14px",
+    background: "transparent",
+    _hover: {
+      borderColor: "#00FFA7",
+      background: "transparent",
+    },
+  },
+});
