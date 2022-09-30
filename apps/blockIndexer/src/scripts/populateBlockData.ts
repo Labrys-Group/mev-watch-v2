@@ -16,4 +16,4 @@ const main = async (initialiseBlockNumber: number) => {
   console.log("Done!");
 };
 
-main(15642476);
+main(BLOCK_NUMBER_OF_MERGE);
