@@ -25,6 +25,7 @@
     "utils": "*"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.186",
     "ts-node-dev": "^1.1.8",
     "tsconfig": "*",
     "tsconfig-paths": "^3.14.1"

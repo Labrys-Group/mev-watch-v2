@@ -2,7 +2,7 @@ import { BLOCK_NUMBER_OF_MERGE } from "consts";
 import { connect, BlockStatsModel } from "database";
 import { ProviderSingleton } from "utils";
 
-import { RawBlock, ProcessedBlock } from "../types";
+import { RawBlock, ProcessedBlock } from "./types";
 
 import { recursivelyPopulateBlockData } from "./helpers/recursivelyPopulateBlockStats";
 

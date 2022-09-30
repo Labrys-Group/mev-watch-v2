@@ -3,7 +3,7 @@ import { BlockStatsModel, connect } from "database";
 import { range } from "lodash";
 import { ProviderSingleton } from "utils";
 
-import { ProcessedBlock } from "../../types";
+import { ProcessedBlock } from "../types";
 
 const provider = ProviderSingleton.batchProvider;
 
