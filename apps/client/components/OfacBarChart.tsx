@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,9 +44,28 @@ ChartJS.register(
   Legend
 );
 
+interface DateRange {
+  startTime: number;
+  endTime: number;
+}
+
+const getNowInUnix = () => Math.floor(Date.now() / 1000);
+
 const OfacBarChart = () => {
-  const { data: blockStatsResponse, isLoading } = useQuery(["todos"], () =>
-    axios.get<GetBlockStatsResponse>("/api/blockStats")
+  const [dateRange, setDateRange] = useState<DateRange>({
+    startTime: 0,
+    endTime: getNowInUnix(),
+  });
+
+  const [endTime, setEndTime] = useState();
+
+  const { data: blockStatsResponse, isLoading } = useQuery(
+    ["todos", dateRange],
+    () =>
+      axios.post<GetBlockStatsResponse>("/api/blockStats", {
+        startTime: dateRange.startTime,
+        endTime: dateRange.endTime,
+      })
   );
 
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
@@ -64,9 +83,9 @@ const OfacBarChart = () => {
         (stats) => stats.numBlocks
       );
 
-      // const totalBlocks = isIncludingAllBlocks
-      //   ? numBlocksSinceMerge
-      //   : totalBlocksFromRelays;
+      const overallBlocks = isIncludingAllBlocks
+        ? totalBlocks
+        : totalBlocksFromRelays;
 
       const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
 
@@ -77,23 +96,25 @@ const OfacBarChart = () => {
               {
                 label: "OFAC Compliant",
                 backgroundColor: colors.brightRed[500],
-                data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
+                data: [sumBy(isOfac, (o) => o.numBlocks) / overallBlocks],
               },
               {
                 label: "Not OFAC Compliant",
                 backgroundColor: colors.brightGreen[500],
-                data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
+                data: [sumBy(notOfac, (o) => o.numBlocks) / overallBlocks],
               },
               {
                 label: "Non-MEV-Boost",
                 backgroundColor: "#CBCBCB",
-                data: [1 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
+                data: [
+                  1 - getPercentage([...isOfac, ...notOfac], overallBlocks),
+                ],
               },
             ]
           : [
               // Display all the OFAC compliant relays first and then the non-OFAC relays
-              ...getFormattedDatasets(isOfac, true, totalBlocks),
-              ...getFormattedDatasets(notOfac, false, totalBlocks),
+              ...getFormattedDatasets(isOfac, true, overallBlocks),
+              ...getFormattedDatasets(notOfac, false, overallBlocks),
             ],
       };
     }, [isIncludingAllBlocks, blockStatsResponse]);
@@ -106,21 +127,17 @@ const OfacBarChart = () => {
       (stats) => stats.numBlocks
     );
 
-    // const totalBlocks = isIncludingAllBlocks
-    //   ? numBlocksSinceMerge
-    //   : totalBlocksFromRelays;
+    const totalBlocks = isIncludingAllBlocks
+      ? blockStatsResponse.data.totalBlocks
+      : totalBlocksFromRelays;
 
     const { isOfac } = sortAndDivideOfacRelays(
       blockStatsResponse.data.relayStats
     );
-    return Math.floor(
-      (100 * sumBy(isOfac, (o) => o.numBlocks)) /
-        blockStatsResponse.data.totalBlocks
-    );
+    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [isIncludingAllBlocks, blockStatsResponse]);
 
-  // TODO: Loader
-
+  console.log(barChartData);
   if (!barChartData) {
     return <Flex>Loading...</Flex>;
   }

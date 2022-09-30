@@ -1,13 +1,11 @@
 import type { NextApiResponse } from "next";
-import { z, ZodError, ZodIssue } from "zod";
+import { z, ZodError } from "zod";
 // TODO: Can this be fixed to not reference the dist folder
-import { connect } from "database/dist";
+import { BlockStatsModel, connect, RelayerModel } from "database/dist";
 
 import { TypedNextApiRequest } from "../../types/api";
-import { ProviderSingleton } from "utils";
-import { BLOCK_NUMBER_OF_MERGE } from "consts";
 import { processRelayStats } from "../../helpers/api/processRelayStats";
-import { RelayerResponseData } from "../../types/relays";
+import { maxBy, minBy } from "lodash";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -30,43 +28,49 @@ export interface GetBlockStatsResponse {
 }
 
 export default async (
-  req: TypedNextApiRequest<GetBlockStatsRequest>,
+  req: TypedNextApiRequest<never, GetBlockStatsRequest>,
   res: NextApiResponse<GetBlockStatsResponse>
 ) => {
-  // try {
-  //   blockStatsRequestSchema.parse(req.body);
-  // } catch (e) {
-  //   if (e instanceof ZodError) {
-  //     return res.status(200).send({ success: false, error: e.errors });
-  //   }
+  await connect();
 
-  //   return res.status(400).send({ success: false, error: "Validation failed" });
-  // }
+  try {
+    blockStatsRequestSchema.parse(req.body);
+  } catch (e) {
+    if (e instanceof ZodError) {
+      // Casting this return response to any because the type is enforcing a valid return type whereas we want to send an error
+      return res.status(400).send(e.errors as any);
+    }
 
-  return res.status(200).json({ relayStats: [], totalBlocks: 0 });
-  // await connect();
+    return res.status(400).end("Unknown Validation error");
+  }
 
-  // // // TODO: These timezones need checking
-  // const startDate = new Date(req.body.startTime * 1000);
-  // const endDate = new Date(req.body.endTime * 1000);
+  const startDate = new Date(req.body.startTime * 1000);
+  const endDate = new Date(req.body.endTime * 1000);
 
-  // console.log(startDate);
+  // TODO: Can this be cast to just an object?
+  const blockStats = await BlockStatsModel.find({
+    ts: { $gte: startDate, $lte: endDate },
+  }).sort({ ts: -1 });
 
-  // const currentBlockNumber = await ProviderSingleton.provider.getBlockNumber();
+  if (!blockStats.length) {
+    return res.status(200).send({ relayStats: [], totalBlocks: 0 });
+  }
 
-  // // TODO: Can this be cast to just an object?
-  // const blockStats = await BlockStatsModel.find({
-  //   ts: { $gte: startDate, $lte: endDate },
-  // });
+  const firstBlockNumber = minBy(blockStats, (block) => block.blockNumber)
+    ?.blockNumber as number;
 
-  // const relayers = await RelayerModel.find();
+  const lastBlockNumber = maxBy(blockStats, (block) => block.blockNumber)
+    ?.blockNumber as number;
 
-  // const relayStats = processRelayStats(blockStats, relayers);
+  const totalBlocks = lastBlockNumber - firstBlockNumber;
 
-  // // TODO: This is wrong it needs to be number of blocks from start to end
-  // const totalBlocks = currentBlockNumber - BLOCK_NUMBER_OF_MERGE;
+  console.log("Total blocks: ", totalBlocks);
 
-  // res.status(200).json({ relayStats, totalBlocks });
+  const relayers = await RelayerModel.find();
 
-  // res.status(200).json({ relayStats: [], totalBlocks: 0 });
+  const relayStats = processRelayStats(blockStats, relayers);
+
+  console.log(relayStats);
+
+  return res.status(200).json({ relayStats, totalBlocks });
 };

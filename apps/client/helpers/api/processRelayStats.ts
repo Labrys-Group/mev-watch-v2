@@ -22,7 +22,7 @@ const getRelayerMapping = (
     }
   }
 
-  return keyBy(expandedRelayers, (relayer) => relayer.address);
+  return keyBy(expandedRelayers, (relayer) => relayer.address.toLowerCase());
 };
 
 export const processRelayStats = (
@@ -45,7 +45,7 @@ export const processRelayStats = (
     );
 
     const foundRelayer: ExpandedRelayer | undefined =
-      relayerMapping[relayAddress];
+      relayerMapping[relayAddress.toLowerCase()];
 
     if (!foundRelayer) {
       // TODO: How to handle
