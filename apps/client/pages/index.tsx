@@ -1,15 +1,9 @@
 import { Text, Flex, chakra } from "@chakra-ui/react";
-import { RelayerResponseData } from "../types/relays";
-import { getRelayerStats } from "../helpers/getRelayerStats";
-import { BLOCK_NUMBER_OF_MERGE } from "consts";
-import { ProviderSingleton } from "utils";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import { Title, DefaultText } from "../styles/StyledComponents";
 
-const Home = (props: RelayerResponseData) => {
-  if (!props.success) return <>Error Display</>;
-
+const Home = () => {
   return (
     <>
       <Title>MEV Watch</Title>
@@ -19,10 +13,7 @@ const Home = (props: RelayerResponseData) => {
         Ethereum blocks.
       </DefaultText>
 
-      <OfacBarChart
-        numBlocksSinceMerge={props.response.numBlocksSinceMerge}
-        relayStats={props.response.relayStats}
-      />
+      <OfacBarChart />
 
       <Note>
         <Text fontWeight="bold" color="#00FFA7">
@@ -39,31 +30,6 @@ const Home = (props: RelayerResponseData) => {
 };
 
 export default Home;
-
-export async function getServerSideProps(): Promise<{
-  props: RelayerResponseData;
-}> {
-  const [relayStats, currentBlock] = await Promise.all([
-    await getRelayerStats(),
-    await ProviderSingleton.provider.getBlock("latest"),
-  ]);
-
-  if (!relayStats.success) {
-    return {
-      props: { success: false },
-    };
-  }
-
-  return {
-    props: {
-      success: true,
-      response: {
-        relayStats: relayStats.response,
-        numBlocksSinceMerge: currentBlock.number - BLOCK_NUMBER_OF_MERGE,
-      },
-    },
-  };
-}
 
 const Note = chakra(Flex, {
   baseStyle: {

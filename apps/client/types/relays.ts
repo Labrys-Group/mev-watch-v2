@@ -1,16 +1,16 @@
-interface RelayStats {
+export interface RelayStats {
   name: string;
   numBlocks: number;
-  totalValueETH: number;
+  isOfacCensoring: boolean;
 }
 
 export interface WebScrapedRelayStats extends RelayStats {
   avgBlockValue: number;
-  ofacCompliant: boolean;
+  totalValueETH: number;
 }
 
 export type GenericResponse<T> =
-  | { success: false }
+  | { success: false; error: any }
   | { success: true; response: T };
 
 export type RelayerResponseData = GenericResponse<{

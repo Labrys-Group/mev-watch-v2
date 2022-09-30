@@ -10,7 +10,11 @@ import {
   ChartData,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { WebScrapedRelayStats } from "../types/relays";
+import {
+  RelayerResponseData,
+  RelayStats,
+  WebScrapedRelayStats,
+} from "../types/relays";
 import { ofacBarChartOptions } from "../config/barChart";
 import {
   Box,
@@ -31,6 +35,9 @@ import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 import getFormattedDatasets from "../helpers/getFormattedDatasets";
 import getPercentage from "../helpers/getPercentage";
 import { greenGradient, redGradient } from "../styles/chartColor";
+import { useQuery } from "react-query";
+import axios from "axios";
+import { GetBlockStatsResponse } from "../pages/api/blockStats";
 
 ChartJS.register(
   CategoryScale,
@@ -41,62 +48,97 @@ ChartJS.register(
   Legend
 );
 
-const OfacBarChart = ({
-  relayStats,
-  numBlocksSinceMerge,
-}: {
-  relayStats: WebScrapedRelayStats[];
-  numBlocksSinceMerge: number;
-}) => {
+// {
+//   relayStats,
+//   numBlocksSinceMerge,
+// }: {
+//   relayStats: WebScrapedRelayStats[];
+//   numBlocksSinceMerge: number;
+// }
+
+// const relayStats: RelayStats[] = [];
+// const numBlocksSinceMerge: number = 0;
+
+const OfacBarChart = () => {
+  const { data: blockStatsResponse, isLoading } = useQuery(["todos"], () =>
+    axios.get<GetBlockStatsResponse>("/api/blockStats")
+  );
+
   const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
 
-  const barChartData: ChartData<"bar", number[], string> = useMemo(() => {
-    const totalBlocksFromRelays = sumBy(relayStats, (stats) => stats.numBlocks);
+  const barChartData: ChartData<"bar", number[], string> | null =
+    useMemo(() => {
+      if (!blockStatsResponse) return null;
 
-    const totalBlocks = isIncludingAllBlocks
-      ? numBlocksSinceMerge
-      : totalBlocksFromRelays;
+      const {
+        data: { relayStats, totalBlocks },
+      } = blockStatsResponse;
 
-    const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
+      const totalBlocksFromRelays = sumBy(
+        relayStats,
+        (stats) => stats.numBlocks
+      );
 
-    return {
-      labels: [""],
-      datasets: isIncludingAllBlocks
-        ? [
-            {
-              label: "OFAC Compliant",
-              backgroundColor: redGradient[0],
-              data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
-            },
-            {
-              label: "Not OFAC Compliant",
-              backgroundColor: greenGradient[0],
-              data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
-            },
-            {
-              label: "Non-MEV-Boost",
-              backgroundColor: "#CBCBCB",
-              data: [1 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
-            },
-          ]
-        : [
-            // Display all the OFAC compliant relays first and then the non-OFAC relays
-            ...getFormattedDatasets(isOfac, true, totalBlocks, false),
-            ...getFormattedDatasets(notOfac, false, totalBlocks, false),
-          ],
-    };
-  }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
+      // const totalBlocks = isIncludingAllBlocks
+      //   ? numBlocksSinceMerge
+      //   : totalBlocksFromRelays;
+
+      const { isOfac, notOfac } = sortAndDivideOfacRelays(relayStats);
+
+      return {
+        labels: [""],
+        datasets: isIncludingAllBlocks
+          ? [
+              {
+                label: "OFAC Compliant",
+                backgroundColor: redGradient[0],
+                data: [sumBy(isOfac, (o) => o.numBlocks) / totalBlocks],
+              },
+              {
+                label: "Not OFAC Compliant",
+                backgroundColor: greenGradient[0],
+                data: [sumBy(notOfac, (o) => o.numBlocks) / totalBlocks],
+              },
+              {
+                label: "Non-MEV-Boost",
+                backgroundColor: "#CBCBCB",
+                data: [1 - getPercentage([...isOfac, ...notOfac], totalBlocks)],
+              },
+            ]
+          : [
+              // Display all the OFAC compliant relays first and then the non-OFAC relays
+              ...getFormattedDatasets(isOfac, true, totalBlocks, false),
+              ...getFormattedDatasets(notOfac, false, totalBlocks, false),
+            ],
+      };
+    }, [isIncludingAllBlocks, blockStatsResponse]);
 
   const percentageCensoring = useMemo(() => {
-    const totalBlocksFromRelays = sumBy(relayStats, (stats) => stats.numBlocks);
+    if (!blockStatsResponse) return null;
 
-    const totalBlocks = isIncludingAllBlocks
-      ? numBlocksSinceMerge
-      : totalBlocksFromRelays;
+    const totalBlocksFromRelays = sumBy(
+      blockStatsResponse.data.relayStats,
+      (stats) => stats.numBlocks
+    );
 
-    const { isOfac } = sortAndDivideOfacRelays(relayStats);
-    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
-  }, [isIncludingAllBlocks, numBlocksSinceMerge, relayStats]);
+    // const totalBlocks = isIncludingAllBlocks
+    //   ? numBlocksSinceMerge
+    //   : totalBlocksFromRelays;
+
+    const { isOfac } = sortAndDivideOfacRelays(
+      blockStatsResponse.data.relayStats
+    );
+    return Math.floor(
+      (100 * sumBy(isOfac, (o) => o.numBlocks)) /
+        blockStatsResponse.data.totalBlocks
+    );
+  }, [isIncludingAllBlocks, blockStatsResponse]);
+
+  // TODO: Loader
+
+  if (!barChartData) {
+    return <Flex>Loading...</Flex>;
+  }
 
   return (
     <Flex flexDir="column" w="100%" my="20px">

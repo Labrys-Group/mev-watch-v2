@@ -1,17 +1,13 @@
 import type { NextApiResponse } from "next";
-import { z } from "zod";
-import {
-  BlockStats,
-  BlockStatsModel,
-  connect,
-  Relayer,
-  RelayerModel,
-} from "database";
+import { z, ZodError, ZodIssue } from "zod";
+// TODO: Can this be fixed to not reference the dist folder
+import { connect } from "database/dist";
 
 import { TypedNextApiRequest } from "../../types/api";
-import { Dictionary, forEach, groupBy, keyBy, map, sumBy } from "lodash";
 import { ProviderSingleton } from "utils";
 import { BLOCK_NUMBER_OF_MERGE } from "consts";
+import { processRelayStats } from "../../helpers/api/processRelayStats";
+import { RelayerResponseData } from "../../types/relays";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -19,7 +15,7 @@ const blockStatsRequestSchema = z.object({
   endTime: z.number(),
 });
 
-type BlockStatsRequest = z.infer<typeof blockStatsRequestSchema>;
+type GetBlockStatsRequest = z.infer<typeof blockStatsRequestSchema>;
 
 interface RelayStats {
   name: string;
@@ -27,96 +23,50 @@ interface RelayStats {
   isOfacCensoring: boolean;
 }
 
-interface Response {
+export interface GetBlockStatsResponse {
   relayStats: RelayStats[];
   // Number of blocks since provided startTime
   totalBlocks: number;
 }
 
-type ExpandedRelayer = Omit<Relayer, "addresses"> & { address: string };
-
-/**
- * This method first removes the addresses array field and adds an address field to all relayer objects. This then allows us to produce a mapping of relayerAddress to relayer. This mapping can then be efficiently used when we try to find a relayer to relayAddress
- */
-const getRelayerMapping = (
-  relayers: Relayer[]
-): Dictionary<ExpandedRelayer> => {
-  const expandedRelayers: ExpandedRelayer[] = [];
-
-  for (const relayer of relayers) {
-    for (const address of relayer.addresses) {
-      expandedRelayers.push({
-        name: relayer.name,
-        address,
-        isOfacCensoring: relayer.isOfacCensoring,
-      });
-    }
-  }
-
-  return keyBy(expandedRelayers, (relayer) => relayer.address);
-};
-
-const getRelayStats = (
-  blockStats: BlockStats[],
-  relayers: Relayer[]
-): RelayStats[] => {
-  const relayerMapping = getRelayerMapping(relayers);
-
-  const groupedStats = groupBy(
-    blockStats,
-    (blockStat) => blockStat.relayAddress
-  );
-
-  const relayStats: RelayStats[] = [];
-
-  forEach(groupedStats, (allRelayStats, relayAddress) => {
-    const totalNumBlocks = sumBy(
-      allRelayStats,
-      (relayStats) => relayStats.blockNumber
-    );
-
-    const foundRelayer: ExpandedRelayer | undefined =
-      relayerMapping[relayAddress];
-
-    if (!foundRelayer) {
-      // TODO: How to handle
-    } else {
-      relayStats.push({
-        name: foundRelayer.name,
-        numBlocks: totalNumBlocks,
-        isOfacCensoring: foundRelayer.isOfacCensoring,
-      });
-    }
-  });
-
-  // TODO: We need to aggregate the relayers with names again, we will have duplicate name entries
-
-  return relayStats;
-};
-
-export const getBlockStats = async (
-  req: TypedNextApiRequest<BlockStatsRequest>,
-  res: NextApiResponse<Response>
+export default async (
+  req: TypedNextApiRequest<GetBlockStatsRequest>,
+  res: NextApiResponse<GetBlockStatsResponse>
 ) => {
-  await connect();
+  // try {
+  //   blockStatsRequestSchema.parse(req.body);
+  // } catch (e) {
+  //   if (e instanceof ZodError) {
+  //     return res.status(200).send({ success: false, error: e.errors });
+  //   }
 
-  // TODO: These timezones need checking
-  const startDate = new Date(req.body.startTime * 1000);
-  const endDate = new Date(req.body.endTime * 1000);
+  //   return res.status(400).send({ success: false, error: "Validation failed" });
+  // }
 
-  const currentBlockNumber = await ProviderSingleton.provider.getBlockNumber();
+  return res.status(200).json({ relayStats: [], totalBlocks: 0 });
+  // await connect();
 
-  // TODO: Can this be cast to just an object?
-  const blockStats = await BlockStatsModel.find({
-    ts: { $gte: startDate, $lte: endDate },
-  });
+  // // // TODO: These timezones need checking
+  // const startDate = new Date(req.body.startTime * 1000);
+  // const endDate = new Date(req.body.endTime * 1000);
 
-  const relayers = await RelayerModel.find();
+  // console.log(startDate);
 
-  const relayStats = getRelayStats(blockStats, relayers);
+  // const currentBlockNumber = await ProviderSingleton.provider.getBlockNumber();
 
-  // TODO: This is wrong it needs to be number of blocks from start to end
-  const totalBlocks = currentBlockNumber - BLOCK_NUMBER_OF_MERGE;
+  // // TODO: Can this be cast to just an object?
+  // const blockStats = await BlockStatsModel.find({
+  //   ts: { $gte: startDate, $lte: endDate },
+  // });
 
-  res.status(200).json({ relayStats, totalBlocks });
+  // const relayers = await RelayerModel.find();
+
+  // const relayStats = processRelayStats(blockStats, relayers);
+
+  // // TODO: This is wrong it needs to be number of blocks from start to end
+  // const totalBlocks = currentBlockNumber - BLOCK_NUMBER_OF_MERGE;
+
+  // res.status(200).json({ relayStats, totalBlocks });
+
+  // res.status(200).json({ relayStats: [], totalBlocks: 0 });
 };

@@ -9,7 +9,7 @@ import { parseStringToNumber } from "./parser";
  * This method scrapes the mevboost.org webpage to extract the relayer stats.This mostly utilizes node-html-parser to parse the webpage and extract the relevant data
  * @returns The parsed data or an invalid response
  */
-export const getRelayerStats = async (): Promise<
+export const getWebScrapedRelayerStats = async (): Promise<
   GenericResponse<WebScrapedRelayStats[]>
 > => {
   const { data: mevBoostWebpage } = await axios.get(
@@ -51,10 +51,10 @@ export const getRelayerStats = async (): Promise<
     // This checks if the current row is actually the title row
     if (name === "Relay") return;
 
-    const ofacCompliant = isRelayerOfacCompliant(name);
+    const isOfacCensoring = isRelayerOfacCompliant(name);
 
     // This means our ofac compliance config is missing the entry for this relayer name
-    if (ofacCompliant === null) {
+    if (isOfacCensoring === null) {
       // TODO: Sentry
 
       return;
@@ -62,7 +62,7 @@ export const getRelayerStats = async (): Promise<
 
     relayStats.push({
       name,
-      ofacCompliant,
+      isOfacCensoring,
       avgBlockValue: parseStringToNumber(avgBlockValue),
       numBlocks: parseStringToNumber(numBlocks),
       totalValueETH: parseStringToNumber(totalValueETH),

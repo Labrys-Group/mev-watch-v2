@@ -8,6 +8,9 @@ import MainContainer from "../components/MainContainer";
 
 import Head from "next/head";
 import Script from "next/script";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -42,9 +45,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         `}
       </Script>
       <ChakraProvider theme={theme}>
-        <MainContainer>
-          <Component {...pageProps} />
-        </MainContainer>
+        <QueryClientProvider client={queryClient}>
+          <MainContainer>
+            <Component {...pageProps} />
+          </MainContainer>
+        </QueryClientProvider>
       </ChakraProvider>
     </>
   );

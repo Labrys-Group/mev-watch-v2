@@ -2,9 +2,8 @@ import { BLOCK_NUMBER_OF_MERGE } from "consts";
 import { connect, BlockStatsModel } from "database";
 import { ProviderSingleton } from "utils";
 
-import { RawBlock, ProcessedBlock } from "../types";
-
 import { recursivelyPopulateBlockData } from "./helpers/recursivelyPopulateBlockStats";
+import { RawBlock, ProcessedBlock } from "./types";
 
 // Renamed the method for readability
 export const parseHexString = (value: string) => parseInt(value, 16);
