@@ -137,7 +137,6 @@ const OfacBarChart = () => {
     return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [isIncludingAllBlocks, blockStatsResponse]);
 
-  console.log(barChartData);
   if (!barChartData) {
     return <Flex>Loading...</Flex>;
   }

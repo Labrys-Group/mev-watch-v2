@@ -6,6 +6,7 @@ import { BlockStatsModel, connect, RelayerModel } from "database/dist";
 import { TypedNextApiRequest } from "../../types/api";
 import { processRelayStats } from "../../helpers/api/processRelayStats";
 import { maxBy, minBy } from "lodash";
+import { RelayStats } from "../../types";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -14,12 +15,6 @@ const blockStatsRequestSchema = z.object({
 });
 
 type GetBlockStatsRequest = z.infer<typeof blockStatsRequestSchema>;
-
-interface RelayStats {
-  name: string;
-  numBlocks: number;
-  isOfacCensoring: boolean;
-}
 
 export interface GetBlockStatsResponse {
   relayStats: RelayStats[];
@@ -69,8 +64,6 @@ export default async (
   const relayers = await RelayerModel.find();
 
   const relayStats = processRelayStats(blockStats, relayers);
-
-  console.log(relayStats);
 
   return res.status(200).json({ relayStats, totalBlocks });
 };
