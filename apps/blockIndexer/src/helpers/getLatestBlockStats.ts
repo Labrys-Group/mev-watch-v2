@@ -6,6 +6,11 @@ interface GetLatestBlockStats {
   relayers: Relayer[];
 }
 
+/**
+ * This method gets the latest block stats for the supplied relayers and returns the data. It also returns an array of any failed requests to relayers that might've occurred
+ * @param param0 All the relayers to get block stats for
+ * @returns Returns the blocks stats and an array of an relayers that might've failed, incase this needs handling
+ */
 export const getLatestBlockStats = async ({
   relayers,
 }: GetLatestBlockStats): Promise<{

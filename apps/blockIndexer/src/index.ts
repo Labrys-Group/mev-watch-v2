@@ -1,6 +1,7 @@
-import { BlockStatsModel, connect, RelayerModel } from "database";
+import { connect, RelayerModel } from "database";
 
 import { getLatestBlockStats } from "./helpers/getLatestBlockStats";
+import { saveBlockStats } from "./helpers/saveBlockStats";
 
 const getLatestData = async () => {
   console.log("Getting latest relayer data");
@@ -9,27 +10,15 @@ const getLatestData = async () => {
 
   const latestBlockStats = await getLatestBlockStats({ relayers });
 
-  try {
-    await BlockStatsModel.insertMany(latestBlockStats.blockStats, {
-      // Skip duplicates and still save everything else
-      ordered: false,
-    });
-  } catch (e: any) {
-    if (e.result.result.ok === 1) {
-      console.log(`Successfully inserted: ${e.insertedCount}`);
-
-      return;
-    }
-
-    console.error("Unknown mongodb write error");
-    throw e;
-  }
+  await saveBlockStats(latestBlockStats.blockStats);
 };
 
 const main = async () => {
   await connect();
 
-  setInterval(() => getLatestData(), 10000);
+  // setInterval(() => getLatestData(), 12000);
+
+  await getLatestData();
 };
 
 main();

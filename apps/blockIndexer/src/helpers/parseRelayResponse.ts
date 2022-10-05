@@ -1,4 +1,5 @@
 import { BlockStats, Relayer } from "database";
+import { getDateFromSlotNumber } from "utils";
 
 interface RawRelayerResponse {
   slot: string;
@@ -12,14 +13,16 @@ interface RawRelayerResponse {
 export const parseRawRelayerResponse = (
   relayResponse: RawRelayerResponse,
   relayer: Relayer
-): BlockStats => ({
-  builderPublicKey: relayResponse.builder_pubkey,
-  feeRecipient: relayResponse.proposer_fee_recipient,
-  gasUsed: parseInt(relayResponse.gas_used, 10),
-  proposerPublicKey: relayResponse.proposer_pubkey,
-  relayer,
-  slotNumber: parseInt(relayResponse.slot, 10),
-  // TODO: Populate:
-  ts: new Date(),
-  value: relayResponse.value,
-});
+): BlockStats => {
+  const slotNumber = parseInt(relayResponse.slot, 10);
+  return {
+    builderPublicKey: relayResponse.builder_pubkey,
+    feeRecipient: relayResponse.proposer_fee_recipient,
+    gasUsed: parseInt(relayResponse.gas_used, 10),
+    proposerPublicKey: relayResponse.proposer_pubkey,
+    relayer,
+    slotNumber,
+    ts: getDateFromSlotNumber(slotNumber),
+    value: relayResponse.value,
+  };
+};
