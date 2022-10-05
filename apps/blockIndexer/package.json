@@ -20,6 +20,7 @@
     "database": "*",
     "ethers": "^5.7.1",
     "lodash": "^4.17.21",
+    "mongodb": "^4.10.0",
     "node-html-parser": "^6.1.1",
     "typescript": "^4.6.3",
     "utils": "*"

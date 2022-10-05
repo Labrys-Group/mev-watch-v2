@@ -1,15 +1,28 @@
-import { getModelForClass, prop } from "@typegoose/typegoose";
+import { getModelForClass, prop, Ref } from "@typegoose/typegoose";
+
+import { Relayer } from "./Relayer";
 
 export class BlockStats {
-  // This could've optionally been a ref to the Relayer class but it's likely we will have to retrospectively add relayers and that will then require parsing all the old data and updating records
-  @prop({ required: true })
-  public relayAddress!: string;
+  @prop({ required: true, ref: () => Relayer })
+  public relayer!: Ref<Relayer>;
 
   @prop({ required: true, unique: true })
-  public blockNumber!: number;
+  public slotNumber!: number;
+
+  @prop({ required: true })
+  public feeRecipient!: string;
+
+  @prop({ required: true })
+  public proposerPublicKey!: string;
+
+  @prop({ required: true })
+  public builderPublicKey!: string;
 
   @prop({ required: true })
   public gasUsed!: number;
+
+  @prop({ required: true })
+  public value!: string;
 
   @prop({ required: true })
   // Using ts as a field name enables mongoDB to recognize this model as a time-series model

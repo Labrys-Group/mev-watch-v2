@@ -1,4 +1,4 @@
-import { relayerData } from "consts";
+import { RELAYERS } from "consts";
 import { connect, RelayerModel } from "database";
 
 const readFromConsts = async () => {
@@ -6,7 +6,7 @@ const readFromConsts = async () => {
 
   console.log("Updating relayer data");
 
-  await RelayerModel.create(relayerData);
+  await RelayerModel.create(RELAYERS);
 
   console.log("Finished!");
 };

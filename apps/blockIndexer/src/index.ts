@@ -1,56 +1,35 @@
-import { BLOCK_NUMBER_OF_MERGE } from "consts";
-import { connect, BlockStatsModel } from "database";
-import { ProviderSingleton } from "utils";
+import { BlockStatsModel, connect, RelayerModel } from "database";
 
-import { recursivelyPopulateBlockData } from "./helpers/recursivelyPopulateBlockStats";
-import { RawBlock, ProcessedBlock } from "./types";
+import { getLatestBlockStats } from "./helpers/getLatestBlockStats";
 
-// Renamed the method for readability
-export const parseHexString = (value: string) => parseInt(value, 16);
+const getLatestData = async () => {
+  console.log("Getting latest relayer data");
 
-export const parseRawBlock = (rawBlock: RawBlock): ProcessedBlock => ({
-  hash: rawBlock.hash,
-  relayAddress: rawBlock.miner,
-  parentHash: rawBlock.parentHash,
-  gasUsed: parseHexString(rawBlock.gasUsed),
-  gasLimit: parseHexString(rawBlock.gasLimit),
-  blockNumber: parseHexString(rawBlock.number),
-  ts: new Date(parseHexString(rawBlock.timestamp) * 1000),
-});
+  const relayers = await RelayerModel.find();
+
+  const latestBlockStats = await getLatestBlockStats({ relayers });
+
+  try {
+    await BlockStatsModel.insertMany(latestBlockStats.blockStats, {
+      // Skip duplicates and still save everything else
+      ordered: false,
+    });
+  } catch (e: any) {
+    if (e.result.result.ok === 1) {
+      console.log(`Successfully inserted: ${e.insertedCount}`);
+
+      return;
+    }
+
+    console.error("Unknown mongodb write error");
+    throw e;
+  }
+};
 
 const main = async () => {
   await connect();
 
-  // Use batch provider here because the recursive function will use the same provider saving memory
-  const currentBlockNumber =
-    await ProviderSingleton.batchProvider.getBlockNumber();
-
-  const [lastBlockStatsInserted] = await BlockStatsModel.find()
-    .sort({
-      blockNumber: -1,
-    })
-    .limit(1);
-
-  console.log("Updating database to have all blocks\n");
-  await recursivelyPopulateBlockData(
-    lastBlockStatsInserted?.blockNumber ?? BLOCK_NUMBER_OF_MERGE,
-    currentBlockNumber
-  );
-
-  console.log("Starting WSS connection for new blocks\n");
-  // Directly using the subscribe method on the provider here as ethers provider.on("block") method actually deletes all of the block data apart from the number ...weird
-  ProviderSingleton.websocketProvider._subscribe(
-    "block",
-    ["newHeads"],
-    async (rawBlock: RawBlock) => {
-      const block = parseRawBlock(rawBlock);
-      await BlockStatsModel.create(block);
-
-      console.log(
-        `Processed block ${block.blockNumber} @ ${new Date().toUTCString()}`
-      );
-    }
-  );
+  setInterval(() => getLatestData(), 10000);
 };
 
 main();

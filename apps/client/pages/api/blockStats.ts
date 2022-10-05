@@ -1,11 +1,9 @@
 import type { NextApiResponse } from "next";
 import { z, ZodError } from "zod";
 // TODO: Can this be fixed to not reference the dist folder
-import { BlockStatsModel, connect, RelayerModel } from "database/dist";
+import { BlockStatsModel, connect } from "database/dist";
 
 import { TypedNextApiRequest } from "../../types/api";
-import { processRelayStats } from "../../helpers/api/processRelayStats";
-import { maxBy, minBy } from "lodash";
 import { RelayStats } from "../../types";
 
 const blockStatsRequestSchema = z.object({
@@ -51,19 +49,5 @@ export default async (
     return res.status(200).send({ relayStats: [], totalBlocks: 0 });
   }
 
-  const firstBlockNumber = minBy(blockStats, (block) => block.blockNumber)
-    ?.blockNumber as number;
-
-  const lastBlockNumber = maxBy(blockStats, (block) => block.blockNumber)
-    ?.blockNumber as number;
-
-  const totalBlocks = lastBlockNumber - firstBlockNumber;
-
-  console.log("Total blocks: ", totalBlocks);
-
-  const relayers = await RelayerModel.find();
-
-  const relayStats = processRelayStats(blockStats, relayers);
-
-  return res.status(200).json({ relayStats, totalBlocks });
+  // TODO: Route logic
 };
