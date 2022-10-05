@@ -1,8 +1,21 @@
 import { BlockStatsModel, connect, Relayer, RelayerModel } from "database";
-import { minBy } from "lodash";
+import { minBy, groupBy, forEach } from "lodash";
 
 import { getBlockStatsFromRelayer } from "../helpers/getBlockStatsFromRelayer";
 import { saveBlockStats } from "../helpers/saveBlockStats";
+
+const analyzeDB = async () => {
+  const allBlockStats = await BlockStatsModel.find().populate("relayer");
+
+  const groupedStats = groupBy(
+    allBlockStats,
+    (stats) => (stats.relayer as any).name
+  );
+
+  forEach(groupedStats, (stats, key) => {
+    console.log(`${key} has ${stats.length} entries`);
+  });
+};
 
 const recursivelyPopulateRelayerData = async (
   relayer: Relayer,
@@ -17,6 +30,8 @@ const recursivelyPopulateRelayerData = async (
       fromSlotNumber
     );
 
+    console.log(relayerBlockStats);
+
     await saveBlockStats(relayerBlockStats);
 
     const nextFromSlotNumber = minBy(
@@ -30,8 +45,7 @@ const recursivelyPopulateRelayerData = async (
       return;
     }
 
-    // Is it inclusive with the end of array? Add 1?
-    // When we stop getting responses is it actually finished?
+    // TODO: Add a delay here
 
     await recursivelyPopulateRelayerData(
       relayer,
@@ -48,9 +62,15 @@ const main = async () => {
 
   const relayers = await RelayerModel.find();
 
+  const relayersWithoutFlashbots = relayers.filter(
+    (relayer) => relayer.name !== "Flashbots"
+  );
+
   const bloxRouteEthical = relayers.find(
-    (relayer) => relayer.name === "BloXroute Ethical"
+    (relayer) => relayer.name === "Eden Network"
   ) as Relayer;
+
+  // await analyzeDB();
 
   // const blocks = await BlockStatsModel.find({
   //   relayer: bloxRouteEthical,
@@ -60,7 +80,9 @@ const main = async () => {
 
   // await Promise.all(
   //   // Get all relayer data from inception
-  //   relayers.map((relayer) => recursivelyPopulateRelayerData(relayer, 0))
+  //   relayersWithoutFlashbots.map((relayer) =>
+  //     recursivelyPopulateRelayerData(relayer, 0)
+  //   )
   // );
 };
 

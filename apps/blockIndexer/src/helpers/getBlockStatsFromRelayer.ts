@@ -19,7 +19,7 @@ export const getBlockStatsFromRelayer = async (
     "/relay/v1/data/bidtraces/proposer_payload_delivered",
     {
       // This selected from this slot number down for a maximum of 200 items. If 0 is provided it will get the latest entries
-      params: { cursor: fromSlotNumber || 0 },
+      params: { cursor: fromSlotNumber || 0, order_by: "-value" },
       baseURL: relayer.url,
     }
   );

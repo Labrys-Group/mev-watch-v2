@@ -18,6 +18,8 @@ const main = async () => {
 
   // setInterval(() => getLatestData(), 12000);
 
+  // TODO: Calculate aggregates here, hourly, daily, etc
+
   await getLatestData();
 };
 
