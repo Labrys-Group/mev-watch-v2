@@ -30,8 +30,6 @@ const recursivelyPopulateRelayerData = async (
       fromSlotNumber
     );
 
-    console.log(relayerBlockStats);
-
     await saveBlockStats(relayerBlockStats);
 
     const nextFromSlotNumber = minBy(
@@ -62,27 +60,25 @@ const main = async () => {
 
   const relayers = await RelayerModel.find();
 
-  const relayersWithoutFlashbots = relayers.filter(
-    (relayer) => relayer.name !== "Flashbots"
-  );
+  // const relayersWithoutFlashbots = relayers.filter(
+  //   (relayer) => relayer.name !== "Flashbots"
+  // );
 
-  const bloxRouteEthical = relayers.find(
-    (relayer) => relayer.name === "Eden Network"
-  ) as Relayer;
+  // const bloxRouteEthical = relayers.find(
+  //   (relayer) => relayer.name === "Eden Network"
+  // ) as Relayer;
 
-  // await analyzeDB();
+  await analyzeDB();
 
   // const blocks = await BlockStatsModel.find({
   //   relayer: bloxRouteEthical,
   // }).limit(0);
 
-  await recursivelyPopulateRelayerData(bloxRouteEthical, 0);
+  // await recursivelyPopulateRelayerData(bloxRouteEthical, 0);
 
   // await Promise.all(
   //   // Get all relayer data from inception
-  //   relayersWithoutFlashbots.map((relayer) =>
-  //     recursivelyPopulateRelayerData(relayer, 0)
-  //   )
+  //   relayers.map((relayer) => recursivelyPopulateRelayerData(relayer, 0))
   // );
 };
 
