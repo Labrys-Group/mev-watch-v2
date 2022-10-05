@@ -24,7 +24,7 @@ export const RELAYERS: Relayer[] = [
   {
     url: "https://mainnet-relay.securerpc.com",
     name: "Manifold",
-    isOfacCensoring: true,
+    isOfacCensoring: false,
   },
   {
     url: "https://boost-relay.flashbots.net",
