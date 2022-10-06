@@ -153,6 +153,7 @@ const OfacBarChart = () => {
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
           {timeFrames.map((timeFrame, index) => (
             <TimeFrameBtn
+              key={timeFrame.value}
               onClick={() => setSelectedTimeFrame(timeFrames[index])}
               size="sm"
               borderColor={
