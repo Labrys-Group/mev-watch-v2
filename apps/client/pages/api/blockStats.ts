@@ -7,7 +7,7 @@ import { BlockStatsModel } from "database/dist/models";
 import { TypedNextApiRequest } from "../../types/api";
 import { RelayStats } from "../../types";
 import { Relayer } from "database";
-import { differenceInSeconds } from "date-fns";
+import { getTotalBlocks } from "../../helpers/getTotalBlocks";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -48,7 +48,7 @@ export default async (
   const startDate = new Date(req.body.startTime * 1000);
   const endDate = new Date(req.body.endTime * 1000);
 
-  const totalBlocks = differenceInSeconds(endDate, startDate) / 12;
+  const totalBlocks = await getTotalBlocks(startDate, endDate);
 
   const blockStats = (await BlockStatsModel.aggregate([
     { $match: { ts: { $gte: startDate, $lte: endDate } } },
