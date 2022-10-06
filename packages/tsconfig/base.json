@@ -3,6 +3,7 @@
   "display": "Default",
   "compilerOptions": {
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
@@ -17,10 +18,10 @@
     "module": "commonjs",
     "target": "ES6",
     "sourceMap": true,
-    "rootDir": "../../",
     "noEmit": true,
     "declaration": true,
     "declarationMap": true
   },
+  "include": ["src", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }
