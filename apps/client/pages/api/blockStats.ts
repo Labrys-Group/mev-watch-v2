@@ -2,12 +2,11 @@ import type { NextApiResponse } from "next";
 import { z, ZodError } from "zod";
 // TODO: Can this be fixed to not reference the dist folder
 import { connect } from "database/dist";
-import { BlockStatsModel } from "database/dist/models";
 
 import { TypedNextApiRequest } from "../../types/api";
 import { RelayStats } from "../../types";
-import { Relayer } from "database";
 import { getTotalBlocks } from "../../helpers/getTotalBlocks";
+import { getBlockStats } from "../../helpers/getBlockStats";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -21,11 +20,6 @@ export interface GetBlockStatsResponse {
   relayStats: RelayStats[];
   // Number of blocks since provided startTime
   totalBlocks: number;
-}
-
-interface TimeFrameAggregationResponse {
-  blocks: number;
-  relayerData: Relayer;
 }
 
 export default async (
@@ -50,29 +44,11 @@ export default async (
 
   const totalBlocks = await getTotalBlocks(startDate, endDate);
 
-  const blockStats = (await BlockStatsModel.aggregate([
-    { $match: { ts: { $gte: startDate, $lte: endDate } } },
-    { $group: { _id: "$relayer", blocks: { $count: {} } } },
-    {
-      $lookup: {
-        from: "relayers",
-        localField: "_id",
-        foreignField: "_id",
-        as: "relayerData",
-      },
-    },
-    { $unwind: { path: "$relayerData" } },
-  ])) as TimeFrameAggregationResponse[];
+  const relayStats = await getBlockStats(startDate, endDate);
 
-  if (!blockStats.length) {
+  if (!relayStats.length) {
     return res.status(200).send({ relayStats: [], totalBlocks: 0 });
   }
-
-  const relayStats: RelayStats[] = blockStats.map((_stats) => ({
-    name: _stats.relayerData.name,
-    numBlocks: _stats.blocks,
-    isOfacCensoring: _stats.relayerData.isOfacCensoring,
-  }));
 
   res.status(200).send({ relayStats, totalBlocks });
 };
