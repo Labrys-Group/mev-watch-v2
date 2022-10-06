@@ -1,5 +1,6 @@
 import { BlockStatsModel, connect, Relayer, RelayerModel } from "database";
 import { minBy, groupBy, forEach } from "lodash";
+import { delayMillis } from "../helpers/delayMillis";
 
 import { getBlockStatsFromRelayer } from "../helpers/getBlockStatsFromRelayer";
 import { saveBlockStats } from "../helpers/saveBlockStats";
@@ -43,7 +44,7 @@ const recursivelyPopulateRelayerData = async (
       return;
     }
 
-    // TODO: Add a delay here
+    await delayMillis(5000);
 
     await recursivelyPopulateRelayerData(
       relayer,
@@ -68,7 +69,7 @@ const main = async () => {
   //   (relayer) => relayer.name === "Eden Network"
   // ) as Relayer;
 
-  await analyzeDB();
+  // await analyzeDB();
 
   // const blocks = await BlockStatsModel.find({
   //   relayer: bloxRouteEthical,
@@ -76,10 +77,10 @@ const main = async () => {
 
   // await recursivelyPopulateRelayerData(bloxRouteEthical, 0);
 
-  // await Promise.all(
-  //   // Get all relayer data from inception
-  //   relayers.map((relayer) => recursivelyPopulateRelayerData(relayer, 0))
-  // );
+  await Promise.all(
+    // Get all relayer data from inception
+    relayers.map((relayer) => recursivelyPopulateRelayerData(relayer, 0))
+  );
 };
 
 main();
