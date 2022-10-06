@@ -2,6 +2,7 @@
 
 const withTM = require("next-transpile-modules")([
   "consts",
+  "database"
 ])
 
 const nextConfig = withTM({
