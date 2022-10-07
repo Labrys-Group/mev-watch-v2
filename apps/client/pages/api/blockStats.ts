@@ -1,11 +1,12 @@
 import type { NextApiResponse } from "next";
 import { z, ZodError } from "zod";
 // TODO: Can this be fixed to not reference the dist folder
-import { BlockStatsModel } from "database/dist/models";
 import { connect } from "database/dist";
 
 import { TypedNextApiRequest } from "../../types/api";
 import { RelayStats } from "../../types";
+import { getTotalBlocks } from "../../helpers/getTotalBlocks";
+import { getBlockStats } from "../../helpers/getBlockStats";
 
 const blockStatsRequestSchema = z.object({
   // Using UNIX for requests to simplify datetime stuff
@@ -41,14 +42,13 @@ export default async (
   const startDate = new Date(req.body.startTime * 1000);
   const endDate = new Date(req.body.endTime * 1000);
 
-  // TODO: Can this be cast to just an object?
-  const blockStats = await BlockStatsModel.find({
-    ts: { $gte: startDate, $lte: endDate },
-  }).sort({ ts: -1 });
+  const totalBlocks = await getTotalBlocks(startDate, endDate);
 
-  if (!blockStats.length) {
+  const relayStats = await getBlockStats(startDate, endDate);
+
+  if (!relayStats.length) {
     return res.status(200).send({ relayStats: [], totalBlocks: 0 });
   }
 
-  // TODO: Route logic
+  res.status(200).send({ relayStats, totalBlocks });
 };

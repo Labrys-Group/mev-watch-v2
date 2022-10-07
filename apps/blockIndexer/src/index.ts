@@ -16,7 +16,7 @@ const getLatestData = async () => {
 const main = async () => {
   await connect();
 
-  // setInterval(() => getLatestData(), 12000);
+  setInterval(() => getLatestData(), 12000);
 
   // TODO: Calculate aggregates here, hourly, daily, etc
 

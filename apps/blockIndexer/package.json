@@ -8,8 +8,8 @@
     "dev": "ts-node-dev --require dotenv/config --require tsconfig-paths/register src/index.ts",
     "build": "tsc --project tsconfig.build.json",
     "start": "NODE_ENV=production node --require dotenv/config ./dist/index.js",
-    "populate-block-data": "ts-node --require tsconfig-paths/register ./src/scripts/populateBlockData.ts",
-    "populate-relayers": "ts-node --require tsconfig-paths/register ./src/scripts/populateRelayers.ts"
+    "populate-block-data": "ts-node --require tsconfig-paths/register --require dotenv/config ./src/scripts/populateBlockData.ts",
+    "populate-relayers": "ts-node --require tsconfig-paths/register --require dotenv/config ./src/scripts/populateRelayers.ts"
   },
   "author": "",
   "license": "ISC",

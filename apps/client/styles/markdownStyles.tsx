@@ -7,8 +7,7 @@ const markdownStyles = {
   a: ({ node, ...props }: { node: any }) => (
     <a target="_blank" style={{ color: "#00FFA7" }} {...props} />
   ),
-  code: ({ node, ...props }: { node: any }) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+  code: ({ node, inline, ...props }: { node: any, inline: boolean }) => {
     const toast = useToast();
     return (
       <Code
@@ -17,11 +16,10 @@ const markdownStyles = {
         bgColor="gray.700"
         fontSize="15px"
         color="brightGreen.500"
-        // overflowWrap="break-word"
         cursor="pointer"
         mt="5px"
         mb="20px"
-        onClick={(e) => {
+        onClick={() => {
           navigator.clipboard.writeText((props as any).children[0]);
           toast({
             title: "Copied",

@@ -110,7 +110,6 @@ const OfacBarChart = () => {
     return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [isIncludingAllBlocks, blockStatsResponse]);
 
-  console.log("tHIS", barChartData);
   return (
     <DefaultContainer>
       <VStack h="130px">
@@ -144,6 +143,7 @@ const OfacBarChart = () => {
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
           {timeFrames.map((timeFrame, index) => (
             <TimeFrameBtn
+              key={timeFrame.value}
               onClick={() => setSelectedTimeFrame(timeFrames[index])}
               size="sm"
               borderColor={
