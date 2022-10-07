@@ -5,9 +5,12 @@ import {
   Button,
   IconButton,
   Link,
+  Flex,
+  Switch,
+  HStack,
 } from "@chakra-ui/react";
 
-export const Title = chakra(Text, {
+export const PageTitle = chakra(Text, {
   baseStyle: {
     fontFamily: "GT-America-Extended-Bold",
     textAlign: "center",
@@ -21,7 +24,30 @@ export const Title = chakra(Text, {
   },
 });
 
-export const StyledListItem = chakra(ListItem, {
+export const DefaultContainer = chakra(Flex, {
+  baseStyle: {
+    flexDirection: "column",
+    width: "100%",
+    background: "#0f0f0f",
+    borderRadius: "10px",
+    border: "1px solid #393939",
+    padding: "20px",
+    marginY: "40px",
+    boxShadow: "rgba(0, 0, 0, 0.56) 0px 22px 70px 4px",
+  },
+});
+
+export const DefaultTitle = chakra(Text, {
+  baseStyle: {
+    // fontFamily: "GT-America-Extended-Bold",
+    textAlign: "center",
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    color: "white",
+  },
+});
+
+export const DefaultListItem = chakra(ListItem, {
   baseStyle: {
     fontSize: "16px",
     margin: "0 0 20px 20px",
@@ -46,7 +72,7 @@ export const LabrysGreenText = chakra(Text, {
   },
 });
 
-export const StyledIconBtn = chakra(IconButton, {
+export const DefaultIconBtn = chakra(IconButton, {
   baseStyle: {
     position: "relative",
     background: "transparent",
@@ -60,7 +86,7 @@ export const StyledIconBtn = chakra(IconButton, {
   },
 });
 
-export const StyledBtn = chakra(Button, {
+export const DefaultBtn = chakra(Button, {
   baseStyle: {
     position: "relative",
     background: "transparent",
@@ -78,7 +104,7 @@ export const StyledBtn = chakra(Button, {
   },
 });
 
-export const StyledLink = chakra(Link, {
+export const DefaultLink = chakra(Link, {
   baseStyle: {
     color: "white",
     marginX: "10px",
@@ -88,3 +114,33 @@ export const StyledLink = chakra(Link, {
     },
   },
 });
+
+interface DefaultSwitchProps {
+  label: string;
+  isChecked: boolean;
+  onChange: VoidFunction;
+  // TODO: fix type
+  size?: string;
+  colorScheme?: string;
+}
+
+export const DefaultSwitch = (props: DefaultSwitchProps) => {
+  const {
+    label,
+    isChecked,
+    onChange,
+    size = "sm",
+    colorScheme = "brightGreen",
+  } = props;
+  return (
+    <HStack>
+      <Switch
+        size={size}
+        onChange={onChange}
+        isChecked={isChecked}
+        colorScheme={colorScheme}
+      ></Switch>
+      <DefaultText fontSize="14px">{label}</DefaultText>
+    </HStack>
+  );
+};

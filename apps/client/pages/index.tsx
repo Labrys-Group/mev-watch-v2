@@ -1,14 +1,15 @@
 import { Text, Flex, chakra } from "@chakra-ui/react";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
-import { Title, DefaultText, StyledBtn } from "../styles/StyledComponents";
+import { PageTitle, DefaultText, DefaultBtn } from "../styles/StyledComponents";
 import { BsTwitter } from "react-icons/bs";
 import { HiSpeakerphone } from "react-icons/hi";
+import BlockVisualization from "../components/blockVisualization";
 
 const Home = () => {
   return (
     <>
-      <Title>MEV Watch</Title>
+      <PageTitle>MEV Watch</PageTitle>
       <DefaultText w="500px" textAlign="center">
         Some MEV-Boost relays are regulated under OFAC and will censor certain
         transactions. Use this tool to observe the effect it&#39;s having on
@@ -20,7 +21,7 @@ const Home = () => {
         Help us improve this tool for the community
       </DefaultText>
       <Flex mb="70px">
-        <StyledBtn
+        <DefaultBtn
           aria-label="provide feedback"
           leftIcon={<HiSpeakerphone />}
           size="sm"
@@ -29,8 +30,8 @@ const Home = () => {
           }
         >
           Provide Feedback
-        </StyledBtn>
-        <StyledBtn
+        </DefaultBtn>
+        <DefaultBtn
           aria-label="labrys-twitter"
           leftIcon={<BsTwitter />}
           size="sm"
@@ -41,8 +42,10 @@ const Home = () => {
           }
         >
           Share
-        </StyledBtn>
+        </DefaultBtn>
       </Flex>
+
+      <BlockVisualization />
 
       <Note>
         <Text fontWeight="bold" color="#00FFA7">

@@ -32,7 +32,13 @@ import { IoWarning } from "react-icons/io5";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
-import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
+import {
+  DefaultText,
+  LabrysGreenText,
+  DefaultTitle,
+  DefaultContainer,
+  DefaultSwitch,
+} from "../styles/StyledComponents";
 import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";
@@ -106,25 +112,9 @@ const OfacBarChart = () => {
 
   console.log("tHIS", barChartData);
   return (
-    <Flex
-      flexDir="column"
-      w="100%"
-      bg="#0f0f0f"
-      borderRadius="10px"
-      border="1px solid #393939"
-      p="20px"
-      my="40px"
-      boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
-    >
+    <DefaultContainer>
       <VStack h="130px">
-        <Text
-          color="white"
-          textAlign="center"
-          fontWeight="bold"
-          fontSize="1.5rem"
-        >
-          Post-Merge OFAC Compliant Blocks
-        </Text>
+        <DefaultTitle>Post-Merge OFAC Compliant Blocks</DefaultTitle>
         {barChartData ? (
           <Bar options={ofacBarChartOptions} data={barChartData} />
         ) : (
@@ -167,17 +157,13 @@ const OfacBarChart = () => {
             </TimeFrameBtn>
           ))}
         </HStack>
-        <HStack>
-          <Switch
-            size="sm"
-            onChange={setIsIncludingAllBlocks.toggle}
-            isChecked={isIncludingAllBlocks}
-            colorScheme="brightGreen"
-          />
-          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
-        </HStack>
+        <DefaultSwitch
+          label="Include all Blocks"
+          onChange={setIsIncludingAllBlocks.toggle}
+          isChecked={isIncludingAllBlocks}
+        />
       </HStack>
-    </Flex>
+    </DefaultContainer>
   );
 };
 
