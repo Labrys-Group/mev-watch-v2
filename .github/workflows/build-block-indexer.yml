@@ -43,7 +43,7 @@ jobs:
     - name: Build
       run: |-
         docker pull $LATEST_IMAGE_TAG || true
-        docker build --cache-from $LATEST_IMAGE_TAG -t $LATEST_IMAGE_TAG -t $IMAGE_TAG -f $DOCKERFILE .
+        yarn build:blockIndexer
         docker push $IMAGE_TAG 
         docker push $LATEST_IMAGE_TAG
 
