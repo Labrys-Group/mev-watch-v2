@@ -15,7 +15,8 @@ env:
   GKE_ZONE: us-central1-c   # Add your cluster zone here.
   DEPLOYMENT_NAME: block-indexer # Add your deployment name here.
   DOCKERFILE: apps/blockIndexer/Dockerfile
-  IMAGE: static-site
+  IMAGE_TAG: ${{ github.repository }}/block-indexer:${{ github.sha }}
+  LATEST_IMAGE_TAG: ${{github.repository }}/block-indexer:latest
 
 jobs:
   setup-build-publish:
