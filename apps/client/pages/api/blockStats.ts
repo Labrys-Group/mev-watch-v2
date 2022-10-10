@@ -17,8 +17,13 @@ const blockStatsRequestSchema = z.object({
 type GetBlockStatsRequest = z.infer<typeof blockStatsRequestSchema>;
 
 export interface GetBlockStatsResponse {
+  /**
+   * Relay stats that occurred between startTime and endTime
+   */
   relayStats: RelayStats[];
-  // Number of blocks since provided startTime
+  /**
+   * Number of blocks since provided startTime
+   */
   totalBlocks: number;
 }
 
