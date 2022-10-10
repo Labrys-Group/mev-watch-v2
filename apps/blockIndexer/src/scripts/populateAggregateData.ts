@@ -1,6 +1,6 @@
 import { DATE_OF_MERGE } from "consts";
 import { connect } from "database";
-import { add, isAfter, isBefore } from "date-fns";
+import { add, isAfter } from "date-fns";
 
 import {
   AGGREGATION_PERIOD,

@@ -1,36 +1,52 @@
-import { BlockStatsModel, Relayer, RelayerModel, StatsAggregateModel } from "database/dist/models";
-import { RelayStats } from "../types";
+import { StatsAggregate, StatsAggregateModel } from "database/dist";
+import { AggregatedStats, RelayStats } from "../types";
 
 /**
- * Get MEV block stats for each relay in time frame
- *
- * @param timeFrame The time frame to fetch stats for as a string
- * @param startDate The date at which to start the time frame calculation
- * @returns Stats for each relay in the given time period
+ * 12 hours periods since merge, with one block per 12 seconds
  */
-export const getBlockStatsAggregated = async (
-  timeFrame: string,
-  startDate: Date
-): Promise<RelayStats[]> => { 
-  const blockStats = await StatsAggregateModel.findOne({}).sort({ ts: -1 });
+const BLOCKS_PER_PERIOD = 12 * 60 * 5;
 
-  const relayers = await RelayerModel.find();
+/**
+ * Get MEV block stats for each relay to populate line chart
+ *
+ * @returns Stats for each relay in the required time period
+ */
+export const getBlockStatsAggregated = async (): Promise<AggregatedStats[]> => {
+  const aggregatedStats =
+    (await StatsAggregateModel.find()) as StatsAggregate[];
 
-  const timeFrameStats = blockStats?.stats.find(
-    ({ timeFrame: tf }) => tf === timeFrame
+  const formattedStats: AggregatedStats[] = await Promise.all(
+    aggregatedStats.map(async (periodAggregate) => {
+      let censoringBlocks = 0;
+      let nonCensoringBlocks = 0;
+
+      const relayerStats: RelayStats[] = periodAggregate.stats.map(
+        ({ relayerName, isOfacCensoring, blocks }) => {
+          if (isOfacCensoring) {
+            censoringBlocks += blocks;
+          } else {
+            nonCensoringBlocks += blocks;
+          }
+
+          return {
+            name: relayerName,
+            numBlocks: blocks,
+            isOfacCensoring: isOfacCensoring,
+          };
+        }
+      );
+
+      return {
+        date: periodAggregate.ts,
+        relayerStats,
+        totalBlocks: BLOCKS_PER_PERIOD,
+        censoringBlocks,
+        nonCensoringBlocks
+      };
+    })
   );
 
-  if (!timeFrameStats) {
-    return [];
-  }
-  
-  const relayStats: RelayStats[] = timeFrameStats.stats.map((_stats) => ({
-    name: relayers.find(({ _id }) => _id === _stats.relayer)?.name ?? "Relayer",
-    numBlocks: _stats.blocks,
-    isOfacCensoring: _stats.isOfacCensoring,
-  }));
+  console.log(formattedStats);
 
-  console.log({ blockStats, timeFrameStats, relayers, relayStats });
-
-  return relayStats;
+  return formattedStats;
 };

@@ -4,60 +4,29 @@ import { z, ZodError } from "zod";
 import { connect } from "database/dist";
 
 import { TypedNextApiRequest } from "../../types/api";
-import { RelayStats } from "../../types";
+import { AggregatedStats, RelayStats } from "../../types";
 import { getTotalBlocks } from "../../helpers/getTotalBlocks";
-import { getBlockStats } from "../../helpers/getBlockStats";
 import { getBlockStatsAggregated } from "../../helpers/getBlockStatsAggregated";
 
-const blockStatsAggregatedRequestSchema = z.object({
-  // Using UNIX for requests to simplify datetime stuff
-  startTime: z.number(),
-  timeFrame: z.string(),
-});
-
-type GetBlockStatsRequest = z.infer<typeof blockStatsAggregatedRequestSchema>;
-
-export interface GetBlockStatsResponse {
+export interface AggregatedStatsResponse {
   /**
    * Relay stats that occurred between startTime and endTime
    */
-  relayStats: RelayStats[];
-  /**
-   * Number of blocks since provided startTime
-   */
-  totalBlocks: number;
+  relayStats: AggregatedStats[];
 }
 
 export default async (
-  req: TypedNextApiRequest<never, GetBlockStatsRequest>,
-  res: NextApiResponse<GetBlockStatsResponse>
+  req: TypedNextApiRequest<never>,
+  res: NextApiResponse<AggregatedStatsResponse>
 ) => {
   await connect();
 
-  try {
-    blockStatsAggregatedRequestSchema.parse(req.body);
-  } catch (e) {
-    if (e instanceof ZodError) {
-      // Casting this return response to any because the type is enforcing a valid return type whereas we want to send an error
-      return res.status(400).send(e.errors as any);
-    }
 
-    return res.status(400).end("Unknown Validation error");
-  }
-
-  const { startTime, timeFrame } = req.body;
-
-  const startDate = new Date(startTime * 1000);
-  const endDate = new Date();
-
-  const totalBlocks = await getTotalBlocks(startDate, endDate);
-  // const totalBlocks = 100000;
-
-  const relayStats = await getBlockStatsAggregated(timeFrame, startDate);
+  const relayStats = await getBlockStatsAggregated();
 
   if (!relayStats.length) {
-    return res.status(200).send({ relayStats: [], totalBlocks: 0 });
+    return res.status(200).send({ relayStats: [] });
   }
 
-  res.status(200).send({ relayStats, totalBlocks });
+  res.status(200).send({ relayStats });
 };
