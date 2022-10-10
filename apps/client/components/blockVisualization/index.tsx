@@ -15,22 +15,18 @@ import { useState } from "react";
 
 import { formatDistance } from "date-fns";
 import BlockLabel from "./BlockLabel";
+import { useQuery } from "react-query";
+import axios from "axios";
+import { GetLatestBlocksResponse } from "../../pages/api/getLatestBlocks";
 
 const BlockVisualization = () => {
   const [time, setTime] = useState<Date>(new Date());
   const [includeAllBlocks, setIncludeAllBlocks] = useBoolean(false);
 
-  const getBlocks = (size: number) => {
-    const blocks: { censor: boolean; id: number }[] = [];
+  const { data: latestBlocks } = useQuery(["latestBlocks"], () =>
+    axios.post<GetLatestBlocksResponse>("api/getLatestBlocks", { limit: 100 })
+  );
 
-    for (let i = 0; i < size; i += 1) {
-      blocks.push({
-        censor: i % 2 === 0,
-        id: i,
-      });
-    }
-    return blocks;
-  };
   return (
     <DefaultContainer>
       <DefaultTitle>
@@ -48,17 +44,22 @@ const BlockVisualization = () => {
         )}
       </HStack>
       <SimpleGrid columns={20} w="100%" spacingY="3px" spacingX="5px" my="20px">
-        {getBlocks(100).map((block) => (
-          <BlockTile
-            key={block.id}
-            bg={block.censor ? "brightRed.600" : "brightGreen.600"}
-          >
-            <Text
-              color={block.censor ? "white" : "black"}
-              fontSize="0.9rem"
-            >{`#${block.id}`}</Text>
-          </BlockTile>
-        ))}
+        {latestBlocks &&
+          latestBlocks.data.visualizationBlocks.map((block) => (
+            <BlockTile
+              key={block.slotNumber}
+              bg={
+                block.relayer.isOfacCensoring
+                  ? "brightRed.600"
+                  : "brightGreen.600"
+              }
+            >
+              <Text
+                color={block.relayer.isOfacCensoring ? "white" : "black"}
+                fontSize="0.7rem"
+              >{`#${block.slotNumber.toString().slice(-3)}`}</Text>
+            </BlockTile>
+          ))}
       </SimpleGrid>
       <Flex justify="flex-end" mx="20px">
         <DefaultSwitch
