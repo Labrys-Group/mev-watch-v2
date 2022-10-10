@@ -7,7 +7,7 @@ export class RelayStat {
   @prop({ required: true, ref: () => Relayer })
   public relayer!: Ref<Relayer>;
 
-  @prop({ require: true })
+  @prop({ required: true })
   public relayerName!: string;
 
   @prop({ default: null })
@@ -21,16 +21,10 @@ export class StatsAggregate {
   @prop({ required: true })
   public stats!: RelayStat[];
 
-  /**
-   * The starting time for the aggregation time period
-   */
   @prop({ required: true })
-  public startTime!: Date;
+  public startDate!: Date;
 
-  /**
-   * The end time at which the stats aggregation has occurred
-   */
-  @prop({ required: true })
+  @prop({ required: true, unique: true })
   public ts!: Date;
 }
 

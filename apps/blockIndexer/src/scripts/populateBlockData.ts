@@ -1,7 +1,7 @@
 import { BlockStatsModel, connect, Relayer, RelayerModel } from "database";
 import { minBy, groupBy, forEach } from "lodash";
-import { delayMillis } from "../helpers/delayMillis";
 
+import { delayMillis } from "../helpers/delayMillis";
 import { getBlockStatsFromRelayer } from "../helpers/getBlockStatsFromRelayer";
 import { saveBlockStats } from "../helpers/saveBlockStats";
 
