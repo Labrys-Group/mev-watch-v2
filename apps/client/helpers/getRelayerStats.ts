@@ -64,7 +64,6 @@ export const getWebScrapedRelayerStats = async (): Promise<
     relayStats.push({
       name,
       isOfacCensoring,
-      address: "",
       avgBlockValue: parseStringToNumber(avgBlockValue),
       numBlocks: parseStringToNumber(numBlocks),
       totalValueETH: parseStringToNumber(totalValueETH),
