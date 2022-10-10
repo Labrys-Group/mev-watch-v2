@@ -1,0 +1,106 @@
+import React, { useMemo } from "react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  ChartData,
+  PointElement,
+  LineElement,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import { useQuery } from "react-query";
+import axios from "axios";
+
+import {
+  HStack,
+  Switch,
+  useBoolean,
+  Text,
+  VStack,
+  Flex,
+  chakra,
+  Button,
+  Spinner,
+  Center,
+} from "@chakra-ui/react";
+
+import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
+import { getLineChartData } from "../helpers/getLineChartData";
+import { AggregatedStatsResponse } from "../pages/api/blockStatsAggregated";
+import { ofacLineChartOptions } from "../config/lineChart";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const getNowInUnix = () => Math.floor(Date.now() / 1000);
+
+const OfacLineChart = () => {
+  const { data: aggregateStatsResponse } = useQuery([], () =>
+    axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated", {})
+  );
+
+  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
+  const lineChartData = useMemo(() => {
+    if (!aggregateStatsResponse) return null;
+
+    return getLineChartData(
+      aggregateStatsResponse.data.relayStats,
+      isIncludingAllBlocks
+    );
+  }, [isIncludingAllBlocks, aggregateStatsResponse]);
+
+  return (
+    <Flex
+      flexDir="column"
+      w="100%"
+      bg="#0f0f0f"
+      borderRadius="10px"
+      border="1px solid #393939"
+      p="20px"
+      my="40px"
+      boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
+    >
+      <VStack>
+        <Text
+          color="white"
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="1.5rem"
+        >
+          Post-Merge OFAC Compliant Blocks
+        </Text>
+        {lineChartData ? (
+          <Area options={ofacLineChartOptions} data={lineChartData} />
+        ) : (
+          <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
+            <Spinner color="#00FFA7" size="xl" />
+          </Flex>
+        )}
+      </VStack>
+
+      <HStack justifyContent="right" p="10px 0px 5px" mx="15px">
+        <HStack>
+          <Switch
+            size="sm"
+            onChange={setIsIncludingAllBlocks.toggle}
+            isChecked={isIncludingAllBlocks}
+            colorScheme="brightGreen"
+          />
+          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+        </HStack>
+      </HStack>
+    </Flex>
+  );
+};
+
+export default OfacLineChart;

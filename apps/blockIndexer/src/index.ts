@@ -15,12 +15,6 @@ const getLatestData = async () => {
   await saveBlockStats(latestBlockStats.blockStats);
 };
 
-const aggregate = async () => {
-  console.log("Aggregating relayer stats")
-  
-  await saveAggregateStats([await getAggregateStats()]);
-}
-
 const main = async () => {
   await connect();
   await getLatestData();
