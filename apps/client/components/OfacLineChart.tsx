@@ -80,7 +80,7 @@ const OfacLineChart = () => {
           Post-Merge OFAC Compliant Blocks
         </Text>
         {lineChartData ? (
-          <Area options={ofacLineChartOptions} data={lineChartData} />
+          <Line options={ofacLineChartOptions} data={lineChartData} />
         ) : (
           <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
             <Spinner color="#00FFA7" size="xl" />
