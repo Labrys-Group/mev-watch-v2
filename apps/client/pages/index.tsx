@@ -17,6 +17,7 @@ const Home = () => {
       </DefaultText>
 
       <OfacBarChart />
+
       <DefaultText mt="10px">
         Help us improve this tool for the community
       </DefaultText>
@@ -48,7 +49,7 @@ const Home = () => {
       <BlockVisualization />
 
       <Note>
-        <Text fontWeight="bold" color="#00FFA7">
+        <Text fontWeight="bold" color="brightGreen.500">
           Protocol level censorship = Bad
         </Text>
         <DefaultText>

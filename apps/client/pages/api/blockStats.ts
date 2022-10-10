@@ -1,7 +1,7 @@
 import type { NextApiResponse } from "next";
 import { z, ZodError } from "zod";
 // TODO: Can this be fixed to not reference the dist folder
-import { connect } from "database/dist";
+import { connect } from "database/src/";
 
 import { TypedNextApiRequest } from "../../types/api";
 import { RelayStats } from "../../types";

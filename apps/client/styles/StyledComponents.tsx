@@ -19,8 +19,8 @@ export const PageTitle = chakra(Text, {
     marginBottom: "20px",
     background:
       "linear-gradient(to right, #00FFD3 0%, #71FFE0 50%, #FFFF00 100%)",
-    "-webkit-background-clip": "text",
-    "-webkit-text-fill-color": "transparent",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
 });
 
@@ -68,7 +68,7 @@ export const DefaultText = chakra(Text, {
 export const LabrysGreenText = chakra(Text, {
   baseStyle: {
     fontFamily: "GT-America-Mono-Medium",
-    color: "#00FFA7",
+    color: "brightGreen.500",
   },
 });
 
@@ -90,7 +90,7 @@ export const DefaultBtn = chakra(Button, {
   baseStyle: {
     position: "relative",
     background: "transparent",
-    border: "1px solid #00FFA7",
+    border: "1px solid brightGreen.500",
     top: "0px",
     left: "0px",
     color: "white",
@@ -98,7 +98,7 @@ export const DefaultBtn = chakra(Button, {
     fontSize: "14px",
     padding: "-5px 10px",
     _hover: {
-      background: "#00FFA7",
+      background: "brightGreen.500",
       color: "black",
     },
   },

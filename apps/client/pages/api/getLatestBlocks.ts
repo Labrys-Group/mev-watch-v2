@@ -1,4 +1,4 @@
-import { connect } from "database/dist";
+import { connect } from "database/src";
 import type { NextApiResponse } from "next";
 import { VisualizationBlock, TypedNextApiRequest } from "../../types";
 import { z, ZodError } from "zod";

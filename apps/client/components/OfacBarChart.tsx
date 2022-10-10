@@ -118,7 +118,7 @@ const OfacBarChart = () => {
           <Bar options={ofacBarChartOptions} data={barChartData} />
         ) : (
           <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
-            <Spinner color="#00FFA7" size="xl" />
+            <Spinner color="brightGreen.500" size="xl" />
           </Flex>
         )}
       </VStack>
@@ -147,7 +147,9 @@ const OfacBarChart = () => {
               onClick={() => setSelectedTimeFrame(timeFrames[index])}
               size="sm"
               borderColor={
-                timeFrame === selectedTimeFrame ? "#00FFA7" : "transparent"
+                timeFrame === selectedTimeFrame
+                  ? "brightGreen.500"
+                  : "transparent"
               }
               background={
                 timeFrame === selectedTimeFrame ? "#ffffff3c" : "transparent"
@@ -184,7 +186,7 @@ const TimeFrameBtn = chakra(Button, {
     fontSize: "14px",
     background: "transparent",
     _hover: {
-      borderColor: "#00FFA7",
+      borderColor: "brightGreen.500",
       background: "transparent",
     },
   },

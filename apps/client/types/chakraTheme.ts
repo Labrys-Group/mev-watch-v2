@@ -10,7 +10,7 @@ export type ColorGradient =
   | 800
   | 900;
 
-type ColorLookup = Record<ColorGradient, string>;
+type ColorLookup = Partial<Record<ColorGradient, string>>;
 
 export interface ColorTheme {
   brightGreen: ColorLookup;
