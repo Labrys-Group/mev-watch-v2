@@ -1,4 +1,4 @@
-import { StatsAggregate, StatsAggregateModel } from "database/dist";
+import { StatsAggregate, StatsAggregateModel } from "database";
 import { AggregatedStats, RelayStats } from "../types";
 
 /**
@@ -45,8 +45,6 @@ export const getBlockStatsAggregated = async (): Promise<AggregatedStats[]> => {
       };
     })
   );
-
-  console.log(formattedStats);
 
   return formattedStats;
 };

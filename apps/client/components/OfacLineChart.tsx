@@ -9,6 +9,7 @@ import {
   ChartData,
   PointElement,
   LineElement,
+  Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useQuery } from "react-query";
@@ -39,7 +40,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const getNowInUnix = () => Math.floor(Date.now() / 1000);

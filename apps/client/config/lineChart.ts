@@ -19,6 +19,9 @@ export const ofacLineChartOptions: ChartOptions<"line"> = {
       propagate: true,
     },
   },
+  elements: {
+    point: { radius: 0 },
+  },
   color: "white",
   maintainAspectRatio: true,
   scales: {
@@ -29,8 +32,6 @@ export const ofacLineChartOptions: ChartOptions<"line"> = {
     y: {
       ...axisProps,
       ticks: {
-        maxTicksLimit: 6,
-        stepSize: 0.25,
         callback: function (val: string | number, index: number) {
           // Upscale the x-axis so that it correctly represents the percentage values, otherwise it will limit at 1%
           return `${parseFloat(val.toString()) * 100}%`;

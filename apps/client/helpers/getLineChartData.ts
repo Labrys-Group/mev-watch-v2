@@ -1,51 +1,50 @@
-import { Chart } from "chart.js";
-import { sumBy } from "lodash";
 import { colors } from "../styles/theme";
-import { AggregatedStats, RelayStats } from "../types";
-import getFormattedDatasets from "./getFormattedDatasets";
-import getPercentage from "./getPercentage";
-import { sortAndDivideOfacRelays } from "./relayProcessing";
+import { AggregatedStats } from "../types";
 
 export const getLineChartData = (
   relayStats: AggregatedStats[],
   isIncludingAllBlocks: boolean
 ) => {
-  const ofacCompliantData = relayStats.map(
-    ({ totalBlocks, censoringBlocks, nonCensoringBlocks }) =>
-      censoringBlocks / totalBlocks
+  const sumOfacCompliantData = relayStats.map(
+    ({ totalBlocks, censoringBlocks }) => censoringBlocks / totalBlocks
   );
 
-  const nonOfacCompliantData = relayStats.map(
-    ({ totalBlocks, censoringBlocks, nonCensoringBlocks }) =>
-      nonCensoringBlocks / totalBlocks
+  const sumNonOfacCompliantData = relayStats.map(
+    ({ totalBlocks, nonCensoringBlocks }) => nonCensoringBlocks / totalBlocks
   );
 
-  const nonMevBlock = relayStats.map(
+  const nonMevBoostData = relayStats.map(
     ({ totalBlocks, censoringBlocks, nonCensoringBlocks }) =>
       (totalBlocks - censoringBlocks - nonCensoringBlocks) / totalBlocks
   );
 
-  console.log({ ofacCompliantData, nonOfacCompliantData, nonMevBlock });
+  const timeline = relayStats.map(({ date }) => date);
 
-  const timeline = relayStats.map(({ date }) => date.toString());
-
-  return {
+  const data = {
     labels: timeline,
     datasets: [
       {
         label: "Not OFAC Compliant",
-        data: nonOfacCompliantData,
+        data: sumNonOfacCompliantData,
         backgroundColor: colors.brightGreen[500],
-        borderColor: colors.brightGreen[700],
-        fill: true, 
+        fill: "origin",
       },
       {
         label: "OFAC Compliant",
-        data: ofacCompliantData,
+        data: sumOfacCompliantData,
         backgroundColor: colors.brightRed[500],
-        borderColor: colors.brightRed[700],
-        fill: true
+        fill: "origin",
       },
     ],
   };
+
+  if (isIncludingAllBlocks) {
+    data.datasets.push({
+      label: "Non-MEV-Boost",
+      data: nonMevBoostData,
+      backgroundColor: "#2f2f2f",
+      fill: "origin",
+    });
+  }
+  return data;
 };
