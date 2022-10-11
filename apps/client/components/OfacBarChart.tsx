@@ -111,7 +111,7 @@ const OfacBarChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
-      <VStack h={{sm: "150px", md: "130px"}}>
+      <VStack maxH={{sm: "150px", md: "130px"}}>
         <Text
           color="white"
           textAlign="center"
