@@ -11,9 +11,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  GKE_CLUSTER: cluster-1    # Add your cluster name here.
-  GKE_ZONE: us-central1-c   # Add your cluster zone here.
-  DEPLOYMENT_NAME: block-indexer # Add your deployment name here.
+  DEPLOYMENT_NAME: block-indexer
   DOCKERFILE: apps/blockIndexer/Dockerfile
   IMAGE_TAG: gcr.io/mev-watch/block-indexer:${{ github.sha }}
   LATEST_IMAGE_TAG: gcr.io/mev-watch/block-indexer:latest
@@ -40,14 +38,6 @@ jobs:
     - name: GCP Auth
       run: |-
         gcloud --quiet auth configure-docker
-
-    # Get the GKE credentials so we can deploy to the cluster
-    # - name: GKE Credentials
-    #   uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-    #   with:
-    #     cluster_name: ${{ env.GKE_CLUSTER }}
-    #     location: ${{ env.GKE_ZONE }}
-    #     credentials: ${{ secrets.GKE_SA_KEY }}
 
     # Build the Docker image
     - name: Build
