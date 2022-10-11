@@ -19,11 +19,11 @@ COPY out/full .
 # build the app
 RUN npx turbo run build --scope=server --include-dependencies --no-deps
 
+# pull env
+RUN npm_config_yes=true npx dotenv-vault@latest pull --dotenvMe $DOTENV_ME
+
 # switch to non-root user
 USER node
-
-# pull env
-CMD npm_config_yes=true npx dotenv-vault@latest pull --dotenvMe $DOTENV_ME
 
 # run server
 CMD npx turbo run start --scope=server

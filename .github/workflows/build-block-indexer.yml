@@ -11,6 +11,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  DOTENV_ME: ${{ secrets.DOTENV_ME }}
   DEPLOYMENT_NAME: block-indexer
   DOCKERFILE: apps/blockIndexer/Dockerfile
   IMAGE_TAG: gcr.io/mev-watch/block-indexer:${{ github.sha }}
