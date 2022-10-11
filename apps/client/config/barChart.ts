@@ -22,7 +22,7 @@ export const ofacBarChartOptions: ChartOptions<"bar"> = {
       },
     },
   },
-  maintainAspectRatio: false,
+  maintainAspectRatio: true,
   responsive: true,
   color: "white",
   scales: {
