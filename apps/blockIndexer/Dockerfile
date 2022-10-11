@@ -1,6 +1,8 @@
 # install stage
 FROM node:lts-alpine as builder
 
+ARG DOTENV_ME
+
 # set the working directory
 WORKDIR /app
 
@@ -19,7 +21,11 @@ COPY out/full .
 # build the app
 RUN npx turbo run build --scope=server --include-dependencies --no-deps
 
+# pull env
+RUN cd ./apps/blockIndexer && npm_config_yes=true npx dotenv-vault@latest pull --dotenvMe $DOTENV_ME && cd ../..
+
 # switch to non-root user
 USER node
 
+# run server
 CMD npx turbo run start --scope=server

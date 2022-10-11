@@ -1,4 +1,4 @@
-import { BlockStats, Relayer } from "database";
+import { BlockStats, Relayer } from "database/dist";
 
 import { getBlockStatsFromRelayer } from "./getBlockStatsFromRelayer";
 
