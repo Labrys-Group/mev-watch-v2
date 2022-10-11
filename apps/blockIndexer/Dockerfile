@@ -22,4 +22,8 @@ RUN npx turbo run build --scope=server --include-dependencies --no-deps
 # switch to non-root user
 USER node
 
+# pull env
+CMD npm_config_yes=true npx dotenv-vault@latest pull --dotenvMe $DOTENV_ME
+
+# run server
 CMD npx turbo run start --scope=server
