@@ -49,3 +49,4 @@ jobs:
     - name: Publish
       run: |-
         docker push "$IMAGE_TAG"
+        docker push "$LATEST_IMAGE_TAG"
