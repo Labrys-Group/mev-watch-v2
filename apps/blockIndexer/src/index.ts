@@ -1,4 +1,4 @@
-import { connect, RelayerModel } from "database";
+import { connect, RelayerModel } from "database/dist";
 
 import { getLatestBlockStats } from "./helpers/getLatestBlockStats";
 import { saveBlockStats } from "./helpers/saveBlockStats";

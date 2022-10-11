@@ -1,4 +1,4 @@
-import { BlockStats, BlockStatsModel } from "database";
+import { BlockStats, BlockStatsModel } from "database/dist";
 
 /**
  * This method wraps the mongoDb insert call to allow for saving duplicates and then basic error handling
