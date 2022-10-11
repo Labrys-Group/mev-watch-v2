@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -38,6 +38,7 @@ import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";
 import { TimeFrame } from "../types";
+import { StatsContext } from "../providers/StatsProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -56,6 +57,8 @@ interface DateRange {
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
+  const {includeAllBlocks, AllBlocksToggle} = useContext(StatsContext)
+
   const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
     timeFrames[timeFrames.length - 3]
   );
@@ -69,8 +72,6 @@ const OfacBarChart = () => {
       })
   );
 
-  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
-
   const barChartData: ChartData<"bar", number[], string> | null =
     useMemo(() => {
       if (!blockStatsResponse) return null;
@@ -78,9 +79,9 @@ const OfacBarChart = () => {
       return getBarChartData(
         blockStatsResponse.data.relayStats,
         blockStatsResponse.data.totalBlocks,
-        isIncludingAllBlocks
+        includeAllBlocks
       );
-    }, [isIncludingAllBlocks, blockStatsResponse]);
+    }, [includeAllBlocks, blockStatsResponse]);
 
   const percentageCensoring = useMemo(() => {
     if (!blockStatsResponse) return null;
@@ -90,7 +91,7 @@ const OfacBarChart = () => {
       (stats) => stats.numBlocks
     );
 
-    const totalBlocks = isIncludingAllBlocks
+    const totalBlocks = includeAllBlocks
       ? blockStatsResponse.data.totalBlocks
       : totalBlocksFromRelays;
 
@@ -98,7 +99,7 @@ const OfacBarChart = () => {
       blockStatsResponse.data.relayStats
     );
     return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
-  }, [isIncludingAllBlocks, blockStatsResponse]);
+  }, [includeAllBlocks, blockStatsResponse]);
 
   return (
     <Flex
@@ -135,7 +136,7 @@ const OfacBarChart = () => {
             <IoWarning color="#ff0" size={24} />
             <PercentBlocksText>
               {`${percentageCensoring}${
-                isIncludingAllBlocks
+                includeAllBlocks
                   ? "% enforced OFAC compliance"
                   : "% (relayed blocks) enforcing OFAC compliance"
               }`}
@@ -168,21 +169,7 @@ const OfacBarChart = () => {
             </TimeFrameBtn>
           ))}
         </HStack>
-        <HStack>
-          <Switch
-            size="sm"
-            onChange={setIsIncludingAllBlocks.toggle}
-            isChecked={isIncludingAllBlocks}
-            colorScheme="brightGreen"
-          />
-          <AllBlocksToggleText
-            onClick={setIsIncludingAllBlocks.toggle}
-            fontSize="14px"
-            color={isIncludingAllBlocks ? "brightGreen.500" : "white"}
-          >
-            Include all Blocks
-          </AllBlocksToggleText>
-        </HStack>
+        {AllBlocksToggle}
       </Stack>
     </Flex>
   );
@@ -208,15 +195,5 @@ const TimeFrameBtn = chakra(Button, {
       borderColor: "#00FFA7",
       background: "transparent",
     },
-  },
-});
-
-const AllBlocksToggleText = chakra(DefaultText, {
-  baseStyle: {
-    _hover: {
-      cursor: "pointer",
-    },
-    WebkitTouchCallout: "none",
-    userSelect: "none",
   },
 });

@@ -8,6 +8,7 @@ import MainContainer from "../components/MainContainer";
 import Head from "next/head";
 import Script from "next/script";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { StatsContextProvider } from "../providers/StatsProvider";
 
 const queryClient = new QueryClient();
 
@@ -47,7 +48,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <MainContainer>
-            <Component {...pageProps} />
+            <StatsContextProvider>
+              <Component {...pageProps} />
+            </StatsContextProvider>
           </MainContainer>
         </QueryClientProvider>
       </ChakraProvider>

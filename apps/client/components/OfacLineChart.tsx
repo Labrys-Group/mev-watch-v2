@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,6 +32,7 @@ import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
 import { getLineChartData } from "../helpers/getLineChartData";
 import { AggregatedStatsResponse } from "../pages/api/blockStatsAggregated";
 import { ofacLineChartOptions } from "../config/lineChart";
+import { StatsContext } from "../providers/StatsProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -51,15 +52,16 @@ const OfacLineChart = () => {
     axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated", {})
   );
 
-  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
+  const {includeAllBlocks, AllBlocksToggle} = useContext(StatsContext)
+
   const lineChartData = useMemo(() => {
     if (!aggregateStatsResponse) return null;
 
     return getLineChartData(
       aggregateStatsResponse.data.relayStats,
-      isIncludingAllBlocks
+      includeAllBlocks
     );
-  }, [isIncludingAllBlocks, aggregateStatsResponse]);
+  }, [includeAllBlocks, aggregateStatsResponse]);
 
   return (
     <Flex
@@ -91,15 +93,7 @@ const OfacLineChart = () => {
       </VStack>
 
       <HStack justifyContent="right" p="10px 0px 5px" mx="15px">
-        <HStack>
-          <Switch
-            size="sm"
-            onChange={setIsIncludingAllBlocks.toggle}
-            isChecked={isIncludingAllBlocks}
-            colorScheme="brightGreen"
-          />
-          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
-        </HStack>
+        {AllBlocksToggle}
       </HStack>
     </Flex>
   );
