@@ -59,11 +59,6 @@ const OfacBarChart = () => {
     timeFrames[timeFrames.length - 1]
   );
 
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startTime: 0,
-    endTime: getNowInUnix(),
-  });
-
   const { data: blockStatsResponse } = useQuery(
     ["todos", selectedTimeFrame.value],
     () =>
@@ -133,7 +128,7 @@ const OfacBarChart = () => {
         )}
       </VStack>
 
-      <HStack justify="center" mt="40px" h="20px">
+      <HStack justify="center" mt="20px" mb="10px" h="20px">
         {barChartData && (
           <>
             <IoWarning color="#ff0" size={24} />
@@ -174,7 +169,13 @@ const OfacBarChart = () => {
             isChecked={isIncludingAllBlocks}
             colorScheme="brightGreen"
           />
-          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+          <AllBlocksToggleText
+            onClick={setIsIncludingAllBlocks.toggle}
+            fontSize="14px"
+            color={isIncludingAllBlocks ? "brightGreen.500" : "white"}
+          >
+            Include all Blocks
+          </AllBlocksToggleText>
         </HStack>
       </HStack>
     </Flex>
@@ -201,5 +202,15 @@ const TimeFrameBtn = chakra(Button, {
       borderColor: "#00FFA7",
       background: "transparent",
     },
+  },
+});
+
+const AllBlocksToggleText = chakra(DefaultText, {
+  baseStyle: {
+    _hover: {
+      cursor: "pointer",
+    },
+    WebkitTouchCallout: "none",
+    userSelect: "none"
   },
 });
