@@ -21,6 +21,10 @@ export const timeFrames: TimeFrame[] = [
     value: getUnixTime(sub(new Date(), { days: 7 })),
   },
   {
+    label: "1d",
+    value: getUnixTime(sub(new Date(), { days: 1 })),
+  },
+  {
     label: "1h",
     value: getUnixTime(sub(new Date(), { hours: 1 })),
   },
