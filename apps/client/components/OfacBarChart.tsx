@@ -57,7 +57,7 @@ interface DateRange {
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
-  const {includeAllBlocks, AllBlocksToggle} = useContext(StatsContext)
+  const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
   const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
     timeFrames[timeFrames.length - 3]
@@ -112,7 +112,7 @@ const OfacBarChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
-      <VStack h={{sm: "150px", md: "130px"}}>
+      <VStack h={{ sm: "150px", md: "130px" }}>
         <Text
           color="white"
           textAlign="center"

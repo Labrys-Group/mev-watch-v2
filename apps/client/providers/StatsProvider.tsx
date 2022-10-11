@@ -19,20 +19,20 @@ const StatsContextProvider = ({ children }: { children: ReactNode }) => {
 
   const AllBlocksToggle = (
     <HStack>
-          <Switch
-            size="sm"
-            onChange={setIncludeAllBlocks.toggle}
-            isChecked={includeAllBlocks}
-            colorScheme="brightGreen"
-          />
-          <AllBlocksToggleText
-            onClick={setIncludeAllBlocks.toggle}
-            fontSize="14px"
-            color={includeAllBlocks ? "brightGreen.500" : "white"}
-          >
-            Include all Blocks
-          </AllBlocksToggleText>
-        </HStack>
+      <Switch
+        size="sm"
+        onChange={setIncludeAllBlocks.toggle}
+        isChecked={includeAllBlocks}
+        colorScheme="brightGreen"
+      />
+      <AllBlocksToggleText
+        onClick={setIncludeAllBlocks.toggle}
+        fontSize="14px"
+        color={includeAllBlocks ? "brightGreen.500" : "white"}
+      >
+        Include all Blocks
+      </AllBlocksToggleText>
+    </HStack>
   );
 
   return (
@@ -57,5 +57,4 @@ const AllBlocksToggleText = chakra(DefaultText, {
   },
 });
 
-
-export { StatsContext, StatsContextProvider }
+export { StatsContext, StatsContextProvider };
