@@ -7,7 +7,7 @@ const markdownStyles = {
   a: ({ node, ...props }: { node: any }) => (
     <a target="_blank" style={{ color: "#00FFA7" }} {...props} />
   ),
-  code: ({ node, inline, ...props }: { node: any, inline: boolean }) => {
+  code: ({ node, ...props }: { node: any }) => {
     const toast = useToast();
     return (
       <Code
@@ -29,7 +29,7 @@ const markdownStyles = {
             position: "top",
           });
         }}
-        {...props}
+        {...{ ...props, inline: undefined }}
       />
     );
   },

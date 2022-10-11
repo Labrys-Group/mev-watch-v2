@@ -1,4 +1,4 @@
-import { connect, RelayerModel } from "database";
+import { connect, RelayerModel } from "database/dist";
 
 import { getAggregateStats } from "./helpers/aggregation/getAggregateStats";
 import { saveAggregateStats } from "./helpers/aggregation/saveAggregateStats";
