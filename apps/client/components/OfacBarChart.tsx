@@ -25,6 +25,7 @@ import {
   Button,
   Spinner,
   Center,
+  Stack,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
@@ -56,13 +57,8 @@ const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
   const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
-    timeFrames[timeFrames.length - 1]
+    timeFrames[timeFrames.length - 3]
   );
-
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startTime: 0,
-    endTime: getNowInUnix(),
-  });
 
   const { data: blockStatsResponse } = useQuery(
     ["todos", selectedTimeFrame.value],
@@ -115,7 +111,7 @@ const OfacBarChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
-      <VStack h="130px">
+      <VStack h={{sm: "150px", md: "130px"}}>
         <Text
           color="white"
           textAlign="center"
@@ -133,7 +129,7 @@ const OfacBarChart = () => {
         )}
       </VStack>
 
-      <HStack justify="center" mt="40px" h="20px">
+      <HStack justify="center" mt="20px" mb="10px" h="20px">
         {barChartData && (
           <>
             <IoWarning color="#ff0" size={24} />
@@ -148,7 +144,12 @@ const OfacBarChart = () => {
         )}
       </HStack>
 
-      <HStack justifyContent="space-between" p="20px 0px 5px" mx="15px">
+      <Stack
+        direction={{ sm: "column", md: "row" }}
+        justifyContent="space-between"
+        p="20px 0px 5px"
+        mx="15px"
+      >
         <HStack>
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
           {timeFrames.map((timeFrame, index) => (
@@ -174,9 +175,15 @@ const OfacBarChart = () => {
             isChecked={isIncludingAllBlocks}
             colorScheme="brightGreen"
           />
-          <DefaultText fontSize="14px">Include all Blocks</DefaultText>
+          <AllBlocksToggleText
+            onClick={setIsIncludingAllBlocks.toggle}
+            fontSize="14px"
+            color={isIncludingAllBlocks ? "brightGreen.500" : "white"}
+          >
+            Include all Blocks
+          </AllBlocksToggleText>
         </HStack>
-      </HStack>
+      </Stack>
     </Flex>
   );
 };
@@ -201,5 +208,15 @@ const TimeFrameBtn = chakra(Button, {
       borderColor: "#00FFA7",
       background: "transparent",
     },
+  },
+});
+
+const AllBlocksToggleText = chakra(DefaultText, {
+  baseStyle: {
+    _hover: {
+      cursor: "pointer",
+    },
+    WebkitTouchCallout: "none",
+    userSelect: "none",
   },
 });
