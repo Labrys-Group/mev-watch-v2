@@ -42,4 +42,8 @@ export const ofacLineChartOptions: ChartOptions<"line"> = {
       },
     },
   },
+  interaction: {
+    mode: "index",
+    intersect: false,
+  },
 };

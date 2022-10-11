@@ -18,7 +18,9 @@ export const getLineChartData = (
       (totalBlocks - censoringBlocks - nonCensoringBlocks) / totalBlocks
   );
 
-  const timeline = relayStats.map(({ date }) => date);
+  const timeline = relayStats.map(({ date }) =>
+    new Date(date).toDateString().slice(4)
+  );
 
   const data = {
     labels: timeline,
