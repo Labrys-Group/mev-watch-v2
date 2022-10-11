@@ -25,6 +25,7 @@ import {
   Button,
   Spinner,
   Center,
+  Stack,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
@@ -56,7 +57,7 @@ const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
   const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
-    timeFrames[timeFrames.length - 1]
+    timeFrames[timeFrames.length - 3]
   );
 
   const { data: blockStatsResponse } = useQuery(
@@ -110,7 +111,7 @@ const OfacBarChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
-      <VStack h="130px">
+      <VStack h={{sm: "150px", md: "130px"}}>
         <Text
           color="white"
           textAlign="center"
@@ -143,7 +144,12 @@ const OfacBarChart = () => {
         )}
       </HStack>
 
-      <HStack justifyContent="space-between" p="20px 0px 5px" mx="15px">
+      <Stack
+        direction={{ sm: "column", md: "row" }}
+        justifyContent="space-between"
+        p="20px 0px 5px"
+        mx="15px"
+      >
         <HStack>
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
           {timeFrames.map((timeFrame, index) => (
@@ -177,7 +183,7 @@ const OfacBarChart = () => {
             Include all Blocks
           </AllBlocksToggleText>
         </HStack>
-      </HStack>
+      </Stack>
     </Flex>
   );
 };
@@ -211,6 +217,6 @@ const AllBlocksToggleText = chakra(DefaultText, {
       cursor: "pointer",
     },
     WebkitTouchCallout: "none",
-    userSelect: "none"
+    userSelect: "none",
   },
 });
