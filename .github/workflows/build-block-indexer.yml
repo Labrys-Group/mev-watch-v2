@@ -15,8 +15,8 @@ env:
   GKE_ZONE: us-central1-c   # Add your cluster zone here.
   DEPLOYMENT_NAME: block-indexer # Add your deployment name here.
   DOCKERFILE: apps/blockIndexer/Dockerfile
-  IMAGE_TAG: mev-watch/block-indexer:${{ github.sha }}
-  LATEST_IMAGE_TAG: mev-watch/block-indexer:latest
+  IMAGE_TAG: gcr.io/mev-watch/block-indexer:${{ github.sha }}
+  LATEST_IMAGE_TAG: gcr.io/mev-watch/block-indexer:latest
 
 jobs:
   setup-build-publish:
@@ -58,5 +58,4 @@ jobs:
     # Push the Docker image to Google Container Registry
     - name: Publish
       run: |-
-        docker push "gcr.io/$IMAGE_TAG"
-        docker push "gcr.io/$LATEST_IMAGE_TAG"
+        docker push "$IMAGE_TAG"
