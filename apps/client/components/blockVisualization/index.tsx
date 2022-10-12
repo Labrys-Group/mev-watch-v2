@@ -7,8 +7,13 @@ import {
   Center,
   useBreakpoint,
   useBreakpointValue,
+  Spinner,
 } from "@chakra-ui/react";
-import { DefaultContainer, DefaultTitle } from "../../styles/StyledComponents";
+import {
+  DefaultContainer,
+  DefaultSpinner,
+  DefaultTitle,
+} from "../../styles/StyledComponents";
 import { useContext, useEffect, useMemo, useState } from "react";
 
 import { formatDistance, sub } from "date-fns";
@@ -17,7 +22,6 @@ import { useQuery } from "react-query";
 import axios from "axios";
 import { GetLatestBlocksResponse } from "../../pages/api/getLatestBlocks";
 import BlockTile from "./BlockTile";
-import { ethers, providers } from "ethers";
 import getAllLatestBlocks from "../../helpers/getAllLatestBlocks";
 import { StatsContext } from "../../providers/StatsProvider";
 
@@ -41,7 +45,11 @@ const BlockVisualization = () => {
   );
 
   // refetch every 20seconds
-  setInterval(refetch, 20000);
+  useEffect(() => {
+    const refetchBlocks = setInterval(refetch, 20000);
+
+    return () => clearInterval(refetchBlocks);
+  }, [refetch]);
 
   // useMemo to return blocks to avoid data flashing
   const getBlocks = useMemo(() => {
@@ -85,7 +93,11 @@ const BlockVisualization = () => {
         )}
       </HStack>
 
-      {!isLoading && (
+      {isLoading ? (
+        <Flex>
+          <DefaultSpinner minH="240px" />
+        </Flex>
+      ) : (
         <SimpleGrid
           columns={blocksPerRow}
           w="100%"
