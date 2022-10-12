@@ -36,8 +36,6 @@ const getAllLatestBlocks = (
 
     allBlocks.push(block);
   }
-  // console.log("OR", mevBlocks);
-  // console.log("RE", allBlocks);
   return allBlocks;
 };
 

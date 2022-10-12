@@ -1,34 +1,49 @@
-import { Flex, Text, Tooltip, chakra } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  Tooltip,
+  chakra,
+  Center,
+  AspectRatio,
+} from "@chakra-ui/react";
 import { VisualizationBlock } from "../../types";
 
 interface BlockTileProps {
   block: VisualizationBlock;
+  blocksPerRow: number;
 }
 
 const getTileBgColor = (block: VisualizationBlock): string => {
   if (block.relayer.name !== "Non-MEV block") {
     if (block.relayer.isOfacCensoring) {
-      return "brightRed.600";
+      return "brightRed.500";
     }
-    return "brightGreen.600";
+    return "brightGreen.500";
   }
-  return "gray";
+  return "#CBCBCB";
 };
 
 const BlockTile = (props: BlockTileProps) => {
-  const { block } = props;
+  const { block, blocksPerRow } = props;
 
   return (
     <Tooltip
-      label={`#${block.slotNumber}`}
+      label={`Slot #${block.slotNumber}`}
       hasArrow
       placement="top"
       bg="#202020c7"
     >
-      <BlockTileContainer bg={getTileBgColor(block)}>
+      <BlockTileContainer
+        ratio={1}
+        maxW="32px"
+        bg={getTileBgColor(block)}
+        onClick={() =>
+          window.open(`https://beaconcha.in/slot/${block.slotNumber}`)
+        }
+      >
         <Text
           color={block.relayer.isOfacCensoring ? "white" : "black"}
-          fontSize="0.7rem"
+          fontSize="0.65rem"
         >{`#${block.slotNumber.toString().slice(-3)}`}</Text>
       </BlockTileContainer>
     </Tooltip>
@@ -37,15 +52,18 @@ const BlockTile = (props: BlockTileProps) => {
 
 export default BlockTile;
 
-const BlockTileContainer = chakra(Flex, {
+const BlockTileContainer = chakra(AspectRatio, {
   baseStyle: {
-    width: "35px",
-    height: "35px",
-    padding: "10px",
-    margin: "8px",
-    borderRadius: "5px",
-    justifyContent: "center",
-    alignItems: "center",
+    // minWidth: "20px",
+    // maxWidth: "35px",
+    // width: "100%",
+    // minHeight: "20px",
+    // maxHeight: "35px",
+    // boxSize: "35px",
+    // height: "100%",
+    // padding: "5px",
+    // margin: "2px",
+    borderRadius: "3px",
     cursor: "pointer",
   },
 });

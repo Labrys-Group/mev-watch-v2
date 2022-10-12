@@ -16,30 +16,26 @@ import axios from "axios";
 import { ofacBarChartOptions } from "../config/barChart";
 import {
   HStack,
-  Switch,
-  useBoolean,
   Text,
   VStack,
   Flex,
   chakra,
   Button,
   Spinner,
-  Center,
   Stack,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
+import { getBarChartData } from "../helpers/getBarChartData";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
 import {
   LabrysGreenText,
   DefaultTitle,
   DefaultContainer,
-  DefaultSwitch,
 } from "../styles/StyledComponents";
-import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";
 import { TimeFrame } from "../types";
@@ -54,10 +50,10 @@ ChartJS.register(
   Legend
 );
 
-interface DateRange {
-  startTime: number;
-  endTime: number;
-}
+// interface DateRange {
+//   startTime: number;
+//   endTime: number;
+// }
 
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
@@ -113,7 +109,13 @@ const OfacBarChart = () => {
         {barChartData ? (
           <Bar options={ofacBarChartOptions} data={barChartData} />
         ) : (
-          <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
+          <Flex
+            h="100%"
+            minH="120px"
+            w="100%"
+            alignItems="end"
+            justifyContent="center"
+          >
             <Spinner color="brightGreen.500" size="xl" />
           </Flex>
         )}

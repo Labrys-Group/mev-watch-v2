@@ -1,4 +1,4 @@
-import { HStack, Box, Text } from "@chakra-ui/react";
+import { HStack, Box, Text, chakra } from "@chakra-ui/react";
 
 interface BlockLabelProps {
   color: string;
@@ -7,8 +7,8 @@ interface BlockLabelProps {
 const BlockLabel = (props: BlockLabelProps) => {
   const { color, label } = props;
   return (
-    <HStack pr="30px">
-      <Box bg={color} h="25px" w="25px" mr="5px" borderRadius="5px" />
+    <HStack>
+      <Label bg={color} />
       <Text color="white" fontSize="0.8rem">
         {label}
       </Text>
@@ -17,3 +17,10 @@ const BlockLabel = (props: BlockLabelProps) => {
 };
 
 export default BlockLabel;
+
+const Label = chakra(Box, {
+  baseStyle: {
+    minHeight: "13px",
+    minWidth: "40px",
+  },
+});

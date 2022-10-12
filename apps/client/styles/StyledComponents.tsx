@@ -90,7 +90,8 @@ export const DefaultBtn = chakra(Button, {
   baseStyle: {
     position: "relative",
     background: "transparent",
-    border: "1px solid brightGreen.500",
+    borderWidth: "1px",
+    borderColor: "brightGreen.500",
     top: "0px",
     left: "0px",
     color: "white",
