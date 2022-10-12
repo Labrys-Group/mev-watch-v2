@@ -71,6 +71,7 @@ const OfacLineChart = () => {
       borderRadius="10px"
       border="1px solid #393939"
       p="20px"
+      pr="40px"
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
