@@ -1,10 +1,10 @@
-import { BlockStatsModel } from "database";
+import { BlockStatsModel } from "database/dist/models";
 import { VisualizationBlock } from "../types";
 
 export const getLatestBlocks = async (
   limit: number
 ): Promise<VisualizationBlock[]> => {
-  const latestBlocks = await BlockStatsModel.aggregate([
+  const latestBlocks: VisualizationBlock[] = await BlockStatsModel.aggregate([
     {
       $sort: {
         ts: -1,

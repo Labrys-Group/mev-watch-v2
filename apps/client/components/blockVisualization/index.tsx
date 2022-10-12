@@ -11,21 +11,66 @@ import {
   DefaultSwitch,
   DefaultTitle,
 } from "../../styles/StyledComponents";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { formatDistance } from "date-fns";
+import { formatDistance, sub } from "date-fns";
 import BlockLabel from "./BlockLabel";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { GetLatestBlocksResponse } from "../../pages/api/getLatestBlocks";
+import BlockTile from "./BlockTile";
+import { ethers, providers } from "ethers";
+import getAllLatestBlocks from "../../helpers/getAllLatestBlocks";
+
+const maxBlocks = 100;
 
 const BlockVisualization = () => {
   const [time, setTime] = useState<Date>(new Date());
   const [includeAllBlocks, setIncludeAllBlocks] = useBoolean(false);
+  const [provider, setProvider] = useState<providers.Provider>();
 
-  const { data: latestBlocks } = useQuery(["latestBlocks"], () =>
-    axios.post<GetLatestBlocksResponse>("api/getLatestBlocks", { limit: 100 })
+  // fetch the latest blocks from MongoDb
+  const {
+    data: latestBlocks,
+    refetch,
+    isLoading,
+  } = useQuery(["latestBlocks"], () =>
+    axios.post<GetLatestBlocksResponse>("api/getLatestBlocks", {
+      limit: maxBlocks,
+    })
   );
+
+  // create a provider to read mainnet
+  useEffect(() => {
+    if (!window.ethereum) return;
+    const newProvider = ethers.getDefaultProvider();
+    setProvider(newProvider);
+  }, []);
+
+  // TODO: uncomment this to run
+  // refetch latest blocks on every new block in mainnet
+  provider?.on("block", refetch);
+
+  // useMemo to return blocks to avoid data flashing
+  const getBlocks = useMemo(() => {
+    if (!latestBlocks) return;
+
+    const blocks = getAllLatestBlocks(
+      latestBlocks.data.visualizationBlocks.reverse(),
+      maxBlocks,
+      includeAllBlocks
+    );
+
+    setTime(
+      includeAllBlocks
+        ? sub(new Date(), { minutes: 20 })
+        : new Date(blocks[blocks.length - 1].ts)
+    );
+
+    return blocks.map((block) => (
+      <BlockTile key={block.slotNumber} block={block} />
+    ));
+  }, [latestBlocks, includeAllBlocks]);
 
   return (
     <DefaultContainer>
@@ -39,28 +84,21 @@ const BlockVisualization = () => {
           color="brightGreen.600"
           label="Not Enforcing OFAC Censorship"
         />
-        {includeAllBlocks && (
-          <BlockLabel color="gray.500" label="Non-MEV-Boost" />
-        )}
+        {includeAllBlocks && <BlockLabel color="gray" label="Non-MEV-Boost" />}
       </HStack>
-      <SimpleGrid columns={20} w="100%" spacingY="3px" spacingX="5px" my="20px">
-        {latestBlocks &&
-          latestBlocks.data.visualizationBlocks.map((block) => (
-            <BlockTile
-              key={block.slotNumber}
-              bg={
-                block.relayer.isOfacCensoring
-                  ? "brightRed.600"
-                  : "brightGreen.600"
-              }
-            >
-              <Text
-                color={block.relayer.isOfacCensoring ? "white" : "black"}
-                fontSize="0.7rem"
-              >{`#${block.slotNumber.toString().slice(-3)}`}</Text>
-            </BlockTile>
-          ))}
-      </SimpleGrid>
+
+      {!isLoading && (
+        <SimpleGrid
+          columns={20}
+          w="100%"
+          spacingY="3px"
+          spacingX="5px"
+          my="20px"
+        >
+          {getBlocks}
+        </SimpleGrid>
+      )}
+
       <Flex justify="flex-end" mx="20px">
         <DefaultSwitch
           onChange={setIncludeAllBlocks.toggle}
@@ -79,17 +117,5 @@ const SpanText = chakra(Text, {
     color: "gray",
     fontSize: "0.8rem",
     marginLeft: "20px",
-  },
-});
-
-const BlockTile = chakra(Flex, {
-  baseStyle: {
-    width: "35px",
-    height: "35px",
-    padding: "10px",
-    margin: "8px",
-    borderRadius: "5px",
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

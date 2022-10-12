@@ -1,4 +1,4 @@
-import { connect } from "database/src";
+import { connect } from "database/dist";
 import type { NextApiResponse } from "next";
 import { VisualizationBlock, TypedNextApiRequest } from "../../types";
 import { z, ZodError } from "zod";
@@ -20,6 +20,8 @@ export default async (
 ) => {
   await connect();
 
+  const { limit } = req.body;
+
   // Zod body validation
   try {
     getLatestBlocksRequestSchema.parse(req.body);
@@ -30,7 +32,7 @@ export default async (
     return res.status(400).end("Unknown Validation error");
   }
 
-  const visualizationBlocks = await getLatestBlocks(100);
+  const visualizationBlocks = await getLatestBlocks(limit);
 
   res.status(200).send({ visualizationBlocks });
 };
