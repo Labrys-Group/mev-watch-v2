@@ -61,7 +61,6 @@ const Title = chakra(Text, {
     color: "brightGreen.500",
     marginBottom: "10px",
     marginLeft: "20px",
-    // fontFamily: "Lexend Deca",
     fontWeight: "700",
   },
 });

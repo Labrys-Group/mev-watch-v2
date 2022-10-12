@@ -39,7 +39,6 @@ export const DefaultContainer = chakra(Flex, {
 
 export const DefaultTitle = chakra(Text, {
   baseStyle: {
-    // fontFamily: "GT-America-Extended-Bold",
     textAlign: "center",
     fontSize: "1.5rem",
     fontWeight: "bold",
