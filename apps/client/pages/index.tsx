@@ -1,6 +1,7 @@
 import { Text, Flex, chakra } from "@chakra-ui/react";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
+import NavBar from "../components/NavBar";
 import { Title, DefaultText, StyledBtn } from "../styles/StyledComponents";
 import { BsTwitter } from "react-icons/bs";
 import { HiSpeakerphone } from "react-icons/hi";
@@ -9,6 +10,7 @@ import OfacLineChart from "../components/OfacLineChart";
 const Home = () => {
   return (
     <>
+      <NavBar />
       <Title>MEV Watch</Title>
       <DefaultText w="500px" textAlign="center">
         Some MEV-Boost relays are regulated under OFAC and will censor certain
