@@ -10,15 +10,15 @@ export const saveAggregateStats = async (stats: StatsAggregate[]) => {
       ordered: false,
     });
 
-    console.log(`Successfully inserted: ${response.length}`);
+    console.log(`Successfully inserted aggregate: ${response.length}`);
   } catch (e: any) {
     if (e.result.result.ok === 1) {
-      console.log(`Successfully inserted: ${e.insertedCount}`);
+      console.log(`Successfully inserted aggregate: ${e.insertedCount}`);
 
       return;
     }
 
-    console.error("Unknown mongodb write error");
+    console.error("Unknown mongodb write error on aggregate");
     throw e;
   }
 };

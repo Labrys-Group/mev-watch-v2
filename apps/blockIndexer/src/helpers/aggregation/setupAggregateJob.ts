@@ -1,7 +1,7 @@
 import { DATE_OF_MERGE } from "consts";
 import { CronJob } from "cron";
 
-import { recursivelyPopulateAggregateData } from "../../scripts/populateAggregateData";
+import { recursivelyPopulateAggregateData } from "./recursivelyPopulateAggregateData";
 
 const aggregateData = async () => {
   recursivelyPopulateAggregateData(DATE_OF_MERGE);
@@ -17,7 +17,7 @@ export const setupAggregateJob = () => {
     true,
     undefined,
     null,
-    undefined,
+    false,
     0
   );
   const aggregateJobPM = new CronJob(
@@ -27,7 +27,7 @@ export const setupAggregateJob = () => {
     true,
     undefined,
     null,
-    undefined,
+    false,
     0
   );
   console.log("Data Aggregation Setup Complete. Next aggregations at: ");
