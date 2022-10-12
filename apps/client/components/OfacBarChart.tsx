@@ -33,7 +33,7 @@ import { IoWarning } from "react-icons/io5";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
-import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
+import {  LabrysGreenText } from "../styles/StyledComponents";
 import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";

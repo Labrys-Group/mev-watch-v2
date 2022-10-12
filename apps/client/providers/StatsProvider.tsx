@@ -1,6 +1,6 @@
 import { chakra, HStack, Switch, useBoolean } from "@chakra-ui/react";
 import { createContext, ReactNode } from "react";
-import { DefaultText } from "../styles/StyledComponents";
+import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
 
 interface StatsProviderProps {
   includeAllBlocks: boolean;
@@ -27,10 +27,10 @@ const StatsContextProvider = ({ children }: { children: ReactNode }) => {
       />
       <AllBlocksToggleText
         onClick={setIncludeAllBlocks.toggle}
-        fontSize="14px"
+        fontSize="12px"
         color={includeAllBlocks ? "brightGreen.500" : "white"}
       >
-        Include all Blocks
+        INCLUDE ALL BLOCKS
       </AllBlocksToggleText>
     </HStack>
   );
@@ -47,7 +47,7 @@ const StatsContextProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const AllBlocksToggleText = chakra(DefaultText, {
+const AllBlocksToggleText = chakra(LabrysGreenText, {
   baseStyle: {
     _hover: {
       cursor: "pointer",
