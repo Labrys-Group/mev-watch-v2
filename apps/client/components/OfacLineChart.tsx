@@ -15,20 +15,8 @@ import { Line } from "react-chartjs-2";
 import { useQuery } from "react-query";
 import axios from "axios";
 
-import {
-  HStack,
-  Switch,
-  useBoolean,
-  Text,
-  VStack,
-  Flex,
-  chakra,
-  Button,
-  Spinner,
-  Center,
-} from "@chakra-ui/react";
+import { HStack, Text, VStack, Flex, Spinner } from "@chakra-ui/react";
 
-import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
 import { getLineChartData } from "../helpers/getLineChartData";
 import { AggregatedStatsResponse } from "../pages/api/blockStatsAggregated";
 import { ofacLineChartOptions } from "../config/lineChart";
@@ -45,14 +33,14 @@ ChartJS.register(
   Filler
 );
 
-const getNowInUnix = () => Math.floor(Date.now() / 1000);
+// const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacLineChart = () => {
   const { data: aggregateStatsResponse } = useQuery([], () =>
     axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated", {})
   );
 
-  const {includeAllBlocks, AllBlocksToggle} = useContext(StatsContext)
+  const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
   const lineChartData = useMemo(() => {
     if (!aggregateStatsResponse) return null;

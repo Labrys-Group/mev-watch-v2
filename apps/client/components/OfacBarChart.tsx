@@ -16,25 +16,26 @@ import axios from "axios";
 import { ofacBarChartOptions } from "../config/barChart";
 import {
   HStack,
-  Switch,
-  useBoolean,
   Text,
   VStack,
   Flex,
   chakra,
   Button,
   Spinner,
-  Center,
   Stack,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
+import { getBarChartData } from "../helpers/getBarChartData";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
-import {  LabrysGreenText } from "../styles/StyledComponents";
-import { getBarChartData } from "../helpers/getBarChartData";
+import {
+  LabrysGreenText,
+  DefaultTitle,
+  DefaultContainer,
+} from "../styles/StyledComponents";
 
 import { timeFrames } from "consts";
 import { TimeFrame } from "../types";
@@ -49,10 +50,10 @@ ChartJS.register(
   Legend
 );
 
-interface DateRange {
-  startTime: number;
-  endTime: number;
-}
+// interface DateRange {
+//   startTime: number;
+//   endTime: number;
+// }
 
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
@@ -102,30 +103,20 @@ const OfacBarChart = () => {
   }, [includeAllBlocks, blockStatsResponse]);
 
   return (
-    <Flex
-      flexDir="column"
-      w="100%"
-      bg="#0f0f0f"
-      borderRadius="10px"
-      border="1px solid #393939"
-      p="20px"
-      my="40px"
-      boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
-    >
-      <VStack maxH={{base: "150px", md: "130px"}}>
-        <Text
-          color="white"
-          textAlign="center"
-          fontWeight="bold"
-          fontSize="1.5rem"
-        >
-          Post-Merge OFAC Compliant Blocks
-        </Text>
+    <DefaultContainer>
+      <VStack maxH={{ base: "150px", md: "130px" }}>
+        <DefaultTitle>Post-Merge OFAC Compliant Blocks</DefaultTitle>
         {barChartData ? (
           <Bar options={ofacBarChartOptions} data={barChartData} />
         ) : (
-          <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
-            <Spinner color="#00FFA7" size="xl" />
+          <Flex
+            h="100%"
+            minH="120px"
+            w="100%"
+            alignItems="end"
+            justifyContent="center"
+          >
+            <Spinner color="brightGreen.500" size="xl" />
           </Flex>
         )}
       </VStack>
@@ -159,7 +150,9 @@ const OfacBarChart = () => {
               onClick={() => setSelectedTimeFrame(timeFrames[index])}
               size="sm"
               borderColor={
-                timeFrame === selectedTimeFrame ? "#00FFA7" : "transparent"
+                timeFrame === selectedTimeFrame
+                  ? "brightGreen.500"
+                  : "transparent"
               }
               background={
                 timeFrame === selectedTimeFrame ? "#ffffff3c" : "transparent"
@@ -171,7 +164,7 @@ const OfacBarChart = () => {
         </HStack>
         {AllBlocksToggle}
       </Stack>
-    </Flex>
+    </DefaultContainer>
   );
 };
 
@@ -192,7 +185,7 @@ const TimeFrameBtn = chakra(Button, {
     fontSize: "14px",
     background: "transparent",
     _hover: {
-      borderColor: "#00FFA7",
+      borderColor: "brightGreen.500",
       background: "transparent",
     },
   },
