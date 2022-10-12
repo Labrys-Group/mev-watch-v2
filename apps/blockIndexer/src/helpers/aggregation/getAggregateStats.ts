@@ -40,7 +40,7 @@ export const getBlockStats = async (startDate: Date, endDate: Date) => {
 
 /**
  * @param startDate: the date to start aggregation at, and will include the next 12 hours after this date
- * @returns 
+ * @returns Stats for the block date
  */
 export const getAggregateStats = async (startDate: Date): Promise<StatsAggregate> => {
   const endDate = add(startDate, { hours: AGGREGATION_PERIOD });
