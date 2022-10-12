@@ -11,7 +11,7 @@ import {
   DefaultSpinner,
   DefaultTitle,
 } from "../../styles/StyledComponents";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 
 import { formatDistance, sub } from "date-fns";
 import BlockLabel from "./BlockLabel";
@@ -22,7 +22,7 @@ import BlockTile from "./BlockTile";
 import getAllLatestBlocks from "../../helpers/getAllLatestBlocks";
 import { StatsContext } from "../../providers/StatsProvider";
 
-const maxBlocks = 10;
+const maxBlocks = 100;
 
 const BlockVisualization = () => {
   const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
@@ -38,7 +38,6 @@ const BlockVisualization = () => {
   } = useQuery(
     ["latestBlocks"],
     async () => {
-      console.log("getting data from api");
       const response = await axios.post<GetLatestBlocksResponse>(
         "api/getLatestBlocks",
         {
@@ -57,15 +56,11 @@ const BlockVisualization = () => {
   const getBlocks = useMemo(() => {
     if (isLoading) return;
 
-    console.log("hi", visualizationBlocks?.reverse());
-
     const blocks = getAllLatestBlocks(
       visualizationBlocks?.reverse(),
       maxBlocks,
       includeAllBlocks
     );
-
-    console.log("DISPLAYING BLOCKS", includeAllBlocks, blocks);
 
     setTime(
       includeAllBlocks

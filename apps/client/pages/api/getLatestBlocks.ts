@@ -34,7 +34,5 @@ export default async (
 
   const visualizationBlocks = await getLatestBlocks(limit);
 
-  console.log(visualizationBlocks.map((i) => i.slotNumber));
-
   res.status(200).send({ visualizationBlocks });
 };
