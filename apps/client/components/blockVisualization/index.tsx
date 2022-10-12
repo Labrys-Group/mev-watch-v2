@@ -27,7 +27,6 @@ const BlockVisualization = () => {
   const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
   const [time, setTime] = useState<Date>(new Date());
-  const [provider, setProvider] = useState<providers.Provider>();
 
   const blocksPerRow = useBreakpointValue({ base: 10, md: 20 });
   // fetch the latest blocks from MongoDb
@@ -41,15 +40,8 @@ const BlockVisualization = () => {
     })
   );
 
-  // create a provider to read mainnet
-  useEffect(() => {
-    if (!window.ethereum) return;
-    const newProvider = ethers.getDefaultProvider();
-    setProvider(newProvider);
-  }, []);
-
-  // refetch latest blocks on every new block in mainnet
-  provider?.on("block", refetch);
+  // refetch every 20seconds
+  setInterval(refetch, 20000);
 
   // useMemo to return blocks to avoid data flashing
   const getBlocks = useMemo(() => {
