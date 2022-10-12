@@ -4,10 +4,7 @@ import {
   SimpleGrid,
   chakra,
   HStack,
-  Center,
-  useBreakpoint,
   useBreakpointValue,
-  Spinner,
 } from "@chakra-ui/react";
 import {
   DefaultContainer,
@@ -25,7 +22,7 @@ import BlockTile from "./BlockTile";
 import getAllLatestBlocks from "../../helpers/getAllLatestBlocks";
 import { StatsContext } from "../../providers/StatsProvider";
 
-const maxBlocks = 100;
+const maxBlocks = 10;
 
 const BlockVisualization = () => {
   const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
@@ -38,28 +35,37 @@ const BlockVisualization = () => {
     data: latestBlocks,
     refetch,
     isLoading,
-  } = useQuery(["latestBlocks"], () =>
-    axios.post<GetLatestBlocksResponse>("api/getLatestBlocks", {
-      limit: maxBlocks,
-    })
+  } = useQuery(
+    ["latestBlocks"],
+    async () => {
+      console.log("getting data from api");
+      const response = await axios.post<GetLatestBlocksResponse>(
+        "api/getLatestBlocks",
+        {
+          limit: maxBlocks,
+        }
+      );
+
+      return response.data;
+    },
+    { refetchInterval: 20000 }
   );
 
-  // refetch every 20seconds
-  useEffect(() => {
-    const refetchBlocks = setInterval(refetch, 20000);
-
-    return () => clearInterval(refetchBlocks);
-  }, [refetch]);
-
   // useMemo to return blocks to avoid data flashing
+  const visualizationBlocks = latestBlocks?.visualizationBlocks;
+
   const getBlocks = useMemo(() => {
-    if (!latestBlocks) return;
+    if (isLoading) return;
+
+    console.log("hi", visualizationBlocks?.reverse());
 
     const blocks = getAllLatestBlocks(
-      latestBlocks.data.visualizationBlocks.reverse(),
+      visualizationBlocks?.reverse(),
       maxBlocks,
       includeAllBlocks
     );
+
+    console.log("DISPLAYING BLOCKS", includeAllBlocks, blocks);
 
     setTime(
       includeAllBlocks
@@ -74,7 +80,7 @@ const BlockVisualization = () => {
         blocksPerRow={blocksPerRow ?? 20}
       />
     ));
-  }, [latestBlocks, includeAllBlocks]);
+  }, [visualizationBlocks, includeAllBlocks]);
 
   return (
     <DefaultContainer>
