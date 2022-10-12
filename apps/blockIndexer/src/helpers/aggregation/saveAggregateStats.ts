@@ -1,4 +1,4 @@
-import { StatsAggregate, StatsAggregateModel } from "database";
+import { StatsAggregate, StatsAggregateModel } from "database/dist";
 
 /**
  * This method wraps the mongoDb insert call to allow for saving duplicates and then basic error handling
@@ -10,16 +10,15 @@ export const saveAggregateStats = async (stats: StatsAggregate[]) => {
       ordered: false,
     });
 
-    console.log(`Successfully inserted: ${response.length}`);
+    console.log(`Successfully inserted aggregate: ${response.length}`);
   } catch (e: any) {
-    console.log(e);
     if (e.result.result.ok === 1) {
-      console.log(`Successfully inserted: ${e.insertedCount}`);
+      console.log(`Successfully inserted aggregate: ${e.insertedCount}`);
 
       return;
     }
 
-    console.error("Unknown mongodb write error");
+    console.error("Unknown mongodb write error on aggregate");
     throw e;
   }
 };

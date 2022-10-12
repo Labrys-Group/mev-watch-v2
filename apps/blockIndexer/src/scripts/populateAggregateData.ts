@@ -1,26 +1,7 @@
 import { DATE_OF_MERGE } from "consts";
-import { connect } from "database";
-import { add, isAfter } from "date-fns";
+import { connect } from "database/dist";
 
-import {
-  AGGREGATION_PERIOD,
-  getAggregateStats,
-} from "../helpers/aggregation/getAggregateStats";
-import { saveAggregateStats } from "../helpers/aggregation/saveAggregateStats";
-
-const recursivelyPopulateAggregateData = async (startDate: Date) => {
-  const endDate = add(startDate, { hours: AGGREGATION_PERIOD });
-  console.log({ startDate, endDate });
-  if (isAfter(endDate, new Date())) {
-    console.log("period exceeded")
-    return;
-  }
-
-  const aggregateStats = await getAggregateStats(startDate);
-  await saveAggregateStats([aggregateStats]);
-
-  await recursivelyPopulateAggregateData(endDate);
-};
+import { recursivelyPopulateAggregateData } from "../helpers/aggregation/recursivelyPopulateAggregateData";
 
 const main = async () => {
   await connect();
