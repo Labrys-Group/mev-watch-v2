@@ -1,4 +1,4 @@
-import { StatsAggregate, StatsAggregateModel } from "database";
+import { StatsAggregate, StatsAggregateModel } from "database/dist";
 
 /**
  * This method wraps the mongoDb insert call to allow for saving duplicates and then basic error handling

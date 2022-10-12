@@ -1,5 +1,5 @@
 import { DATE_OF_MERGE } from "consts";
-import { connect } from "database";
+import { connect } from "database/dist";
 import { add, isAfter } from "date-fns";
 
 import {

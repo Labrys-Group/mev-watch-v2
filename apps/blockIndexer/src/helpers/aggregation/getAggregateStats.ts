@@ -1,4 +1,4 @@
-import { StatsAggregate, BlockStatsModel } from "database";
+import { StatsAggregate, BlockStatsModel } from "database/dist";
 import { add } from "date-fns";
 
 /**
