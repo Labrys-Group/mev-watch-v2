@@ -4,6 +4,7 @@ import { CronJob } from "cron";
 import { recursivelyPopulateAggregateData } from "./recursivelyPopulateAggregateData";
 
 const aggregateData = async () => {
+  console.log("Running Aggregation Job")
   recursivelyPopulateAggregateData(DATE_OF_MERGE);
 };
 
