@@ -1,5 +1,4 @@
-import { Relayer } from "database";
-import { BlockStatsModel } from "database/src/models";
+import { BlockStatsModel, Relayer } from "database/dist/models";
 import { RelayStats } from "../types";
 
 interface TimeFrameAggregationResponse {

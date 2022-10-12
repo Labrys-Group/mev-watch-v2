@@ -4,6 +4,7 @@ import OfacBarChart from "../components/OfacBarChart";
 import { PageTitle, DefaultText, DefaultBtn } from "../styles/StyledComponents";
 import { BsTwitter } from "react-icons/bs";
 import { HiSpeakerphone } from "react-icons/hi";
+import OfacLineChart from "../components/OfacLineChart";
 import BlockVisualization from "../components/blockVisualization";
 
 const Home = () => {
@@ -17,6 +18,7 @@ const Home = () => {
       </DefaultText>
 
       <OfacBarChart />
+      <OfacLineChart />
 
       <DefaultText mt="10px">
         Help us improve this tool for the community

@@ -16,4 +16,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Relayer"), exports);
 __exportStar(require("./BlockStats"), exports);
+__exportStar(require("./BlockStatsAggregate"), exports);
 //# sourceMappingURL=index.js.map

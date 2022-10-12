@@ -4,6 +4,14 @@ export interface RelayStats {
   isOfacCensoring: boolean;
 }
 
+export interface AggregatedStats {
+  date: Date;
+  relayerStats: RelayStats[];
+  totalBlocks: number;
+  censoringBlocks: number;
+  nonCensoringBlocks: number;
+}
+
 export interface WebScrapedRelayStats extends RelayStats {
   avgBlockValue: number;
   totalValueETH: number;

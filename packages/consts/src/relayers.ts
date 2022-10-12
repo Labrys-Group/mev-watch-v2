@@ -1,4 +1,4 @@
-import { Relayer } from "database";
+import { Relayer } from "database/dist/models";
 
 export const RELAYERS: Relayer[] = [
   {

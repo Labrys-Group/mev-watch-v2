@@ -1,0 +1,53 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'apps/blockIndexer/**/*'
+      - 'packages/**/*'
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  DOTENV_ME: ${{ secrets.DOTENV_ME }}
+  DEPLOYMENT_NAME: block-indexer
+  DOCKERFILE: apps/blockIndexer/Dockerfile
+  IMAGE_TAG: gcr.io/mev-watch/block-indexer:${{ github.sha }}
+  LATEST_IMAGE_TAG: gcr.io/mev-watch/block-indexer:latest
+
+jobs:
+  setup-build-publish:
+    name: Setup, Build, Publish
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Setup gcloud CLI
+    - name: GCloud CLI Setup
+      uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT }}
+
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - name: GCP Auth
+      run: |-
+        gcloud --quiet auth configure-docker
+
+    # Build the Docker image
+    - name: Build
+      run: |-
+        docker pull $LATEST_IMAGE_TAG || true
+        yarn docker:build:server:ci
+
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "$IMAGE_TAG"
+        docker push "$LATEST_IMAGE_TAG"

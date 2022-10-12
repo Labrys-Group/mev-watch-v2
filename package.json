@@ -1,5 +1,6 @@
 {
-  "name": "turborepo-basic-shared",
+  "name": "mev-watch",
+  "author": "Labrys",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
@@ -11,7 +12,10 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "build:blockIndexer": "npx turbo prune --scope=server --docker && cd out/full && find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && cd ../.. && docker build -t block-indexer -f apps/blockIndexer/Dockerfile ."
+    "predocker:build:server": "npx turbo prune --scope=server --docker && cd out/full && find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && cd ../..",
+    "docker:build:server": "docker build --build-arg DOTENV_ME -t block-indexer -f apps/blockIndexer/Dockerfile .",
+    "predocker:build:server:ci": "yarn predocker:build:server",
+    "docker:build:server:ci": "docker build --build-arg DOTENV_ME=$DOTENV_ME --cache-from $LATEST_IMAGE_TAG -t $LATEST_IMAGE_TAG -t $IMAGE_TAG -f $DOCKERFILE ."
   },
   "devDependencies": {
     "@shopify/eslint-plugin": "^41.2.0",

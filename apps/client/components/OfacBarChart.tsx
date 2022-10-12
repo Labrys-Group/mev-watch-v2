@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -25,6 +25,7 @@ import {
   Button,
   Spinner,
   Center,
+  Stack,
 } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
@@ -33,7 +34,6 @@ import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
 import {
-  DefaultText,
   LabrysGreenText,
   DefaultTitle,
   DefaultContainer,
@@ -43,6 +43,7 @@ import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";
 import { TimeFrame } from "../types";
+import { StatsContext } from "../providers/StatsProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -61,14 +62,11 @@ interface DateRange {
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
-  const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
-    timeFrames[timeFrames.length - 1]
-  );
+  const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startTime: 0,
-    endTime: getNowInUnix(),
-  });
+  const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
+    timeFrames[timeFrames.length - 3]
+  );
 
   const { data: blockStatsResponse } = useQuery(
     ["todos", selectedTimeFrame.value],
@@ -79,8 +77,6 @@ const OfacBarChart = () => {
       })
   );
 
-  const [isIncludingAllBlocks, setIsIncludingAllBlocks] = useBoolean(true);
-
   const barChartData: ChartData<"bar", number[], string> | null =
     useMemo(() => {
       if (!blockStatsResponse) return null;
@@ -88,9 +84,9 @@ const OfacBarChart = () => {
       return getBarChartData(
         blockStatsResponse.data.relayStats,
         blockStatsResponse.data.totalBlocks,
-        isIncludingAllBlocks
+        includeAllBlocks
       );
-    }, [isIncludingAllBlocks, blockStatsResponse]);
+    }, [includeAllBlocks, blockStatsResponse]);
 
   const percentageCensoring = useMemo(() => {
     if (!blockStatsResponse) return null;
@@ -100,7 +96,7 @@ const OfacBarChart = () => {
       (stats) => stats.numBlocks
     );
 
-    const totalBlocks = isIncludingAllBlocks
+    const totalBlocks = includeAllBlocks
       ? blockStatsResponse.data.totalBlocks
       : totalBlocksFromRelays;
 
@@ -108,11 +104,11 @@ const OfacBarChart = () => {
       blockStatsResponse.data.relayStats
     );
     return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
-  }, [isIncludingAllBlocks, blockStatsResponse]);
+  }, [includeAllBlocks, blockStatsResponse]);
 
   return (
     <DefaultContainer>
-      <VStack h="130px">
+      <VStack maxH={{ base: "150px", md: "130px" }}>
         <DefaultTitle>Post-Merge OFAC Compliant Blocks</DefaultTitle>
         {barChartData ? (
           <Bar options={ofacBarChartOptions} data={barChartData} />
@@ -123,13 +119,13 @@ const OfacBarChart = () => {
         )}
       </VStack>
 
-      <HStack justify="center" mt="40px" h="20px">
+      <HStack justify="center" mt="20px" mb="10px" h="20px">
         {barChartData && (
           <>
             <IoWarning color="#ff0" size={24} />
             <PercentBlocksText>
               {`${percentageCensoring}${
-                isIncludingAllBlocks
+                includeAllBlocks
                   ? "% enforced OFAC compliance"
                   : "% (relayed blocks) enforcing OFAC compliance"
               }`}
@@ -138,7 +134,12 @@ const OfacBarChart = () => {
         )}
       </HStack>
 
-      <HStack justifyContent="space-between" p="20px 0px 5px" mx="15px">
+      <Stack
+        direction={{ base: "column", md: "row" }}
+        justifyContent="space-between"
+        p="20px 0px 5px"
+        mx="15px"
+      >
         <HStack>
           <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
           {timeFrames.map((timeFrame, index) => (
@@ -159,12 +160,8 @@ const OfacBarChart = () => {
             </TimeFrameBtn>
           ))}
         </HStack>
-        <DefaultSwitch
-          label="Include all Blocks"
-          onChange={setIsIncludingAllBlocks.toggle}
-          isChecked={isIncludingAllBlocks}
-        />
-      </HStack>
+        {AllBlocksToggle}
+      </Stack>
     </DefaultContainer>
   );
 };
