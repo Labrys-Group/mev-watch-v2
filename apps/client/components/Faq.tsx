@@ -17,7 +17,7 @@ import markdownStyles from "../styles/markdownStyles";
 const Faq = () => {
   return (
     <>
-      <Flex w="100%">
+      <Flex w="100%" id="faq">
         <Title>FAQ</Title>
       </Flex>
       <Accordion allowMultiple defaultIndex={[-1]} w="100%">

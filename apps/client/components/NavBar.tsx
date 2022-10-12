@@ -13,10 +13,15 @@ const navLinks: INavLink[] = [
 ];
 
 const NavBar = () => {
+  const scrollTo = (id: string) =>
+    document.querySelector(id)!.scrollIntoView({
+      behavior: "smooth",
+    });
+
   return (
     <NavContainer>
       {navLinks.map(({ title, href }) => (
-        <LinkStyled href={href}>{title}</LinkStyled>
+        <LinkStyled onClick={() => scrollTo(href)}>{title}</LinkStyled>
       ))}
     </NavContainer>
   );

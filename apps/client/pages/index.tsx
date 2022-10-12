@@ -12,7 +12,6 @@ const Home = () => {
     <>
       <NavBar />
       <PageTitle>MEV Watch</PageTitle>
-      <PageTitle>MEV Watch</PageTitle>
       <DefaultText w="500px" textAlign="center">
         Some MEV-Boost relays are regulated under OFAC and will censor certain
         transactions. Use this tool to observe the effect it&#39;s having on
