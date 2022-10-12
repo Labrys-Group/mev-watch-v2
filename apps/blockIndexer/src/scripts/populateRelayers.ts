@@ -1,5 +1,5 @@
 import { RELAYERS } from "consts";
-import { connect, Relayer, RelayerModel } from "database";
+import { connect, Relayer, RelayerModel } from "database/dist";
 
 const readFromConsts = async () => {
   await connect();

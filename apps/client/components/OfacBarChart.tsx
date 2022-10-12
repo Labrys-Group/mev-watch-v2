@@ -111,7 +111,7 @@ const OfacBarChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
-      <VStack h={{sm: "150px", md: "130px"}}>
+      <VStack maxH={{base: "150px", md: "130px"}}>
         <Text
           color="white"
           textAlign="center"
@@ -145,7 +145,7 @@ const OfacBarChart = () => {
       </HStack>
 
       <Stack
-        direction={{ sm: "column", md: "row" }}
+        direction={{ base: "column", md: "row" }}
         justifyContent="space-between"
         p="20px 0px 5px"
         mx="15px"
