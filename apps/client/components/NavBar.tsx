@@ -1,14 +1,16 @@
-import { chakra, Link, Box } from "@chakra-ui/react";
+import { chakra, Link, Box, useBreakpointValue } from "@chakra-ui/react";
 
 interface INavLink {
   title: string;
   href: string;
+  anchor: boolean;
 }
 
 const navLinks: INavLink[] = [
   {
     title: "FAQ",
     href: "#faq",
+    anchor: true,
   },
 ];
 
@@ -19,9 +21,14 @@ const NavBar = () => {
     });
 
   return (
-    <NavContainer>
-      {navLinks.map(({ title, href }) => (
-        <LinkStyled onClick={() => scrollTo(href)}>{title}</LinkStyled>
+    <NavContainer display={useBreakpointValue({ base: "none", sm: "block" })}>
+      {navLinks.map(({ title, href, anchor }) => (
+        <LinkStyled
+          onClick={() => anchor && scrollTo(href)}
+          href={!anchor && href}
+        >
+          {title}
+        </LinkStyled>
       ))}
     </NavContainer>
   );
