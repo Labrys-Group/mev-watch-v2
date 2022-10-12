@@ -1,5 +1,6 @@
 import { connect, RelayerModel } from "database/dist";
 
+import { setupAggregateJob } from "./helpers/aggregation/setupAggregateJob";
 import { getLatestBlockStats } from "./helpers/getLatestBlockStats";
 import { saveBlockStats } from "./helpers/saveBlockStats";
 
@@ -15,12 +16,10 @@ const getLatestData = async () => {
 
 const main = async () => {
   await connect();
+  setupAggregateJob();
+  await getLatestData();
 
   setInterval(() => getLatestData(), 12000);
-
-  // TODO: Calculate aggregates here, hourly, daily, etc
-
-  await getLatestData();
 };
 
 main();
