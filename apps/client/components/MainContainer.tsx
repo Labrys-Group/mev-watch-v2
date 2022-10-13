@@ -3,7 +3,7 @@ import { Flex, chakra, Box, VStack, Image, Link, Text } from "@chakra-ui/react";
 import { AiTwotoneHeart } from "react-icons/ai";
 
 import { useRouter } from "next/router";
-import { StyledLink, StyledIconBtn } from "../styles/StyledComponents";
+import { DefaultLink, DefaultIconBtn } from "../styles/StyledComponents";
 import { BsTwitter } from "react-icons/bs";
 
 const MainContainer = ({ children }: { children: ReactNode }) => {
@@ -15,9 +15,9 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
       <Background>
         <BodyContainer>{children}</BodyContainer>
         <Footer>
-          <StyledLink color="white" href="/terms-of-use">
+          <DefaultLink color="white" href="/terms-of-use">
             {router.pathname === "/terms-of-use" ? "" : "Terms of Use"}
-          </StyledLink>
+          </DefaultLink>
           <Link href={LABRYS_LINK} target="_blank">
             <VStack align="center">
               <Flex alignItems="center">
@@ -40,7 +40,7 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
             </VStack>
           </Link>
 
-          <StyledIconBtn
+          <DefaultIconBtn
             aria-label="labrys-twitter"
             icon={<BsTwitter />}
             onClick={() => window.open("https://twitter.com/Labrys_io")}
@@ -67,7 +67,6 @@ const Background = chakra(Flex, {
   baseStyle: {
     flexDirection: "column",
     margin: "0 auto",
-    // backgroundColor: "#0000007e",
     minHeight: "100vh",
     width: "100%",
   },

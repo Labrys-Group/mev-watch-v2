@@ -5,7 +5,7 @@ const markdownStyles = {
     <p style={{ margin: "10px 0" }} {...props} />
   ),
   a: ({ node, ...props }: { node: any }) => (
-    <a target="_blank" style={{ color: "#00FFA7" }} {...props} />
+    <a target="_blank" style={{ color: "brightGreen.500" }} {...props} />
   ),
   code: ({ node, ...props }: { node: any }) => {
     const toast = useToast();
