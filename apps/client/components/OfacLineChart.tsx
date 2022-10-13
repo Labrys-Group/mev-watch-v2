@@ -82,8 +82,10 @@ const OfacLineChart = () => {
   }, [hoverIndex, includeAllBlocks, aggregateStatsResponse]);
 
   const onHoverCallback = (elements: ActiveElement[]) => {
-    if (!elements.length)
-      setHoverIndex(aggregateStatsResponse?.data.relayStats.length ?? 0);
+    if (!elements.length) {
+      if (!aggregateStatsResponse?.data) return;
+      setHoverIndex(aggregateStatsResponse?.data.relayStats.length - 1);
+    }
     setHoverIndex(elements[0].index);
   };
 
