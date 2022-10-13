@@ -25,6 +25,7 @@ import { StatsContext } from "../../providers/StatsProvider";
 import { VisualizationBlock } from "../../types";
 import { IoWarning } from "react-icons/io5";
 import { sumBy } from "lodash";
+import { MevWatchText } from "../MevWatchText";
 
 // number of blocks displaying in the Block visualization table
 const maxBlocks = 100;
@@ -91,6 +92,7 @@ const BlockVisualization = () => {
 
   return (
     <DefaultContainer>
+      <MevWatchText />
       <DefaultTitle>
         OFAC Compliant Block Visualisation - Last 100 blocks
         <SpanText as="span">{`(${formatDistance(new Date(), time)})`}</SpanText>

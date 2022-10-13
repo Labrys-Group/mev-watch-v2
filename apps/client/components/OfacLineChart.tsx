@@ -33,6 +33,7 @@ import { StatsContext } from "../providers/StatsProvider";
 import { DefaultSpinner } from "../styles/StyledComponents";
 import { last } from "lodash";
 import { IoWarning } from "react-icons/io5";
+import { MevWatchText } from "./MevWatchText";
 
 ChartJS.register(
   CategoryScale,
@@ -82,7 +83,7 @@ const OfacLineChart = () => {
   }, [hoverIndex, includeAllBlocks, aggregateStatsResponse]);
 
   const onHoverCallback = (elements: ActiveElement[]) => {
-    if (!elements.length) {
+    if (!elements.length || !elements[0].index) {
       if (!aggregateStatsResponse?.data) return;
       setHoverIndex(aggregateStatsResponse?.data.relayStats.length - 1);
     }
@@ -108,6 +109,7 @@ const OfacLineChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
+      <MevWatchText />
       <VStack>
         <Text
           color="white"

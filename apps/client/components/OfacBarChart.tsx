@@ -32,6 +32,7 @@ import {
 import { timeFrames } from "consts";
 import { TimeFrame } from "../types";
 import { StatsContext } from "../providers/StatsProvider";
+import { MevWatchText } from "./MevWatchText";
 
 ChartJS.register(
   CategoryScale,
@@ -91,6 +92,7 @@ const OfacBarChart = () => {
 
   return (
     <DefaultContainer>
+      <MevWatchText />
       <VStack maxH={{ base: "150px", md: "130px" }}>
         <DefaultTitle>Post-Merge OFAC Compliant Blocks</DefaultTitle>
         {barChartData ? (
