@@ -11,71 +11,71 @@ import {
   DefaultSpinner,
   DefaultTitle,
 } from "../../styles/StyledComponents";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
 import { formatDistance, sub } from "date-fns";
 import BlockLabel from "./BlockLabel";
-import { useQuery } from "react-query";
 import axios from "axios";
 import { GetLatestBlocksResponse } from "../../pages/api/getLatestBlocks";
 import BlockTile from "./BlockTile";
 import getAllLatestBlocks from "../../helpers/getAllLatestBlocks";
 import { StatsContext } from "../../providers/StatsProvider";
+import { VisualizationBlock } from "../../types";
 
+// number of blocks displaying in the Block visualization table
 const maxBlocks = 100;
 
 const BlockVisualization = () => {
   const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
+  const [latestBlocks, setLatestBlocks] = useState<VisualizationBlock[]>();
+
   const [time, setTime] = useState<Date>(new Date());
 
   const blocksPerRow = useBreakpointValue({ base: 10, md: 20 });
-  // fetch the latest blocks from MongoDb
-  const {
-    data: latestBlocks,
-    refetch,
-    isLoading,
-  } = useQuery(
-    ["latestBlocks"],
-    async () => {
+
+  const getLatestBlocks = async () => {
+    try {
       const response = await axios.post<GetLatestBlocksResponse>(
         "api/getLatestBlocks",
-        {
-          limit: maxBlocks,
-        }
+        { limit: maxBlocks }
       );
+      setLatestBlocks(response.data.visualizationBlocks);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-      return response.data;
-    },
-    { refetchInterval: 20000 }
-  );
+  // fetch the latestBlocks
+  useEffect(() => {
+    getLatestBlocks();
+    const getLatestBlocksInterval = setInterval(getLatestBlocks, 20000);
+    return () => clearInterval(getLatestBlocksInterval);
+  }, []);
 
   // useMemo to return blocks to avoid data flashing
-  const visualizationBlocks = latestBlocks?.visualizationBlocks;
-
   const getBlocks = useMemo(() => {
-    if (isLoading) return;
+    if (!latestBlocks) return;
+    if (!latestBlocks) return;
 
-    const blocks = getAllLatestBlocks(
-      visualizationBlocks?.reverse(),
-      maxBlocks,
-      includeAllBlocks
-    );
+    const visualizationBlocks = !includeAllBlocks
+      ? latestBlocks
+      : getAllLatestBlocks(latestBlocks, maxBlocks);
 
     setTime(
       includeAllBlocks
         ? sub(new Date(), { minutes: 20 })
-        : new Date(blocks[blocks.length - 1].ts)
+        : new Date(visualizationBlocks[visualizationBlocks.length - 1].ts)
     );
 
-    return blocks.map((block) => (
+    return visualizationBlocks.map((block) => (
       <BlockTile
         key={block.slotNumber}
         block={block}
         blocksPerRow={blocksPerRow ?? 20}
       />
     ));
-  }, [visualizationBlocks, includeAllBlocks]);
+  }, [latestBlocks, includeAllBlocks]);
 
   return (
     <DefaultContainer>
@@ -83,31 +83,34 @@ const BlockVisualization = () => {
         OFAC Compliant Block Visualisation - Last 100 blocks
         <SpanText as="span">{`(${formatDistance(new Date(), time)})`}</SpanText>
       </DefaultTitle>
-      <HStack m="20px auto">
-        <BlockLabel color="brightRed.500" label="Enforcing OFAC Censorship" />
-        <BlockLabel
-          color="brightGreen.500"
-          label="Not Enforcing OFAC Censorship"
-        />
-        {includeAllBlocks && (
-          <BlockLabel color="#CBCBCB" label="Non-MEV-Boost" />
-        )}
-      </HStack>
 
-      {isLoading ? (
-        <Flex>
-          <DefaultSpinner minH="240px" />
-        </Flex>
+      {!latestBlocks ? (
+        <DefaultSpinner minH="240px" />
       ) : (
-        <SimpleGrid
-          columns={blocksPerRow}
-          w="100%"
-          spacingY="10px"
-          spacingX="1px"
-          my="20px"
-        >
-          {getBlocks}
-        </SimpleGrid>
+        <>
+          <HStack m="20px auto">
+            <BlockLabel
+              color="brightRed.500"
+              label="Enforcing OFAC Censorship"
+            />
+            <BlockLabel
+              color="brightGreen.500"
+              label="Not Enforcing OFAC Censorship"
+            />
+            {includeAllBlocks && (
+              <BlockLabel color="#CBCBCB" label="Non-MEV-Boost" />
+            )}
+          </HStack>
+          <SimpleGrid
+            columns={blocksPerRow}
+            w="100%"
+            spacingY="10px"
+            spacingX="1px"
+            my="20px"
+          >
+            {getBlocks}
+          </SimpleGrid>
+        </>
       )}
 
       <Flex justify="flex-end" mx="20px">
