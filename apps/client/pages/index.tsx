@@ -1,4 +1,4 @@
-import { Text, Flex, chakra } from "@chakra-ui/react";
+import { Text, Flex, chakra, Box } from "@chakra-ui/react";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import NavBar from "../components/NavBar";
@@ -23,7 +23,7 @@ const Home = () => {
         <Text fontWeight="bold" color="brightGreen.500">
           Protocol level censorship = Bad
         </Text>
-        <DefaultText>
+        <DefaultText textAlign="center">
           Keep Ethereum credibly neutral by adopting a non-censoring mev-boost
           relay.
         </DefaultText>
@@ -31,6 +31,7 @@ const Home = () => {
       <SocialMediaContents />
       <OfacLineChart />
       <BlockVisualization />
+      <Box mt="50px" />
       <Faq />
     </>
   );

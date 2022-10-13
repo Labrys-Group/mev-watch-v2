@@ -14,7 +14,7 @@ import {
 
 export const PageTitle = chakra(Text, {
   baseStyle: {
-    fontFamily: "GT-America-Extended-Bold",
+    fontFamily: "GT-America-Expanded-Black",
     textAlign: "center",
     fontSize: "3rem",
     fontWeight: "bold",

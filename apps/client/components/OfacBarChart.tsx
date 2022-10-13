@@ -19,9 +19,9 @@ import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
 
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
-import { getBarChartData } from "../helpers/getBarChartData";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
+import { getBarChartData } from "../helpers/getBarChartData";
 import {
   LabrysGreenText,
   DefaultTitle,
@@ -32,6 +32,7 @@ import {
 import { timeFrames } from "consts";
 import { TimeFrame } from "../types";
 import { StatsContext } from "../providers/StatsProvider";
+import { MevWatchText } from "./MevWatchText";
 
 ChartJS.register(
   CategoryScale,
@@ -41,11 +42,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-// interface DateRange {
-//   startTime: number;
-//   endTime: number;
-// }
 
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
@@ -91,11 +87,12 @@ const OfacBarChart = () => {
     const { isOfac } = sortAndDivideOfacRelays(
       blockStatsResponse.data.relayStats
     );
-    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
+    return Math.round((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [includeAllBlocks, blockStatsResponse]);
 
   return (
     <DefaultContainer>
+      <MevWatchText />
       <VStack maxH={{ base: "150px", md: "130px" }}>
         <DefaultTitle>Post-Merge OFAC Compliant Blocks</DefaultTitle>
         {barChartData ? (

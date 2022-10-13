@@ -1,10 +1,12 @@
 import {
-  Flex,
   Text,
   SimpleGrid,
   chakra,
   HStack,
   useBreakpointValue,
+  Box,
+  Spacer,
+  Stack,
 } from "@chakra-ui/react";
 import {
   DefaultContainer,
@@ -21,6 +23,9 @@ import BlockTile from "./BlockTile";
 import getAllLatestBlocks from "../../helpers/getAllLatestBlocks";
 import { StatsContext } from "../../providers/StatsProvider";
 import { VisualizationBlock } from "../../types";
+import { IoWarning } from "react-icons/io5";
+import { sumBy } from "lodash";
+import { MevWatchText } from "../MevWatchText";
 
 // number of blocks displaying in the Block visualization table
 const maxBlocks = 100;
@@ -46,6 +51,15 @@ const BlockVisualization = () => {
     }
   };
 
+  const compliancePercentage = useMemo(() => {
+    return includeAllBlocks
+      ? sumBy(getAllLatestBlocks(latestBlocks, maxBlocks), (b) =>
+          b.relayer.isOfacCensoring ? 1 : 0
+        ) : sumBy(latestBlocks, (b) =>
+        b.relayer.isOfacCensoring ? 1 : 0
+      );
+  }, [latestBlocks, includeAllBlocks]);
+
   // fetch the latestBlocks
   useEffect(() => {
     getLatestBlocks();
@@ -55,7 +69,6 @@ const BlockVisualization = () => {
 
   // useMemo to return blocks to avoid data flashing
   const getBlocks = useMemo(() => {
-    if (!latestBlocks) return;
     if (!latestBlocks) return;
 
     const visualizationBlocks = !includeAllBlocks
@@ -79,6 +92,7 @@ const BlockVisualization = () => {
 
   return (
     <DefaultContainer>
+      <MevWatchText />
       <DefaultTitle>
         OFAC Compliant Block Visualisation - Last 100 blocks
         <SpanText as="span">{`(${formatDistance(new Date(), time)})`}</SpanText>
@@ -113,14 +127,42 @@ const BlockVisualization = () => {
         </>
       )}
 
-      <Flex justify="flex-end" mx="20px">
+      <Stack
+        direction={{ base: "column", md: "row" }}
+        justifyContent="right"
+        p="0px 0px 5px"
+        mx="15px"
+      >
+        <Box w={{ base: "0px", md: "200px" }} /> <Spacer />
+        <HStack justify="center" mt="20px" mb="10px" h="20px">
+          {latestBlocks && (
+            <>
+              <IoWarning color="#ff0" size={24} />
+              <PercentBlocksText>
+                {`${compliancePercentage}${
+                  includeAllBlocks
+                    ? " / 100 blocks enforcing OFAC compliance"
+                    : " / 100 relay blocks enforcing OFAC compliance"
+                }`}
+              </PercentBlocksText>
+            </>
+          )}
+        </HStack>
+        <Spacer />
         {AllBlocksToggle}
-      </Flex>
+      </Stack>
     </DefaultContainer>
   );
 };
 
 export default BlockVisualization;
+
+const PercentBlocksText = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    color: "white",
+  },
+});
 
 const SpanText = chakra(Text, {
   baseStyle: {

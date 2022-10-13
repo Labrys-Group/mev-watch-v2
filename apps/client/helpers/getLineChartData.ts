@@ -6,11 +6,17 @@ export const getLineChartData = (
   isIncludingAllBlocks: boolean
 ) => {
   const sumOfacCompliantData = relayStats.map(
-    ({ totalBlocks, censoringBlocks }) => censoringBlocks / totalBlocks
+    ({ totalBlocks, censoringBlocks, nonCensoringBlocks }) =>
+      isIncludingAllBlocks
+        ? censoringBlocks / totalBlocks
+        : (1 - nonCensoringBlocks / (nonCensoringBlocks + censoringBlocks))
   );
 
   const sumNonOfacCompliantData = relayStats.map(
-    ({ totalBlocks, nonCensoringBlocks }) => nonCensoringBlocks / totalBlocks
+    ({ totalBlocks, nonCensoringBlocks, censoringBlocks }) =>
+      isIncludingAllBlocks
+        ? nonCensoringBlocks / totalBlocks
+        : nonCensoringBlocks / (nonCensoringBlocks + censoringBlocks)
   );
 
   const nonMevBoostData = relayStats.map(
@@ -26,17 +32,18 @@ export const getLineChartData = (
     labels: timeline,
     datasets: [
       {
-        label: "Not OFAC Compliant",
-        data: sumNonOfacCompliantData,
-        backgroundColor: colors.brightGreen[500],
-        fill: "origin",
-      },
-      {
         label: "OFAC Compliant",
         data: sumOfacCompliantData,
         backgroundColor: colors.brightRed[500],
         fill: "origin",
       },
+      {
+        label: "Not OFAC Compliant",
+        data: sumNonOfacCompliantData,
+        backgroundColor: colors.brightGreen[500],
+        fill: "origin",
+      },
+      
     ],
   };
 
