@@ -26,7 +26,7 @@ const NavBar = () => {
         <LinkStyled
           key={title}
           onClick={() => anchor && scrollTo(href)}
-          href={!anchor ? href : ""}
+          href={!anchor ? href : undefined}
         >
           {title}
         </LinkStyled>
