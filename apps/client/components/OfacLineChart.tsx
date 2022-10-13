@@ -82,7 +82,7 @@ const OfacLineChart = () => {
           fontWeight="bold"
           fontSize="1.5rem"
         >
-          Post-Merge OFAC Compliant Blocks
+          Daily OFAC Compliant Blocks
         </Text>
         {lineChartData ? (
           <Line options={ofacLineChartOptions} data={lineChartData} />
