@@ -2,7 +2,7 @@ import { connect } from "database/dist";
 import type { NextApiResponse } from "next";
 import { VisualizationBlock, TypedNextApiRequest } from "../../types";
 import { z, ZodError } from "zod";
-import { getLatestBlocks } from "../../helpers/getLatestBlocks";
+import { BlockStatsModel } from "database/src/models";
 
 const getLatestBlocksRequestSchema = z.object({
   limit: z.number(),
@@ -32,7 +32,30 @@ export default async (
     return res.status(400).end("Unknown Validation error");
   }
 
-  const visualizationBlocks = await getLatestBlocks(limit);
+  const visualizationBlocks = await BlockStatsModel.aggregate([
+    {
+      $sort: {
+        ts: -1,
+      },
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $lookup: {
+        from: "relayers",
+        localField: "relayer",
+        foreignField: "_id",
+        as: "relayer",
+      },
+    },
+    {
+      $unwind: {
+        path: "$relayer",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ]);
 
   res.status(200).send({ visualizationBlocks });
 };

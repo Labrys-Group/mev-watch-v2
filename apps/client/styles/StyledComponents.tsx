@@ -8,6 +8,8 @@ import {
   Flex,
   Switch,
   HStack,
+  Spinner,
+  FlexProps,
 } from "@chakra-ui/react";
 
 export const PageTitle = chakra(Text, {
@@ -142,5 +144,20 @@ export const DefaultSwitch = (props: DefaultSwitchProps) => {
       ></Switch>
       <DefaultText fontSize="14px">{label}</DefaultText>
     </HStack>
+  );
+};
+
+export const DefaultSpinner = (props: FlexProps) => {
+  return (
+    <Flex
+      h="100%"
+      minH="120px"
+      w="100%"
+      alignItems="center"
+      justifyContent="center"
+      {...props}
+    >
+      <Spinner color="brightGreen.500" size="xl" />
+    </Flex>
   );
 };

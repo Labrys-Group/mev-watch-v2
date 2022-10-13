@@ -1,24 +1,22 @@
 import { VisualizationBlock } from "../types";
 
 const getAllLatestBlocks = (
-  mevBlocks: VisualizationBlock[] | undefined,
-  totalBlocks: number,
-  includeAll: boolean
+  visualizationBlocks: VisualizationBlock[] | undefined,
+  totalBlocks: number
 ) => {
-  if (!mevBlocks) return [];
-  if (!includeAll) return mevBlocks;
+  if (!visualizationBlocks || visualizationBlocks.length === 0) return [];
 
-  const latestBlock = mevBlocks[0].slotNumber;
+  const latestBlock = visualizationBlocks[0].slotNumber;
   const allBlocks: VisualizationBlock[] = [];
 
   for (let i = 0; i < totalBlocks; i++) {
-    const blockIndex = mevBlocks.findIndex(
+    const blockIndex = visualizationBlocks.findIndex(
       (block) => latestBlock - block.slotNumber - i === 0
     );
 
     const block =
       blockIndex !== -1
-        ? mevBlocks[blockIndex]
+        ? visualizationBlocks[blockIndex]
         : {
             slotNumber: latestBlock - i,
             relayer: {

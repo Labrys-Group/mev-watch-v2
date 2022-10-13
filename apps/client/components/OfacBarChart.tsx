@@ -14,16 +14,7 @@ import { useQuery } from "react-query";
 import axios from "axios";
 
 import { ofacBarChartOptions } from "../config/barChart";
-import {
-  HStack,
-  Text,
-  VStack,
-  Flex,
-  chakra,
-  Button,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { HStack, Text, VStack, chakra, Button, Stack } from "@chakra-ui/react";
 import { sumBy } from "lodash";
 import { IoWarning } from "react-icons/io5";
 
@@ -35,6 +26,7 @@ import {
   LabrysGreenText,
   DefaultTitle,
   DefaultContainer,
+  DefaultSpinner,
 } from "../styles/StyledComponents";
 
 import { timeFrames } from "consts";
@@ -109,15 +101,7 @@ const OfacBarChart = () => {
         {barChartData ? (
           <Bar options={ofacBarChartOptions} data={barChartData} />
         ) : (
-          <Flex
-            h="100%"
-            minH="120px"
-            w="100%"
-            alignItems="end"
-            justifyContent="center"
-          >
-            <Spinner color="brightGreen.500" size="xl" />
-          </Flex>
+          <DefaultSpinner minH="120px" />
         )}
       </VStack>
 
