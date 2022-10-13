@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,6 +9,7 @@ import {
   PointElement,
   LineElement,
   Filler,
+  ActiveElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useQuery } from "react-query";
@@ -22,6 +23,7 @@ import {
   Box,
   Spacer,
   chakra,
+  Stack,
 } from "@chakra-ui/react";
 
 import { getLineChartData } from "../helpers/getLineChartData";
@@ -29,6 +31,8 @@ import { AggregatedStatsResponse } from "../pages/api/blockStatsAggregated";
 import { ofacLineChartOptions } from "../config/lineChart";
 import { StatsContext } from "../providers/StatsProvider";
 import { DefaultSpinner } from "../styles/StyledComponents";
+import { last } from "lodash";
+import { IoWarning } from "react-icons/io5";
 
 ChartJS.register(
   CategoryScale,
@@ -41,14 +45,19 @@ ChartJS.register(
   Filler
 );
 
-// const getNowInUnix = () => Math.floor(Date.now() / 1000);
-
 const OfacLineChart = () => {
-  const { data: aggregateStatsResponse } = useQuery([], () =>
-    axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated", {})
-  );
+  const { data: aggregateStatsResponse } = useQuery([], () => {
+    const data = axios.get<AggregatedStatsResponse>(
+      "/api/blockStatsAggregated",
+      {}
+    );
+    if (!aggregateStatsResponse?.data) return data;
+    setHoverIndex(aggregateStatsResponse?.data.relayStats.length - 1);
+    return data;
+  });
 
   const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
+  const [hoverIndex, setHoverIndex] = useState<number>(0);
 
   const lineChartData = useMemo(() => {
     if (!aggregateStatsResponse) return null;
@@ -58,6 +67,32 @@ const OfacLineChart = () => {
       includeAllBlocks
     );
   }, [includeAllBlocks, aggregateStatsResponse]);
+
+  const compliancePercentage = useMemo(() => {
+    const stats = aggregateStatsResponse?.data.relayStats[hoverIndex];
+
+    if (!stats) return 0;
+    return includeAllBlocks
+      ? Math.round((stats.censoringBlocks / stats.totalBlocks) * 100)
+      : Math.round(
+          (stats.censoringBlocks /
+            (stats.censoringBlocks + stats.nonCensoringBlocks)) *
+            100
+        );
+  }, [hoverIndex, includeAllBlocks, aggregateStatsResponse]);
+
+  const onHoverCallback = (elements: ActiveElement[]) => {
+    if (!elements.length)
+      setHoverIndex(aggregateStatsResponse?.data.relayStats.length ?? 0);
+    setHoverIndex(elements[0].index);
+  };
+
+  const resetIndex = () => {
+    if (!aggregateStatsResponse?.data) return;
+    setHoverIndex(aggregateStatsResponse?.data.relayStats.length - 1);
+  };
+
+  useEffect(() => resetIndex(), [aggregateStatsResponse]);
 
   return (
     <Flex
@@ -81,31 +116,49 @@ const OfacLineChart = () => {
           Post-Merge Daily OFAC Compliant Blocks
         </Text>
         {lineChartData ? (
-          <Line options={ofacLineChartOptions} data={lineChartData} />
+          <Line
+            onMouseLeave={resetIndex}
+            options={ofacLineChartOptions(onHoverCallback)}
+            data={lineChartData}
+          />
         ) : (
           <DefaultSpinner minH="150px" />
         )}
       </VStack>
 
-      <HStack justifyContent="right" p="10px 0px 5px" mx="15px">
+      <Stack
+        direction={{ base: "column", md: "row" }}
+        justifyContent="right"
+        p="0px 0px 5px"
+        mx="15px"
+      >
         <Box w={{ base: "0px", md: "200px" }} /> <Spacer />
-        {!includeAllBlocks && (
-          <DescriptionText mr="0px">(RELAYED BLOCKS ONLY)</DescriptionText>
-        )}
+        <HStack justify="center" mt="20px" mb="10px" h="20px">
+          {lineChartData && (
+            <>
+              <IoWarning color="#ff0" size={24} />
+              <PercentBlocksText>
+                {`${compliancePercentage}${
+                  includeAllBlocks
+                    ? "% enforced OFAC compliance"
+                    : "% (relayed blocks) enforcing OFAC compliance"
+                }`}
+              </PercentBlocksText>
+            </>
+          )}
+        </HStack>
         <Spacer />
         {AllBlocksToggle}
-      </HStack>
+      </Stack>
     </Flex>
   );
 };
 
-export default OfacLineChart;
-
-const DescriptionText = chakra(Text, {
+const PercentBlocksText = chakra(Text, {
   baseStyle: {
-    fontSize: "12px",
     textAlign: "center",
-    // fontFamily: "GT-America-Mono-Medium",
     color: "white",
   },
 });
+
+export default OfacLineChart;

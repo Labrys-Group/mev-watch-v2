@@ -24,8 +24,9 @@ const NavBar = () => {
     <NavContainer display={useBreakpointValue({ base: "none", sm: "block" })}>
       {navLinks.map(({ title, href, anchor }) => (
         <LinkStyled
+          key={title}
           onClick={() => anchor && scrollTo(href)}
-          href={!anchor && href}
+          href={!anchor ? href : ""}
         >
           {title}
         </LinkStyled>

@@ -91,7 +91,7 @@ const OfacBarChart = () => {
     const { isOfac } = sortAndDivideOfacRelays(
       blockStatsResponse.data.relayStats
     );
-    return Math.floor((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
+    return Math.round((100 * sumBy(isOfac, (o) => o.numBlocks)) / totalBlocks);
   }, [includeAllBlocks, blockStatsResponse]);
 
   return (

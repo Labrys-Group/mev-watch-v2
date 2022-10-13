@@ -23,7 +23,7 @@ const Home = () => {
         <Text fontWeight="bold" color="brightGreen.500">
           Protocol level censorship = Bad
         </Text>
-        <DefaultText>
+        <DefaultText textAlign="center">
           Keep Ethereum credibly neutral by adopting a non-censoring mev-boost
           relay.
         </DefaultText>
