@@ -9,6 +9,7 @@ export const ofacLineChartOptions: ChartOptions<"line"> = {
   responsive: true,
   plugins: {
     legend: {
+      onClick: () => null,
       position: "top" as const,
     },
     title: {
