@@ -1,4 +1,4 @@
-import { Text, Flex, chakra } from "@chakra-ui/react";
+import { Text, Flex, chakra, Box } from "@chakra-ui/react";
 import Faq from "../components/Faq";
 import OfacBarChart from "../components/OfacBarChart";
 import NavBar from "../components/NavBar";
@@ -31,6 +31,7 @@ const Home = () => {
       <SocialMediaContents />
       <OfacLineChart />
       <BlockVisualization />
+      <Box mt="50px" />
       <Faq />
     </>
   );
