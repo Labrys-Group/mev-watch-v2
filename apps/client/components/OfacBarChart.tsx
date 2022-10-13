@@ -33,7 +33,7 @@ import { IoWarning } from "react-icons/io5";
 import { sortAndDivideOfacRelays } from "../helpers/relayProcessing";
 
 import { GetBlockStatsResponse } from "../pages/api/blockStats";
-import {  LabrysGreenText } from "../styles/StyledComponents";
+import { LabrysGreenText } from "../styles/StyledComponents";
 import { getBarChartData } from "../helpers/getBarChartData";
 
 import { timeFrames } from "consts";
@@ -112,7 +112,7 @@ const OfacBarChart = () => {
       my="40px"
       boxShadow="rgba(0, 0, 0, 0.56) 0px 22px 70px 4px"
     >
-      <VStack maxH={{base: "150px", md: "130px"}}>
+      <VStack maxH={{ base: "150px", md: "130px" }}>
         <Text
           color="white"
           textAlign="center"

@@ -96,7 +96,7 @@ const OfacLineChart = () => {
       </VStack>
 
       <HStack justifyContent="right" p="10px 0px 5px" mx="15px">
-        <Box w="150px" /> <Spacer />
+        <Box w={{base: "0px", md: "200px"}} /> <Spacer />
         {!includeAllBlocks && (
           <DescriptionText mr="0px">(RELAYED BLOCKS ONLY)</DescriptionText>
         )}
