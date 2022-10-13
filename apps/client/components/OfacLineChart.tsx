@@ -26,6 +26,8 @@ import {
   Button,
   Spinner,
   Center,
+  Spacer,
+  Box,
 } from "@chakra-ui/react";
 
 import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
@@ -52,7 +54,7 @@ const OfacLineChart = () => {
     axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated", {})
   );
 
-  const {includeAllBlocks, AllBlocksToggle} = useContext(StatsContext)
+  const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
   const lineChartData = useMemo(() => {
     if (!aggregateStatsResponse) return null;
@@ -82,7 +84,7 @@ const OfacLineChart = () => {
           fontWeight="bold"
           fontSize="1.5rem"
         >
-          Daily OFAC Compliant Blocks
+          Post-Merge Daily OFAC Compliant Blocks
         </Text>
         {lineChartData ? (
           <Line options={ofacLineChartOptions} data={lineChartData} />
@@ -94,6 +96,11 @@ const OfacLineChart = () => {
       </VStack>
 
       <HStack justifyContent="right" p="10px 0px 5px" mx="15px">
+        <Box w="150px" /> <Spacer />
+        {!includeAllBlocks && (
+          <DescriptionText mr="0px">(RELAYED BLOCKS ONLY)</DescriptionText>
+        )}
+        <Spacer />
         {AllBlocksToggle}
       </HStack>
     </Flex>
@@ -101,3 +108,12 @@ const OfacLineChart = () => {
 };
 
 export default OfacLineChart;
+
+const DescriptionText = chakra(Text, {
+  baseStyle: {
+    fontSize: "12px",
+    textAlign: "center",
+    // fontFamily: "GT-America-Mono-Medium",
+    color: "white",
+  },
+});
