@@ -69,8 +69,8 @@ const OfacLineChart = () => {
   }, [includeAllBlocks, aggregateStatsResponse]);
 
   const compliancePercentage = useMemo(() => {
+    if (!aggregateStatsResponse?.data.relayStats) return 0;
     const stats = aggregateStatsResponse?.data.relayStats[hoverIndex];
-
     if (!stats) return 0;
     return includeAllBlocks
       ? Math.round((stats.censoringBlocks / stats.totalBlocks) * 100)
@@ -120,6 +120,8 @@ const OfacLineChart = () => {
         {lineChartData ? (
           <Line
             onMouseLeave={resetIndex}
+            onDragLeave={resetIndex}
+            onPointerLeave={resetIndex}
             options={ofacLineChartOptions(onHoverCallback)}
             data={lineChartData}
           />

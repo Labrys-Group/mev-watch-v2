@@ -42,11 +42,6 @@ ChartJS.register(
   Legend
 );
 
-// interface DateRange {
-//   startTime: number;
-//   endTime: number;
-// }
-
 const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacBarChart = () => {
