@@ -1,7 +1,11 @@
 import { OrderedList, chakra, IconButton, Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { IoIosArrowBack } from "react-icons/io";
-import { Title, StyledListItem, DefaultText } from "../styles/StyledComponents";
+import {
+  PageTitle,
+  DefaultListItem,
+  DefaultText,
+} from "../styles/StyledComponents";
 
 const Disclaimer = () => {
   const router = useRouter();
@@ -13,9 +17,9 @@ const Disclaimer = () => {
         icon={<IoIosArrowBack size="2rem" />}
         onClick={() => router.push("/")}
       />
-      <Title fontSize="3rem" fontWeight="bold" textAlign="center">
+      <PageTitle fontSize="3rem" fontWeight="bold" textAlign="center">
         Disclaimer
-      </Title>
+      </PageTitle>
       <DefaultText>
         The information provided on this website does not, and is not intended
         to, constitute legal or financial advice. All information, content, and
@@ -37,21 +41,21 @@ const Disclaimer = () => {
         linked. Labrys issues no liability or responsibility for any:
       </DefaultText>
       <OrderedList>
-        <StyledListItem>
+        <DefaultListItem>
           Errors, mistakes, or inaccuracies of content and materials, or
-        </StyledListItem>
+        </DefaultListItem>
 
-        <StyledListItem>
+        <DefaultListItem>
           Unauthorised access to or use of our secure servers and any personal
           information, including financial information, stored therein, or
-        </StyledListItem>
-        <StyledListItem>
+        </DefaultListItem>
+        <DefaultListItem>
           Interruption or cessation of transmission to or from the site, and
-        </StyledListItem>
-        <StyledListItem>
+        </DefaultListItem>
+        <DefaultListItem>
           Bugs, viruses, Trojan horses, or the like which may be transmitted to
           or through the site by a third-party.
-        </StyledListItem>
+        </DefaultListItem>
       </OrderedList>
       <DefaultText>
         Your use of the site is solely at your own risk. This website contains

@@ -5,9 +5,14 @@ import {
   Button,
   IconButton,
   Link,
+  Flex,
+  Switch,
+  HStack,
+  Spinner,
+  FlexProps,
 } from "@chakra-ui/react";
 
-export const Title = chakra(Text, {
+export const PageTitle = chakra(Text, {
   baseStyle: {
     fontFamily: "GT-America-Extended-Bold",
     textAlign: "center",
@@ -16,12 +21,34 @@ export const Title = chakra(Text, {
     marginBottom: "20px",
     background:
       "linear-gradient(to right, #00FFD3 0%, #71FFE0 50%, #FFFF00 100%)",
-    "-webkit-background-clip": "text",
-    "-webkit-text-fill-color": "transparent",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
 });
 
-export const StyledListItem = chakra(ListItem, {
+export const DefaultContainer = chakra(Flex, {
+  baseStyle: {
+    flexDirection: "column",
+    width: "100%",
+    background: "#0f0f0f",
+    borderRadius: "10px",
+    border: "1px solid #393939",
+    padding: "20px",
+    marginY: "40px",
+    boxShadow: "rgba(0, 0, 0, 0.56) 0px 22px 70px 4px",
+  },
+});
+
+export const DefaultTitle = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    color: "white",
+  },
+});
+
+export const DefaultListItem = chakra(ListItem, {
   baseStyle: {
     fontSize: "16px",
     margin: "0 0 20px 20px",
@@ -42,11 +69,11 @@ export const DefaultText = chakra(Text, {
 export const LabrysGreenText = chakra(Text, {
   baseStyle: {
     fontFamily: "GT-America-Mono-Medium",
-    color: "#00FFA7",
+    color: "brightGreen.500",
   },
 });
 
-export const StyledIconBtn = chakra(IconButton, {
+export const DefaultIconBtn = chakra(IconButton, {
   baseStyle: {
     position: "relative",
     background: "transparent",
@@ -60,11 +87,12 @@ export const StyledIconBtn = chakra(IconButton, {
   },
 });
 
-export const StyledBtn = chakra(Button, {
+export const DefaultBtn = chakra(Button, {
   baseStyle: {
     position: "relative",
     background: "transparent",
-    border: "1px solid #00FFA7",
+    borderWidth: "1px",
+    borderColor: "brightGreen.500",
     top: "0px",
     left: "0px",
     color: "white",
@@ -72,13 +100,13 @@ export const StyledBtn = chakra(Button, {
     fontSize: "14px",
     padding: "-5px 10px",
     _hover: {
-      background: "#00FFA7",
+      background: "brightGreen.500",
       color: "black",
     },
   },
 });
 
-export const StyledLink = chakra(Link, {
+export const DefaultLink = chakra(Link, {
   baseStyle: {
     color: "white",
     marginX: "10px",
@@ -88,3 +116,48 @@ export const StyledLink = chakra(Link, {
     },
   },
 });
+
+interface DefaultSwitchProps {
+  label: string;
+  isChecked: boolean;
+  onChange: VoidFunction;
+  // TODO: fix type
+  size?: string;
+  colorScheme?: string;
+}
+
+export const DefaultSwitch = (props: DefaultSwitchProps) => {
+  const {
+    label,
+    isChecked,
+    onChange,
+    size = "sm",
+    colorScheme = "brightGreen",
+  } = props;
+  return (
+    <HStack>
+      <Switch
+        size={size}
+        onChange={onChange}
+        isChecked={isChecked}
+        colorScheme={colorScheme}
+      ></Switch>
+      <DefaultText fontSize="14px">{label}</DefaultText>
+    </HStack>
+  );
+};
+
+export const DefaultSpinner = (props: FlexProps) => {
+  return (
+    <Flex
+      h="100%"
+      minH="120px"
+      w="100%"
+      alignItems="center"
+      justifyContent="center"
+      {...props}
+    >
+      <Spinner color="brightGreen.500" size="xl" />
+    </Flex>
+  );
+};

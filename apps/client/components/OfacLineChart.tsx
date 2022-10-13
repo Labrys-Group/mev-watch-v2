@@ -15,24 +15,13 @@ import { Line } from "react-chartjs-2";
 import { useQuery } from "react-query";
 import axios from "axios";
 
-import {
-  HStack,
-  Switch,
-  useBoolean,
-  Text,
-  VStack,
-  Flex,
-  chakra,
-  Button,
-  Spinner,
-  Center,
-} from "@chakra-ui/react";
+import { HStack, Text, VStack, Flex, Spinner } from "@chakra-ui/react";
 
-import { DefaultText, LabrysGreenText } from "../styles/StyledComponents";
 import { getLineChartData } from "../helpers/getLineChartData";
 import { AggregatedStatsResponse } from "../pages/api/blockStatsAggregated";
 import { ofacLineChartOptions } from "../config/lineChart";
 import { StatsContext } from "../providers/StatsProvider";
+import { DefaultSpinner } from "../styles/StyledComponents";
 
 ChartJS.register(
   CategoryScale,
@@ -45,14 +34,14 @@ ChartJS.register(
   Filler
 );
 
-const getNowInUnix = () => Math.floor(Date.now() / 1000);
+// const getNowInUnix = () => Math.floor(Date.now() / 1000);
 
 const OfacLineChart = () => {
   const { data: aggregateStatsResponse } = useQuery([], () =>
     axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated", {})
   );
 
-  const {includeAllBlocks, AllBlocksToggle} = useContext(StatsContext)
+  const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
 
   const lineChartData = useMemo(() => {
     if (!aggregateStatsResponse) return null;
@@ -87,9 +76,7 @@ const OfacLineChart = () => {
         {lineChartData ? (
           <Line options={ofacLineChartOptions} data={lineChartData} />
         ) : (
-          <Flex h="100%" w="100%" alignItems="end" justifyContent="center">
-            <Spinner color="#00FFA7" size="xl" />
-          </Flex>
+          <DefaultSpinner minH="150px" />
         )}
       </VStack>
 
