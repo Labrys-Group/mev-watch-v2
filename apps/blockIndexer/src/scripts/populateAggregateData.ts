@@ -8,11 +8,9 @@ import {
 } from "../helpers/aggregation/getAggregateStats";
 import { saveAggregateStats } from "../helpers/aggregation/saveAggregateStats";
 
-const recursivelyPopulateAggregateData = async (startDate: Date) => {
+export const recursivelyPopulateAggregateData = async (startDate: Date) => {
   const endDate = add(startDate, { hours: AGGREGATION_PERIOD });
-  console.log({ startDate, endDate });
   if (isAfter(endDate, new Date())) {
-    console.log("period exceeded")
     return;
   }
 

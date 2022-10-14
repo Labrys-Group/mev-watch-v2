@@ -12,7 +12,6 @@ export const saveAggregateStats = async (stats: StatsAggregate[]) => {
 
     console.log(`Successfully inserted: ${response.length}`);
   } catch (e: any) {
-    console.log(e);
     if (e.result.result.ok === 1) {
       console.log(`Successfully inserted: ${e.insertedCount}`);
 
