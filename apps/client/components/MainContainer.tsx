@@ -1,5 +1,14 @@
 import { ReactNode } from "react";
-import { Flex, chakra, Box, VStack, Image, Link, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  chakra,
+  Box,
+  VStack,
+  Image,
+  Link,
+  Text,
+  HStack,
+} from "@chakra-ui/react";
 import { AiTwotoneHeart } from "react-icons/ai";
 
 import { useRouter } from "next/router";
@@ -17,6 +26,9 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
         <Footer>
           <DefaultLink color="white" href="/terms-of-use">
             {router.pathname === "/terms-of-use" ? "" : "Terms of Use"}
+          </DefaultLink>
+          <DefaultLink color="white" href="mailto:press@labrys.io">
+            Press Contact
           </DefaultLink>
           <Link href={LABRYS_LINK} target="_blank">
             <VStack align="center">
@@ -39,7 +51,6 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
               />
             </VStack>
           </Link>
-
           <DefaultIconBtn
             aria-label="labrys-twitter"
             icon={<BsTwitter />}
