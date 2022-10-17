@@ -18,6 +18,9 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
           <DefaultLink color="white" href="/terms-of-use">
             {router.pathname === "/terms-of-use" ? "" : "Terms of Use"}
           </DefaultLink>
+          <DefaultLink color="white" href="mailto:press@labrys.io">
+            Press Enquiries
+          </DefaultLink>
           <Link href={LABRYS_LINK} target="_blank">
             <VStack align="center">
               <Flex alignItems="center">
@@ -39,7 +42,6 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
               />
             </VStack>
           </Link>
-
           <DefaultIconBtn
             aria-label="labrys-twitter"
             icon={<BsTwitter />}
