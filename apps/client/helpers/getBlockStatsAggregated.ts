@@ -12,8 +12,9 @@ const BLOCKS_PER_PERIOD = 12 * 60 * 5;
  * @returns Stats for each relay in the required time period
  */
 export const getBlockStatsAggregated = async (): Promise<AggregatedStats[]> => {
-  const aggregatedStats =
-    (await StatsAggregateModel.find()) as StatsAggregate[];
+  const aggregatedStats = (await StatsAggregateModel.find().sort({
+    ts: 1,
+  })) as StatsAggregate[];
 
   const formattedStats: AggregatedStats[] = await Promise.all(
     aggregatedStats.map(async (periodAggregate) => {
@@ -41,7 +42,7 @@ export const getBlockStatsAggregated = async (): Promise<AggregatedStats[]> => {
         relayerStats,
         totalBlocks: BLOCKS_PER_PERIOD,
         censoringBlocks,
-        nonCensoringBlocks
+        nonCensoringBlocks,
       };
     })
   );
