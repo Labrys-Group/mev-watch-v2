@@ -1,14 +1,5 @@
 import { ReactNode } from "react";
-import {
-  Flex,
-  chakra,
-  Box,
-  VStack,
-  Image,
-  Link,
-  Text,
-  HStack,
-} from "@chakra-ui/react";
+import { Flex, chakra, Box, VStack, Image, Link, Text } from "@chakra-ui/react";
 import { AiTwotoneHeart } from "react-icons/ai";
 
 import { useRouter } from "next/router";
