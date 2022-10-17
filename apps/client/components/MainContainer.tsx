@@ -28,7 +28,7 @@ const MainContainer = ({ children }: { children: ReactNode }) => {
             {router.pathname === "/terms-of-use" ? "" : "Terms of Use"}
           </DefaultLink>
           <DefaultLink color="white" href="mailto:press@labrys.io">
-            Press Contact
+            Press Enquiries
           </DefaultLink>
           <Link href={LABRYS_LINK} target="_blank">
             <VStack align="center">
