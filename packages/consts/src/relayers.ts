@@ -36,6 +36,11 @@ export const RELAYERS: Relayer[] = [
     name: "Blocknative",
     isOfacCensoring: true,
   },
+  {
+    url: "https://relayooor.wtf/",
+    name: "Relayooor",
+    isOfacCensoring: false,
+  }
 ];
 
 export const relayAddresses = {
