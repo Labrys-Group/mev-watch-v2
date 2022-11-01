@@ -7,6 +7,7 @@ const ofacCensorshipLookup: Record<string, boolean> = {
   "BloXroute Regulated": true,
   Manifold: false,
   Eden: true,
+  Relayooor: false,
 };
 
 /**
