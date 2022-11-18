@@ -22,7 +22,7 @@ export const LeaderboardRow = ({
       <Cell color="gray.600">{rank}</Cell>
       <Cell>
         <HStack>
-          <EntityImage />
+          {entityLogo ? <EntityImage src={entityLogo} /> : <EntityImage />}
           <Text>{entityName}</Text>
         </HStack>
       </Cell>

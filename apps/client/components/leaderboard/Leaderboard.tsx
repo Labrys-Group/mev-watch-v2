@@ -45,7 +45,7 @@ export const Leaderboard = () => {
         <DefaultSpinner minH="364px" />
       ) : (
         <LeaderboardTable
-          data={leaderboardData?.data.leaderboard.slice(0, 5) ?? []}
+          data={leaderboardData?.data.leaderboard.slice(0, 10) ?? []}
         />
       )}
       <TimeFrameContainer>

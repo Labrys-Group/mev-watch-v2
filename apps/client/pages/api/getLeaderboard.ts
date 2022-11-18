@@ -50,7 +50,7 @@ export default async (
     getLeaderboardEntity(entity, totalBlocksInPeriod)
   );
 
-  // sort by number of censored blocks rather than network
+  // sort by number of censored blocks rather than network penetration
   leaderboard.sort(
     (a, b) => b.censoredBlocks - a.censoredBlocks
   );

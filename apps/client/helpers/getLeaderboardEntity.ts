@@ -1,4 +1,4 @@
-import { DATE_OF_MERGE, timeFrames } from "consts";
+import { DATE_OF_MERGE, entityLogos, timeFrames } from "consts";
 import { ILeaderboardEntity } from "../types";
 import { getTotalBlocks } from "./getTotalBlocks";
 
@@ -45,7 +45,7 @@ export const getLeaderboardEntity = (
 
   return {
     entityName: entity.id,
-    entityLogo: "",
+    entityLogo: entityLogos[entity.id] ?? undefined,
     totalBlocks,
     censoredBlocks,
   };
