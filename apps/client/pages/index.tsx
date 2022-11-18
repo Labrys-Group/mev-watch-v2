@@ -6,6 +6,7 @@ import { PageTitle, DefaultText } from "../styles/StyledComponents";
 import OfacLineChart from "../components/OfacLineChart";
 import BlockVisualization from "../components/blockVisualization";
 import SocialMediaContents from "../components/SocialMediaContents";
+import { Leaderboard } from "../components/leaderboard/Leaderboard";
 
 const Home = () => {
   return (
@@ -19,6 +20,7 @@ const Home = () => {
       </DefaultText>
 
       <OfacBarChart />
+      <Leaderboard />
       <Note>
         <Text fontWeight="bold" color="brightGreen.500">
           Protocol level censorship = Bad

@@ -48,6 +48,14 @@ export const DefaultTitle = chakra(Text, {
   },
 });
 
+export const DefaultSubtitle = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    fontSize: "0.7rem",
+    color: "white",
+  },
+});
+
 export const DefaultListItem = chakra(ListItem, {
   baseStyle: {
     fontSize: "16px",
