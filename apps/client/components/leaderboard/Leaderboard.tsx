@@ -1,4 +1,4 @@
-import { chakra, HStack } from "@chakra-ui/react";
+import { chakra, HStack, Link, Spacer } from "@chakra-ui/react";
 import axios from "axios";
 import { TimeFrame, timeFrames } from "consts";
 import { last } from "lodash";
@@ -42,10 +42,10 @@ export const Leaderboard = () => {
         Which staking entities are contributing the most towards censorship?
       </DefaultSubtitle>
       {isLoading ? (
-        <DefaultSpinner minH="364px" />
+        <DefaultSpinner minH="487px" />
       ) : (
         <LeaderboardTable
-          data={leaderboardData?.data.leaderboard.slice(0, 10) ?? []}
+          data={leaderboardData?.data.leaderboard.slice(0, 7) ?? []}
         />
       )}
       <TimeFrameContainer>
@@ -67,6 +67,8 @@ export const Leaderboard = () => {
             {timeFrame.label}
           </TimeFrameBtn>
         ))}
+        <Spacer />
+        <DefaultSubtitle>Data provided by <Link href="https://www.rated.network/" target="_blank">Rated.Network</Link></DefaultSubtitle>
       </TimeFrameContainer>
     </LeaderboardContainer>
   );
