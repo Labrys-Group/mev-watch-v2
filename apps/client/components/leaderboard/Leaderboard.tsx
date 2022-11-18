@@ -1,13 +1,24 @@
-import { chakra } from "@chakra-ui/react";
+import { chakra, HStack } from "@chakra-ui/react";
+import { TimeFrame, timeFrames } from "consts";
+import { last } from "lodash";
+import { useState } from "react";
 import {
   DefaultContainer,
   DefaultTitle,
   DefaultSubtitle,
+  LabrysGreenText,
+  TimeFrameBtn,
 } from "../../styles/StyledComponents";
 import { MevWatchText } from "../MevWatchText";
 import { LeaderboardTable } from "./LeaderboardTable";
 
+const timeFrameSubset = timeFrames.slice(0, 4);
+
 export const Leaderboard = () => {
+  const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>(
+    last(timeFrameSubset)!
+  );
+
   return (
     <LeaderboardContainer>
       <MevWatchText />
@@ -16,9 +27,38 @@ export const Leaderboard = () => {
         Which staking entities are contributing the most towards censorship?
       </DefaultSubtitle>
       <LeaderboardTable data={dummyData} />
+      <TimeFrameContainer>
+        <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
+        {timeFrameSubset.map((timeFrame, index) => (
+          <TimeFrameBtn
+            key={timeFrame.value}
+            onClick={() => setSelectedTimeFrame(timeFrames[index])}
+            size="sm"
+            borderColor={
+              timeFrame === selectedTimeFrame
+                ? "brightGreen.500"
+                : "transparent"
+            }
+            background={
+              timeFrame === selectedTimeFrame ? "#ffffff3c" : "transparent"
+            }
+          >
+            {timeFrame.label}
+          </TimeFrameBtn>
+        ))}
+      </TimeFrameContainer>
     </LeaderboardContainer>
   );
 };
+
+const TimeFrameContainer = chakra(HStack, {
+  baseStyle: {
+    pt: "15px",
+    w: "full",
+    borderTop: "2px solid",
+    borderColor: "gray.700"
+  }
+})
 
 const LeaderboardContainer = chakra(DefaultContainer, {
   baseStyle: {

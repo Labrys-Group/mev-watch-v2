@@ -1,11 +1,4 @@
-import {
-  chakra,
-  HStack,
-  Td,
-  Image,
-  Text,
-  Tr,
-} from "@chakra-ui/react";
+import { chakra, HStack, Td, Image, Text, Tr } from "@chakra-ui/react";
 
 interface ILeaderboardEntity {
   entityName: string;
@@ -26,8 +19,13 @@ export const LeaderboardRow = ({
   const censorshipPercentage = Math.floor((100 * censoredBlocks) / totalBlocks);
   return (
     <Tr>
-      <Cell>{rank}</Cell>
-      <Cell><HStack><EntityImage /><Text>{entityName}</Text></HStack></Cell>
+      <Cell color="gray.600">{rank}</Cell>
+      <Cell>
+        <HStack>
+          <EntityImage />
+          <Text>{entityName}</Text>
+        </HStack>
+      </Cell>
       <Cell>{totalBlocks}</Cell>
       <Cell>
         <HStack>
@@ -44,14 +42,14 @@ const EntityImage = chakra(Image, {
     borderRadius: "25px",
     bgColor: "white",
     boxSize: "30px",
-    mr: "5px"
-  }
-})
+    mr: "5px",
+  },
+});
 
 const Cell = chakra(Td, {
   baseStyle: {
     color: "gray.100",
     pl: "5px",
-    border: "none"
+    border: "none",
   },
 });

@@ -48,6 +48,8 @@ const HeaderCell = chakra(Th, {
     color: "brightGreen.500",
     textAlign: "left",
     p: "5px",
-    borderColor: "gray.700"
+    pb: "10px",
+    borderBottom: "2px solid",
+    borderColor: "gray.700",
   },
 });
