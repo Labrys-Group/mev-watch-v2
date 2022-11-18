@@ -1,13 +1,17 @@
 import { chakra, HStack } from "@chakra-ui/react";
+import axios from "axios";
 import { TimeFrame, timeFrames } from "consts";
 import { last } from "lodash";
 import { useState } from "react";
+import { useQuery } from "react-query";
+import { GetLeaderboardResponse } from "../../pages/api/getLeaderboard";
 import {
   DefaultContainer,
   DefaultTitle,
   DefaultSubtitle,
   LabrysGreenText,
   TimeFrameBtn,
+  DefaultSpinner,
 } from "../../styles/StyledComponents";
 import { MevWatchText } from "../MevWatchText";
 import { LeaderboardTable } from "./LeaderboardTable";
@@ -19,6 +23,17 @@ export const Leaderboard = () => {
     last(timeFrameSubset)!
   );
 
+  const { data: leaderboardData, isLoading } = useQuery(
+    ["leaderboard", selectedTimeFrame.value],
+    () =>
+      axios.get<GetLeaderboardResponse>("/api/getLeaderboard", {
+        params: {
+          limit: 15,
+          timeFrame: selectedTimeFrame.label,
+        },
+      })
+  );
+
   return (
     <LeaderboardContainer>
       <MevWatchText />
@@ -26,7 +41,13 @@ export const Leaderboard = () => {
       <DefaultSubtitle color="gray.200">
         Which staking entities are contributing the most towards censorship?
       </DefaultSubtitle>
-      <LeaderboardTable data={dummyData} />
+      {isLoading ? (
+        <DefaultSpinner minH="364px" />
+      ) : (
+        <LeaderboardTable
+          data={leaderboardData?.data.leaderboard.slice(0, 5) ?? []}
+        />
+      )}
       <TimeFrameContainer>
         <LabrysGreenText fontSize="12px">TIME FRAME</LabrysGreenText>
         {timeFrameSubset.map((timeFrame, index) => (
@@ -56,9 +77,9 @@ const TimeFrameContainer = chakra(HStack, {
     pt: "15px",
     w: "full",
     borderTop: "2px solid",
-    borderColor: "gray.700"
-  }
-})
+    borderColor: "gray.700",
+  },
+});
 
 const LeaderboardContainer = chakra(DefaultContainer, {
   baseStyle: {

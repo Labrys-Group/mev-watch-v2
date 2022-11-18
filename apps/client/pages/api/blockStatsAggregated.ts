@@ -5,7 +5,6 @@ import { connect } from "database/dist";
 
 import { TypedNextApiRequest } from "../../types/api";
 import { AggregatedStats, RelayStats } from "../../types";
-import { getTotalBlocks } from "../../helpers/getTotalBlocks";
 import { getBlockStatsAggregated } from "../../helpers/getBlockStatsAggregated";
 
 

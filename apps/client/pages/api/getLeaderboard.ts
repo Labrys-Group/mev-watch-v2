@@ -1,0 +1,59 @@
+import type { NextApiResponse } from "next";
+import { TypedNextApiRequest, ILeaderboardEntity } from "../../types";
+import { z } from "zod";
+import axios from "axios";
+import {
+  getLeaderboardEntity,
+  RatedNetworkEntity,
+} from "../../helpers/getLeaderboardEntity";
+import { timeFrames, DATE_OF_MERGE } from "consts";
+import { getTotalBlocks } from "../../helpers/getTotalBlocks";
+
+const RATED_OPERATOR_API = "https://api.rated.network/v0/eth/operators";
+
+const getLeaderboardRequestSchema = z.object({
+  timeFrame: z.string(),
+  limit: z.number(),
+});
+
+type GetLeaderboardRequestSchema = z.infer<typeof getLeaderboardRequestSchema>;
+
+export interface GetLeaderboardResponse {
+  leaderboard: ILeaderboardEntity[];
+}
+
+export default async (
+  req: TypedNextApiRequest<never, GetLeaderboardRequestSchema>,
+  res: NextApiResponse<GetLeaderboardResponse>
+) => {
+  const { limit, timeFrame } = req.query as GetLeaderboardRequestSchema;
+
+  const ratedNetworkData = await axios.get(RATED_OPERATOR_API, {
+    params: {
+      from: 0,
+      size: limit,
+      window: timeFrame.toLowerCase(),
+      idType: "entity",
+    },
+  });
+
+  const entityData: RatedNetworkEntity[] = ratedNetworkData.data.data;
+
+  const totalBlocksInPeriod = getTotalBlocks(
+    new Date(
+      timeFrames.find((t) => t.label === timeFrame)?.value! * 1000
+    ),
+    new Date()
+  );
+
+  const leaderboard: ILeaderboardEntity[] = entityData.map((entity) =>
+    getLeaderboardEntity(entity, totalBlocksInPeriod)
+  );
+
+  // sort by number of censored blocks rather than network
+  leaderboard.sort(
+    (a, b) => b.censoredBlocks - a.censoredBlocks
+  );
+
+  res.status(200).json({ leaderboard });
+};
