@@ -30,7 +30,7 @@ export const LeaderboardRow = ({
       <Cell>
         <HStack>
           <Text color="brightRed.500">{`${censoredBlocks.toLocaleString()}`}</Text>{" "}
-          <Text fontSize="0.5rem">{`(${censorshipPercentage}%)`}</Text>{" "}
+          <Text fontSize="0.7rem">{`(${censorshipPercentage}%)`}</Text>{" "}
         </HStack>
       </Cell>
     </Tr>

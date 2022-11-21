@@ -1,6 +1,5 @@
-import { DATE_OF_MERGE, entityLogos, timeFrames } from "consts";
+import { entityLogos } from "consts";
 import { ILeaderboardEntity } from "../types";
-import { getTotalBlocks } from "./getTotalBlocks";
 
 export interface RatedNetworkEntity {
   id: string;

@@ -51,7 +51,7 @@ export const DefaultTitle = chakra(Text, {
 export const DefaultSubtitle = chakra(Text, {
   baseStyle: {
     textAlign: "center",
-    fontSize: "0.7rem",
+    fontSize: "0.9rem",
     color: "white",
   },
 });
