@@ -28,7 +28,7 @@ export const Leaderboard = () => {
     () =>
       axios.get<GetLeaderboardResponse>("/api/getLeaderboard", {
         params: {
-          limit: 15,
+          limit: 35,
           timeFrame: selectedTimeFrame.label,
         },
       })
@@ -45,7 +45,7 @@ export const Leaderboard = () => {
         <DefaultSpinner minH="487px" />
       ) : (
         <LeaderboardTable
-          data={leaderboardData?.data.leaderboard.slice(0, 7) ?? []}
+          data={leaderboardData?.data.leaderboard.slice(0, 35) ?? []}
         />
       )}
       <TimeFrameContainer>

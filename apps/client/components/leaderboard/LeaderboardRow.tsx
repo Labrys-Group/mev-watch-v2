@@ -22,7 +22,7 @@ export const LeaderboardRow = ({
       <Cell color="gray.600">{rank}</Cell>
       <Cell>
         <HStack>
-          {entityLogo ? <EntityImage src={entityLogo} /> : <EntityImage />}
+          <EntityImage src={entityLogo} />
           <Text>{entityName}</Text>
         </HStack>
       </Cell>
@@ -40,7 +40,6 @@ export const LeaderboardRow = ({
 const EntityImage = chakra(Image, {
   baseStyle: {
     borderRadius: "25px",
-    bgColor: "white",
     boxSize: "30px",
     mr: "5px",
   },

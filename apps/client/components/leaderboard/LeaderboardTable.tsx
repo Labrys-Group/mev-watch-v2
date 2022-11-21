@@ -18,6 +18,7 @@ interface ILeaderboardTable {
 }
 
 export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
+  console.log(data.map(e => e.entityName).sort());
   return (
     <TableContainer pt="20px">
       <Table variant="simple">
