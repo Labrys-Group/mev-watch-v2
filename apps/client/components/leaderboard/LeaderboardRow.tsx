@@ -26,10 +26,10 @@ export const LeaderboardRow = ({
           <Text>{entityName}</Text>
         </HStack>
       </Cell>
-      <Cell>{totalBlocks}</Cell>
+      <Cell>{totalBlocks.toLocaleString()}</Cell>
       <Cell>
         <HStack>
-          <Text color="brightRed.500">{`${censoredBlocks}`}</Text>{" "}
+          <Text color="brightRed.500">{`${censoredBlocks.toLocaleString()}`}</Text>{" "}
           <Text fontSize="0.5rem">{`(${censorshipPercentage}%)`}</Text>{" "}
         </HStack>
       </Cell>

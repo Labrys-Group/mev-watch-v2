@@ -28,7 +28,6 @@ export const getLeaderboardEntity = (
   entity: RatedNetworkEntity,
   totalBlocksInPeriod: number
 ): ILeaderboardEntity => {
-    if(entity.id ==="Lido") console.log(entity, {totalBlocksInPeriod})
   const totalBlocks = Math.floor(
     totalBlocksInPeriod * entity.networkPenetration
   );

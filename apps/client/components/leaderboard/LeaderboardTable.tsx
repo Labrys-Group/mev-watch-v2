@@ -1,11 +1,8 @@
 import {
   chakra,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
-  Td,
-  Tfoot,
   Th,
   Thead,
   Tr,
@@ -18,11 +15,10 @@ interface ILeaderboardTable {
 }
 
 export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
-  console.log(data.map(e => e.entityName).sort());
   return (
-    <TableContainer pt="20px">
+    <TableContainer mt="20px" maxH="500px" overflowY="auto">
       <Table variant="simple">
-        <Thead>
+        <Thead position="sticky" top={0} background="#0f0f0f">
           <Tr>
             <HeaderCell>Rank</HeaderCell>
             <HeaderCell>Staking Entity</HeaderCell>

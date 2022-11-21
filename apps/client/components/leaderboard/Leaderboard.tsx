@@ -16,6 +16,7 @@ import {
 import { MevWatchText } from "../MevWatchText";
 import { LeaderboardTable } from "./LeaderboardTable";
 
+const NUM_LEADERBOARD_ROWS = 20;
 const timeFrameSubset = timeFrames.slice(0, 4);
 
 export const Leaderboard = () => {
@@ -28,7 +29,7 @@ export const Leaderboard = () => {
     () =>
       axios.get<GetLeaderboardResponse>("/api/getLeaderboard", {
         params: {
-          limit: 35,
+          limit: 30,
           timeFrame: selectedTimeFrame.label,
         },
       })
@@ -42,10 +43,13 @@ export const Leaderboard = () => {
         Which staking entities are contributing the most towards censorship?
       </DefaultSubtitle>
       {isLoading ? (
-        <DefaultSpinner minH="487px" />
+        <DefaultSpinner h="520px" />
       ) : (
         <LeaderboardTable
-          data={leaderboardData?.data.leaderboard.slice(0, 35) ?? []}
+          data={
+            leaderboardData?.data.leaderboard.slice(0, NUM_LEADERBOARD_ROWS) ??
+            []
+          }
         />
       )}
       <TimeFrameContainer>
@@ -68,7 +72,12 @@ export const Leaderboard = () => {
           </TimeFrameBtn>
         ))}
         <Spacer />
-        <DefaultSubtitle>Data provided by <Link href="https://www.rated.network/" target="_blank">Rated.Network</Link></DefaultSubtitle>
+        <DefaultSubtitle>
+          Data provided by{" "}
+          <Link href="https://www.rated.network/" target="_blank">
+            Rated.Network
+          </Link>
+        </DefaultSubtitle>
       </TimeFrameContainer>
     </LeaderboardContainer>
   );
