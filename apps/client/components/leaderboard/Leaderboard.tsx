@@ -1,8 +1,9 @@
-import { chakra, HStack, Link, Spacer } from "@chakra-ui/react";
+import { Box, chakra, HStack, Link, Spacer, Tooltip } from "@chakra-ui/react";
 import axios from "axios";
 import { TimeFrame, timeFrames } from "consts";
 import { last } from "lodash";
 import { useState } from "react";
+import { AiFillInfoCircle } from "react-icons/ai";
 import { useQuery } from "react-query";
 import { GetLeaderboardResponse } from "../../pages/api/getLeaderboard";
 import {
@@ -15,7 +16,6 @@ import {
 } from "../../styles/StyledComponents";
 import { MevWatchText } from "../MevWatchText";
 import { LeaderboardTable } from "./LeaderboardTable";
-import { WeNeedYourHelp } from "./WeNeedYourHelp";
 
 const NUM_LEADERBOARD_ROWS = 20;
 const timeFrameSubset = timeFrames.slice(0, 4);
@@ -42,8 +42,9 @@ export const Leaderboard = () => {
       <DefaultTitle>Censorship Offenders Leaderboard</DefaultTitle>
       <DefaultSubtitle color="gray.200">
         {`These entities run censoring mev relays on their validators and are
-        actively harming Ethereum's credible neutrality`}
+        actively harming Ethereum's credible neutrality`}{" "}
       </DefaultSubtitle>
+
       {isLoading ? (
         <DefaultSpinner h="520px" />
       ) : (

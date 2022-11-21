@@ -9,8 +9,8 @@ export const WeNeedYourHelp = () => (
       contributing to the censorship of Ethereum.
     </DefaultText>
     <DefaultText fontSize="0.9rem">
-      Screenshot this leaderboard and tweet @ them to switch to a non-censoring
-      relay now.
+      Screenshot this leaderboard and tweet @ them to disable their censoring
+      relays now.
     </DefaultText>
   </GreenContainer>
 );
