@@ -15,6 +15,7 @@ import {
 } from "../../styles/StyledComponents";
 import { MevWatchText } from "../MevWatchText";
 import { LeaderboardTable } from "./LeaderboardTable";
+import { WeNeedYourHelp } from "./WeNeedYourHelp";
 
 const NUM_LEADERBOARD_ROWS = 20;
 const timeFrameSubset = timeFrames.slice(0, 4);
@@ -40,7 +41,8 @@ export const Leaderboard = () => {
       <MevWatchText />
       <DefaultTitle>Censorship Offenders Leaderboard</DefaultTitle>
       <DefaultSubtitle color="gray.200">
-        Which staking entities are contributing the most towards censorship?
+        {`These entities run censoring mev relays on their validators and are
+        actively harming Ethereum's credible neutrality`}
       </DefaultSubtitle>
       {isLoading ? (
         <DefaultSpinner h="520px" />
