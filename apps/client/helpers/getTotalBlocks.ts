@@ -8,7 +8,7 @@ import { differenceInSeconds, isBefore } from "date-fns";
  * @param endDate Last date to calculate blocks up to
  * @returns
  */
-export const getTotalBlocks = async (startDate: Date, endDate: Date) => {
+export const getTotalBlocks = (startDate: Date, endDate: Date) => {
   const _startDate = isBefore(startDate, DATE_OF_MERGE)
     ? DATE_OF_MERGE
     : startDate;

@@ -48,6 +48,14 @@ export const DefaultTitle = chakra(Text, {
   },
 });
 
+export const DefaultSubtitle = chakra(Text, {
+  baseStyle: {
+    textAlign: "center",
+    fontSize: "0.9rem",
+    color: "white",
+  },
+});
+
 export const DefaultListItem = chakra(ListItem, {
   baseStyle: {
     fontSize: "16px",
@@ -105,6 +113,21 @@ export const DefaultBtn = chakra(Button, {
     },
   },
 });
+
+export const TimeFrameBtn = chakra(Button, {
+  baseStyle: {
+    borderRadius: "2px",
+    borderWidth: "1px",
+    color: "white",
+    fontSize: "14px",
+    background: "transparent",
+    _hover: {
+      borderColor: "brightGreen.500",
+      background: "transparent",
+    },
+  },
+});
+
 
 export const DefaultLink = chakra(Link, {
   baseStyle: {

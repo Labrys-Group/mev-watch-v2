@@ -27,6 +27,7 @@ import {
   DefaultTitle,
   DefaultContainer,
   DefaultSpinner,
+  TimeFrameBtn,
 } from "../styles/StyledComponents";
 
 import { timeFrames } from "consts";
@@ -155,19 +156,5 @@ const PercentBlocksText = chakra(Text, {
   baseStyle: {
     textAlign: "center",
     color: "white",
-  },
-});
-
-const TimeFrameBtn = chakra(Button, {
-  baseStyle: {
-    borderRadius: "2px",
-    borderWidth: "1px",
-    color: "white",
-    fontSize: "14px",
-    background: "transparent",
-    _hover: {
-      borderColor: "brightGreen.500",
-      background: "transparent",
-    },
   },
 });
