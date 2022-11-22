@@ -39,7 +39,7 @@ export const Leaderboard = () => {
   return (
     <LeaderboardContainer>
       <MevWatchText />
-      <DefaultTitle>OFAC Enforcement Leaderboard</DefaultTitle>
+      <DefaultTitle>Censorship Offenders Leaderboard</DefaultTitle>
       <DefaultSubtitle color="gray.200">
         {`These entities run censoring mev relays on their validators and are
         actively harming Ethereum's credible neutrality`}{" "}

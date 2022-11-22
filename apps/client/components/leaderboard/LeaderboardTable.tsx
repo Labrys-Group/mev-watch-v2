@@ -23,7 +23,7 @@ export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
             <HeaderCell>Rank</HeaderCell>
             <HeaderCell>Staking Entity</HeaderCell>
             <HeaderCell>Total Blocks</HeaderCell>
-            <HeaderCell>OFAC Enforced</HeaderCell>
+            <HeaderCell>Censored</HeaderCell>
           </Tr>
         </Thead>
         <Tbody>
