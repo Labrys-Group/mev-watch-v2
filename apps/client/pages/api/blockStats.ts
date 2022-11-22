@@ -47,7 +47,7 @@ export default async (
   const startDate = new Date(req.body.startTime * 1000);
   const endDate = new Date(req.body.endTime * 1000);
 
-  const totalBlocks = await getTotalBlocks(startDate, endDate);
+  const totalBlocks = getTotalBlocks(startDate, endDate);
 
   const relayStats = await getBlockStats(startDate, endDate);
 
