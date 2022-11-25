@@ -26,13 +26,13 @@ export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
   );
 
   return (
-    <TableContainer mt="20px" maxH="500px" overflowY="auto">
+    <StyledTableContainer css={hideScrollbar}>
       <Table variant="simple">
         <Thead position="sticky" top={0} background="#0f0f0f">
           <Tr>
             <HeaderCell>Rank</HeaderCell>
             <HeaderCell>Staking Entity</HeaderCell>
-            <HeaderCell>Total</HeaderCell>
+            <HeaderCell w="90px">Total</HeaderCell>
             <SortedHeaderCell
               textDecoration={
                 sortingOption === ISortingOption.CensoredBlocks
@@ -77,9 +77,27 @@ export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
           ))}
         </Tbody>
       </Table>
-    </TableContainer>
+    </StyledTableContainer>
   );
 };
+
+const hideScrollbar = {
+  "&::-webkit-scrollbar": {
+    display: "none",
+  },
+
+  "&::-webkit-scrollbar-thumb": {
+    display: "none",
+  },
+};
+
+const StyledTableContainer = chakra(TableContainer, {
+  baseStyle: {
+    mt: "20px",
+    maxH: "500px",
+    overflowY: "auto",
+  },
+});
 
 const HeaderCell = chakra(Th, {
   baseStyle: {
@@ -96,6 +114,6 @@ const SortedHeaderCell = chakra(HeaderCell, {
   baseStyle: {
     cursor: "pointer",
     userSelect: "none",
-    maxW: "90px"
+    w: "90px",
   },
 });
