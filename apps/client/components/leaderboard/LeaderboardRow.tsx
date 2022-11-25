@@ -1,11 +1,5 @@
 import { chakra, HStack, Td, Image, Text, Tr } from "@chakra-ui/react";
-
-interface ILeaderboardEntity {
-  entityName: string;
-  entityLogo: string;
-  totalBlocks: number;
-  censoredBlocks: number;
-}
+import { ILeaderboardEntity } from "../../types";
 
 interface ILeaderboardRow {
   rank: string;
@@ -14,28 +8,31 @@ interface ILeaderboardRow {
 
 export const LeaderboardRow = ({
   rank,
-  entity: { entityName, entityLogo, totalBlocks, censoredBlocks },
+  entity: { entityName, entityLogo, totalBlocks, censoredBlocks, censorshipPercentage },
 }: ILeaderboardRow) => {
-  const censorshipPercentage = Math.floor((100 * censoredBlocks) / totalBlocks);
   return (
     <Tr>
       <Cell color="gray.600">{rank}</Cell>
       <Cell>
         <HStack>
           <EntityImage src={entityLogo} />
-          <Text>{entityName}</Text>
+          <EntityName>{entityName}</EntityName>
         </HStack>
       </Cell>
       <Cell>{totalBlocks.toLocaleString()}</Cell>
-      <Cell>
-        <HStack>
-          <Text color="brightRed.500">{`${censoredBlocks.toLocaleString()}`}</Text>{" "}
-          <Text fontSize="0.7rem">{`(${censorshipPercentage}%)`}</Text>{" "}
-        </HStack>
-      </Cell>
+      <CensoredCell>{`${censoredBlocks.toLocaleString()}`}</CensoredCell>
+      <CensoredCell>{`${censorshipPercentage.toFixed(0)}%`}</CensoredCell>
     </Tr>
   );
 };
+
+const EntityName = chakra(Text, {
+  baseStyle: {
+    maxW: "150px",
+    fontSize: "0.9rem",
+    textOverflow: "ellipsis"
+  }
+})
 
 const EntityImage = chakra(Image, {
   baseStyle: {
@@ -50,5 +47,12 @@ const Cell = chakra(Td, {
     color: "gray.100",
     pl: "5px",
     border: "none",
+  },
+});
+
+const CensoredCell = chakra(Cell, {
+  baseStyle: {
+    color: "red",
+    w: "90px"
   },
 });
