@@ -1,9 +1,8 @@
-import { Box, chakra, HStack, Link, Spacer, Tooltip } from "@chakra-ui/react";
+import { chakra, HStack, Link, Spacer } from "@chakra-ui/react";
 import axios from "axios";
 import { TimeFrame, timeFrames } from "consts";
 import { last } from "lodash";
 import { useState } from "react";
-import { AiFillInfoCircle } from "react-icons/ai";
 import { useQuery } from "react-query";
 import { GetLeaderboardResponse } from "../../pages/api/getLeaderboard";
 import {
@@ -30,7 +29,7 @@ export const Leaderboard = () => {
     () =>
       axios.get<GetLeaderboardResponse>("/api/getLeaderboard", {
         params: {
-          limit: 30,
+          limit: 35,
           timeFrame: selectedTimeFrame.label,
         },
       })
