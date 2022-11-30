@@ -1,4 +1,5 @@
 import { chakra, HStack, Td, Image, Text, Tr } from "@chakra-ui/react";
+import { unknownEntityLogo } from "consts";
 import { ILeaderboardEntity } from "../../types";
 
 interface ILeaderboardRow {
@@ -15,7 +16,7 @@ export const LeaderboardRow = ({
       <Cell color="gray.600">{rank}</Cell>
       <Cell>
         <HStack>
-          <EntityImage src={entityLogo} />
+          <EntityImage src={entityLogo ?? unknownEntityLogo} />
           <EntityName>{entityName}</EntityName>
         </HStack>
       </Cell>
