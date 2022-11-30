@@ -3,4 +3,5 @@ export interface ILeaderboardEntity {
   entityLogo: string;
   totalBlocks: number;
   censoredBlocks: number;
+  censorshipPercentage: number;
 }

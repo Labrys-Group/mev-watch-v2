@@ -30,6 +30,7 @@ export const getLeaderboardEntity = (
   const totalBlocks = Math.floor(
     totalBlocksInPeriod * entity.networkPenetration
   );
+
   const censoredBlocks = Math.floor(
     totalBlocks *
       entity.relayerPercentages.reduce(
@@ -41,10 +42,13 @@ export const getLeaderboardEntity = (
       )
   );
 
+  const censorshipPercentage = (100 * censoredBlocks) / totalBlocks;
+
   return {
     entityName: entity.id,
     entityLogo: entityLogos[entity.id] ?? undefined,
     totalBlocks,
     censoredBlocks,
+    censorshipPercentage,
   };
 };
