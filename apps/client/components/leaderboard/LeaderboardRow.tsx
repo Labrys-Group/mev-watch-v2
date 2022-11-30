@@ -21,8 +21,8 @@ export const LeaderboardRow = ({
         </HStack>
       </Cell>
       <Cell>{totalBlocks.toLocaleString()}</Cell>
-      <CensoredCell>{`${censoredBlocks.toLocaleString()}`}</CensoredCell>
-      <CensoredCell>{`${censorshipPercentage.toFixed(0)}%`}</CensoredCell>
+      <CensoredCell color={censoredBlocks > 0 ? "brightRed.500" : "brightGreen.500"}>{`${censoredBlocks.toLocaleString()}`}</CensoredCell>
+      <CensoredCell color={censoredBlocks > 0 ? "brightRed.500" : "brightGreen.500"}>{`${censorshipPercentage.toFixed(0)}%`}</CensoredCell>
     </Tr>
   );
 };
@@ -53,7 +53,6 @@ const Cell = chakra(Td, {
 
 const CensoredCell = chakra(Cell, {
   baseStyle: {
-    color: "red",
     w: "90px"
   },
 });
