@@ -11,6 +11,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 import { ISortingOption, sortLeaderboard } from "../../helpers/sortLeaderboard";
 import { ILeaderboardEntity } from "../../types/leaderboard";
@@ -41,11 +42,16 @@ export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
               }
               onClick={() => setSortingOption(ISortingOption.CensoredBlocks)}
             >
-              <HStack>
+              <HStack spacing={0}>
                 <Text>Censored</Text>
-                {/* {sortingOption === ISortingOption.CensoredBlocks && (
-                  <IoMdArrowDropdown />
-                )} */}
+                <IoMdArrowDropdown
+                  size={20}
+                  color={
+                    sortingOption === ISortingOption.CensoredBlocks
+                      ? "#00FFA7"
+                      : "gray"
+                  }
+                />
               </HStack>
             </SortedHeaderCell>
             <SortedHeaderCell
@@ -58,11 +64,16 @@ export const LeaderboardTable = ({ data }: ILeaderboardTable) => {
                 setSortingOption(ISortingOption.CensoredPercentage)
               }
             >
-              <HStack>
+              <HStack spacing={0}>
                 <Text>% Censored</Text>
-                {/* {sortingOption === ISortingOption.CensoredPercentage && (
-                  <IoMdArrowDropdown />
-                )} */}
+                <IoMdArrowDropdown
+                  size={20}
+                  color={
+                    sortingOption === ISortingOption.CensoredPercentage
+                      ? "#00FFA7"
+                      : "gray"
+                  }
+                />
               </HStack>
             </SortedHeaderCell>
           </Tr>
