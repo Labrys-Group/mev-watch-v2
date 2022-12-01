@@ -8,6 +8,8 @@ const ofacCensorshipLookup: Record<string, boolean> = {
   Manifold: false,
   Eden: true,
   Relayooor: false,
+  "Ultra Sound Money": false,
+  "Agnostic Boost": false,
 };
 
 /**
