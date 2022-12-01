@@ -9,11 +9,11 @@ const getFormattedDatasets = (
 ): DatasetEntry[] =>
   relaysStats.map((relay, index) => {
     const percentageOfBlocks = relay.numBlocks / totalBlocks;
-    const gradient = (index * 100 + 500) as ColorGradient;
+    const gradient = (index * 100 + 100) as ColorGradient;
 
     const backgroundColor = isOfacCompliant
-      ? colors.brightRed[gradient]
-      : colors.brightGreen[gradient];
+      ? colors.redBarGradient[gradient]
+      : colors.greenBarGradient[gradient];
 
     return {
       label: relay.name,

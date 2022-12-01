@@ -37,8 +37,18 @@ export const RELAYERS: Relayer[] = [
     isOfacCensoring: true,
   },
   {
-    url: "https://relayooor.wtf/",
+    url: "https://relayooor.wtf",
     name: "Relayooor",
+    isOfacCensoring: false,
+  },
+  {
+    url: "https://relay.ultrasound.money",
+    name: "Ultra Sound Money",
+    isOfacCensoring: false,
+  },
+  {
+    url: "https://agnostic-relay.net",
+    name: "Agnostic Boost",
     isOfacCensoring: false,
   }
 ];
