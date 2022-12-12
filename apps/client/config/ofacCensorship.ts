@@ -10,6 +10,7 @@ const ofacCensorshipLookup: Record<string, boolean> = {
   Relayooor: false,
   "Ultra Sound Money": false,
   "Agnostic Boost": false,
+  Aestus: false,
 };
 
 /**

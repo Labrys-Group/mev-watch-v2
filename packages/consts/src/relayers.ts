@@ -50,7 +50,12 @@ export const RELAYERS: Relayer[] = [
     url: "https://agnostic-relay.net",
     name: "Agnostic Boost",
     isOfacCensoring: false,
-  }
+  },
+  {
+    url: "https://mainnet.aestus.live/",
+    name: "Aestus",
+    isOfacCensoring: false,
+  },
 ];
 
 export const relayAddresses = {
@@ -61,4 +66,7 @@ export const relayAddresses = {
   Blocknative: "https://builder-relay-mainnet.blocknative.com",
   Manifold: "https://mainnet-relay.securerpc.com",
   Eden: "https://relay.edennetwork.io",
+  Aestus: "https://mainnet.aestus.live/",
+  "Agnostic Boost": "https://agnostic-relay.net",
+  "Ultra Sound Money": "https://relay.ultrasound.money",
 };

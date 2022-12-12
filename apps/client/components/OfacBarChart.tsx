@@ -94,7 +94,7 @@ const OfacBarChart = () => {
   return (
     <DefaultContainer>
       <MevWatchText />
-      <VStack maxH={{ base: "150px", md: "130px" }}>
+      <VStack maxH={{ base: "190px", md: "130px" }}>
         <DefaultTitle>Post-Merge OFAC Compliant Blocks</DefaultTitle>
         {barChartData ? (
           <Bar options={ofacBarChartOptions} data={barChartData} />
