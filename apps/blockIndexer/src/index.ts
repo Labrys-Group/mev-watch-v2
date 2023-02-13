@@ -11,10 +11,8 @@ const getLatestData = async () => {
 
     const relayers = await RelayerModel.find().sort({ priority: -1 });
 
-    console.log(relayers);
-
-    // const latestBlockStats = await getLatestBlockStats({ relayers });
-    // await saveBlockStats(latestBlockStats.blockStats);
+    const latestBlockStats = await getLatestBlockStats({ relayers });
+    await saveBlockStats(latestBlockStats.blockStats);
   } catch (error: any) {
     console.error(error);
     await slackWebhook(`Failed to fetch latest relayer data: ${error.message}`);
