@@ -14,6 +14,7 @@ export const saveBlockStats = async (blockStats: BlockStats[]) => {
     // if we inserted without duplicates
     console.log(`Successfully inserted: ${response.length}`);
   } catch (e: any) {
+    console.log(e.result.result.writeErrors);
     if (e.result.result.ok === 1) {
       console.log(`Successfully inserted: ${e.insertedCount}`);
 

@@ -25,6 +25,10 @@ __decorate([
     (0, typegoose_1.prop)({ default: null }),
     __metadata("design:type", Boolean)
 ], Relayer.prototype, "isOfacCensoring", void 0);
+__decorate([
+    (0, typegoose_1.prop)({ required: false }),
+    __metadata("design:type", Number)
+], Relayer.prototype, "priority", void 0);
 exports.Relayer = Relayer;
 exports.RelayerModel = (0, typegoose_1.getModelForClass)(Relayer);
 //# sourceMappingURL=Relayer.js.map

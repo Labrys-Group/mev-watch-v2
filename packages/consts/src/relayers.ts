@@ -45,16 +45,19 @@ export const RELAYERS: Relayer[] = [
     url: "https://relay.ultrasound.money",
     name: "Ultra Sound Money",
     isOfacCensoring: false,
+    priority: 1,
   },
   {
     url: "https://agnostic-relay.net",
     name: "Agnostic Boost",
     isOfacCensoring: false,
+    priority: 2,
   },
   {
     url: "https://mainnet.aestus.live/",
     name: "Aestus",
     isOfacCensoring: false,
+    priority: 3,
   },
 ];
 

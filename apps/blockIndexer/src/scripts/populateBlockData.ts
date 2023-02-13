@@ -59,9 +59,15 @@ const recursivelyPopulateRelayerData = async (
 const main = async () => {
   await connect();
 
-  const relayers = await RelayerModel.find({_id: {
-    $in: ["638849bd7f333a7765ceaee5", "638849bd7f333a7765ceaee6", "638849bd7f333a7765ceaee7"]
-  }});
+  const relayers = await RelayerModel.find({
+    // _id: {
+    //   $in: [
+    //     "638849bd7f333a7765ceaee5",
+    //     "638849bd7f333a7765ceaee6",
+    //     "638849bd7f333a7765ceaee7",
+    //   ],
+    // },
+  });
 
   // const relayersWithoutFlashbots = relayers.filter(
   //   (relayer) => relayer.name !== "Flashbots"

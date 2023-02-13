@@ -9,6 +9,12 @@ export class Relayer {
 
   @prop({ default: null })
   public isOfacCensoring!: boolean;
+
+  /**
+   * Sorting priority for returning relayers. Higher number is a higher priority
+   */
+  @prop({ required: false })
+  public priority?: number;
 }
 
 export const RelayerModel = getModelForClass(Relayer);
