@@ -20,7 +20,6 @@ const Home = () => {
       </DefaultText>
 
       <OfacBarChart />
-      <LeaderboardSection />
       <Note>
         <Text fontWeight="bold" color="brightGreen.500">
           Protocol level censorship = Bad
