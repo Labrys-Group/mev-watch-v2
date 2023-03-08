@@ -28,6 +28,12 @@ export default async (
 ) => {
   const { limit, timeFrame } = req.query as GetLeaderboardRequestSchema;
 
+  const { RATED_NETWORK_API_TOKEN } = process.env;
+
+  if (!RATED_NETWORK_API_TOKEN) {
+    throw Error("RATED_NETWORK_API_TOKEN not set in env");
+  }
+
   const ratedNetworkData = await axios.get(RATED_OPERATOR_API, {
     params: {
       from: 0,
@@ -35,14 +41,13 @@ export default async (
       window: timeFrame.toLowerCase(),
       idType: "entity",
     },
+    headers: { Authorization: `Bearer ${RATED_NETWORK_API_TOKEN}` },
   });
 
   const entityData: RatedNetworkEntity[] = ratedNetworkData.data.data;
 
   const totalBlocksInPeriod = getTotalBlocks(
-    new Date(
-      timeFrames.find((t) => t.label === timeFrame)?.value! * 1000
-    ),
+    new Date(timeFrames.find((t) => t.label === timeFrame)?.value! * 1000),
     new Date()
   );
 
@@ -51,9 +56,7 @@ export default async (
   );
 
   // sort by number of censored blocks rather than network penetration
-  leaderboard.sort(
-    (a, b) => b.censoredBlocks - a.censoredBlocks
-  );
+  leaderboard.sort((a, b) => b.censoredBlocks - a.censoredBlocks);
 
   res.status(200).json({ leaderboard });
 };
