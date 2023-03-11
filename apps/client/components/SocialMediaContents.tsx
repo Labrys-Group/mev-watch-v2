@@ -6,11 +6,10 @@ import { DefaultText, DefaultBtn } from "../styles/StyledComponents";
 const SocialMediaContents = () => {
   return (
     <>
-      <DefaultText mt="10px">
-        Help us improve this tool for the community
-      </DefaultText>
+      <DefaultText mt="10px">Help spread the word</DefaultText>
       <Flex mb="20px">
-        <DefaultBtn
+        {/* Removed due to TypeForm subscription being ended */}
+        {/* <DefaultBtn
           aria-label="provide feedback"
           leftIcon={<HiSpeakerphone />}
           size="sm"
@@ -19,7 +18,7 @@ const SocialMediaContents = () => {
           }
         >
           Provide Feedback
-        </DefaultBtn>
+        </DefaultBtn> */}
         <DefaultBtn
           aria-label="labrys-twitter"
           leftIcon={<BsTwitter />}
