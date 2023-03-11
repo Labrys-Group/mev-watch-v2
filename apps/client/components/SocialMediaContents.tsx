@@ -6,7 +6,7 @@ import { DefaultText, DefaultBtn } from "../styles/StyledComponents";
 const SocialMediaContents = () => {
   return (
     <>
-      <DefaultText mt="10px">Help spread the word</DefaultText>
+      <DefaultText>Help spread the word</DefaultText>
       <Flex mb="20px">
         {/* Removed due to TypeForm subscription being ended */}
         {/* <DefaultBtn
