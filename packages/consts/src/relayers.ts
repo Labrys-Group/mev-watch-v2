@@ -59,6 +59,12 @@ export const RELAYERS: Relayer[] = [
     isOfacCensoring: false,
     priority: 3,
   },
+  {
+    url: "https://relay.wenmerge.com/",
+    name: "Wenmerge",
+    isOfacCensoring: false,
+    priority: 4,
+  },
 ];
 
 export const relayAddresses = {
