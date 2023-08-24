@@ -1,5 +1,5 @@
 import { ActionFn, Context, Event, BlockEvent } from "@tenderly/actions";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 /**
  * Hit the mev-watch API once per block to trigger indexing of beacon chain data
@@ -10,14 +10,14 @@ export const blockIndexerActionFn: ActionFn = async (
 ) => {
   const blockEvent = event as BlockEvent;
 
-  const SECRET_KEY = await context.secrets.get("SECRET_KEY");
-  const API_URL = await context.secrets.get("API_URL");
+  const mevApiSecret = await context.secrets.get("MEV_API_SECRET");
+  const mevApiUrl = await context.secrets.get("MEV_API_URL");
 
   // TODO: Refactor to pass in secret key and api url as parameters
   try {
     const mevWatchApi = axios.create({
-      baseURL: API_URL,
-      headers: { Authorization: `Bearer ${SECRET_KEY}` },
+      baseURL: mevApiUrl,
+      headers: { Authorization: `Bearer ${mevApiSecret}` },
     });
 
     const parameters = {
@@ -25,21 +25,36 @@ export const blockIndexerActionFn: ActionFn = async (
     };
 
     await mevWatchApi.post("/block-indexer", parameters);
-  } catch (err) {
-    const webhook = await context.secrets.get("SLACK_WEBHOOK");
+  } catch (error) {
+    console.error((error as AxiosError).response?.data);
+  }
+};
 
-    try {
-      if (!webhook) {
-        throw Error("Webhook url not set");
-      }
+/**
+ * Hit the mev-watch API once per block to trigger indexing of beacon chain data
+ */
+export const blockIndexerActionFnDev: ActionFn = async (
+  context: Context,
+  event: Event
+) => {
+  const blockEvent = event as BlockEvent;
 
-      await axios.post(webhook, {
-        error: err,
-        message: "Failed to trigger block indexer",
-      });
-    } catch (webhookError) {
-      console.error(webhookError);
-      console.error(err);
-    }
+  const mevApiSecret = await context.secrets.get("MEV_API_SECRET_DEV");
+  const mevApiUrl = await context.secrets.get("MEV_API_URL");
+
+  // TODO: Refactor to pass in secret key and api url as parameters
+  try {
+    const mevWatchApi = axios.create({
+      baseURL: mevApiUrl,
+      headers: { Authorization: `Bearer ${mevApiSecret}` },
+    });
+
+    const parameters = {
+      blockNumber: blockEvent.blockNumber,
+    };
+
+    await mevWatchApi.post("/block-indexer", parameters);
+  } catch (error) {
+    console.error((error as AxiosError).response?.data);
   }
 };
