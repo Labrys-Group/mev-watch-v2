@@ -8,6 +8,8 @@ import { saveAggregateStats } from "./saveAggregateStats";
  * This will not insert over records which already exist in the db
  * @param startDate The date to start aggregation (ideally this should be the merge date)
  * @returns
+ *
+ * @author mfbevan
  */
 export const recursivelyPopulateAggregateData = async (startDate: Date) => {
   const endDate = add(startDate, { hours: AGGREGATION_PERIOD });

@@ -6,7 +6,7 @@ interface GetLatestBlockStatsWithCursor {
   relayers: Array<Relayer & { lastSavedSlotNumber: number }>;
 }
 
-export const getLatestBlockStats = async ({
+export const getLatestBlockStatsWithCursor = async ({
   relayers,
 }: GetLatestBlockStatsWithCursor): Promise<{
   blockStats: BlockStats[];
