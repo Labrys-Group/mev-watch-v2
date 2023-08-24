@@ -21,6 +21,9 @@
     "incremental": true,
     "paths": {
       // TODO: Not ideal work around here, resolves type issues in some files
+      "api": [
+        "../../packages/api/src"
+      ],
       "consts": [
         "../../packages/consts/src"
       ],

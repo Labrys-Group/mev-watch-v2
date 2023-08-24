@@ -1,4 +1,4 @@
-import { getLatestData, slackWebhook } from "database";
+import { getLatestData, slackWebhook } from "api";
 import { connect } from "database/dist";
 import { NextApiRequest, NextApiResponse } from "next";
 

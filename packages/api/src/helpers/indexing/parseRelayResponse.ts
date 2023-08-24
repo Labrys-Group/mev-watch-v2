@@ -1,6 +1,8 @@
-import { getDateFromSlotNumber } from "utils/src/slotParsing";
+// import { getDateFromSlotNumber } from "utils";
 
-import { Relayer, BlockStats } from "../../../../dist";
+import { SLOT_NUMBER_OF_MERGE, DATE_OF_MERGE } from "consts";
+import { Relayer, BlockStats } from "database";
+import { addSeconds } from "date-fns";
 
 interface RawRelayerResponse {
   slot: string;
@@ -10,6 +12,13 @@ interface RawRelayerResponse {
   gas_used: string;
   value: string;
 }
+
+export const getDateFromSlotNumber = (slotNumber: number) => {
+  // Block time is always 12 seconds, we can safely use this
+  const totalSecondsElapsed = (slotNumber - SLOT_NUMBER_OF_MERGE) * 12;
+
+  return addSeconds(DATE_OF_MERGE, totalSecondsElapsed);
+};
 
 export const parseRawRelayerResponse = (
   relayResponse: RawRelayerResponse,

@@ -1,6 +1,5 @@
+import { StatsAggregate, BlockStatsModel } from "database";
 import { add } from "date-fns";
-
-import { StatsAggregate, BlockStatsModel } from "../../../models";
 
 /**
  * Time between data aggregations in hours

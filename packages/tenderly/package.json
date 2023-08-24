@@ -1,0 +1,23 @@
+{
+  "name": "tenderly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test:block-indexer": "ts-node ./test/block-indexer.test.ts",
+    "test:test-action": "ts-node ./test/test-action.test.ts",
+    "build": "tenderly actions build",
+    "publish-actions": "tenderly actions publish",
+    "deploy": "tenderly actions deploy"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsconfig": "*",
+    "@tenderly/actions-test": "^0.1.0",
+    "ts-node": "^10.9.1",
+    "dotenv": "^16.0.3",
+    "typescript": "^4.6.3"
+  }
+}

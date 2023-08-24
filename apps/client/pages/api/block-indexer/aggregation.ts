@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { connect } from "database/dist";
-import { recursivelyPopulateAggregateData, slackWebhook } from "database";
 import { DATE_OF_MERGE } from "consts";
+import { recursivelyPopulateAggregateData, slackWebhook } from "api";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   await connect();

@@ -12,6 +12,7 @@
     "@chakra-ui/react": "^2.3.4",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "api": "*",
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
     "consts": "*",

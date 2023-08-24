@@ -1,4 +1,4 @@
-import { DATE_OF_MERGE } from "consts/src";
+import { DATE_OF_MERGE } from "consts";
 import { CronJob } from "cron";
 
 import { recursivelyPopulateAggregateData } from "./recursivelyPopulateAggregateData";

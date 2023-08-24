@@ -87,7 +87,7 @@ const OfacLineChart = () => {
       if (!aggregateStatsResponse?.data) return;
       setHoverIndex(aggregateStatsResponse?.data.relayStats.length - 1);
     }
-    setHoverIndex(elements[0].index);
+    setHoverIndex(elements[0]?.index);
   };
 
   const resetIndex = () => {
