@@ -2,6 +2,14 @@
   "extends": "tsconfig/base.json",
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "consts": [
+        "../consts/src"
+        ],
+      "utils": [
+        "../utils/src"
+        ]
+    }
   }
 }
