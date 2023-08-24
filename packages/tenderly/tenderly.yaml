@@ -1,0 +1,12 @@
+version: v0
+template:
+  name: block-event-mev
+  block-number: latest
+  visibility: TEAM
+  network-id: 1
+  execution:
+    chain-config:
+      chain-id: 1
+    block-gas-limit: 10000000
+    base-fee-per-gas: 1000000000
+  display-name: block-event-mev

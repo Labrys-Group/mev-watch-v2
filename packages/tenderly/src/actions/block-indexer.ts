@@ -10,13 +10,12 @@ export const blockIndexerActionFn: ActionFn = async (
 ) => {
   const blockEvent = event as BlockEvent;
 
-  const SECRET_KEY = await context.secrets.get("THIRD_PARTY_SECRET_KEY");
+  const SECRET_KEY = await context.secrets.get("SECRET_KEY");
   const API_URL = await context.secrets.get("API_URL");
 
-  console.log(SECRET_KEY);
-
+  // TODO: Refactor to pass in secret key and api url as parameters
   try {
-    const api = axios.create({
+    const mevWatchApi = axios.create({
       baseURL: API_URL,
       headers: { Authorization: `Bearer ${SECRET_KEY}` },
     });
@@ -25,7 +24,7 @@ export const blockIndexerActionFn: ActionFn = async (
       blockNumber: blockEvent.blockNumber,
     };
 
-    await api.post("/index-stats", parameters);
+    await mevWatchApi.post("/block-indexer", parameters);
   } catch (err) {
     const webhook = await context.secrets.get("SLACK_WEBHOOK");
 
@@ -35,9 +34,8 @@ export const blockIndexerActionFn: ActionFn = async (
       }
 
       await axios.post(webhook, {
-        username: "🤖 ETH Staked Bot",
-        text: JSON.stringify(err, null, 4),
-        icon_url: "https://www.ethstaked.info/favicon.ico",
+        error: err,
+        message: "Failed to trigger block indexer",
       });
     } catch (webhookError) {
       console.error(webhookError);

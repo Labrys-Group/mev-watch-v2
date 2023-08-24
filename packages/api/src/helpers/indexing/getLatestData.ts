@@ -23,4 +23,6 @@ export const getLatestData = async () => {
   //   console.error(error);
   //   await slackWebhook(`Failed to fetch latest relayer data: ${error.message}`);
   // }
+
+  return latestBlockStats;
 };
