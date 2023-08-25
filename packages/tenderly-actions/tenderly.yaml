@@ -1,0 +1,39 @@
+account_id: ""
+actions:
+  tanabata/mev:
+    runtime: v2
+    sources: actions
+    specs:
+      blockIndexerAction:
+        description: This listens for every block event on mainnet
+        function: blockIndexerAction:blockIndexerAction
+        trigger:
+          type: block
+          block:
+            network:
+              - 1
+            blocks: 1
+        execution_type: sequential
+      blockIndexerActionDev:
+        description: This listens for every block event on mainnet
+        function: blockIndexerActionDev:blockIndexerActionDev
+        trigger:
+          type: block
+          block:
+            network:
+              - 1
+            blocks: 1
+        execution_type: sequential
+project_slug: ""
+template:
+  block-number: latest
+  display-name: block-event-mev
+  execution:
+    base-fee-per-gas: 1000000000
+    block-gas-limit: 10000000
+    chain-config:
+      chain-id: 1
+  name: block-event-mev
+  network-id: 1
+  visibility: TEAM
+version: v0

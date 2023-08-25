@@ -3,7 +3,16 @@ import { connect } from "database/dist";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  await connect();
+  console.log("Request Body:", req.body);
+  console.log("Request Headers:", req.headers);
+
+  try {
+    await connect();
+  } catch (error: any) {
+    console.error("Error connecting to the database:", error.message);
+    await slackWebhook(`Failed to connect to the database: ${error.message}`);
+    return res.status(500).send({ error: error as any, success: false });
+  }
 
   try {
     console.log("Getting latest relayer data");

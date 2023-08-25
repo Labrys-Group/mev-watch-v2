@@ -10,6 +10,7 @@ import {
 const Disclaimer = () => {
   const router = useRouter();
 
+
   return (
     <Box position="relative">
       <BackBtn
