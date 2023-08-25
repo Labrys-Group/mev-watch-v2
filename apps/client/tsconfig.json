@@ -22,7 +22,7 @@
     "paths": {
       // TODO: Not ideal work around here, resolves type issues in some files
       "api": [
-        "../../packages/api/src"
+        "../../packages/apiHelpers/src"
       ],
       "consts": [
         "../../packages/consts/src"

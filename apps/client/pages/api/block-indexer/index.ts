@@ -1,10 +1,10 @@
-import { getLatestData, slackWebhook } from "api";
 import { connect } from "database/dist";
 import { NextApiRequest, NextApiResponse } from "next";
+import { slackWebhook, getLatestData } from "../../../helpers/apiHelpers";
+import { authoriseTenderlyWebhook } from "../../../helpers/apiHelpers/webhooks/authoriseWebhook";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log("Request Body:", req.body);
-  console.log("Request Headers:", req.headers);
+  authoriseTenderlyWebhook(req);
 
   try {
     await connect();

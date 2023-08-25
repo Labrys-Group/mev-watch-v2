@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Relayer } from "database";
-
-import { RawRelayerResponse } from "../../types/relayer";
+import { RawRelayerResponse } from "../../../types/relayer";
 
 import { parseRawRelayerResponse } from "./parseRelayResponse";
 
