@@ -12,10 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@typegoose/typegoose": "^9.7.1",
-    "consts": "*",
     "dotenv": "^16.0.2",
-    "mongoose": "^6.2.9",
-    "utils": "*"
+    "mongoose": "^6.2.9"
   },
   "devDependencies": {
     "tsconfig": "*",

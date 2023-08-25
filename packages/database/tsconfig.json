@@ -8,14 +8,6 @@
     "src"
   ],
   "compilerOptions": {
-    "outDir": "./dist",
-    "paths": {
-      "consts": [
-        "../consts/src"
-        ],
-      "utils": [
-        "../utils/src"
-        ]
-    }
+    "outDir": "./dist"
   }
 }
