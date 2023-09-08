@@ -6,10 +6,10 @@ import {
   recursivelyPopulateAggregateData,
   slackWebhook,
 } from "../../../helpers/apiHelpers";
-import { authoriseTenderlyWebhook } from "../../../helpers/apiHelpers/webhooks/authoriseWebhook";
+import { authoriseCronJob } from "../../../helpers/apiHelpers/webhooks/authoriseWebhook";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  authoriseTenderlyWebhook(req);
+  authoriseCronJob(req);
   await connect();
 
   try {

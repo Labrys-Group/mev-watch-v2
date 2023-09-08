@@ -43,3 +43,10 @@ const authoriseWebhook = (
  */
 export const authoriseTenderlyWebhook = (req: NextApiRequest) =>
   authoriseWebhook(req, process.env.TENDERLY_WEBHOOK_SECRET, "Bearer");
+
+export const authoriseCronJob = (req: NextApiRequest) => {
+  const authorization = req.query.auth as string;
+  if (authorization !== process.env.TENDERLY_WEBHOOK_SECRET) {
+    throw new Error("Unauthorized request to webhook");
+  }
+};
