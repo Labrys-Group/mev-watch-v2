@@ -1,30 +1,21 @@
 account_id: ""
 actions:
-  tanabata/mev:
+  mev-watch-labrys/mev-watch-labrys:
     runtime: v2
     sources: actions
     specs:
-      blockIndexerAction:
+      blockindexeraction:
         description: This listens for every block event on mainnet
+        execution_type: sequential
         function: blockIndexerAction:blockIndexerAction
         trigger:
-          type: block
           block:
+            blocks: 1
             network:
               - 1
-            blocks: 1
-        execution_type: sequential
-      blockIndexerActionDev:
-        description: This listens for every block event on mainnet
-        function: blockIndexerActionDev:blockIndexerActionDev
-        trigger:
           type: block
-          block:
-            network:
-              - 1
-            blocks: 1
-        execution_type: sequential
-project_slug: ""
+project_slug: mev-watch-labrys
+provider: ""
 template:
   block-number: latest
   display-name: block-event-mev
