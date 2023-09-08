@@ -9,6 +9,12 @@ import {
 import { authoriseCronJob } from "../../../helpers/apiHelpers/webhooks/authoriseWebhook";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  if (process.env.ENABLED_CRON_JOBS !== "true") {
+    return res
+      .status(400)
+      .end({ error: "Cron jobs are not enabled", success: false });
+  }
+
   authoriseCronJob(req);
   await connect();
 
