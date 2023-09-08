@@ -40,3 +40,7 @@ packages/terraform/terraform.tfvars
 
 # temp exception for database types build
 !packages/database/dist
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

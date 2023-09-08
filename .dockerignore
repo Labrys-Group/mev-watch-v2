@@ -1,1 +1,5 @@
 apps/client
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
