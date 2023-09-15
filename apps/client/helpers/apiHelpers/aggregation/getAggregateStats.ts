@@ -53,5 +53,6 @@ export const getAggregateStats = async (
     stats: blockStats,
     startDate,
     ts: endDate,
+    key: `${startDate.toISOString()}-${endDate.toISOString()}`,
   };
 };

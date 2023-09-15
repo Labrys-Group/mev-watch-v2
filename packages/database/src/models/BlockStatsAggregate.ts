@@ -26,6 +26,9 @@ export class StatsAggregate {
 
   @prop({ required: true, unique: true })
   public ts!: Date;
+
+  @prop({ required: true, unique: true })
+  public key!: string;
 }
 
 export const StatsAggregateModel = getModelForClass(StatsAggregate);

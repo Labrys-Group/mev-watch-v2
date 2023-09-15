@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { connect } from "database/dist";
-import { DATE_OF_MERGE } from "consts";
+import { timeOfMerge } from "consts";
 
 import {
   recursivelyPopulateAggregateData,
   slackWebhook,
 } from "../../../helpers/apiHelpers";
 import { authoriseCronJob } from "../../../helpers/apiHelpers/webhooks/authoriseWebhook";
+import { sub } from "date-fns";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (process.env.ENABLED_CRON_JOBS !== "true") {
@@ -20,7 +21,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     console.log("Running Aggregation Job");
-    await recursivelyPopulateAggregateData(DATE_OF_MERGE);
+    await recursivelyPopulateAggregateData(sub(timeOfMerge(), { days: 2 }));
   } catch (error: any) {
     console.error(error);
     await slackWebhook(`Failed to complete aggregation: ${error.message}`);
