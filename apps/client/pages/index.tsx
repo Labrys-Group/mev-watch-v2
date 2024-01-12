@@ -7,20 +7,8 @@ import OfacLineChart from "../components/OfacLineChart";
 import BlockVisualization from "../components/blockVisualization";
 import SocialMediaContents from "../components/SocialMediaContents";
 import { LeaderboardSection } from "../components/leaderboard/LeaderboardSection";
-import axios from "axios";
-import { useQuery } from "react-query";
 
 const Home = () => {
-  const getData = async () => {
-    const { data } = await axios.get("/api/block-indexer");
-
-    return data;
-  };
-
-  const { data, error } = useQuery("block-indexer", getData);
-
-  console.log(error);
-  console.log(data);
   return (
     <>
       <NavBar />
