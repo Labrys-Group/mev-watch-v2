@@ -12,7 +12,13 @@ import { slackWebhook } from "./slackWebhook";
  */
 export const getLatestData = async () => {
   try {
-    const relayers = await RelayerModel.find().sort({ priority: -1 });
+    const relayers = await RelayerModel.find({
+      $or: [{ disabled: { $exists: false } }, { disabled: false }],
+    }).sort({ priority: -1 });
+
+    console.log({
+      relayers: relayers.map((r) => r.name),
+    });
 
     const latestBlockStats = await getLatestBlockStats({ relayers });
 

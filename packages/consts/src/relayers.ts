@@ -5,11 +5,18 @@ export const RELAYERS: Relayer[] = [
     url: "https://bloxroute.ethical.blxrbdn.com",
     name: "BloXroute Ethical",
     isOfacCensoring: false,
+    disabled: true,
   },
   {
     url: "https://bloxroute.max-profit.blxrbdn.com",
-    name: "BloXroute Max Profit",
+    name: "BloXroute Max Profit (Non Censoring)",
     isOfacCensoring: false,
+    disabled: true,
+  },
+  {
+    url: "https://bloxroute.max-profit.blxrbdn.com",
+    name: "BloXroute Max Profit (Censoring)",
+    isOfacCensoring: true,
   },
   {
     url: "https://bloxroute.regulated.blxrbdn.com",
@@ -40,6 +47,7 @@ export const RELAYERS: Relayer[] = [
     url: "https://relayooor.wtf",
     name: "Relayooor",
     isOfacCensoring: false,
+    disabled: true,
   },
   {
     url: "https://relay.ultrasound.money",
@@ -66,16 +74,3 @@ export const RELAYERS: Relayer[] = [
     priority: 4,
   },
 ];
-
-export const relayAddresses = {
-  Flashbots: "https://boost-relay.flashbots.net",
-  "BloXroute Max Profit": "https://bloxroute.max-profit.blxrbdn.com",
-  "BloXroute Ethical": "https://bloxroute.ethical.blxrbdn.com",
-  "BloXroute Regulated": "https://bloxroute.regulated.blxrbdn.com",
-  Blocknative: "https://builder-relay-mainnet.blocknative.com",
-  Manifold: "https://mainnet-relay.securerpc.com",
-  Eden: "https://relay.edennetwork.io",
-  Aestus: "https://mainnet.aestus.live/",
-  "Agnostic Boost": "https://agnostic-relay.net",
-  "Ultra Sound Money": "https://relay.ultrasound.money",
-};

@@ -46,6 +46,10 @@ __decorate([
     (0, typegoose_1.prop)({ required: true, unique: true }),
     __metadata("design:type", Date)
 ], StatsAggregate.prototype, "ts", void 0);
+__decorate([
+    (0, typegoose_1.prop)({ required: true, unique: true }),
+    __metadata("design:type", String)
+], StatsAggregate.prototype, "key", void 0);
 exports.StatsAggregate = StatsAggregate;
 exports.StatsAggregateModel = (0, typegoose_1.getModelForClass)(StatsAggregate);
 //# sourceMappingURL=BlockStatsAggregate.js.map

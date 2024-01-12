@@ -1,7 +1,7 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 
 export class Relayer {
-  @prop({ required: true, unique: true })
+  @prop({ required: true })
   public url!: string;
 
   @prop({ required: true })
@@ -15,6 +15,9 @@ export class Relayer {
    */
   @prop({ required: false })
   public priority?: number;
+
+  @prop({ required: false })
+  public disabled?: boolean;
 }
 
 export const RelayerModel = getModelForClass(Relayer);
