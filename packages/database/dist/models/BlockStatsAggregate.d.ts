@@ -10,6 +10,7 @@ export declare class StatsAggregate {
     stats: RelayStat[];
     startDate: Date;
     ts: Date;
+    key: string;
 }
 export declare const StatsAggregateModel: import("@typegoose/typegoose").ReturnModelType<typeof StatsAggregate, import("@typegoose/typegoose/lib/types").BeAnObject>;
 //# sourceMappingURL=BlockStatsAggregate.d.ts.map

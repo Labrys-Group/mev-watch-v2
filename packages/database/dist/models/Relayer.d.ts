@@ -6,6 +6,7 @@ export declare class Relayer {
      * Sorting priority for returning relayers. Higher number is a higher priority
      */
     priority?: number;
+    disabled?: boolean;
 }
 export declare const RelayerModel: import("@typegoose/typegoose").ReturnModelType<typeof Relayer, import("@typegoose/typegoose/lib/types").BeAnObject>;
 //# sourceMappingURL=Relayer.d.ts.map
