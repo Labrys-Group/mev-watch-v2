@@ -14,7 +14,7 @@ This is the official Labrys Repository for [mevwatch.info](https://mevwatch.info
    2. If you do this you will also need to backfill the aggregate data.
    3. Drop the `BlockStatsAggregate` model in your DB
    4. Run `yarn populate-aggregate` to repopulate the aggregate model
-   5. Check that your graphs all look correct
+   5. Check that your graphs all look correct 
 
 ## What's inside?
 
