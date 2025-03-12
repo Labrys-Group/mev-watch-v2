@@ -34,6 +34,7 @@ import { DefaultSpinner } from "../styles/StyledComponents";
 import { last } from "lodash";
 import { IoWarning } from "react-icons/io5";
 import { MevWatchText } from "./MevWatchText";
+import { AggregatedStats } from "../types";
 
 ChartJS.register(
   CategoryScale,
@@ -46,16 +47,23 @@ ChartJS.register(
   Filler
 );
 
-const OfacLineChart = () => {
-  const { data: aggregateStatsResponse } = useQuery([], () => {
-    const data = axios.get<AggregatedStatsResponse>(
-      "/api/blockStatsAggregated",
-      {}
-    );
-    if (!aggregateStatsResponse?.data) return data;
-    setHoverIndex(aggregateStatsResponse?.data.relayStats.length - 1);
-    return data;
-  });
+interface OfacLineChartProps {
+  initialData?: AggregatedStats[];
+}
+
+const OfacLineChart = ({ initialData }: OfacLineChartProps) => {
+  const { data: aggregateStatsResponse } = useQuery(
+    ["blockStatsAggregated"],
+    () => axios.get<AggregatedStatsResponse>("/api/blockStatsAggregated"),
+    {
+      initialData: initialData
+        ? {
+            data: { relayStats: initialData },
+          }
+        : undefined,
+      refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    }
+  );
 
   const { includeAllBlocks, AllBlocksToggle } = useContext(StatsContext);
   const [hoverIndex, setHoverIndex] = useState<number>(0);

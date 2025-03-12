@@ -7,8 +7,16 @@ import OfacLineChart from "../components/OfacLineChart";
 import BlockVisualization from "../components/blockVisualization";
 import SocialMediaContents from "../components/SocialMediaContents";
 import { LeaderboardSection } from "../components/leaderboard/LeaderboardSection";
+import { GetStaticProps } from "next";
+import { connect } from "database/dist";
+import { getBlockStatsAggregated } from "../helpers/getBlockStatsAggregated";
+import { AggregatedStats } from "../types";
 
-const Home = () => {
+interface HomeProps {
+  initialAggregatedStats: AggregatedStats[];
+}
+
+const Home = ({ initialAggregatedStats }: HomeProps) => {
   return (
     <>
       <NavBar />
@@ -31,12 +39,25 @@ const Home = () => {
         </DefaultText>
       </Note>
       <SocialMediaContents />
-      <OfacLineChart />
+      <OfacLineChart initialData={initialAggregatedStats} />
       <BlockVisualization />
       <Box mt="50px" />
       <Faq />
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+  await connect();
+  const aggregatedStats = await getBlockStatsAggregated();
+
+  return {
+    props: {
+      initialAggregatedStats: JSON.parse(JSON.stringify(aggregatedStats)),
+    },
+    // Revalidate every 5 minutes
+    revalidate: 300,
+  };
 };
 
 export default Home;

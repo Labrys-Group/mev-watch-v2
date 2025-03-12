@@ -1,13 +1,10 @@
 import type { NextApiResponse } from "next";
-import { z, ZodError } from "zod";
-// TODO: Can this be fixed to not reference the dist folder
 import { connect } from "database/dist";
-
 import { TypedNextApiRequest } from "../../types/api";
-import { AggregatedStats, RelayStats } from "../../types";
+import { AggregatedStats } from "../../types";
 import { getBlockStatsAggregated } from "../../helpers/getBlockStatsAggregated";
-
-
+import { apiHandler } from "../../helpers/api-handler";
+import { cache } from "../../helpers/apiHelpers/cache";
 
 export interface AggregatedStatsResponse {
   /**
@@ -16,18 +13,23 @@ export interface AggregatedStatsResponse {
   relayStats: AggregatedStats[];
 }
 
-export default async (
-  req: TypedNextApiRequest<never>,
-  res: NextApiResponse<AggregatedStatsResponse>
-) => {
-  await connect();
+const CACHE_TIME = 5 * 60; // 5 minutes
 
+export default apiHandler()
+  .use(cache(CACHE_TIME))
+  .get(
+    async (
+      req: TypedNextApiRequest<never>,
+      res: NextApiResponse<AggregatedStatsResponse>
+    ) => {
+      await connect();
 
-  const relayStats = await getBlockStatsAggregated();
+      const relayStats = await getBlockStatsAggregated();
 
-  if (!relayStats.length) {
-    return res.status(200).send({ relayStats: [] });
-  }
+      if (!relayStats.length) {
+        return res.status(200).send({ relayStats: [] });
+      }
 
-  res.status(200).send({ relayStats });
-};
+      res.status(200).send({ relayStats });
+    }
+  );
