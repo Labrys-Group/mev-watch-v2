@@ -16,7 +16,7 @@ This is the official Labrys Repository for [mevwatch.info](https://mevwatch.info
    4. Run `yarn populate-aggregate` to repopulate the aggregate model
    5. Check that your graphs all look correct 
  
-## What's inside?
+## What's inside? 
 
 This turborepo uses [Yarn](https://classic.yarnpkg.com/lang/en/) as a package manager. It includes the following packages/apps:
 
