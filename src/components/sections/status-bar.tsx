@@ -10,7 +10,7 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
   const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
 
   return (
-    <div className="border-b border-border-labrys font-mono text-fg-muted">
+    <div className="bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
       {/* Inner row: grid of cells */}
       <div className="grid grid-cols-[auto_repeat(5,1fr)]">
         {/* Corner mark — Labrys blurple SVG */}

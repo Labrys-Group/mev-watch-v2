@@ -62,7 +62,7 @@ function FooterLinkList({
 
 export function SiteFooter() {
   return (
-    <footer className="pt-8 pb-8 border-t border-border-labrys mt-2">
+    <footer className="bg-panel-alt pt-8 pb-8 border-t border-border-labrys mt-2">
       <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_1fr] gap-8 font-mono text-[11px] tracking-[0.06em] text-fg-muted">
         {/* Brand column */}
         <div>

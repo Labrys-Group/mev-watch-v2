@@ -10,7 +10,7 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   return (
-    <header className="flex justify-between items-center py-4 border-b border-border-labrys">
+    <header className="bg-background flex justify-between items-center py-4 border-b border-border-labrys">
       {/* Brand lockup */}
       <div className="flex items-center gap-3.5">
         {/* Labrys gradient mark */}
