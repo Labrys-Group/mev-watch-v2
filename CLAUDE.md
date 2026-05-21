@@ -20,6 +20,9 @@ Package manager is **pnpm**. Run from the repo root.
 - `pnpm db:generate` — generate a Drizzle migration from `src/lib/db/schema.ts`
 - `pnpm db:migrate` — apply migrations
 - `pnpm db:check` — verify the database connection
+- `pnpm refresh [date]` — fetch + store one day of relay stats (default: yesterday)
+- `pnpm seed-history [start] [end]` — backfill historical daily snapshots
+- `pnpm db:summary` — print snapshot row count and the latest day
 
 ## Architecture
 
@@ -32,6 +35,10 @@ Next.js 16 App Router app. Styling is Tailwind CSS v4 + shadcn/ui (radix-nova), 
 - The local database is a libSQL file under `data/`; it needs a `.env` file (copy from `.env.example`) and `pnpm db:migrate`.
 - Unit tests sit beside their source as `*.test.ts(x)`; e2e tests live in `e2e/`.
 
+## Data pipeline
+
+Censorship data comes from the **relayscan.io** public JSON API (`GET /stats/day/{date}/json`), behind the `DataSource` adapter in `src/lib/data-source/`. The OFAC-censorship classification of each relay is an editorial config in `src/config/relays.ts`. `src/lib/metrics.ts` computes the censorship metric as the censoring relays' **share of MEV-boost relay payload deliveries** (relayscan counts payloads per relay, so a ratio cancels the multi-relay double-counting). `src/lib/refresh/` orchestrates fetch → compute → persist → audit-log. Pages read only the snapshot tables, never the external API.
+
 ## Status
 
-Phase 1 (Foundation) complete. Phases 2–5 (data layer, core UI, deploy, iteration) are tracked in `docs/superpowers/plans/`.
+Phases 1 (Foundation) and 2 (Data layer) complete. Phases 3–5 (core UI, deploy, iteration) are tracked in `docs/superpowers/plans/`.
