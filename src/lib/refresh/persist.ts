@@ -1,6 +1,6 @@
 import { db } from "../db";
-import { dailyStats, relayDailyStats } from "../db/schema";
-import { computeDailyStats, computeRelayBreakdown } from "../metrics";
+import { dailyStats, relayDailyStats, builderDailyStats } from "../db/schema";
+import { computeDailyStats, computeRelayBreakdown, computeBuilderBreakdown } from "../metrics";
 import type { DayRelayStats } from "../data-source/types";
 
 /**
@@ -46,6 +46,24 @@ export async function persistDailySnapshot(day: DayRelayStats): Promise<void> {
           blocks: relay.blocks,
           sharePct: relay.sharePct,
           censorshipRate: relay.censorshipRate,
+        },
+      });
+  }
+
+  for (const builder of computeBuilderBreakdown(day.builders)) {
+    await db
+      .insert(builderDailyStats)
+      .values({
+        builderKey: builder.builderId,
+        date: day.date,
+        blocks: builder.blocks,
+        sharePct: builder.sharePct,
+      })
+      .onConflictDoUpdate({
+        target: [builderDailyStats.builderKey, builderDailyStats.date],
+        set: {
+          blocks: builder.blocks,
+          sharePct: builder.sharePct,
         },
       });
   }

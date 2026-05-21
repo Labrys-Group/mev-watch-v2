@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { computeDailyStats, computeRelayBreakdown } from "./metrics";
+import { computeBuilderBreakdown } from "./metrics";
 
 // Flashbots is "censoring"; ultrasound is "neutral".
 const RELAYS = [
@@ -46,5 +47,21 @@ describe("computeRelayBreakdown", () => {
     const us = breakdown.find((b) => b.relayId === "relay.ultrasound.money")!;
     expect(us.censorshipRate).toBe(0);
     expect(us.sharePct).toBeCloseTo(75, 5);
+  });
+});
+
+describe("computeBuilderBreakdown", () => {
+  it("returns per-builder block counts and share", () => {
+    const result = computeBuilderBreakdown([
+      { builderId: "Titan", numBlocks: 75 },
+      { builderId: "Quasar", numBlocks: 25 },
+    ]);
+    const titan = result.find((b) => b.builderId === "Titan")!;
+    expect(titan.blocks).toBe(75);
+    expect(titan.sharePct).toBeCloseTo(75, 5);
+  });
+
+  it("handles an empty builder list", () => {
+    expect(computeBuilderBreakdown([])).toEqual([]);
   });
 });

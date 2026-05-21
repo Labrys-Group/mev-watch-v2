@@ -1,7 +1,7 @@
 // Relative import (not "@/config/relays"): this module is transitively
 // imported by tsx scripts, which do not resolve the @/* path alias.
 import { classifyRelay } from "../config/relays";
-import type { RelayPayloadCount } from "./data-source/types";
+import type { RelayPayloadCount, BuilderBlockCount } from "./data-source/types";
 
 export interface DailyStatsResult {
   /** Censoring relays' share of all MEV-boost relay payload deliveries (%). */
@@ -74,4 +74,22 @@ export function computeRelayBreakdown(
       censorshipRate: info.posture === "censoring" ? 100 : 0,
     };
   });
+}
+
+export interface BuilderBreakdownEntry {
+  builderId: string;
+  blocks: number;
+  sharePct: number;
+}
+
+/** Per-builder share of MEV-boost blocks for the builder leaderboard. */
+export function computeBuilderBreakdown(
+  builders: BuilderBlockCount[],
+): BuilderBreakdownEntry[] {
+  const total = builders.reduce((sum, b) => sum + b.numBlocks, 0);
+  return builders.map((b) => ({
+    builderId: b.builderId,
+    blocks: b.numBlocks,
+    sharePct: total === 0 ? 0 : (b.numBlocks / total) * 100,
+  }));
 }
