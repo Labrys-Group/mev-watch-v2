@@ -12,10 +12,13 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       aria-label="Toggle theme"
+      className="focus-visible:ring-accent-brand"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
-      <Sun className="hidden h-4 w-4 dark:block" />
-      <Moon className="block h-4 w-4 dark:hidden" />
+      {/* Sun: visible in dark mode, fades out in light mode */}
+      <Sun className="absolute h-4 w-4 transition-opacity duration-200 opacity-0 dark:opacity-100" />
+      {/* Moon: visible in light mode, fades out in dark mode */}
+      <Moon className="absolute h-4 w-4 transition-opacity duration-200 opacity-100 dark:opacity-0" />
     </Button>
   );
 }

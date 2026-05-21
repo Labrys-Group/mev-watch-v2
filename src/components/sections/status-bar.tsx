@@ -12,12 +12,9 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
   return (
     <div className="bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
       {/* Inner row: grid of cells */}
-      <div className="grid grid-cols-[auto_repeat(5,1fr)]">
-        {/* Corner mark — Labrys blurple SVG */}
-        <div
-          className="flex items-center justify-center px-3.5 py-1.5 border-r border-border-labrys"
-          title="Labrys"
-        >
+      <div className="grid grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_repeat(5,1fr)]">
+        {/* Corner mark — Labrys blurple SVG (decorative) */}
+        <div className="flex items-center justify-center px-3.5 py-1.5 border-r border-border-labrys">
           <svg
             viewBox="0 0 71 70"
             fill="none"
@@ -48,10 +45,15 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
           </svg>
         </div>
 
-        {/* NETWORK */}
-        <StatusCell label="NETWORK" value="ETH MAINNET" />
+        {/* NETWORK — hidden on small screens, visible from md up */}
+        <div className="hidden md:flex justify-between items-center gap-3 px-4 py-2.5 border-r border-border-labrys text-[10.5px] tracking-[0.1em] uppercase">
+          <span>NETWORK</span>
+          <strong className="text-foreground font-semibold tracking-normal normal-case">
+            ETH MAINNET
+          </strong>
+        </div>
 
-        {/* STATUS — with pulsing dot */}
+        {/* STATUS — always visible, with pulsing dot */}
         <div className="flex justify-between items-center gap-3 px-4 py-2.5 border-r border-border-labrys text-[10.5px] tracking-[0.1em] uppercase">
           <span>STATUS</span>
           <strong className="text-good font-semibold tracking-normal normal-case flex items-center gap-1.5">
@@ -63,18 +65,28 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
           </strong>
         </div>
 
-        {/* DATA THROUGH */}
-        <StatusCell label="DATA THROUGH" value={latestDate} />
+        {/* DATA THROUGH — hidden on small screens, visible from md up */}
+        <div className="hidden md:flex justify-between items-center gap-3 px-4 py-2.5 border-r border-border-labrys text-[10.5px] tracking-[0.1em] uppercase">
+          <span>DATA THROUGH</span>
+          <strong className="text-foreground font-semibold tracking-normal normal-case">
+            {latestDate}
+          </strong>
+        </div>
 
-        {/* CENSORSHIP */}
+        {/* CENSORSHIP — always visible */}
         <StatusCell
           label="CENSORSHIP"
           value={formatPercent(censorshipPct)}
           valueClassName="text-warn"
         />
 
-        {/* UPDATED */}
-        <StatusCell label="UPDATED" value={updatedText} isLast />
+        {/* UPDATED — hidden on small screens, visible from md up */}
+        <div className="hidden md:flex justify-between items-center gap-3 px-4 py-2.5 text-[10.5px] tracking-[0.1em] uppercase">
+          <span>UPDATED</span>
+          <strong className="text-foreground font-semibold tracking-normal normal-case">
+            {updatedText}
+          </strong>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
@@ -9,10 +12,16 @@ const NAV_LINKS = [
 ] as const;
 
 export function SiteHeader() {
+  const pathname = usePathname();
+
   return (
-    <header className="bg-background flex justify-between items-center py-4 border-b border-border-labrys">
-      {/* Brand lockup */}
-      <div className="flex items-center gap-3.5">
+    <header className="sticky top-0 z-50 bg-background flex justify-between items-center py-4 border-b border-border-labrys">
+      {/* Brand lockup — home link */}
+      <Link
+        href="/"
+        aria-label="MEV Watch home"
+        className="flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
+      >
         {/* Labrys gradient mark */}
         <div className="w-9 h-9 grid place-items-center shrink-0">
           <svg
@@ -83,20 +92,28 @@ export function SiteHeader() {
           <span className="text-foreground font-semibold">MEVWATCH</span>
           <span className="text-fg-muted">{" // MONITOR"}</span>
         </div>
-      </div>
+      </Link>
 
       {/* Nav + theme toggle */}
       <div className="flex items-center gap-6">
         <nav className="flex gap-6" aria-label="Main navigation">
-          {NAV_LINKS.map(({ label, href }) => (
-            <Link
-              key={href}
-              href={href}
-              className="font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted hover:text-accent-brand transition-colors"
-            >
-              {label}
-            </Link>
-          ))}
+          {NAV_LINKS.map(({ label, href }) => {
+            const isActive = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={isActive ? "page" : undefined}
+                className={`font-mono text-[11px] tracking-[0.12em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm ${
+                  isActive
+                    ? "text-foreground"
+                    : "text-fg-muted hover:text-accent-brand"
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
         <ThemeToggle />
       </div>
