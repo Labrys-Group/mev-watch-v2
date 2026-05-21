@@ -1,5 +1,6 @@
 import { formatPercent } from "@/lib/format";
 import type { LeaderboardRow } from "@/lib/queries";
+import { Section } from "@/components/section";
 
 interface LeaderboardProps {
   rows: LeaderboardRow[];
@@ -7,26 +8,23 @@ interface LeaderboardProps {
 
 export function Leaderboard({ rows }: LeaderboardProps) {
   return (
-    <section className="py-12 border-b border-border-labrys">
-      {/* Section header */}
-      <div className="flex justify-between items-end mb-7">
-        <div>
-          <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
-            02 / RELAY LEADERBOARD
-          </div>
-          <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
-            Ranked by
-            <br />
-            block share.
-          </h2>
-        </div>
-        <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed">
+    <Section
+      label="02 / RELAY LEADERBOARD"
+      title={
+        <>
+          Ranked by
+          <br />
+          block share.
+        </>
+      }
+      aside={
+        <>
           SORT: SHARE DESC // WINDOW: 1D
           <br />
           SOURCE: RELAYSCAN.IO + BEACON
-        </div>
-      </div>
-
+        </>
+      }
+    >
       {/* Table */}
       <table className="w-full border-collapse font-mono text-[13px]">
         <thead>
@@ -137,6 +135,6 @@ export function Leaderboard({ rows }: LeaderboardProps) {
           )}
         </tbody>
       </table>
-    </section>
+    </Section>
   );
 }
