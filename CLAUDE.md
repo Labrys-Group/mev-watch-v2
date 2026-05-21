@@ -37,8 +37,8 @@ Next.js 16 App Router app. Styling is Tailwind CSS v4 + shadcn/ui (radix-nova), 
 
 ## Data pipeline
 
-Censorship data comes from the **relayscan.io** public JSON API (`GET /stats/day/{date}/json`), behind the `DataSource` adapter in `src/lib/data-source/`. The OFAC-censorship classification of each relay is an editorial config in `src/config/relays.ts`. `src/lib/metrics.ts` computes the censorship metric as the censoring relays' **share of MEV-boost relay payload deliveries** (relayscan counts payloads per relay, so a ratio cancels the multi-relay double-counting). `src/lib/refresh/` orchestrates fetch → compute → persist → audit-log. Pages read only the snapshot tables, never the external API. In production, a Vercel Cron job calls the secret-protected `/api/refresh` route daily; failures alert via Slack.
+Censorship data comes from the **relayscan.io** public JSON API (`GET /stats/day/{date}/json`), behind the `DataSource` adapter in `src/lib/data-source/`. The OFAC-censorship classification of each relay is an editorial config in `src/config/relays.ts`. `src/lib/metrics.ts` computes the censorship metric as the censoring relays' **share of MEV-boost relay payload deliveries** (relayscan counts payloads per relay, so a ratio cancels the multi-relay double-counting). `src/lib/refresh/` orchestrates fetch → compute → persist → audit-log. Pages read only the snapshot tables, never the external API. In production, a Vercel Cron job calls the secret-protected `/api/refresh` route daily; failures alert via Slack. A public read-only JSON API is served under /api/v1/ (summary, trend, relays); /status surfaces refresh health.
 
 ## Status
 
-Phases 1-4 complete (foundation, data layer, core UI, deployment config). Phase 5 (iteration) tracked in docs/superpowers/plans/. Production provisioning: see docs/DEPLOYMENT.md.
+All 5 phases complete (foundation, data layer, core UI, deployment config, iteration). Production provisioning: see docs/DEPLOYMENT.md.
