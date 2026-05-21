@@ -1,4 +1,5 @@
 import type { LatestStats } from "@/lib/queries";
+import { Section } from "@/components/section";
 
 interface CompositionGridProps {
   latest: LatestStats;
@@ -15,26 +16,17 @@ export function CompositionGrid({ latest }: CompositionGridProps) {
   const neutralTiles = TOTAL_TILES - censoringTiles;
 
   return (
-    <section className="py-12 border-b border-border-labrys">
-      {/* Section header */}
-      <div className="flex justify-between items-end mb-7">
-        <div>
-          <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
-            05 / BLOCK COMPOSITION
-          </div>
-          <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
-            How the latest day breaks down.
-          </h2>
-        </div>
-        <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed">
+    <Section
+      label="05 / BLOCK COMPOSITION"
+      title="How the latest day breaks down."
+      aside={
+        <>
           <span>CENSORING VS NEUTRAL RATIO</span>
           <br />
-          <span>
-            {date}
-          </span>
-        </div>
-      </div>
-
+          <span>{date}</span>
+        </>
+      }
+    >
       {/* Stats header bar — mirrors mockup's .blocks-head */}
       <div className="grid grid-cols-4 border border-border-labrys border-b-0 font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted">
         <div className="p-[14px] border-r border-border-labrys">
@@ -64,7 +56,7 @@ export function CompositionGrid({ latest }: CompositionGridProps) {
       </div>
 
       {/* Tile grid — 16 cols × 8 rows = 128 tiles */}
-      <div className="relative border border-border-labrys bg-panel p-5">
+      <div className="relative border border-border-labrys bg-background p-5">
         {/* Watermark */}
         <svg
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-auto opacity-[0.06] pointer-events-none z-0"
@@ -150,6 +142,6 @@ export function CompositionGrid({ latest }: CompositionGridProps) {
           A live per-block stream is planned.
         </span>
       </div>
-    </section>
+    </Section>
   );
 }
