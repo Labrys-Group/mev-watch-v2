@@ -17,7 +17,7 @@ export function CompositionGrid({ latest }: CompositionGridProps) {
 
   return (
     <Section
-      label="05 / BLOCK COMPOSITION"
+      label="06 / BLOCK COMPOSITION"
       title="How the latest day breaks down."
       aside={
         <>
