@@ -1,28 +1,61 @@
-import { ThemeToggle } from "@/components/theme-toggle";
+import { StatusBar } from "@/components/sections/status-bar";
+import { SiteHeader } from "@/components/sections/site-header";
+import { Hero } from "@/components/sections/hero";
+import { Composition } from "@/components/sections/composition";
+import { Leaderboard } from "@/components/sections/leaderboard";
+import { WhatToDo } from "@/components/sections/what-to-do";
+import { TrendChart } from "@/components/sections/trend-chart";
+import { CompositionGrid } from "@/components/sections/composition-grid";
+import { Faq } from "@/components/sections/faq";
+import { SiteFooter } from "@/components/sections/site-footer";
+import {
+  getLatestStats,
+  getStatsSummary,
+  getTrend,
+  getLeaderboard,
+  getLastRefresh,
+} from "@/lib/queries";
 
-export default function Home() {
+// Re-rendered hourly; the refresh job updates the underlying data.
+export const revalidate = 3600;
+
+export default async function Home() {
+  const [latest, summary, trend, leaderboard, lastRefresh] = await Promise.all([
+    getLatestStats(),
+    getStatsSummary(),
+    getTrend(),
+    getLeaderboard(),
+    getLastRefresh(),
+  ]);
+
+  if (!latest || !summary) {
+    return (
+      <main className="terminal-grid flex min-h-screen items-center justify-center">
+        <p className="font-mono text-sm text-fg-muted">
+          No data yet — run <code>pnpm seed-history</code>.
+        </p>
+      </main>
+    );
+  }
+
   return (
-    <main className="terminal-grid min-h-screen">
-      <header className="flex items-center justify-between border-b border-border-labrys px-6 py-4">
-        <div className="font-mono text-sm tracking-wide">
-          <span className="font-bold">MEVWATCH</span>{" "}
-          <span className="text-fg-muted">{"// MONITOR"}</span>
-        </div>
-        <ThemeToggle />
-      </header>
-
-      <section className="px-6 py-20">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent-brand">
-          {"// Public Transparency Tool"}
-        </p>
-        <h1 className="mt-4 font-sans text-5xl font-extrabold tracking-tight">
-          MEV Watch v2
-        </h1>
-        <p className="mt-4 max-w-md font-mono text-sm text-fg-muted">
-          Foundation online. Data pipeline and dashboard arrive in the next
-          phases.
-        </p>
-      </section>
-    </main>
+    <div className="terminal-grid min-h-screen">
+      <StatusBar
+        latestDate={latest.date}
+        censorshipPct={latest.censorshipPct}
+        lastRefresh={lastRefresh?.ranAt ?? null}
+      />
+      <div className="mx-auto max-w-[1280px] px-6">
+        <SiteHeader />
+        <Hero summary={summary} />
+        <Composition latest={latest} />
+        <Leaderboard rows={leaderboard} />
+        <WhatToDo />
+        <TrendChart trend={trend} summary={summary} />
+        <CompositionGrid latest={latest} />
+        <Faq />
+      </div>
+      <SiteFooter />
+    </div>
   );
 }
