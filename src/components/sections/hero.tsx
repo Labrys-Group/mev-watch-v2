@@ -8,6 +8,9 @@ interface HeroProps {
 export function Hero({ summary }: HeroProps) {
   const drop = (summary.peak - summary.current).toFixed(1);
 
+  const trendWord = summary.current <= summary.peak - 5 ? "FALLING" : "HIGH";
+  const trendColor = summary.current <= summary.peak - 5 ? "text-good" : "text-warn";
+
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-6 md:p-10">
       {/* Faded grid background texture */}
@@ -32,7 +35,7 @@ export function Hero({ summary }: HeroProps) {
             <br />
             IS
             <br />
-            <span className="text-good">FALLING</span>
+            <span className={trendColor}>{trendWord}</span>
           </h1>
 
           {/* Stat line */}

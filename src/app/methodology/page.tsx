@@ -216,12 +216,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* Ultra Sound */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   Ultra Sound
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
@@ -231,12 +231,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* Titan */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   Titan
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
@@ -246,12 +246,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* bloXroute Max Profit */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   bloXroute Max Profit
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-red-500 border border-red-500 px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
                     censoring
                   </span>
                 </div>
@@ -261,12 +261,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* bloXroute Regulated */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   bloXroute Regulated
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-red-500 border border-red-500 px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
                     censoring
                   </span>
                 </div>
@@ -276,12 +276,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* Aestus */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   Aestus
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
@@ -291,12 +291,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* Flashbots */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   Flashbots
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-red-500 border border-red-500 px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
                     censoring
                   </span>
                 </div>
@@ -306,12 +306,12 @@ export default function MethodologyPage() {
               </div>
 
               {/* Agnostic Gnosis */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   Agnostic Gnosis
                 </div>
                 <div className="px-4 py-3 border-r border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
+                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
@@ -321,7 +321,7 @@ export default function MethodologyPage() {
               </div>
 
               {/* EthGas */}
-              <div className="grid grid-cols-[1fr_auto_2fr]">
+              <div className="grid grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt">
                 <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                   EthGas
                 </div>

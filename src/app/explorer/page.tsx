@@ -70,19 +70,19 @@ export default async function ExplorerPage() {
             <table className="w-full border-collapse font-mono text-[13px]">
               <thead>
                 <tr>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel border-t border-b border-border-labrys w-10">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys w-10">
                     #
                   </th>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel border-t border-b border-border-labrys">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     RELAY
                   </th>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel border-t border-b border-border-labrys">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     POSTURE
                   </th>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel border-t border-b border-border-labrys">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     SHARE
                   </th>
-                  <th className="text-right font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel border-t border-b border-border-labrys">
+                  <th className="text-right font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     BLOCKS
                   </th>
                 </tr>
@@ -248,7 +248,7 @@ export default async function ExplorerPage() {
                 return (
                   <div
                     key={relay.id}
-                    className={`grid grid-cols-[1fr_auto_2fr] ${!isLast ? "border-b border-border-labrys" : ""}`}
+                    className={`grid grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt ${!isLast ? "border-b border-border-labrys" : ""}`}
                   >
                     <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                       {relay.name}

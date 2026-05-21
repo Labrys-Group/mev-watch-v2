@@ -146,7 +146,7 @@ export default async function StatusPage() {
                 {recentRefreshes.map((run, idx) => (
                   <div
                     key={idx}
-                    className={`grid grid-cols-[2fr_1fr_1fr_3fr] ${
+                    className={`grid grid-cols-[2fr_1fr_1fr_3fr] transition-colors hover:bg-panel-alt ${
                       idx < recentRefreshes.length - 1
                         ? "border-b border-border-labrys"
                         : ""
