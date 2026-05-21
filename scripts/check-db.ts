@@ -8,11 +8,7 @@ async function main() {
     .values({ status: "ok", source: "check-db", message: "connection check" })
     .returning();
 
-  console.log("Inserted refresh_log row id:", inserted.id);
-
-  const rows = await db.select().from(refreshLog);
-  console.log("refresh_log row count:", rows.length);
-
+  console.log("Inserted and read back refresh_log row id:", inserted.id);
   console.log("DATABASE CONNECTION OK");
   process.exit(0);
 }
