@@ -51,3 +51,18 @@ export const refreshLog = sqliteTable("refresh_log", {
   source: text("source").notNull(),
   message: text("message"),
 });
+
+/** Per builder per day — drives the builder leaderboard. */
+export const builderDailyStats = sqliteTable(
+  "builder_daily_stats",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    builderKey: text("builder_key").notNull(),
+    date: text("date").notNull(),
+    blocks: integer("blocks").notNull(),
+    sharePct: real("share_pct").notNull(),
+  },
+  (t) => [
+    unique("builder_daily_stats_builder_date_unq").on(t.builderKey, t.date),
+  ],
+);
