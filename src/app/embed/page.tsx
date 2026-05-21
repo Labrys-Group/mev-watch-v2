@@ -19,7 +19,7 @@ export default async function EmbedPage() {
 
   if (!latest || !summary) {
     return (
-      <main className="terminal-grid flex min-h-screen items-center justify-center p-4">
+      <main className="bg-background flex min-h-screen items-center justify-center p-4">
         <div className="w-full max-w-md border border-border-labrys bg-panel p-6">
           <p className="font-mono text-xs uppercase tracking-widest text-fg-muted">
             MEV WATCH
@@ -35,7 +35,7 @@ export default async function EmbedPage() {
   const drop = (summary.peak - summary.current).toFixed(1);
 
   return (
-    <main className="terminal-grid flex min-h-screen items-center justify-center p-4">
+    <main className="bg-background flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md border border-border-labrys bg-panel p-6">
         {/* Wordmark */}
         <p className="font-mono text-xs uppercase tracking-widest text-fg-muted">

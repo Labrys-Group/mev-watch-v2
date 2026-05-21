@@ -33,7 +33,7 @@ export default async function Home() {
 
   if (!latest || !summary) {
     return (
-      <main className="terminal-grid flex min-h-screen items-center justify-center">
+      <main className="bg-background flex min-h-screen items-center justify-center">
         <p className="font-mono text-sm text-fg-muted">
           No data yet — run <code>pnpm seed-history</code>.
         </p>
@@ -42,7 +42,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="terminal-grid min-h-screen">
+    <div className="min-h-screen bg-background">
       <StatusBar
         latestDate={latest.date}
         censorshipPct={latest.censorshipPct}
@@ -50,14 +50,16 @@ export default async function Home() {
       />
       <div className="mx-auto max-w-[1280px] px-6">
         <SiteHeader />
-        <Hero summary={summary} />
-        <Composition latest={latest} />
-        <Leaderboard rows={leaderboard} />
-        <BuilderLeaderboard rows={builders} />
-        <WhatToDo />
-        <TrendChart trend={trend} summary={summary} />
-        <CompositionGrid latest={latest} />
-        <Faq />
+        <div className="space-y-6 py-6">
+          <Hero summary={summary} />
+          <Composition latest={latest} />
+          <Leaderboard rows={leaderboard} />
+          <BuilderLeaderboard rows={builders} />
+          <WhatToDo />
+          <TrendChart trend={trend} summary={summary} />
+          <CompositionGrid latest={latest} />
+          <Faq />
+        </div>
       </div>
       <SiteFooter />
     </div>

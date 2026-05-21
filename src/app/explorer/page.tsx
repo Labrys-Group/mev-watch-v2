@@ -19,7 +19,7 @@ export default async function ExplorerPage() {
   const leaderboard = await getLeaderboard();
 
   return (
-    <div className="terminal-grid min-h-screen">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1280px] px-6">
         <SiteHeader />
 

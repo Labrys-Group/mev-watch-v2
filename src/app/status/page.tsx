@@ -19,7 +19,7 @@ export default async function StatusPage() {
   ]);
 
   return (
-    <div className="terminal-grid min-h-screen">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[900px] px-6">
         <SiteHeader />
 
