@@ -2,6 +2,7 @@ import { db } from "../db";
 import { refreshLog } from "../db/schema";
 import type { DataSource } from "../data-source/types";
 import { persistDailySnapshot } from "./persist";
+import { sendSlackAlert } from "./slack";
 
 export interface RefreshResult {
   status: "ok" | "error";
@@ -50,6 +51,7 @@ export async function refreshDay(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     await deps.log({ status: "error", source: source.name, message });
+    await sendSlackAlert(`Refresh failed for ${date}: ${message}`);
     return { status: "error", date, message };
   }
 }
