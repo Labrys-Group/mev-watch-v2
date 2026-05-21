@@ -31,15 +31,15 @@ export function Faq() {
                 .filter(Boolean)
                 .join(" ")}
             >
-              <summary className="cursor-pointer list-none flex justify-between items-start gap-3 font-sans font-bold text-[15px] text-foreground tracking-[-0.01em] [&::-webkit-details-marker]:hidden">
+              <summary className="cursor-pointer list-none flex justify-between items-start gap-3 font-sans font-bold text-[15px] text-foreground tracking-[-0.01em] [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm">
                 <span>{item.q}</span>
                 {/* [+] closed, [-] open — toggled via CSS */}
                 <span
-                  className="font-mono text-[11px] text-accent-brand shrink-0 mt-[2px] before:content-['[+]'] group-open:before:content-['[-]']"
+                  className="font-mono text-[11px] text-accent-brand shrink-0 mt-[2px] transition-all before:content-['[+]'] group-open:before:content-['[-]']"
                   aria-hidden="true"
                 />
               </summary>
-              <p className="font-mono text-[13px] text-fg-muted leading-[1.6] mt-3 mb-0">
+              <p className="font-mono text-[13px] text-fg-muted leading-[1.6] mt-3 mb-0 transition-opacity">
                 {item.a}
               </p>
             </details>

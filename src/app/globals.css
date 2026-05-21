@@ -158,3 +158,23 @@
     transparent 78%
   );
 }
+
+/* Animated <details> accordions. Animates height where supported
+   (interpolate-size), degrades to an instant open elsewhere. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}
+
+details::details-content {
+  height: 0;
+  overflow: hidden;
+  transition:
+    height 0.28s ease,
+    content-visibility 0.28s allow-discrete;
+}
+
+details[open]::details-content {
+  height: auto;
+}
