@@ -7,9 +7,18 @@ const RelaySchema = z.object({
   percent: z.string(),
 });
 
+const BuilderSchema = z.object({
+  info: z.object({
+    extra_data: z.string(),
+    num_blocks: z.number(),
+    percent: z.string(),
+  }),
+});
+
 const DayStatsSchema = z.object({
   date: z.string(),
   relays: z.array(RelaySchema),
+  builders: z.array(BuilderSchema),
 });
 
 /** The relayscan.io public JSON API. */
@@ -38,6 +47,10 @@ export class RelayscanDataSource implements DataSource {
       relays: parsed.relays.map((r) => ({
         relayId: r.relay,
         numPayloads: r.num_payloads,
+      })),
+      builders: parsed.builders.map((b) => ({
+        builderId: b.info.extra_data,
+        numBlocks: b.info.num_blocks,
       })),
     };
   }

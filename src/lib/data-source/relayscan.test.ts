@@ -7,7 +7,10 @@ const SAMPLE = {
     { relay: "relay.ultrasound.money", num_payloads: 4163, percent: "35.41" },
     { relay: "boost-relay.flashbots.net", num_payloads: 283, percent: "2.40" },
   ],
-  builders: [],
+  builders: [
+    { info: { extra_data: "Titan (titanbuilder.xyz)", num_blocks: 3423, percent: "51.04" }, children: [] },
+    { info: { extra_data: "Quasar", num_blocks: 1450, percent: "21.63" }, children: [] },
+  ],
 };
 
 afterEach(() => {
@@ -28,6 +31,10 @@ describe("RelayscanDataSource", () => {
     expect(result.relays).toEqual([
       { relayId: "relay.ultrasound.money", numPayloads: 4163 },
       { relayId: "boost-relay.flashbots.net", numPayloads: 283 },
+    ]);
+    expect(result.builders).toEqual([
+      { builderId: "Titan (titanbuilder.xyz)", numBlocks: 3423 },
+      { builderId: "Quasar", numBlocks: 1450 },
     ]);
   });
 

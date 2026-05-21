@@ -8,6 +8,7 @@ function fakeSource(overrides: Partial<DataSource> = {}): DataSource {
     fetchDay: vi.fn(async (date: string) => ({
       date,
       relays: [{ relayId: "relay.ultrasound.money", numPayloads: 100 }],
+      builders: [],
     })),
     ...overrides,
   };

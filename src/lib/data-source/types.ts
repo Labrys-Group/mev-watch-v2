@@ -6,11 +6,19 @@ export interface RelayPayloadCount {
   numPayloads: number;
 }
 
+/** A single builder's block count for a given day. */
+export interface BuilderBlockCount {
+  /** Builder identifier (relayscan's `extra_data`). */
+  builderId: string;
+  numBlocks: number;
+}
+
 /** One day of relay statistics from the external source. */
 export interface DayRelayStats {
   /** ISO date, e.g. "2026-05-20". */
   date: string;
   relays: RelayPayloadCount[];
+  builders: BuilderBlockCount[];
 }
 
 /**
