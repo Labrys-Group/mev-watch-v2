@@ -1,0 +1,21 @@
+import { defineConfig } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "e2e",
+  use: {
+    baseURL: "http://localhost:3000",
+  },
+  projects: [
+    {
+      name: "chromium",
+      use: { browserName: "chromium" },
+    },
+  ],
+  retries: 0,
+  webServer: {
+    command: "pnpm dev",
+    port: 3000,
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
+});
