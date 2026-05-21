@@ -9,6 +9,9 @@ interface CompositionProps {
 export function Composition({ latest }: CompositionProps) {
   const { censorshipPct, neutralPct, totalBlocks } = latest;
 
+  const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
+  const neutralBlocks = totalBlocks - censoringBlocks;
+
   return (
     <Section
       label="01 / POST-MERGE COMPOSITION"
@@ -30,19 +33,12 @@ export function Composition({ latest }: CompositionProps) {
         </>
       }
     >
-      {/* Panel header */}
-      <div className="flex justify-between font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted mb-[18px]">
-        <span>OFAC POSTURE BREAKDOWN</span>
-        <span>
-          N&nbsp;={" "}
-          <strong className="text-foreground font-semibold tracking-normal normal-case">
-            {totalBlocks.toLocaleString()} BLOCKS
-          </strong>
-        </span>
-      </div>
-
       {/* Stacked bar */}
-      <div className="flex h-12 border border-border-labrys overflow-hidden">
+      <div
+        className="flex h-12 border border-border-labrys overflow-hidden"
+        role="img"
+        aria-label={`Censorship split: ${formatPercent(censorshipPct)} censoring, ${formatPercent(neutralPct)} neutral`}
+      >
         {/* Censoring segment */}
         <div
           className="relative flex items-center justify-center font-mono text-sm font-semibold bg-ofac text-ofac-fg border-r border-border-labrys shrink-0"
@@ -81,7 +77,10 @@ export function Composition({ latest }: CompositionProps) {
             Censoring relays
           </div>
           <div className="font-sans font-bold text-[42px] leading-none tracking-[-0.025em] text-foreground mt-3.5">
-            {formatPercent(censorshipPct)}
+            {censoringBlocks.toLocaleString()}
+          </div>
+          <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted mt-1.5">
+            MEV-boost deliveries
           </div>
         </div>
 
@@ -95,7 +94,10 @@ export function Composition({ latest }: CompositionProps) {
             Neutral relays
           </div>
           <div className="font-sans font-bold text-[42px] leading-none tracking-[-0.025em] text-foreground mt-3.5">
-            {formatPercent(neutralPct)}
+            {neutralBlocks.toLocaleString()}
+          </div>
+          <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted mt-1.5">
+            MEV-boost deliveries
           </div>
         </div>
       </div>

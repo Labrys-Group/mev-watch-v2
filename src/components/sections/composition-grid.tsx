@@ -28,7 +28,11 @@ export function CompositionGrid({ latest }: CompositionGridProps) {
       }
     >
       {/* Stats header bar — mirrors mockup's .blocks-head */}
-      <div className="grid grid-cols-4 border border-border-labrys border-b-0 font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted">
+      <div
+        className="grid grid-cols-4 border border-border-labrys border-b-0 font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted"
+        role="group"
+        aria-label="Block composition statistics"
+      >
         <div className="p-[14px] border-r border-border-labrys">
           <span>EACH TILE</span>
           <strong className="block font-sans font-bold text-[18px] tracking-[-0.01em] text-foreground mt-1 normal-case">
@@ -99,7 +103,7 @@ export function CompositionGrid({ latest }: CompositionGridProps) {
               <div
                 key={i}
                 className={[
-                  "aspect-square",
+                  "aspect-square relative transition-transform duration-100 hover:scale-[1.4] hover:z-10 cursor-crosshair",
                   isCensoring
                     ? "bg-ofac"
                     : "bg-neutral-relay",
