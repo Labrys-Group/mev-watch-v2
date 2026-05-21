@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/sections/site-header";
 import { Hero } from "@/components/sections/hero";
 import { Composition } from "@/components/sections/composition";
 import { Leaderboard } from "@/components/sections/leaderboard";
+import { BuilderLeaderboard } from "@/components/sections/builder-leaderboard";
 import { WhatToDo } from "@/components/sections/what-to-do";
 import { TrendChart } from "@/components/sections/trend-chart";
 import { CompositionGrid } from "@/components/sections/composition-grid";
@@ -13,6 +14,7 @@ import {
   getStatsSummary,
   getTrend,
   getLeaderboard,
+  getBuilderLeaderboard,
   getLastRefresh,
 } from "@/lib/queries";
 
@@ -20,11 +22,12 @@ import {
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [latest, summary, trend, leaderboard, lastRefresh] = await Promise.all([
+  const [latest, summary, trend, leaderboard, builders, lastRefresh] = await Promise.all([
     getLatestStats(),
     getStatsSummary(),
     getTrend(),
     getLeaderboard(),
+    getBuilderLeaderboard(),
     getLastRefresh(),
   ]);
 
@@ -50,6 +53,7 @@ export default async function Home() {
         <Hero summary={summary} />
         <Composition latest={latest} />
         <Leaderboard rows={leaderboard} />
+        <BuilderLeaderboard rows={builders} />
         <WhatToDo />
         <TrendChart trend={trend} summary={summary} />
         <CompositionGrid latest={latest} />
