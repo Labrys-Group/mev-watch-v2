@@ -5,7 +5,7 @@ const NAV_LINKS = [
   { label: "OVERVIEW", href: "/" },
   { label: "RELAYS", href: "/explorer" },
   { label: "METHODOLOGY", href: "/methodology" },
-  { label: "API", href: "/embed" },
+  { label: "API", href: "/api-docs" },
 ] as const;
 
 export function SiteHeader() {
