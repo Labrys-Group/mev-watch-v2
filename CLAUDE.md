@@ -41,4 +41,4 @@ Censorship data comes from the **relayscan.io** public JSON API (`GET /stats/day
 
 ## Status
 
-Phases 1 (Foundation) and 2 (Data layer) complete. Phases 3–5 (core UI, deploy, iteration) are tracked in `docs/superpowers/plans/`.
+Phases 1-3 complete (foundation, data layer, core UI). Phases 4-5 (deploy, iteration) tracked in docs/superpowers/plans/.

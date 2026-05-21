@@ -27,7 +27,7 @@ export default async function ExplorerPage() {
           {/* Page heading */}
           <div className="py-12 border-b border-border-labrys">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
-              // relay explorer
+              {"// relay explorer"}
             </p>
             <h1 className="font-sans font-bold text-4xl tracking-tight text-foreground leading-tight m-0">
               Relay directory &amp; leaderboard

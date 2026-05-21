@@ -101,7 +101,7 @@ export function SiteFooter() {
             </div>
             <div className="font-mono text-sm tracking-[0.04em]">
               <span className="text-foreground font-semibold">MEVWATCH</span>
-              <span className="text-fg-muted"> // v3</span>
+              <span className="text-fg-muted">{" // v3"}</span>
             </div>
           </div>
 

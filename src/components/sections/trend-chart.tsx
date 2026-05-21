@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   AreaChart,
   Area,
@@ -44,12 +44,11 @@ function sparseTickIndices(data: TrendPoint[], maxTicks = 8): string[] {
 
 export function TrendChart({ trend, summary }: TrendChartProps) {
   const [range, setRange] = useState<Range>("ALL");
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mq.matches);
-  }, []);
+  const [reduceMotion] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
 
   const data = useMemo(() => getSlice(trend, range), [trend, range]);
   const ticks = useMemo(() => sparseTickIndices(data), [data]);

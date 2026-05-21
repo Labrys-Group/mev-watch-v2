@@ -18,7 +18,7 @@ export default function MethodologyPage() {
           {/* Page title */}
           <div className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
-              // methodology
+              {"// methodology"}
             </p>
             <h1 className="font-sans font-bold text-4xl tracking-tight text-foreground leading-tight m-0">
               How MEV Watch measures Ethereum censorship

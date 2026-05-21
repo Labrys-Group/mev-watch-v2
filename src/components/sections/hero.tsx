@@ -14,7 +14,7 @@ export function Hero({ summary }: HeroProps) {
       <div>
         {/* Tag line */}
         <div className="inline-flex items-center gap-2.5 font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-6">
-          <span aria-hidden="true">//</span>
+          <span aria-hidden="true">{"// "}</span>
           PUBLIC TRANSPARENCY TOOL
         </div>
 
