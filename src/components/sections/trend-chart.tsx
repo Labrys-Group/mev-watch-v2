@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { TrendPoint, StatsSummary } from "@/lib/queries";
 import { formatPercent, formatDateShort } from "@/lib/format";
+import { Section } from "@/components/section";
 
 interface TrendChartProps {
   trend: TrendPoint[];
@@ -54,29 +55,26 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
   const ticks = useMemo(() => sparseTickIndices(data), [data]);
 
   return (
-    <section className="py-12 border-b border-border-labrys">
-      {/* Section header */}
-      <div className="flex justify-between items-end mb-7">
-        <div>
-          <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
-            04 / CENSORSHIP OVER TIME
-          </div>
-          <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
-            Censorship % since
-            <br />
-            the Merge.
-          </h2>
-        </div>
-        <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed">
+    <Section
+      label="05 / CENSORSHIP OVER TIME"
+      title={
+        <>
+          Censorship % since
+          <br />
+          the Merge.
+        </>
+      }
+      aside={
+        <>
           <span>7D ROLLING AVG</span>
           <br />
           <span>SEP 2022 — NOW</span>
-        </div>
-      </div>
-
-      {/* Panel */}
-      <div className="border border-border-labrys bg-panel">
-        {/* Stat header row — ts-panel-head */}
+        </>
+      }
+    >
+      {/* Recessed chart well */}
+      <div className="border border-border-labrys bg-background">
+        {/* Stat header row */}
         <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted">
           <div className="p-4 border-r border-border-labrys">
             NOW
@@ -217,6 +215,6 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
           </div>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }

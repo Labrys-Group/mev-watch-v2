@@ -1,3 +1,5 @@
+import { Section } from "@/components/section";
+
 const TWEET_TEXT = encodeURIComponent(
   "Protocol-level censorship is bad. Keep Ethereum credibly neutral — switch to non-censoring MEV-Boost relays.",
 );
@@ -28,38 +30,21 @@ const STEPS = [
 
 export function WhatToDo() {
   return (
-    <section className="py-12 border-b border-border-labrys">
-      {/* Section header */}
-      <div className="flex justify-between items-end mb-7">
-        <div>
-          <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
-            03 / WHAT TO DO
-          </div>
-          <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
-            Keep Ethereum
-            <br />
-            credibly neutral.
-          </h2>
-        </div>
-        <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed">
-          FOR: VALIDATORS, STAKERS, BUILDERS
-        </div>
-      </div>
-
+    <Section
+      label="04 / WHAT TO DO"
+      title={
+        <>
+          Keep Ethereum
+          <br />
+          credibly neutral.
+        </>
+      }
+      aside="FOR: VALIDATORS, STAKERS, BUILDERS"
+    >
       {/* Callout panel */}
-      <div className="grid grid-cols-[1fr_1.2fr] border border-border-labrys bg-panel relative overflow-hidden">
-        {/* Gradient accent */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(135deg, transparent 0%, transparent 60%, color-mix(in srgb, var(--color-accent-alt) 40%, transparent) 100%)",
-          }}
-          aria-hidden="true"
-        />
-
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] border border-border-labrys overflow-hidden">
         {/* Left side */}
-        <div className="p-10 border-r border-border-labrys">
+        <div className="p-10 border-b border-border-labrys md:border-b-0 md:border-r md:border-border-labrys bg-background">
           <h3 className="font-sans font-bold text-[42px] leading-none tracking-[-0.025em] text-foreground m-0">
             <span className="text-warn font-mono font-semibold">BAD</span>
             <span className="text-fg-muted mx-1.5">&nbsp;==&nbsp;</span>
@@ -105,7 +90,7 @@ export function WhatToDo() {
         </div>
 
         {/* Right side — validator steps */}
-        <div className="p-10 flex flex-col justify-center relative z-10">
+        <div className="p-10 flex flex-col justify-center bg-background">
           {STEPS.map((step) => (
             <div
               key={step.n}
@@ -124,6 +109,6 @@ export function WhatToDo() {
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }

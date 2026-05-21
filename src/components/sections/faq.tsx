@@ -1,29 +1,19 @@
 import { FAQ_ITEMS } from "@/config/faq";
+import { Section } from "@/components/section";
 
 /**
  * FAQ section — server component, pure CSS accordion via native <details>/<summary>.
  * No JavaScript required; no "use client" directive.
  *
- * Section 06 / FAQ — mirrors mockup-b-terminal.html section 06.
+ * Section 07 / FAQ — mirrors mockup-b-terminal.html section 07.
  */
 export function Faq() {
   return (
-    <section className="py-12 border-b border-border-labrys">
-      {/* Section header */}
-      <div className="flex justify-between items-end mb-7">
-        <div>
-          <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
-            06 / FAQ
-          </div>
-          <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
-            Frequently asked.
-          </h2>
-        </div>
-        <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed">
-          QUICK ANSWERS // METHODOLOGY LINKED
-        </div>
-      </div>
-
+    <Section
+      label="07 / FAQ"
+      title="Frequently asked."
+      aside="QUICK ANSWERS // METHODOLOGY LINKED"
+    >
       {/* Two-column accordion grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 border border-border-labrys">
         {FAQ_ITEMS.map((item, i) => {
@@ -56,6 +46,6 @@ export function Faq() {
           );
         })}
       </div>
-    </section>
+    </Section>
   );
 }
