@@ -1,9 +1,5 @@
 import { Section } from "@/components/section";
-
-const TWEET_TEXT = encodeURIComponent(
-  "Protocol-level censorship is bad. Keep Ethereum credibly neutral — switch to non-censoring MEV-Boost relays.",
-);
-const TWEET_URL = encodeURIComponent("https://mevwatch.info");
+import { ShareStrip } from "./share-strip";
 
 const STEPS = [
   {
@@ -58,39 +54,11 @@ export function WhatToDo() {
             </strong>
           </p>
 
-          {/* Share strip */}
-          <div className="flex mt-8 border border-border-labrys">
-            <a
-              href={`https://twitter.com/intent/tweet?text=${TWEET_TEXT}&url=${TWEET_URL}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 py-3.5 px-3 font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted text-center border-r border-border-labrys transition-all duration-[120ms] hover:bg-accent-brand hover:text-foreground"
-            >
-              Share on X
-            </a>
-            <a
-              href="#"
-              className="flex-1 py-3.5 px-3 font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted text-center border-r border-border-labrys transition-all duration-[120ms] hover:bg-accent-brand hover:text-foreground"
-            >
-              Copy link
-            </a>
-            <a
-              href="/embed"
-              className="flex-1 py-3.5 px-3 font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted text-center border-r border-border-labrys transition-all duration-[120ms] hover:bg-accent-brand hover:text-foreground"
-            >
-              Embed
-            </a>
-            <a
-              href="#"
-              className="flex-1 py-3.5 px-3 font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted text-center transition-all duration-[120ms] hover:bg-accent-brand hover:text-foreground"
-            >
-              Cite
-            </a>
-          </div>
+          <ShareStrip />
         </div>
 
         {/* Right side — validator steps */}
-        <div className="p-10 flex flex-col justify-center bg-background">
+        <div className="p-10 flex flex-col justify-center bg-panel-alt">
           {STEPS.map((step) => (
             <div
               key={step.n}

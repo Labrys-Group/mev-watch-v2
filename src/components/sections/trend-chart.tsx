@@ -78,7 +78,7 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
         <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted">
           <div className="p-4 border-r border-border-labrys">
             NOW
-            <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-warn mt-1.5 normal-case">
+            <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-foreground mt-1.5 normal-case">
               {formatPercent(summary.current)}
             </strong>
           </div>
@@ -106,11 +106,11 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                   key={r}
                   onClick={() => setRange(r)}
                   className={[
-                    "font-mono font-semibold text-[11px] tracking-[0.12em] uppercase px-4 py-2.5 border-0 cursor-pointer transition-colors",
+                    "font-mono font-semibold text-[11px] tracking-[0.12em] uppercase px-4 py-2.5 border-0 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
                     i < RANGE_LABELS.length - 1 ? "border-r border-border-labrys" : "",
                     range === r
                       ? "bg-accent-brand text-panel"
-                      : "bg-transparent text-fg-muted hover:text-foreground",
+                      : "bg-transparent text-fg-muted hover:text-foreground hover:bg-panel-alt",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -193,7 +193,7 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                     formatPercent(typeof value === "number" ? value : Number(value)),
                     "Censorship",
                   ]}
-                  cursor={{ stroke: "var(--border-labrys)", strokeWidth: 1 }}
+                  cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
                 />
                 <Area
                   type="monotone"
