@@ -4,7 +4,11 @@ import { getDatabaseUrl } from "./env";
 const original = process.env.DATABASE_URL;
 
 afterEach(() => {
-  process.env.DATABASE_URL = original;
+  if (original === undefined) {
+    delete process.env.DATABASE_URL;
+  } else {
+    process.env.DATABASE_URL = original;
+  }
 });
 
 describe("getDatabaseUrl", () => {
