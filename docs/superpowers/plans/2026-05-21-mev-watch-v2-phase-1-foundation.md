@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the v1 monorepo with a single, running, themed Next.js application wired to a local Postgres database — the foundation every later phase builds on.
+**Goal:** Replace the v1 monorepo with a single, running, themed Next.js application wired to a local libSQL database — the foundation every later phase builds on.
 
-**Architecture:** A single Next.js (App Router) app at the repo root. Local Postgres runs in Docker Compose, accessed through Drizzle ORM. Styling, theming, and tooling are ported from `labrys-website-v2` so MEV Watch v2 shares the Labrys ecosystem. No data fetching or real pages yet — this phase delivers a verified skeleton: themed shell, passing unit + e2e smoke tests, connected database.
+**Architecture:** A single Next.js (App Router) app at the repo root. The database is libSQL (a SQLite fork) — a local file in development, hosted Turso in production — accessed through Drizzle ORM. Styling, theming, and tooling are ported from `labrys-website-v2` so MEV Watch v2 shares the Labrys ecosystem. No data fetching or real pages yet — this phase delivers a verified skeleton: themed shell, passing unit + e2e smoke tests, connected database.
 
-**Tech Stack:** Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui (radix-nova) · next-themes · Drizzle ORM · PostgreSQL (Docker) · pnpm · Vitest · Playwright.
+**Tech Stack:** Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui (radix-nova) · next-themes · Drizzle ORM · Turso / libSQL (local file) · pnpm · Vitest · Playwright.
 
 **Scope:** This is Phase 1 of 5 (see `docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md`). Phase 2 (data layer), Phase 3 (core UI), Phase 4 (deploy), and Phase 5 (builders / API / status) each get their own plan.
 
@@ -771,64 +771,40 @@ git commit -m "feat: add next-themes provider and theme toggle"
 
 ---
 
-## Task 9: Docker Compose Postgres and the env module
+## Task 9: Local libSQL database location and the env module
 
-Stand up a local Postgres database and a tested helper for reading the connection string.
+Configure the local libSQL database file and a tested helper for reading its URL. libSQL is a SQLite fork — in development the "database" is just a file on disk, so there is no server or container to install or run.
 
 **Files:**
-- Create: `docker-compose.yml`, `.env`, `.env.example`, `src/lib/env.ts`, `src/lib/env.test.ts`
-- Modify: `package.json` (scripts)
+- Create: `data/.gitkeep`, `.env`, `.env.example`, `src/lib/env.ts`, `src/lib/env.test.ts`
+- Modify: `.gitignore`
 
-- [ ] **Step 1: Create `docker-compose.yml`**
+- [ ] **Step 1: Create the database directory**
 
-```yaml
-services:
-  postgres:
-    image: postgres:17-alpine
-    container_name: mevwatch-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: mevwatch
-      POSTGRES_PASSWORD: mevwatch
-      POSTGRES_DB: mevwatch
-    ports:
-      - "5432:5432"
-    volumes:
-      - mevwatch-pgdata:/var/lib/postgresql/data
+Create an empty file `data/.gitkeep`. (libSQL creates the database file but not its parent directory, so the `data/` directory must exist and be tracked.)
 
-volumes:
-  mevwatch-pgdata:
+- [ ] **Step 2: Ignore the database files**
+
+Append to `.gitignore`:
+```
+# local libSQL database
+/data/*
+!/data/.gitkeep
 ```
 
-- [ ] **Step 2: Create `.env.example`**
+- [ ] **Step 3: Create `.env.example`**
 
 ```
-DATABASE_URL=postgres://mevwatch:mevwatch@localhost:5432/mevwatch
+DATABASE_URL=file:./data/mevwatch.db
 ```
 
-- [ ] **Step 3: Create `.env`** (same content — `.env` is gitignored)
+- [ ] **Step 4: Create `.env`** (same content — `.env` is gitignored)
 
 ```
-DATABASE_URL=postgres://mevwatch:mevwatch@localhost:5432/mevwatch
+DATABASE_URL=file:./data/mevwatch.db
 ```
 
-- [ ] **Step 4: Add database scripts to `package.json`**
-
-In `"scripts"`, add:
-```json
-"db:up": "docker compose up -d",
-"db:down": "docker compose down"
-```
-
-- [ ] **Step 5: Start the database**
-
-Run:
-```powershell
-pnpm db:up
-```
-Expected: the `mevwatch-postgres` container starts. Verify with `docker ps`.
-
-- [ ] **Step 6: Write the failing test for the env helper**
+- [ ] **Step 5: Write the failing test for the env helper**
 
 Create `src/lib/env.test.ts`:
 ```ts
@@ -843,8 +819,8 @@ afterEach(() => {
 
 describe("getDatabaseUrl", () => {
   it("returns the value when DATABASE_URL is set", () => {
-    process.env.DATABASE_URL = "postgres://example";
-    expect(getDatabaseUrl()).toBe("postgres://example");
+    process.env.DATABASE_URL = "file:./data/test.db";
+    expect(getDatabaseUrl()).toBe("file:./data/test.db");
   });
 
   it("throws a clear error when DATABASE_URL is missing", () => {
@@ -854,16 +830,16 @@ describe("getDatabaseUrl", () => {
 });
 ```
 
-- [ ] **Step 7: Run the test to verify it fails**
+- [ ] **Step 6: Run the test to verify it fails**
 
 Run: `pnpm test`
 Expected: FAIL — cannot resolve `./env`.
 
-- [ ] **Step 8: Create `src/lib/env.ts`**
+- [ ] **Step 7: Create `src/lib/env.ts`**
 
 ```ts
 /**
- * Reads the Postgres connection string. Throws if it is not configured,
+ * Reads the libSQL database URL. Throws if it is not configured,
  * so misconfiguration fails loudly rather than silently connecting nowhere.
  */
 export function getDatabaseUrl(): string {
@@ -877,33 +853,33 @@ export function getDatabaseUrl(): string {
 }
 ```
 
-- [ ] **Step 9: Run the test to verify it passes**
+- [ ] **Step 8: Run the test to verify it passes**
 
 Run: `pnpm test`
 Expected: PASS — all unit tests pass.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 9: Commit**
 
 ```powershell
 git add -A
-git commit -m "feat: add Docker Compose Postgres and the env helper"
+git commit -m "feat: configure the local libSQL database location and env helper"
 ```
 
 ---
 
-## Task 10: Drizzle ORM client
+## Task 10: Drizzle ORM client (libSQL)
 
-Wire Drizzle to the Postgres database. Modules under `src/lib/db` use **relative imports** internally so standalone scripts (run via `tsx`) resolve them without a path-alias resolver.
+Wire Drizzle to the local libSQL database. Modules under `src/lib/db` use **relative imports** internally so standalone scripts (run via `tsx`) resolve them without a path-alias resolver.
 
 **Files:**
 - Create: `drizzle.config.ts`, `src/lib/db/index.ts`
 - Modify: `package.json` (scripts)
 
-- [ ] **Step 1: Install Drizzle and the Postgres driver**
+- [ ] **Step 1: Install Drizzle and the libSQL driver**
 
 Run:
 ```powershell
-pnpm add drizzle-orm postgres
+pnpm add drizzle-orm @libsql/client
 pnpm add -D drizzle-kit dotenv tsx
 ```
 
@@ -916,22 +892,24 @@ import { defineConfig } from "drizzle-kit";
 export default defineConfig({
   schema: "./src/lib/db/schema.ts",
   out: "./drizzle",
-  dialect: "postgresql",
+  dialect: "turso",
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
 });
 ```
 
+> The `turso` dialect drives both a local `file:` URL and a hosted `libsql://` URL, so the same config serves local development and Phase 4 production.
+
 - [ ] **Step 3: Create `src/lib/db/index.ts`**
 
 ```ts
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 import { getDatabaseUrl } from "../env";
 import * as schema from "./schema";
 
-const client = postgres(getDatabaseUrl());
+const client = createClient({ url: getDatabaseUrl() });
 
 export const db = drizzle(client, { schema });
 ```
@@ -957,7 +935,7 @@ git commit -m "feat: add Drizzle ORM client and config"
 
 ## Task 11: Database schema, migration, and connection check
 
-Define the four snapshot tables from the spec, generate and apply the migration, and verify a real round-trip against the running Postgres.
+Define the four snapshot tables from the spec using Drizzle's SQLite core, generate and apply the migration, and verify a real round-trip against the local libSQL file.
 
 **Files:**
 - Create: `src/lib/db/schema.ts`, `scripts/check-db.ts`, `drizzle/` (generated migration)
@@ -967,34 +945,32 @@ Define the four snapshot tables from the spec, generate and apply the migration,
 
 ```ts
 import {
-  pgTable,
-  serial,
+  sqliteTable,
+  text,
   integer,
   real,
-  date,
-  timestamp,
-  varchar,
-  text,
   unique,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
 
 /** One row per day — drives the censorship trend chart. */
-export const dailyStats = pgTable("daily_stats", {
-  date: date("date").primaryKey(),
+export const dailyStats = sqliteTable("daily_stats", {
+  date: text("date").primaryKey(), // ISO date, e.g. "2026-05-21"
   censorshipPct: real("censorship_pct").notNull(),
   neutralPct: real("neutral_pct").notNull(),
   nonBoostPct: real("non_boost_pct").notNull(),
   totalBlocks: integer("total_blocks").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
 });
 
 /** Per relay per day — drives the leaderboard and per-relay sparklines. */
-export const relayDailyStats = pgTable(
+export const relayDailyStats = sqliteTable(
   "relay_daily_stats",
   {
-    id: serial("id").primaryKey(),
-    relayKey: varchar("relay_key", { length: 64 }).notNull(),
-    date: date("date").notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    relayKey: text("relay_key").notNull(),
+    date: text("date").notNull(),
     blocks: integer("blocks").notNull(),
     sharePct: real("share_pct").notNull(),
     censorshipRate: real("censorship_rate").notNull(),
@@ -1003,20 +979,22 @@ export const relayDailyStats = pgTable(
 );
 
 /** Rolling window of the most recent blocks — drives the live block grid. */
-export const recentBlocks = pgTable("recent_blocks", {
+export const recentBlocks = sqliteTable("recent_blocks", {
   slot: integer("slot").primaryKey(),
   blockNumber: integer("block_number").notNull(),
-  relayKey: varchar("relay_key", { length: 64 }),
-  category: varchar("category", { length: 16 }).notNull(),
-  ts: timestamp("ts").notNull(),
+  relayKey: text("relay_key"),
+  category: text("category").notNull(),
+  ts: integer("ts", { mode: "timestamp" }).notNull(),
 });
 
 /** Audit log of every refresh run — drives "last updated" and alerting. */
-export const refreshLog = pgTable("refresh_log", {
-  id: serial("id").primaryKey(),
-  ranAt: timestamp("ran_at").notNull().defaultNow(),
-  status: varchar("status", { length: 16 }).notNull(),
-  source: varchar("source", { length: 32 }).notNull(),
+export const refreshLog = sqliteTable("refresh_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ranAt: integer("ran_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  status: text("status").notNull(),
+  source: text("source").notNull(),
   message: text("message"),
 });
 ```
@@ -1036,11 +1014,11 @@ Expected: a SQL migration file appears under `drizzle/`.
 
 - [ ] **Step 4: Apply the migration**
 
-Ensure the database is running (`pnpm db:up`), then run:
+Run:
 ```powershell
 pnpm db:migrate
 ```
-Expected: migration applies without error.
+Expected: migration applies without error; the file `data/mevwatch.db` is created.
 
 - [ ] **Step 5: Create `scripts/check-db.ts`**
 
@@ -1201,20 +1179,19 @@ Package manager is **pnpm**. Run from the repo root.
 - `pnpm test:watch` — Vitest in watch mode
 - `pnpm test -- src/lib/format.test.ts` — run a single test file
 - `pnpm test:e2e` — Playwright e2e tests (auto-starts the dev server)
-- `pnpm db:up` / `pnpm db:down` — start/stop the local Postgres container
 - `pnpm db:generate` — generate a Drizzle migration from `src/lib/db/schema.ts`
 - `pnpm db:migrate` — apply migrations
 - `pnpm db:check` — verify the database connection
 
 ## Architecture
 
-Next.js 16 App Router app. Styling is Tailwind CSS v4 + shadcn/ui (radix-nova), themed with the Labrys design tokens in `src/app/globals.css` (light/dark via `next-themes`, accent is mint in light mode and blurple in dark). Data is stored in PostgreSQL (Docker locally) and accessed via Drizzle ORM.
+Next.js 16 App Router app. Styling is Tailwind CSS v4 + shadcn/ui (radix-nova), themed with the Labrys design tokens in `src/app/globals.css` (light/dark via `next-themes`, accent is mint in light mode and blurple in dark). Data is stored in libSQL (a local file in development, hosted Turso in production) and accessed via Drizzle ORM.
 
 ### Key conventions
 
 - Path alias `@/*` maps to `src/*` for application code. Modules under `src/lib/db` use **relative imports** internally so `tsx` scripts (e.g. `scripts/`) resolve them without a path-alias resolver.
 - Database schema lives in `src/lib/db/schema.ts`; the Drizzle client is `src/lib/db/index.ts`.
-- The local database requires `pnpm db:up` and a `.env` file (copy from `.env.example`).
+- The local database is a libSQL file under `data/`; it needs a `.env` file (copy from `.env.example`) and `pnpm db:migrate`.
 - Unit tests sit beside their source as `*.test.ts(x)`; e2e tests live in `e2e/`.
 
 ## Status
@@ -1244,4 +1221,4 @@ git commit -m "docs: rewrite CLAUDE.md for the v2 architecture"
 
 ## Done — Phase 1 complete
 
-The repository now holds a single Next.js 16 application: themed terminal shell, light/dark switching, a connected Postgres database with the snapshot schema, and passing unit + e2e suites. Phase 2 (the external data adapter, refresh routine, and metric computation) gets its own plan — and that plan should begin by verifying the real relayscan.io API surface.
+The repository now holds a single Next.js 16 application: themed terminal shell, light/dark switching, a connected libSQL database with the snapshot schema, and passing unit + e2e suites. Phase 2 (the external data adapter, refresh routine, and metric computation) gets its own plan — and that plan should begin by verifying the real relayscan.io API surface.

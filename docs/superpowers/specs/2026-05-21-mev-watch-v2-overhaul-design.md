@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-21
 **Branch:** `MEVWatch-2`
-**Status:** Approved — ready for implementation planning
+**Status:** Approved — ready for implementation planning (amended 2026-05-21: data layer switched from Postgres/Neon to Turso/libSQL for a zero-install local setup)
 
 ---
 
@@ -62,11 +62,11 @@ Matches `labrys-website-v2` for ecosystem consistency:
 |---|---|
 | Framework | Next.js (App Router), React 19, TypeScript (strict) |
 | Styling | Tailwind CSS v4 + shadcn/ui, Labrys design tokens |
-| Database | PostgreSQL via Drizzle ORM |
+| Database | Turso / libSQL via Drizzle ORM |
 | Charts | Recharts (trend chart, bars) — confirm React 19 compatibility at build time |
 | Tooling | pnpm · Vitest + Testing Library · Playwright · ESLint |
-| Local infra | Docker Compose (Postgres) |
-| Hosting (Phase 4) | Vercel + Neon (serverless Postgres) + Vercel Cron |
+| Local infra | A local libSQL database file — no Docker, no server process |
+| Hosting (Phase 4) | Vercel + Turso (hosted libSQL) + Vercel Cron |
 
 ## 5. Data layer
 
@@ -89,10 +89,12 @@ This replaces v1's `packages/consts/src/relayers.ts` and removes the "populate t
 ritual entirely — the config *is* the source of truth, joined to measured stats at refresh
 time.
 
-### 5.3 Database schema (Postgres / Drizzle)
+### 5.3 Database schema (libSQL / Drizzle)
 
-Postgres stores **our own snapshots** so history and uptime do not depend on the upstream
-provider. Initial tables:
+The database — libSQL, a SQLite fork — stores **our own snapshots** so history and uptime
+do not depend on the upstream provider. In local development it is a single file on disk
+(no server, no Docker); in production it is a hosted Turso database. The data is small,
+aggregate, and read-heavy, so SQLite-family storage is a good fit. Initial tables:
 
 - `daily_stats` — one row per day: `date` (PK), `censorship_pct`, `neutral_pct`,
   `non_boost_pct`, `total_blocks`, `created_at`. Drives the trend chart.
@@ -132,8 +134,8 @@ fields and documented on the `/methodology` page.
 
 ### 5.6 Resilience & error handling
 
-- Pages read **only from Postgres**, never the external API at request time — the site is
-  fast and stays up if the provider is down.
+- Pages read **only from the local database**, never the external API at request time —
+  the site is fast and stays up if the provider is down.
 - If a refresh fails, the last good snapshot is retained, the failure is recorded in
   `refresh_log`, and an alert is sent (Slack webhook, carried over from v1).
 - Every page shows a visible "last updated" timestamp sourced from `refresh_log`.
@@ -147,9 +149,9 @@ External MEV source (relayscan.io API; Dune fallback)
   Compute metrics ── merge ── OFAC classification (static config in repo)
         │
         ▼
-  Postgres snapshot store (Drizzle): daily_stats · relay_daily_stats · recent_blocks · refresh_log
+  libSQL snapshot store (Drizzle): daily_stats · relay_daily_stats · recent_blocks · refresh_log
         │
-        ▼  pages read ONLY from Postgres
+        ▼  pages read ONLY from the database
   Next.js App Router pages (ISR / server components, revalidated on refresh)
 ```
 
@@ -249,12 +251,12 @@ are carried over.
 
 Iterative delivery — ship the core, then expand.
 
-1. **Foundation** — scaffold the Next.js app, Docker Compose Postgres, Drizzle schema, port
-   design tokens + theming from `labrys-website-v2`.
+1. **Foundation** — scaffold the Next.js app, the local libSQL database, Drizzle schema,
+   port design tokens + theming from `labrys-website-v2`.
 2. **Data layer** — `DataSource` adapter, refresh routine, metric computation, history
    seed. Fully runnable locally via `pnpm refresh`.
 3. **Core UI** — homepage scoreboard sections, `/methodology`, `/explorer`, `/embed`.
-4. **Deploy** — Vercel + Neon + Vercel Cron; Slack alerting.
+4. **Deploy** — Vercel + Turso + Vercel Cron; Slack alerting.
 5. **Iteration** — builder data, then the public API, then the status page (§7.5).
 
 Phases 1–3 deliver a complete, locally-runnable product before any cloud setup.
