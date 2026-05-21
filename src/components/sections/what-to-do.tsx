@@ -41,13 +41,13 @@ export function WhatToDo() {
       {/* Callout panel */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] border border-border-labrys overflow-hidden">
         {/* Left side */}
-        <div className="p-10 border-b border-border-labrys md:border-b-0 md:border-r md:border-border-labrys bg-background">
-          <h3 className="font-sans font-bold text-[42px] leading-none tracking-[-0.025em] text-foreground m-0">
+        <div className="p-5 md:p-7 border-b border-border-labrys md:border-b-0 md:border-r md:border-border-labrys bg-background">
+          <h3 className="font-sans font-bold text-[24px] sm:text-[30px] leading-none tracking-[-0.025em] text-foreground m-0">
             <span className="text-warn font-mono font-semibold">BAD</span>
             <span className="text-fg-muted mx-1.5">&nbsp;==&nbsp;</span>
             <span className="text-warn font-mono font-semibold">CENSORSHIP</span>
           </h3>
-          <p className="font-mono text-[13px] leading-[1.6] text-fg-muted mt-[18px]">
+          <p className="font-mono text-[12.5px] leading-[1.6] text-fg-muted mt-3.5">
             Adopt a non-censoring MEV-Boost relay. The cost to you is zero. The
             cost to Ethereum of doing nothing is{" "}
             <strong className="text-foreground font-semibold">
@@ -59,14 +59,14 @@ export function WhatToDo() {
         </div>
 
         {/* Right side — validator steps */}
-        <div className="p-10 flex flex-col justify-center bg-panel-alt">
+        <div className="p-5 md:p-7 flex flex-col justify-center bg-panel-alt">
           {STEPS.map((step, i) => (
             <div
               key={step.n}
-              className="reveal-item group flex gap-3.5 py-3.5 border-b border-border-labrys last:border-b-0 font-mono text-[13px] items-start"
+              className="reveal-item group flex gap-3 py-2.5 border-b border-border-labrys last:border-b-0 font-mono text-[12.5px] items-start"
               style={{ "--delay": `${i * 90}ms` } as CSSVars}
             >
-              <span className="font-mono text-[11px] text-accent-alt tracking-[0.1em] w-8 shrink-0 pt-[1px] transition-transform duration-200 group-hover:translate-x-0.5">
+              <span className="font-mono text-[10.5px] text-accent-alt tracking-[0.1em] w-7 shrink-0 pt-[1px] transition-transform duration-200 group-hover:translate-x-0.5">
                 {step.n}
               </span>
               <span className="text-fg-muted leading-[1.55]">

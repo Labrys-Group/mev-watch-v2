@@ -25,7 +25,7 @@ export function Faq() {
             <details
               key={item.q}
               className={[
-                "reveal-item group p-[18px_20px] bg-panel transition-colors duration-200 hover:bg-panel-alt/60",
+                "reveal-item group p-4 bg-panel transition-colors duration-200 hover:bg-panel-alt/60",
                 isLastRow ? "" : "border-b border-border-labrys",
                 isRightCol ? "" : "md:border-r md:border-border-labrys",
               ]
@@ -33,7 +33,7 @@ export function Faq() {
                 .join(" ")}
               style={{ "--delay": `${i * 55}ms` } as CSSVars}
             >
-              <summary className="cursor-pointer list-none flex justify-between items-start gap-3 font-sans font-bold text-[15px] text-foreground tracking-[-0.01em] transition-colors duration-200 group-hover:text-accent-brand [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm">
+              <summary className="cursor-pointer list-none flex justify-between items-start gap-3 font-sans font-bold text-[13.5px] text-foreground tracking-[-0.01em] transition-colors duration-200 group-hover:text-accent-brand [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm">
                 <span>{item.q}</span>
                 {/* [+] closed, [-] open — toggled via CSS */}
                 <span
@@ -41,7 +41,7 @@ export function Faq() {
                   aria-hidden="true"
                 />
               </summary>
-              <p className="font-mono text-[13px] text-fg-muted leading-[1.6] mt-3 mb-0 transition-opacity">
+              <p className="font-mono text-[12.5px] text-fg-muted leading-[1.6] mt-2.5 mb-0 transition-opacity">
                 {item.a}
               </p>
             </details>

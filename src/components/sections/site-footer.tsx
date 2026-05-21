@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MevMark } from "@/components/mev-mark";
 
 const DATA_LINKS = [
   { label: "Methodology", href: "/methodology", external: false },
@@ -68,44 +69,17 @@ function FooterLinkList({
 
 export function SiteFooter() {
   return (
-    <footer className="bg-panel-alt border-t border-border-labrys mt-8">
+    <footer className="bg-panel-alt border-t border-border-labrys mt-6">
       {/* ── Main band ─────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-[1280px] px-6 pt-12 pb-10">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-[2fr_1fr_1fr_1fr]">
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-9 pb-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-[2fr_1fr_1fr_1fr]">
           {/* Brand column */}
           <div className="flex flex-col gap-5">
             {/* Wordmark */}
             <div className="flex items-center gap-3">
-              {/* Labrys brand mark */}
+              {/* MEV Watch block mark */}
               <div className="shrink-0 w-9 h-9 grid place-items-center">
-                <svg
-                  viewBox="0 0 71 70"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                  className="w-8 h-8 block"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M0.366815 8.68875L14.4011 16.7877L14.4019 41.0845L35.4519 53.219L35.4572 69.4075L0.365234 49.1722L0.366815 8.68875Z"
-                    fill="#4F0CE5"
-                  />
-                  <path
-                    opacity="0.7"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M70.542 8.689L56.507 16.7855V41.0845L35.457 53.219L35.4517 69.4076L70.5436 49.1722L70.542 8.689Z"
-                    fill="#4F0CE5"
-                  />
-                  <path
-                    opacity="0.5"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M0.367188 8.6887L14.4023 0.592438L35.4549 12.8731L56.5083 0.592438L70.5426 8.68893L35.4576 28.9533L0.367188 8.6887Z"
-                    fill="#4F0CE5"
-                  />
-                </svg>
+                <MevMark className="w-5 h-5" />
               </div>
               <div className="leading-none">
                 <span className="font-mono text-[13px] tracking-[0.06em] font-semibold text-foreground">
@@ -134,7 +108,7 @@ export function SiteFooter() {
 
       {/* ── Bottom bar ────────────────────────────────────────────── */}
       <div className="border-t border-border-labrys">
-        <div className="mx-auto max-w-[1280px] px-6 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-3.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Left: credit line */}
           <p className="font-mono text-[11px] tracking-[0.04em] text-fg-muted/60 m-0">
             Relay data from{" "}

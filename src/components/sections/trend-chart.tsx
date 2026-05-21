@@ -106,22 +106,22 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
       {/* Recessed chart well */}
       <div className="border border-border-labrys bg-background">
         {/* Stat header row */}
-        <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted">
-          <div className="p-4 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+        <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
+          <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             NOW
-            <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-foreground mt-1.5 normal-case">
+            <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-foreground mt-1 normal-case">
               <CountUp value={summary.current} decimals={1} suffix="%" />
             </strong>
           </div>
-          <div className="p-4 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+          <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             PEAK
-            <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-warn mt-1.5 normal-case">
+            <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-warn mt-1 normal-case">
               <CountUp value={summary.peak} decimals={1} suffix="%" />
             </strong>
           </div>
-          <div className="p-4 transition-colors duration-200 hover:bg-panel-alt">
+          <div className="p-3 transition-colors duration-200 hover:bg-panel-alt">
             TROUGH
-            <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-good mt-1.5 normal-case">
+            <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-good mt-1 normal-case">
               <CountUp value={summary.trough} decimals={1} suffix="%" />
             </strong>
           </div>
@@ -137,7 +137,7 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                   key={r}
                   onClick={() => setRange(r)}
                   className={[
-                    "font-mono font-semibold text-[11px] tracking-[0.12em] uppercase px-4 py-2.5 border-0 cursor-pointer transition-all duration-200 active:translate-y-px focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
+                    "font-mono font-semibold text-[10.5px] tracking-[0.12em] uppercase px-3 py-1.5 border-0 cursor-pointer transition-all duration-200 active:translate-y-px focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
                     i < RANGE_LABELS.length - 1 ? "border-r border-border-labrys" : "",
                     range === r
                       ? "bg-accent-brand text-panel"
@@ -154,7 +154,7 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
           </div>
 
           {/* Chart */}
-          <div ref={chartRef} className="w-full h-[360px] px-4 pt-4 pb-2">
+          <div ref={chartRef} className="w-full h-[260px] sm:h-[300px] px-2 pt-4 pb-2">
             {inView ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart

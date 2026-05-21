@@ -16,17 +16,27 @@ export function Hero({ summary }: HeroProps) {
   const trendGlow = isFalling ? "glow-good" : "glow-warn";
 
   return (
-    <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-6 md:p-10">
+    <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
+      {/* Verdict-tinted wash — a faint colour cue for the current trend */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, ${
+            isFalling ? "var(--good)" : "var(--warn)"
+          } 14%, transparent) 0%, transparent 58%)`,
+        }}
+      />
       {/* Faded grid background texture */}
       <div aria-hidden="true" className="faded-grid pointer-events-none absolute inset-0" />
 
       {/* Hero content — layered above grid */}
-      <div className="relative grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8 lg:gap-8 items-end">
+      <div className="relative grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-end">
         {/* Left column — headline & stat */}
         <div>
           {/* Tag line */}
           <div
-            className="anim-fade-up inline-flex items-center gap-2.5 font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-6"
+            className="anim-fade-up inline-flex items-center gap-2.5 font-mono text-[10px] tracking-[0.18em] uppercase text-accent-brand mb-4"
             style={{ "--delay": "80ms" } as CSSVars}
           >
             <span aria-hidden="true">{"// "}</span>
@@ -36,7 +46,7 @@ export function Hero({ summary }: HeroProps) {
           {/* Display headline — masked line-by-line rise */}
           <h1
             className="font-sans font-extrabold leading-[0.95] tracking-[-0.035em] m-0 text-foreground"
-            style={{ fontSize: "clamp(3rem, 8vw, 5rem)" }}
+            style={{ fontSize: "clamp(2.5rem, 7vw, 4rem)" }}
           >
             <span className="line-mask block">
               <span className="line-rise" style={{ "--delay": "160ms" } as CSSVars}>
@@ -60,12 +70,12 @@ export function Hero({ summary }: HeroProps) {
 
           {/* Stat line */}
           <div
-            className="anim-fade-up mt-6 font-mono text-sm tracking-[0.04em] leading-snug text-fg-muted"
+            className="anim-fade-up mt-5 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
             style={{ "--delay": "540ms" } as CSSVars}
           >
             <span
               className="font-sans font-extrabold tracking-tight text-foreground"
-              style={{ fontSize: "clamp(2rem, 4vw, 2.5rem)" }}
+              style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
             >
               <CountUp value={summary.current} decimals={1} suffix="%" />
             </span>{" "}
@@ -82,7 +92,7 @@ export function Hero({ summary }: HeroProps) {
 
         {/* Right column — terminal lede box */}
         <div
-          className="anim-fade-up relative font-mono text-[13px] leading-[1.65] text-fg-muted max-w-sm lg:max-w-none p-5 border border-border-labrys bg-panel"
+          className="anim-fade-up relative font-mono text-[12.5px] leading-[1.65] text-fg-muted max-w-sm lg:max-w-none p-4 border border-border-labrys bg-panel"
           style={{ "--delay": "660ms" } as CSSVars}
         >
           {/* $ cat ./readme.md label */}

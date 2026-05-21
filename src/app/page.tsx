@@ -43,14 +43,17 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      <StatusBar
-        latestDate={latest.date}
-        censorshipPct={latest.censorshipPct}
-        lastRefresh={lastRefresh?.ranAt ?? null}
-      />
-      <SiteHeader />
-      <div className="mx-auto max-w-[1280px] px-6">
-        <div className="space-y-6 py-6">
+      {/* Status bar + nav stay pinned together as you scroll */}
+      <div className="sticky top-0 z-50">
+        <StatusBar
+          latestDate={latest.date}
+          censorshipPct={latest.censorshipPct}
+          lastRefresh={lastRefresh?.ranAt ?? null}
+        />
+        <SiteHeader />
+      </div>
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6">
+        <div className="space-y-4 py-5">
           <Hero summary={summary} />
           <Reveal>
             <Composition latest={latest} />

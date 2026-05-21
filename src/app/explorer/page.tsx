@@ -67,7 +67,8 @@ export default async function ExplorerPage() {
               </div>
             </div>
 
-            <table className="w-full border-collapse font-mono text-[13px]">
+            <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <table className="w-full min-w-[480px] border-collapse font-mono text-[13px]">
               <thead>
                 <tr>
                   <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys w-10">
@@ -185,7 +186,8 @@ export default async function ExplorerPage() {
                   })
                 )}
               </tbody>
-            </table>
+              </table>
+            </div>
           </Reveal>
 
           {/* ── Section 2 — Relay directory ── */}

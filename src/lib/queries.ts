@@ -19,6 +19,7 @@ export interface LatestStats {
   date: string;
   censorshipPct: number;
   neutralPct: number;
+  nonBoostPct: number;
   totalBlocks: number;
 }
 
@@ -75,6 +76,7 @@ export async function getLatestStats(): Promise<LatestStats | null> {
     date: row.date,
     censorshipPct: row.censorshipPct,
     neutralPct: row.neutralPct,
+    nonBoostPct: row.nonBoostPct,
     totalBlocks: row.totalBlocks,
   };
 }
