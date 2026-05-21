@@ -6,14 +6,14 @@ export default function Home() {
       <header className="flex items-center justify-between border-b border-border-labrys px-6 py-4">
         <div className="font-mono text-sm tracking-wide">
           <span className="font-bold">MEVWATCH</span>{" "}
-          <span className="text-fg-muted">// MONITOR</span>
+          <span className="text-fg-muted">{"// MONITOR"}</span>
         </div>
         <ThemeToggle />
       </header>
 
       <section className="px-6 py-20">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent-brand">
-          // Public Transparency Tool
+          {"// Public Transparency Tool"}
         </p>
         <h1 className="mt-4 font-sans text-5xl font-extrabold tracking-tight">
           MEV Watch v2
