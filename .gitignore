@@ -32,6 +32,9 @@ yarn-error.log*
 # turbo
 .turbo
 
+# superpowers brainstorm scratch
+.superpowers
+
 # node
 dist
 .env
