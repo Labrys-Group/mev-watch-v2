@@ -1,4 +1,7 @@
+import { db } from "../db";
+import { refreshLog } from "../db/schema";
 import type { DataSource } from "../data-source/types";
+import { persistDailySnapshot } from "./persist";
 
 export interface RefreshResult {
   status: "ok" | "error";
@@ -18,23 +21,12 @@ export interface RefreshDeps {
   log: (entry: RefreshEntry) => Promise<void>;
 }
 
-/** Lazily constructed so the DB client is only initialised when first called. */
-function getDefaultDeps(): RefreshDeps {
-  // All DB-touching modules are required lazily so module-level evaluation
-  // never touches getDatabaseUrl() during tests (which inject their own deps).
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { db } = require("../db") as typeof import("../db");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { refreshLog } = require("../db/schema") as typeof import("../db/schema");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { persistDailySnapshot } = require("./persist") as typeof import("./persist");
-  return {
-    persist: persistDailySnapshot,
-    log: async (entry) => {
-      await db.insert(refreshLog).values(entry);
-    },
-  };
-}
+const defaultDeps: RefreshDeps = {
+  persist: persistDailySnapshot,
+  log: async (entry) => {
+    await db.insert(refreshLog).values(entry);
+  },
+};
 
 /**
  * Fetch, compute, and persist one day of stats. Never throws — failures are
@@ -44,7 +36,7 @@ function getDefaultDeps(): RefreshDeps {
 export async function refreshDay(
   date: string,
   source: DataSource,
-  deps: RefreshDeps = getDefaultDeps(),
+  deps: RefreshDeps = defaultDeps,
 ): Promise<RefreshResult> {
   try {
     const day = await source.fetchDay(date);
