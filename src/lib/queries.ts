@@ -33,6 +33,8 @@ export interface LeaderboardRow {
 export interface RefreshInfo {
   ranAt: Date;
   status: string;
+  source: string;
+  message: string | null;
 }
 
 /** Pure derivation — peak/current/trough from a trend series. Exported for testing. */
@@ -144,5 +146,20 @@ export async function getLastRefresh(): Promise<RefreshInfo | null> {
     .orderBy(desc(refreshLog.ranAt))
     .limit(1);
   if (!row) return null;
-  return { ranAt: row.ranAt, status: row.status };
+  return { ranAt: row.ranAt, status: row.status, source: row.source, message: row.message ?? null };
+}
+
+/** The most recent N refresh-log entries, newest first — powers the status page. */
+export async function getRecentRefreshes(limit = 20): Promise<RefreshInfo[]> {
+  const rows = await db
+    .select()
+    .from(refreshLog)
+    .orderBy(desc(refreshLog.ranAt))
+    .limit(limit);
+  return rows.map((r) => ({
+    ranAt: r.ranAt,
+    status: r.status,
+    source: r.source,
+    message: r.message ?? null,
+  }));
 }
