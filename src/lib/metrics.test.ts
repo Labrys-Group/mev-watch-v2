@@ -1,48 +1,45 @@
 import { describe, it, expect } from "vitest";
-import { computeDailyStats, computeRelayBreakdown, SLOTS_PER_DAY } from "./metrics";
+import { computeDailyStats, computeRelayBreakdown } from "./metrics";
 
-// Flashbots + both bloXroute relays are "censoring"; ultrasound is "neutral".
+// Flashbots is "censoring"; ultrasound is "neutral".
 const RELAYS = [
   { relayId: "relay.ultrasound.money", numPayloads: 3000 },
   { relayId: "boost-relay.flashbots.net", numPayloads: 1000 },
 ];
 
 describe("computeDailyStats", () => {
-  it("splits censoring vs neutral vs non-boost", () => {
-    const result = computeDailyStats(RELAYS);
-    expect(result.totalBlocks).toBe(SLOTS_PER_DAY);
-    expect(result.censorshipPct).toBeCloseTo((1000 / 7200) * 100, 5);
-    expect(result.neutralPct).toBeCloseTo((3000 / 7200) * 100, 5);
-    expect(result.nonBoostPct).toBeCloseTo((3200 / 7200) * 100, 5);
+  it("censorship % is the censoring relays' share of deliveries", () => {
+    const r = computeDailyStats(RELAYS);
+    expect(r.censorshipPct).toBeCloseTo(25, 5); // 1000 / 4000
+    expect(r.neutralPct).toBeCloseTo(75, 5);
+    expect(r.totalBlocks).toBe(4000);
   });
 
-  it("the three percentages sum to 100", () => {
+  it("censorship + neutral sum to 100 for a non-empty day", () => {
     const r = computeDailyStats(RELAYS);
-    expect(r.censorshipPct + r.neutralPct + r.nonBoostPct).toBeCloseTo(100, 5);
+    expect(r.censorshipPct + r.neutralPct).toBeCloseTo(100, 5);
   });
 
   it("treats unknown relays as non-censoring", () => {
-    const r = computeDailyStats([{ relayId: "mystery-relay.xyz", numPayloads: 100 }]);
+    const r = computeDailyStats([{ relayId: "mystery.xyz", numPayloads: 100 }]);
     expect(r.censorshipPct).toBe(0);
+    expect(r.neutralPct).toBeCloseTo(100, 5);
   });
 
   it("handles an empty day without dividing by zero", () => {
     const r = computeDailyStats([]);
-    expect(r.totalBlocks).toBe(SLOTS_PER_DAY);
-    expect(r.nonBoostPct).toBeCloseTo(100, 5);
-  });
-
-  it("clamps non-boost at zero when payloads exceed the slot estimate", () => {
-    const r = computeDailyStats([{ relayId: "relay.ultrasound.money", numPayloads: 9000 }]);
-    expect(r.nonBoostPct).toBe(0);
-    expect(r.totalBlocks).toBe(9000);
+    expect(r.censorshipPct).toBe(0);
+    expect(r.neutralPct).toBe(0);
+    expect(r.totalBlocks).toBe(0);
   });
 });
 
 describe("computeRelayBreakdown", () => {
   it("returns per-relay share and posture-derived censorship rate", () => {
     const breakdown = computeRelayBreakdown(RELAYS);
-    const flashbots = breakdown.find((b) => b.relayId === "boost-relay.flashbots.net")!;
+    const flashbots = breakdown.find(
+      (b) => b.relayId === "boost-relay.flashbots.net",
+    )!;
     expect(flashbots.blocks).toBe(1000);
     expect(flashbots.sharePct).toBeCloseTo(25, 5);
     expect(flashbots.censorshipRate).toBe(100);

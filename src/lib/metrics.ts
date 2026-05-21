@@ -3,17 +3,16 @@
 import { classifyRelay } from "../config/relays";
 import type { RelayPayloadCount } from "./data-source/types";
 
-/**
- * Ethereum produces one slot every 12s → 7200 slots per day. Used to estimate
- * the non-MEV-boost share (blocks built locally by validators, which relayscan
- * does not report). This is an approximation, documented on the methodology page.
- */
-export const SLOTS_PER_DAY = 7200;
-
 export interface DailyStatsResult {
+  /** Censoring relays' share of all MEV-boost relay payload deliveries (%). */
   censorshipPct: number;
+  /** Neutral + unknown relays' share of deliveries (%). */
   neutralPct: number;
+  /** Reserved: non-MEV-boost (locally built) block share. Not derivable from
+   *  relayscan's aggregate API — always 0 until a per-block source is added. */
   nonBoostPct: number;
+  /** Total relay payload deliveries counted (a block delivered via N relays
+   *  counts N times — relayscan's `num_payloads` is per relay). */
   totalBlocks: number;
 }
 
@@ -28,9 +27,16 @@ export interface RelayBreakdownEntry {
   censorshipRate: number;
 }
 
-/** Compute the day's censorship composition from relay payload counts. */
+/**
+ * Compute the day's censorship metric from relay payload counts.
+ *
+ * relayscan reports `num_payloads` per relay; a single block delivered via
+ * multiple relays is counted once per relay. We therefore measure censorship as
+ * the censoring relays' *share of deliveries* — a ratio in which the multi-relay
+ * counting cancels between numerator and denominator. See the methodology page.
+ */
 export function computeDailyStats(relays: RelayPayloadCount[]): DailyStatsResult {
-  const mevBoostTotal = relays.reduce((sum, r) => sum + r.numPayloads, 0);
+  const totalDeliveries = relays.reduce((sum, r) => sum + r.numPayloads, 0);
 
   let censoring = 0;
   for (const r of relays) {
@@ -38,25 +44,23 @@ export function computeDailyStats(relays: RelayPayloadCount[]): DailyStatsResult
       censoring += r.numPayloads;
     }
   }
-  const neutral = mevBoostTotal - censoring;
-  const nonBoost = Math.max(0, SLOTS_PER_DAY - mevBoostTotal);
-  const totalBlocks = mevBoostTotal + nonBoost;
 
-  const pct = (n: number) => (totalBlocks === 0 ? 0 : (n / totalBlocks) * 100);
+  const censorshipPct =
+    totalDeliveries === 0 ? 0 : (censoring / totalDeliveries) * 100;
 
   return {
-    censorshipPct: pct(censoring),
-    neutralPct: pct(neutral),
-    nonBoostPct: pct(nonBoost),
-    totalBlocks,
+    censorshipPct,
+    neutralPct: totalDeliveries === 0 ? 0 : 100 - censorshipPct,
+    nonBoostPct: 0,
+    totalBlocks: totalDeliveries,
   };
 }
 
-/** Per-relay breakdown (share of MEV-boost blocks) for the leaderboard. */
+/** Per-relay breakdown (share of MEV-boost deliveries) for the leaderboard. */
 export function computeRelayBreakdown(
   relays: RelayPayloadCount[],
 ): RelayBreakdownEntry[] {
-  const mevBoostTotal = relays.reduce((sum, r) => sum + r.numPayloads, 0);
+  const totalDeliveries = relays.reduce((sum, r) => sum + r.numPayloads, 0);
 
   return relays.map((r) => {
     const info = classifyRelay(r.relayId);
@@ -65,7 +69,8 @@ export function computeRelayBreakdown(
       name: info.name,
       posture: info.posture,
       blocks: r.numPayloads,
-      sharePct: mevBoostTotal === 0 ? 0 : (r.numPayloads / mevBoostTotal) * 100,
+      sharePct:
+        totalDeliveries === 0 ? 0 : (r.numPayloads / totalDeliveries) * 100,
       censorshipRate: info.posture === "censoring" ? 100 : 0,
     };
   });
