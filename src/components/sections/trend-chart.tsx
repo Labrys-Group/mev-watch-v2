@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -13,6 +13,7 @@ import {
 import type { TrendPoint, StatsSummary } from "@/lib/queries";
 import { formatPercent, formatDateShort } from "@/lib/format";
 import { Section } from "@/components/section";
+import { CountUp } from "@/components/count-up";
 
 interface TrendChartProps {
   trend: TrendPoint[];
@@ -51,12 +52,42 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
 
+  // Defer mounting the chart until it scrolls into view so the area
+  // sweep animation plays exactly when the reader reaches it.
+  const chartRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = chartRef.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      const raf = requestAnimationFrame(() => setInView(true));
+      return () => cancelAnimationFrame(raf);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setInView(true);
+            observer.disconnect();
+          }
+        }
+      },
+      { threshold: 0.25 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const data = useMemo(() => getSlice(trend, range), [trend, range]);
   const ticks = useMemo(() => sparseTickIndices(data), [data]);
 
   return (
     <Section
-      label="05 / CENSORSHIP OVER TIME"
+      label="02 / CENSORSHIP OVER TIME"
       title={
         <>
           Censorship % since
@@ -76,22 +107,22 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
       <div className="border border-border-labrys bg-background">
         {/* Stat header row */}
         <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted">
-          <div className="p-4 border-r border-border-labrys">
+          <div className="p-4 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             NOW
             <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-foreground mt-1.5 normal-case">
-              {formatPercent(summary.current)}
+              <CountUp value={summary.current} decimals={1} suffix="%" />
             </strong>
           </div>
-          <div className="p-4 border-r border-border-labrys">
+          <div className="p-4 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             PEAK
             <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-warn mt-1.5 normal-case">
-              {formatPercent(summary.peak)}
+              <CountUp value={summary.peak} decimals={1} suffix="%" />
             </strong>
           </div>
-          <div className="p-4">
+          <div className="p-4 transition-colors duration-200 hover:bg-panel-alt">
             TROUGH
             <strong className="block font-sans font-bold text-[22px] tracking-[-0.015em] text-good mt-1.5 normal-case">
-              {formatPercent(summary.trough)}
+              <CountUp value={summary.trough} decimals={1} suffix="%" />
             </strong>
           </div>
         </div>
@@ -106,7 +137,7 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                   key={r}
                   onClick={() => setRange(r)}
                   className={[
-                    "font-mono font-semibold text-[11px] tracking-[0.12em] uppercase px-4 py-2.5 border-0 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
+                    "font-mono font-semibold text-[11px] tracking-[0.12em] uppercase px-4 py-2.5 border-0 cursor-pointer transition-all duration-200 active:translate-y-px focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
                     i < RANGE_LABELS.length - 1 ? "border-r border-border-labrys" : "",
                     range === r
                       ? "bg-accent-brand text-panel"
@@ -123,95 +154,99 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
           </div>
 
           {/* Chart */}
-          <div className="w-full h-[360px] px-4 pt-4 pb-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={data}
-                margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
-              >
-                <defs>
-                  <linearGradient id="accentGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="0%"
-                      stopColor="var(--accent-color)"
-                      stopOpacity={0.55}
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor="var(--accent-color)"
-                      stopOpacity={0}
-                    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="0"
-                  stroke="var(--border-labrys)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="date"
-                  ticks={ticks}
-                  tickFormatter={formatDateShort}
-                  tick={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 10,
-                    fontWeight: 600,
-                    fill: "var(--fg-muted)",
-                    letterSpacing: "0.08em",
-                  }}
-                  axisLine={false}
-                  tickLine={false}
-                  dy={8}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tickFormatter={(v) => `${v}%`}
-                  tick={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 10,
-                    fontWeight: 600,
-                    fill: "var(--fg-muted)",
-                    letterSpacing: "0.08em",
-                  }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={40}
-                  ticks={[0, 25, 50, 75, 100]}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--panel)",
-                    border: "1px solid var(--border-labrys)",
-                    borderRadius: 0,
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    color: "var(--foreground)",
-                    letterSpacing: "0.08em",
-                  }}
-                  labelFormatter={(label) => formatDateShort(String(label))}
-                  formatter={(value) => [
-                    formatPercent(typeof value === "number" ? value : Number(value)),
-                    "Censorship",
-                  ]}
-                  cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="censorshipPct"
-                  stroke="var(--accent-color)"
-                  strokeWidth={2}
-                  fill="url(#accentGradient)"
-                  dot={false}
-                  activeDot={{
-                    r: 4,
-                    stroke: "var(--foreground)",
-                    strokeWidth: 1.5,
-                    fill: "var(--accent-color)",
-                  }}
-                  isAnimationActive={!reduceMotion}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div ref={chartRef} className="w-full h-[360px] px-4 pt-4 pb-2">
+            {inView ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={data}
+                  margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
+                >
+                  <defs>
+                    <linearGradient id="accentGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stopColor="var(--accent-color)"
+                        stopOpacity={0.55}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--accent-color)"
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="0"
+                    stroke="var(--border-labrys)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="date"
+                    ticks={ticks}
+                    tickFormatter={formatDateShort}
+                    tick={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fill: "var(--fg-muted)",
+                      letterSpacing: "0.08em",
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                    dy={8}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tickFormatter={(v) => `${v}%`}
+                    tick={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 10,
+                      fontWeight: 600,
+                      fill: "var(--fg-muted)",
+                      letterSpacing: "0.08em",
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={40}
+                    ticks={[0, 25, 50, 75, 100]}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "var(--panel)",
+                      border: "1px solid var(--border-labrys)",
+                      borderRadius: 0,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 11,
+                      color: "var(--foreground)",
+                      letterSpacing: "0.08em",
+                    }}
+                    labelFormatter={(label) => formatDateShort(String(label))}
+                    formatter={(value) => [
+                      formatPercent(typeof value === "number" ? value : Number(value)),
+                      "Censorship",
+                    ]}
+                    cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="censorshipPct"
+                    stroke="var(--accent-color)"
+                    strokeWidth={2}
+                    fill="url(#accentGradient)"
+                    dot={false}
+                    activeDot={{
+                      r: 4,
+                      stroke: "var(--foreground)",
+                      strokeWidth: 1.5,
+                      fill: "var(--accent-color)",
+                    }}
+                    isAnimationActive={!reduceMotion}
+                    animationDuration={1100}
+                    animationEasing="ease-out"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : null}
           </div>
         </div>
       </div>

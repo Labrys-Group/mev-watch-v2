@@ -36,7 +36,7 @@ export default async function EmbedPage() {
 
   return (
     <main className="bg-background flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md border border-border-labrys bg-panel p-6">
+      <div className="anim-fade-up w-full max-w-md border border-border-labrys bg-panel p-6">
         {/* Wordmark */}
         <p className="font-mono text-xs uppercase tracking-widest text-fg-muted">
           MEV WATCH

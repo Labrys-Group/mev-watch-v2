@@ -10,9 +10,15 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
   const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
 
   return (
-    <div className="bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
+    <div className="relative overflow-hidden bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
+      {/* Ambient sheen — a slow accent glow sweeping the bar */}
+      <div
+        aria-hidden="true"
+        className="status-sheen pointer-events-none absolute inset-y-0 left-0 z-0 w-1/5"
+      />
+
       {/* Inner row: grid of cells */}
-      <div className="grid grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_repeat(5,1fr)]">
+      <div className="relative z-10 grid grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_repeat(5,1fr)]">
         {/* Corner mark — Labrys blurple SVG (decorative) */}
         <div className="flex items-center justify-center px-3.5 py-1.5 border-r border-border-labrys">
           <svg

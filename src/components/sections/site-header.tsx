@@ -15,16 +15,16 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border-labrys">
+    <header className="sticky top-0 z-50 border-b border-border-labrys bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
         {/* Brand lockup — home link */}
         <Link
         href="/"
         aria-label="MEV Watch home"
-        className="flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
+        className="group flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
       >
         {/* Labrys gradient mark */}
-        <div className="w-9 h-9 grid place-items-center shrink-0">
+        <div className="w-9 h-9 grid place-items-center shrink-0 transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-6">
           <svg
             viewBox="0 0 71 70"
             fill="none"
@@ -105,7 +105,8 @@ export function SiteHeader() {
                 key={href}
                 href={href}
                 aria-current={isActive ? "page" : undefined}
-                className={`font-mono text-[11px] tracking-[0.12em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm ${
+                data-active={isActive}
+                className={`nav-underline relative font-mono text-[11px] tracking-[0.12em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm ${
                   isActive
                     ? "text-foreground"
                     : "text-fg-muted hover:text-accent-brand"

@@ -1,5 +1,6 @@
 import { formatPercent } from "@/lib/format";
 import type { BuilderRow } from "@/lib/queries";
+import type { CSSVars } from "@/lib/css";
 import { Section } from "@/components/section";
 
 interface BuilderLeaderboardProps {
@@ -9,7 +10,7 @@ interface BuilderLeaderboardProps {
 export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
   return (
     <Section
-      label="03 / BUILDER LEADERBOARD"
+      label="04 / BUILDER LEADERBOARD"
       title={
         <>
           Ranked by
@@ -60,16 +61,17 @@ export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
               return (
                 <tr
                   key={row.builderId}
-                  className="border-b border-border-labrys transition-colors duration-[120ms] hover:bg-accent-alt/15 group"
+                  className="reveal-row border-b border-border-labrys transition-colors duration-200 hover:bg-accent-alt/15 group"
+                  style={{ "--delay": `${index * 45}ms` } as CSSVars}
                 >
                   {/* Rank */}
-                  <td className="px-3 py-3.5 align-middle font-mono text-[13px] text-fg-muted tabular-nums">
+                  <td className="px-3 py-3.5 align-middle font-mono text-[13px] text-fg-muted tabular-nums transition-colors duration-200 group-hover:text-accent-brand">
                     {rank}
                   </td>
 
                   {/* Builder id */}
                   <td className="px-3 py-3.5 align-middle max-w-[260px]">
-                    <div className="font-sans font-bold text-[15px] tracking-[-0.01em] text-foreground leading-snug break-words">
+                    <div className="font-sans font-bold text-[15px] tracking-[-0.01em] text-foreground leading-snug break-words transition-colors duration-200 group-hover:text-accent-brand">
                       {row.builderId}
                     </div>
                   </td>
@@ -80,8 +82,13 @@ export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
                       {/* Mini bar */}
                       <span className="relative inline-block w-[140px] h-1.5 bg-foreground/5 shrink-0 align-middle">
                         <span
-                          className="absolute left-0 top-0 bottom-0 bg-neutral-relay"
-                          style={{ width: `${Math.min(row.sharePct, 100)}%` }}
+                          className="grow-bar absolute left-0 top-0 bottom-0 bg-neutral-relay"
+                          style={
+                            {
+                              width: `${Math.min(row.sharePct, 100)}%`,
+                              "--delay": `${index * 45 + 160}ms`,
+                            } as CSSVars
+                          }
                           aria-hidden="true"
                         />
                       </span>

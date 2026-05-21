@@ -1,5 +1,6 @@
 import { FAQ_ITEMS } from "@/config/faq";
 import { Section } from "@/components/section";
+import type { CSSVars } from "@/lib/css";
 
 /**
  * FAQ section — server component, pure CSS accordion via native <details>/<summary>.
@@ -10,7 +11,7 @@ import { Section } from "@/components/section";
 export function Faq() {
   return (
     <Section
-      label="07 / FAQ"
+      label="06 / FAQ"
       title="Frequently asked."
       aside="QUICK ANSWERS // METHODOLOGY LINKED"
     >
@@ -24,18 +25,19 @@ export function Faq() {
             <details
               key={item.q}
               className={[
-                "group p-[18px_20px] bg-panel",
+                "reveal-item group p-[18px_20px] bg-panel transition-colors duration-200 hover:bg-panel-alt/60",
                 isLastRow ? "" : "border-b border-border-labrys",
                 isRightCol ? "" : "md:border-r md:border-border-labrys",
               ]
                 .filter(Boolean)
                 .join(" ")}
+              style={{ "--delay": `${i * 55}ms` } as CSSVars}
             >
-              <summary className="cursor-pointer list-none flex justify-between items-start gap-3 font-sans font-bold text-[15px] text-foreground tracking-[-0.01em] [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm">
+              <summary className="cursor-pointer list-none flex justify-between items-start gap-3 font-sans font-bold text-[15px] text-foreground tracking-[-0.01em] transition-colors duration-200 group-hover:text-accent-brand [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm">
                 <span>{item.q}</span>
                 {/* [+] closed, [-] open — toggled via CSS */}
                 <span
-                  className="font-mono text-[11px] text-accent-brand shrink-0 mt-[2px] transition-all before:content-['[+]'] group-open:before:content-['[-]']"
+                  className="font-mono text-[11px] text-accent-brand shrink-0 mt-[2px] transition-all duration-200 group-hover:scale-125 before:content-['[+]'] group-open:before:content-['[-]']"
                   aria-hidden="true"
                 />
               </summary>

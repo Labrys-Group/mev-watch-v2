@@ -1,4 +1,6 @@
 import { formatPercent } from "@/lib/format";
+import { CountUp } from "@/components/count-up";
+import type { CSSVars } from "@/lib/css";
 import type { StatsSummary } from "@/lib/queries";
 
 interface HeroProps {
@@ -8,8 +10,10 @@ interface HeroProps {
 export function Hero({ summary }: HeroProps) {
   const drop = (summary.peak - summary.current).toFixed(1);
 
-  const trendWord = summary.current <= summary.peak - 5 ? "FALLING" : "HIGH";
-  const trendColor = summary.current <= summary.peak - 5 ? "text-good" : "text-warn";
+  const isFalling = summary.current <= summary.peak - 5;
+  const trendWord = isFalling ? "FALLING" : "HIGH";
+  const trendColor = isFalling ? "text-good" : "text-warn";
+  const trendGlow = isFalling ? "glow-good" : "glow-warn";
 
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-6 md:p-10">
@@ -21,30 +25,49 @@ export function Hero({ summary }: HeroProps) {
         {/* Left column — headline & stat */}
         <div>
           {/* Tag line */}
-          <div className="inline-flex items-center gap-2.5 font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-6">
+          <div
+            className="anim-fade-up inline-flex items-center gap-2.5 font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-6"
+            style={{ "--delay": "80ms" } as CSSVars}
+          >
             <span aria-hidden="true">{"// "}</span>
             PUBLIC TRANSPARENCY TOOL
           </div>
 
-          {/* Display headline */}
+          {/* Display headline — masked line-by-line rise */}
           <h1
             className="font-sans font-extrabold leading-[0.95] tracking-[-0.035em] m-0 text-foreground"
             style={{ fontSize: "clamp(3rem, 8vw, 5rem)" }}
           >
-            CENSORSHIP
-            <br />
-            IS
-            <br />
-            <span className={trendColor}>{trendWord}</span>
+            <span className="line-mask block">
+              <span className="line-rise" style={{ "--delay": "160ms" } as CSSVars}>
+                CENSORSHIP
+              </span>
+            </span>
+            <span className="line-mask block">
+              <span className="line-rise" style={{ "--delay": "260ms" } as CSSVars}>
+                IS
+              </span>
+            </span>
+            <span className="line-mask block">
+              <span
+                className={`line-rise ${trendColor} ${trendGlow}`}
+                style={{ "--delay": "360ms" } as CSSVars}
+              >
+                {trendWord}
+              </span>
+            </span>
           </h1>
 
           {/* Stat line */}
-          <div className="mt-6 font-mono text-sm tracking-[0.04em] leading-snug text-fg-muted">
+          <div
+            className="anim-fade-up mt-6 font-mono text-sm tracking-[0.04em] leading-snug text-fg-muted"
+            style={{ "--delay": "540ms" } as CSSVars}
+          >
             <span
               className="font-sans font-extrabold tracking-tight text-foreground"
               style={{ fontSize: "clamp(2rem, 4vw, 2.5rem)" }}
             >
-              {formatPercent(summary.current)}
+              <CountUp value={summary.current} decimals={1} suffix="%" />
             </span>{" "}
             <span className="text-good font-semibold">▼</span>{" "}
             <span>
@@ -58,7 +81,10 @@ export function Hero({ summary }: HeroProps) {
         </div>
 
         {/* Right column — terminal lede box */}
-        <div className="relative font-mono text-[13px] leading-[1.65] text-fg-muted max-w-sm lg:max-w-none p-5 border border-border-labrys bg-panel">
+        <div
+          className="anim-fade-up relative font-mono text-[13px] leading-[1.65] text-fg-muted max-w-sm lg:max-w-none p-5 border border-border-labrys bg-panel"
+          style={{ "--delay": "660ms" } as CSSVars}
+        >
           {/* $ cat ./readme.md label */}
           <span
             className="absolute -top-[9px] left-3.5 px-2 bg-background font-mono text-[10px] tracking-[0.1em] text-accent-brand"
@@ -74,6 +100,10 @@ export function Hero({ summary }: HeroProps) {
               through them
             </strong>{" "}
             — and shows that share falling over time.
+            <span
+              aria-hidden="true"
+              className="cursor-blink ml-1 inline-block h-[1.05em] w-[7px] translate-y-[0.2em] bg-accent-brand align-baseline"
+            />
           </p>
         </div>
       </div>

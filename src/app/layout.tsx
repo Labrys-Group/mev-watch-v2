@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Spline_Sans_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ScrollProgress } from "@/components/scroll-progress";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -27,7 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${manrope.variable} ${splineSansMono.variable}`}>
-        <ThemeProvider>{children}</ThemeProvider>
+        {/* Without JS the scroll observer never fires — keep content visible. */}
+        <noscript>
+          <style>{`.reveal{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+        <ThemeProvider>
+          {/* Fixed page-wide blueprint grid, behind all content */}
+          <div className="bg-grid" aria-hidden="true" />
+          <ScrollProgress />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

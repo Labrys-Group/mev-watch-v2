@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
+import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
   title: "API | MEV Watch",
@@ -10,11 +11,11 @@ export const metadata: Metadata = {
 
 export default function ApiDocsPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-[900px] px-6 py-12">
           {/* Page title */}
-          <div className="mb-10 border-b border-border-labrys pb-8">
+          <Reveal className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// api reference"}
             </p>
@@ -30,7 +31,7 @@ export default function ApiDocsPage() {
               , cached approximately hourly, and updated with fresh data once
               per day.
             </p>
-          </div>
+          </Reveal>
 
           {/* Base URL callout */}
           <div className="border border-border-labrys bg-panel px-5 py-4 mb-10 flex items-center gap-4">
@@ -43,7 +44,7 @@ export default function ApiDocsPage() {
           </div>
 
           {/* Endpoint 1 — /api/v1/summary */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <div className="flex items-baseline gap-3 mb-3">
               <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
                 GET
@@ -76,10 +77,10 @@ export default function ApiDocsPage() {
   }
 }`}
             </pre>
-          </section>
+          </Reveal>
 
           {/* Endpoint 2 — /api/v1/trend */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <div className="flex items-baseline gap-3 mb-3">
               <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
                 GET
@@ -107,10 +108,10 @@ export default function ApiDocsPage() {
   ]
 }`}
             </pre>
-          </section>
+          </Reveal>
 
           {/* Endpoint 3 — /api/v1/relays */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <div className="flex items-baseline gap-3 mb-3">
               <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-accent-brand border border-accent-brand px-2 py-0.5">
                 GET
@@ -149,10 +150,10 @@ export default function ApiDocsPage() {
   ]
 }`}
             </pre>
-          </section>
+          </Reveal>
 
           {/* Notes */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               Notes
             </h2>
@@ -238,7 +239,7 @@ export default function ApiDocsPage() {
                 </div>
               </li>
             </ul>
-          </section>
+          </Reveal>
 
           {/* Footer note */}
           <div className="py-8">

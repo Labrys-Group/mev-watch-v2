@@ -26,7 +26,7 @@ const CONNECT_LINKS = [
 ] as const;
 
 const LINK_CLASS =
-  "block font-mono text-[12px] tracking-[0.06em] text-fg-muted mb-2 hover:text-accent-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm";
+  "block w-fit font-mono text-[12px] tracking-[0.06em] text-fg-muted mb-2 hover:text-accent-brand hover:translate-x-[3px] transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm";
 
 function FooterLinkList({
   heading,

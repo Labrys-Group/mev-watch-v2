@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
+import { Reveal } from "@/components/reveal";
+import type { CSSVars } from "@/lib/css";
 import { getLastRefresh, getRecentRefreshes } from "@/lib/queries";
 import { getLatestStats } from "@/lib/queries";
 import { formatRelativeTime } from "@/lib/format";
@@ -19,11 +21,11 @@ export default async function StatusPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-[900px] px-6 py-12">
           {/* Page title */}
-          <div className="mb-10 border-b border-border-labrys pb-8">
+          <Reveal className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// status"}
             </p>
@@ -35,10 +37,10 @@ export default async function StatusPage() {
               when it last ran, what data it produced, and a log of recent
               ingestion runs.
             </p>
-          </div>
+          </Reveal>
 
           {/* Current status block */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-6">
               Current status
             </h2>
@@ -108,10 +110,10 @@ export default async function StatusPage() {
                 </p>
               </div>
             )}
-          </section>
+          </Reveal>
 
           {/* Recent refresh runs */}
-          <section className="py-8">
+          <Reveal className="py-8">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-6">
               Recent refresh runs
             </h2>
@@ -144,11 +146,14 @@ export default async function StatusPage() {
                 {recentRefreshes.map((run, idx) => (
                   <div
                     key={idx}
-                    className={`grid grid-cols-[2fr_1fr_1fr_3fr] transition-colors hover:bg-panel-alt ${
+                    className={`reveal-item grid grid-cols-[2fr_1fr_1fr_3fr] transition-colors duration-200 hover:bg-panel-alt ${
                       idx < recentRefreshes.length - 1
                         ? "border-b border-border-labrys"
                         : ""
                     }`}
+                    style={
+                      { "--delay": `${Math.min(idx, 16) * 45}ms` } as CSSVars
+                    }
                   >
                     <div className="font-mono text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                       {formatRelativeTime(run.ranAt)}
@@ -174,7 +179,7 @@ export default async function StatusPage() {
                 ))}
               </div>
             )}
-          </section>
+          </Reveal>
       </main>
       <SiteFooter />
     </div>

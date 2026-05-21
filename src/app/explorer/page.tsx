@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
+import { Reveal } from "@/components/reveal";
 import { getLeaderboard } from "@/lib/queries";
 import { formatPercent } from "@/lib/format";
 import { RELAYS } from "@/config/relays";
+import type { CSSVars } from "@/lib/css";
 
 export const metadata: Metadata = {
   title: "Relays | MEV Watch",
@@ -19,11 +21,11 @@ export default async function ExplorerPage() {
   const leaderboard = await getLeaderboard();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-[1280px] px-6">
           {/* Page heading */}
-          <div className="py-12 border-b border-border-labrys">
+          <Reveal className="py-12 border-b border-border-labrys">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// relay explorer"}
             </p>
@@ -43,10 +45,10 @@ export default async function ExplorerPage() {
               </Link>
               .
             </p>
-          </div>
+          </Reveal>
 
           {/* ── Section 1 — Live leaderboard ── */}
-          <section className="py-12 border-b border-border-labrys">
+          <Reveal className="py-12 border-b border-border-labrys">
             <div className="flex justify-between items-end mb-7">
               <div>
                 <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
@@ -106,16 +108,17 @@ export default async function ExplorerPage() {
                     return (
                       <tr
                         key={row.relayId}
-                        className="border-b border-border-labrys transition-colors duration-[120ms] hover:bg-accent-alt/15"
+                        className="reveal-row group border-b border-border-labrys transition-colors duration-200 hover:bg-accent-alt/15"
+                        style={{ "--delay": `${index * 40}ms` } as CSSVars}
                       >
                         {/* Rank */}
-                        <td className="px-3 py-3.5 align-middle font-mono text-[13px] text-fg-muted tabular-nums">
+                        <td className="px-3 py-3.5 align-middle font-mono text-[13px] text-fg-muted tabular-nums transition-colors duration-200 group-hover:text-accent-brand">
                           {rank}
                         </td>
 
                         {/* Relay name + id */}
                         <td className="px-3 py-3.5 align-middle">
-                          <div className="font-sans font-bold text-[15px] tracking-[-0.01em] text-foreground leading-snug">
+                          <div className="font-sans font-bold text-[15px] tracking-[-0.01em] text-foreground leading-snug transition-colors duration-200 group-hover:text-accent-brand">
                             {row.name}
                           </div>
                           <div className="font-mono text-[11px] text-fg-muted mt-0.5 leading-tight">
@@ -146,12 +149,15 @@ export default async function ExplorerPage() {
                             {/* Mini bar */}
                             <span className="relative inline-block w-[140px] h-1.5 bg-foreground/5 shrink-0 align-middle">
                               <span
-                                className={`absolute left-0 top-0 bottom-0 ${
+                                className={`grow-bar absolute left-0 top-0 bottom-0 ${
                                   isCensoring ? "bg-ofac" : "bg-neutral-relay"
                                 }`}
-                                style={{
-                                  width: `${Math.min(row.sharePct, 100)}%`,
-                                }}
+                                style={
+                                  {
+                                    width: `${Math.min(row.sharePct, 100)}%`,
+                                    "--delay": `${index * 40 + 150}ms`,
+                                  } as CSSVars
+                                }
                                 aria-hidden="true"
                               />
                             </span>
@@ -180,10 +186,10 @@ export default async function ExplorerPage() {
                 )}
               </tbody>
             </table>
-          </section>
+          </Reveal>
 
           {/* ── Section 2 — Relay directory ── */}
-          <section className="py-12 border-b border-border-labrys">
+          <Reveal className="py-12 border-b border-border-labrys">
             <div className="flex justify-between items-end mb-7">
               <div>
                 <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
@@ -246,7 +252,10 @@ export default async function ExplorerPage() {
                 return (
                   <div
                     key={relay.id}
-                    className={`grid grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt ${!isLast ? "border-b border-border-labrys" : ""}`}
+                    className={`reveal-item grid grid-cols-[1fr_auto_2fr] transition-colors duration-200 hover:bg-panel-alt ${!isLast ? "border-b border-border-labrys" : ""}`}
+                    style={
+                      { "--delay": `${Math.min(idx, 14) * 35}ms` } as CSSVars
+                    }
                   >
                     <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                       {relay.name}
@@ -284,7 +293,7 @@ export default async function ExplorerPage() {
               are absent from this list are also treated as unknown and excluded
               from the censoring total.
             </p>
-          </section>
+          </Reveal>
 
           {/* Footer note */}
           <div className="py-8">

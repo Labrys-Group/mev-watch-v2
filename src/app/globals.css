@@ -13,8 +13,9 @@
   --foreground:    #0D0E16;
   --fg-muted:      #0D0E1680;
   --border-labrys: #0D0E1614;
+  --grid-line:     #0D0E1626;
   --nav-item:      #0D0E1680;
-  --accent-color: #00EF9F;
+  --accent-color: #00A86B;
   --accent-alt-color: #4F0CE5;
 
   /* MEV Watch semantic colours — light mode (pastel) */
@@ -52,6 +53,7 @@
   --foreground:    #FFFFFF;
   --fg-muted:      #FFFFFF80;
   --border-labrys: #FFFFFF14;
+  --grid-line:     #FFFFFF1F;
   --nav-item:      #FFFFFF80;
   --accent-color: #4F0CE5;
   --accent-alt-color: #00EF9F;
@@ -177,4 +179,182 @@ details::details-content {
 
 details[open]::details-content {
   height: auto;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Motion system
+   Entrance + scroll-reveal primitives. The resting state of every
+   element is "fully visible", so the page degrades gracefully with
+   JavaScript disabled and collapses to no motion under
+   prefers-reduced-motion. Animations that fire on reveal use a
+   `backwards` fill so the hidden frame is held only during the
+   stagger delay, never pinned afterwards.
+   ────────────────────────────────────────────────────────────── */
+
+@keyframes mw-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes mw-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes mw-rise {
+  from { transform: translateY(108%); }
+  to   { transform: translateY(0); }
+}
+@keyframes mw-bar-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes mw-tile-pop {
+  0%   { opacity: 0; transform: scale(0.2); }
+  62%  { opacity: 1; transform: scale(1.14); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes mw-blink {
+  0%, 46%   { opacity: 1; }
+  54%, 100% { opacity: 0; }
+}
+@keyframes mw-sheen {
+  0%   { transform: translateX(-140%); }
+  100% { transform: translateX(560%); }
+}
+/* Section-level scroll reveal — toggled by the <Reveal> client component. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Load-time entrance utilities — used above the fold (hero). */
+.anim-fade-up {
+  animation: mw-fade-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+.line-mask {
+  overflow: hidden;
+  padding-bottom: 0.04em;
+}
+.line-rise {
+  display: block;
+  animation: mw-rise 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* Blinking terminal cursor. */
+.cursor-blink {
+  animation: mw-blink 1.15s steps(1, end) infinite;
+}
+
+/* Secondary animations — fire once the parent section is revealed. */
+.grow-bar {
+  transform-origin: left center;
+}
+.is-visible .grow-bar {
+  animation: mw-bar-grow 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--delay, 140ms);
+}
+.is-visible .reveal-item {
+  animation: mw-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+.is-visible .reveal-row {
+  animation: mw-fade-in 0.5s ease-out backwards;
+  animation-delay: var(--delay, 0ms);
+}
+.is-visible .tile {
+  animation: mw-tile-pop 0.52s cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* Page-wide blueprint grid — fixed behind all content, radially
+   feathered so it dissolves inward into the background colour. */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 85% 80% at 50% 42%,
+    transparent 34%,
+    #000 92%
+  );
+  mask-image: radial-gradient(
+    ellipse 85% 80% at 50% 42%,
+    transparent 34%,
+    #000 92%
+  );
+}
+
+/* Ambient sheen that sweeps the status bar. */
+.status-sheen {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--accent-color) 16%, transparent),
+    transparent
+  );
+  animation: mw-sheen 9s ease-in-out infinite;
+}
+
+/* Soft glow for the hero verdict word. */
+.glow-warn {
+  text-shadow: 0 0 30px color-mix(in oklch, var(--warn) 60%, transparent);
+}
+.glow-good {
+  text-shadow: 0 0 30px color-mix(in oklch, var(--good) 60%, transparent);
+}
+
+/* Animated underline for nav links. */
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1.5px;
+  background: var(--accent-color);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-underline:hover::after,
+.nav-underline[data-active="true"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .anim-fade-up,
+  .line-rise,
+  .cursor-blink,
+  .status-sheen,
+  .is-visible .grow-bar,
+  .is-visible .reveal-item,
+  .is-visible .reveal-row,
+  .is-visible .tile {
+    animation: none !important;
+  }
+  .nav-underline::after {
+    transition: none !important;
+  }
 }

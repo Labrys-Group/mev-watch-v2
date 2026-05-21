@@ -1,12 +1,12 @@
 import { StatusBar } from "@/components/sections/status-bar";
 import { SiteHeader } from "@/components/sections/site-header";
+import { Reveal } from "@/components/reveal";
 import { Hero } from "@/components/sections/hero";
 import { Composition } from "@/components/sections/composition";
 import { Leaderboard } from "@/components/sections/leaderboard";
 import { BuilderLeaderboard } from "@/components/sections/builder-leaderboard";
 import { WhatToDo } from "@/components/sections/what-to-do";
 import { TrendChart } from "@/components/sections/trend-chart";
-import { CompositionGrid } from "@/components/sections/composition-grid";
 import { Faq } from "@/components/sections/faq";
 import { SiteFooter } from "@/components/sections/site-footer";
 import {
@@ -42,7 +42,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <StatusBar
         latestDate={latest.date}
         censorshipPct={latest.censorshipPct}
@@ -52,13 +52,24 @@ export default async function Home() {
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="space-y-6 py-6">
           <Hero summary={summary} />
-          <Composition latest={latest} />
-          <Leaderboard rows={leaderboard} />
-          <BuilderLeaderboard rows={builders} />
-          <WhatToDo />
-          <TrendChart trend={trend} summary={summary} />
-          <CompositionGrid latest={latest} />
-          <Faq />
+          <Reveal>
+            <Composition latest={latest} />
+          </Reveal>
+          <Reveal>
+            <TrendChart trend={trend} summary={summary} />
+          </Reveal>
+          <Reveal>
+            <Leaderboard rows={leaderboard} />
+          </Reveal>
+          <Reveal>
+            <BuilderLeaderboard rows={builders} />
+          </Reveal>
+          <Reveal>
+            <WhatToDo />
+          </Reveal>
+          <Reveal>
+            <Faq />
+          </Reveal>
         </div>
       </div>
       <SiteFooter />

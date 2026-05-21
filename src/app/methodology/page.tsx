@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
+import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
   title: "Methodology | MEV Watch",
@@ -10,11 +11,11 @@ export const metadata: Metadata = {
 
 export default function MethodologyPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-[900px] px-6 py-12">
           {/* Page title */}
-          <div className="mb-10 border-b border-border-labrys pb-8">
+          <Reveal className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// methodology"}
             </p>
@@ -27,10 +28,10 @@ export default function MethodologyPage() {
               page explains what that means, where the data comes from, how the
               metric is calculated, and where the approach falls short.
             </p>
-          </div>
+          </Reveal>
 
           {/* Section 1 — What MEV Watch measures */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               What MEV Watch measures
             </h2>
@@ -53,10 +54,10 @@ export default function MethodologyPage() {
               directly, but relay market share is a reliable leading indicator of
               censorship pressure on Ethereum&apos;s block production pipeline.
             </p>
-          </section>
+          </Reveal>
 
           {/* Section 2 — MEV-Boost and relays */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               MEV-Boost and relays
             </h2>
@@ -84,10 +85,10 @@ export default function MethodologyPage() {
               relays is a proxy for how often censoring infrastructure wins the
               block auction.
             </p>
-          </section>
+          </Reveal>
 
           {/* Section 3 — Data source */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               Data source
             </h2>
@@ -123,10 +124,10 @@ export default function MethodologyPage() {
               payload to a requesting validator. This is the raw figure used to
               compute the censorship metric.
             </p>
-          </section>
+          </Reveal>
 
           {/* Section 4 — The metric */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               The metric
             </h2>
@@ -171,10 +172,10 @@ export default function MethodologyPage() {
               same underlying block. The ratio is consistent because any
               double-counting affects both sides equally.
             </p>
-          </section>
+          </Reveal>
 
           {/* Section 5 — OFAC classification */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               OFAC relay classification
             </h2>
@@ -345,10 +346,10 @@ export default function MethodologyPage() {
               <span className="font-mono">unknown</span> and excluded from the
               censoring total.
             </p>
-          </section>
+          </Reveal>
 
           {/* Section 6 — Limitations */}
-          <section className="py-8 border-b border-border-labrys">
+          <Reveal className="py-8 border-b border-border-labrys">
             <h2 className="font-sans font-bold text-2xl tracking-tight text-foreground mb-4">
               Limitations
             </h2>
@@ -429,7 +430,7 @@ export default function MethodologyPage() {
                 </div>
               </li>
             </ul>
-          </section>
+          </Reveal>
 
           {/* Footer note */}
           <div className="py-8">

@@ -9,7 +9,7 @@ const TWEET_TEXT = encodeURIComponent(
 const TWEET_URL = encodeURIComponent("https://mevwatch.info");
 
 const ITEM_CLASS =
-  "flex-1 py-3.5 px-3 font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted text-center transition-all duration-[120ms] hover:bg-accent-brand hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset";
+  "flex-1 py-3.5 px-3 font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted text-center transition-all duration-200 hover:bg-accent-brand hover:text-foreground hover:tracking-[0.16em] active:translate-y-px focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset";
 
 export function ShareStrip() {
   const [copyLinkLabel, setCopyLinkLabel] = useState<"Copy link" | "Copied!">(

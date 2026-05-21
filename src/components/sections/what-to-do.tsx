@@ -1,4 +1,5 @@
 import { Section } from "@/components/section";
+import type { CSSVars } from "@/lib/css";
 import { ShareStrip } from "./share-strip";
 
 const STEPS = [
@@ -27,7 +28,7 @@ const STEPS = [
 export function WhatToDo() {
   return (
     <Section
-      label="04 / WHAT TO DO"
+      label="05 / WHAT TO DO"
       title={
         <>
           Keep Ethereum
@@ -59,12 +60,13 @@ export function WhatToDo() {
 
         {/* Right side — validator steps */}
         <div className="p-10 flex flex-col justify-center bg-panel-alt">
-          {STEPS.map((step) => (
+          {STEPS.map((step, i) => (
             <div
               key={step.n}
-              className="flex gap-3.5 py-3.5 border-b border-border-labrys last:border-b-0 font-mono text-[13px] items-start"
+              className="reveal-item group flex gap-3.5 py-3.5 border-b border-border-labrys last:border-b-0 font-mono text-[13px] items-start"
+              style={{ "--delay": `${i * 90}ms` } as CSSVars}
             >
-              <span className="font-mono text-[11px] text-accent-alt tracking-[0.1em] w-8 shrink-0 pt-[1px]">
+              <span className="font-mono text-[11px] text-accent-alt tracking-[0.1em] w-8 shrink-0 pt-[1px] transition-transform duration-200 group-hover:translate-x-0.5">
                 {step.n}
               </span>
               <span className="text-fg-muted leading-[1.55]">
