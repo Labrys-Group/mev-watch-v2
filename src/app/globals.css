@@ -141,10 +141,20 @@
   }
 }
 
-/* Terminal isometric grid background — theme aware */
-.terminal-grid {
+/* Contained, faded grid texture — used as a hero accent, never page-wide. */
+.faded-grid {
   background-image:
     linear-gradient(var(--border-labrys) 1px, transparent 1px),
     linear-gradient(90deg, var(--border-labrys) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-size: 30px 30px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 75% 70% at 50% 28%,
+    #000 0%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    ellipse 75% 70% at 50% 28%,
+    #000 0%,
+    transparent 78%
+  );
 }
