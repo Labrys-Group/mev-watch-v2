@@ -48,8 +48,8 @@ export default async function Home() {
         censorshipPct={latest.censorshipPct}
         lastRefresh={lastRefresh?.ranAt ?? null}
       />
+      <SiteHeader />
       <div className="mx-auto max-w-[1280px] px-6">
-        <SiteHeader />
         <div className="space-y-6 py-6">
           <Hero summary={summary} />
           <Composition latest={latest} />

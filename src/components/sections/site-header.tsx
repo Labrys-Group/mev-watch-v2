@@ -15,9 +15,10 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 bg-background flex justify-between items-center py-4 border-b border-border-labrys">
-      {/* Brand lockup — home link */}
-      <Link
+    <header className="sticky top-0 z-50 bg-background border-b border-border-labrys">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
+        {/* Brand lockup — home link */}
+        <Link
         href="/"
         aria-label="MEV Watch home"
         className="flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
@@ -116,6 +117,7 @@ export function SiteHeader() {
           })}
         </nav>
         <ThemeToggle />
+      </div>
       </div>
     </header>
   );

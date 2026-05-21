@@ -20,10 +20,8 @@ export default async function ExplorerPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[1280px] px-6">
-        <SiteHeader />
-
-        <main>
+      <SiteHeader />
+      <main className="mx-auto max-w-[1280px] px-6">
           {/* Page heading */}
           <div className="py-12 border-b border-border-labrys">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
@@ -307,10 +305,8 @@ export default async function ExplorerPage() {
               .
             </p>
           </div>
-        </main>
-
-        <SiteFooter />
-      </div>
+      </main>
+      <SiteFooter />
     </div>
   );
 }

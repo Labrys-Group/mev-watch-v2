@@ -11,10 +11,8 @@ export const metadata: Metadata = {
 export default function ApiDocsPage() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[900px] px-6">
-        <SiteHeader />
-
-        <main className="py-12">
+      <SiteHeader />
+      <main className="mx-auto max-w-[900px] px-6 py-12">
           {/* Page title */}
           <div className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
@@ -258,10 +256,8 @@ export default function ApiDocsPage() {
               open-source.
             </p>
           </div>
-        </main>
-
-        <SiteFooter />
-      </div>
+      </main>
+      <SiteFooter />
     </div>
   );
 }
