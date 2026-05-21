@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { dailyStats, relayDailyStats, refreshLog } from "@/lib/db/schema";
+import { dailyStats, relayDailyStats, refreshLog, builderDailyStats } from "@/lib/db/schema";
 import { classifyRelay } from "@/config/relays";
 
 export interface TrendPoint {
@@ -101,6 +101,35 @@ export async function getLeaderboard(): Promise<LeaderboardRow[]> {
       relayId: r.relayKey,
       name: classifyRelay(r.relayKey).name,
       posture: classifyRelay(r.relayKey).posture,
+      blocks: r.blocks,
+      sharePct: r.sharePct,
+    }))
+    .sort((a, b) => b.sharePct - a.sharePct);
+}
+
+export interface BuilderRow {
+  builderId: string;
+  blocks: number;
+  sharePct: number;
+}
+
+/** The most recent day's per-builder leaderboard, sorted by share descending. */
+export async function getBuilderLeaderboard(): Promise<BuilderRow[]> {
+  const [latest] = await db
+    .select({ date: builderDailyStats.date })
+    .from(builderDailyStats)
+    .orderBy(desc(builderDailyStats.date))
+    .limit(1);
+  if (!latest) return [];
+
+  const rows = await db
+    .select()
+    .from(builderDailyStats)
+    .where(eq(builderDailyStats.date, latest.date));
+
+  return rows
+    .map((r) => ({
+      builderId: r.builderKey,
       blocks: r.blocks,
       sharePct: r.sharePct,
     }))
