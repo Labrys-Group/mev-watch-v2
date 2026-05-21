@@ -1,0 +1,52 @@
+import { db } from "../db";
+import { dailyStats, relayDailyStats } from "../db/schema";
+import { computeDailyStats, computeRelayBreakdown } from "../metrics";
+import type { DayRelayStats } from "../data-source/types";
+
+/**
+ * Compute metrics for one day of relay stats and upsert them into the snapshot
+ * tables. Idempotent — re-running for the same date overwrites that day's rows.
+ */
+export async function persistDailySnapshot(day: DayRelayStats): Promise<void> {
+  const stats = computeDailyStats(day.relays);
+  const breakdown = computeRelayBreakdown(day.relays);
+
+  await db
+    .insert(dailyStats)
+    .values({
+      date: day.date,
+      censorshipPct: stats.censorshipPct,
+      neutralPct: stats.neutralPct,
+      nonBoostPct: stats.nonBoostPct,
+      totalBlocks: stats.totalBlocks,
+    })
+    .onConflictDoUpdate({
+      target: dailyStats.date,
+      set: {
+        censorshipPct: stats.censorshipPct,
+        neutralPct: stats.neutralPct,
+        nonBoostPct: stats.nonBoostPct,
+        totalBlocks: stats.totalBlocks,
+      },
+    });
+
+  for (const relay of breakdown) {
+    await db
+      .insert(relayDailyStats)
+      .values({
+        relayKey: relay.relayId,
+        date: day.date,
+        blocks: relay.blocks,
+        sharePct: relay.sharePct,
+        censorshipRate: relay.censorshipRate,
+      })
+      .onConflictDoUpdate({
+        target: [relayDailyStats.relayKey, relayDailyStats.date],
+        set: {
+          blocks: relay.blocks,
+          sharePct: relay.sharePct,
+          censorshipRate: relay.censorshipRate,
+        },
+      });
+  }
+}
