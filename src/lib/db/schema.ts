@@ -13,6 +13,9 @@ export const dailyStats = sqliteTable("daily_stats", {
   neutralPct: real("neutral_pct").notNull(),
   nonBoostPct: real("non_boost_pct").notNull(),
   totalBlocks: integer("total_blocks").notNull(),
+  /** Total execution-layer blocks proposed that UTC day. 0 = not yet
+   *  backfilled (a real day always has ~7,150+). */
+  totalChainBlocks: integer("total_chain_blocks").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .$defaultFn(() => new Date()),
