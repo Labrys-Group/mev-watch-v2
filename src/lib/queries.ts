@@ -6,6 +6,9 @@ import { classifyRelay } from "@/config/relays";
 export interface TrendPoint {
   date: string;
   censorshipPct: number;
+  /** Non-MEV-boost share of all chain blocks (%). Absent on points predating
+   *  the block-count backfill — treat as 0. */
+  nonBoostPct?: number;
 }
 
 export interface StatsSummary {
@@ -81,7 +84,11 @@ export async function getTrend(): Promise<TrendPoint[]> {
     "getTrend",
     async () =>
       db
-        .select({ date: dailyStats.date, censorshipPct: dailyStats.censorshipPct })
+        .select({
+          date: dailyStats.date,
+          censorshipPct: dailyStats.censorshipPct,
+          nonBoostPct: dailyStats.nonBoostPct,
+        })
         .from(dailyStats)
         .orderBy(dailyStats.date),
     [],
