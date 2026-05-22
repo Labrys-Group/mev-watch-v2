@@ -279,6 +279,30 @@ details[open]::details-content {
   animation-delay: var(--delay, 0ms);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Epoch ledger — live per-slot composition grid.
+   `.epoch-tile` animates on mount; React remounts a tile (via a
+   category-keyed key) only when its slot newly fills, so each new
+   slot pops once. Rows collapse/expand via a grid-template-rows
+   transition so the epoch shift needs no measured pixel heights.
+   ────────────────────────────────────────────────────────────── */
+.epoch-tile {
+  animation: mw-tile-pop 0.52s cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+.epoch-row-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.epoch-row-wrap--collapsed {
+  grid-template-rows: 0fr;
+}
+.epoch-row-wrap > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Page-wide blueprint grid — fixed behind all content, radially
    feathered so it dissolves inward into the background colour. */
 .bg-grid {
@@ -354,8 +378,12 @@ details[open]::details-content {
   .is-visible .grow-bar,
   .is-visible .reveal-item,
   .is-visible .reveal-row,
-  .is-visible .tile {
+  .is-visible .tile,
+  .epoch-tile {
     animation: none !important;
+  }
+  .epoch-row-wrap {
+    transition: none !important;
   }
   .nav-underline::after {
     transition: none !important;
