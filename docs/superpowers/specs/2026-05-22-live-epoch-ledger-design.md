@@ -55,6 +55,12 @@ This is one deliberate departure from the v1 rule "pages read only snapshots,
 never the external API" (CLAUDE.md) — consciously traded for true-live data. The
 departure is contained to the epoch ledger; every other section is unchanged.
 
+> **Revised 2026-05-22:** This subsystem is now DB-backed. The `recent_blocks`
+> table is the source of truth; the `/api/epochs` route ingests into it and
+> reads from it, and the homepage server-render is a pure DB read. The
+> "departure from the v1 rule" described above no longer applies. See
+> `2026-05-22-epoch-ledger-db-backed-design.md`.
+
 ## 4. Data layer — `src/lib/epochs/`
 
 A new directory. Modules are small and single-purpose so each is testable in
@@ -224,9 +230,9 @@ Grid height drops from ~540px to ~110px — comfortably more than half shorter.
 
 ## 11. Out of scope / future
 
-- A persisted `slots` table and a public `/api/v1/epochs` endpoint (the relay
-  APIs are sufficient as the live store; the trend chart already covers
-  long-range history).
+- A persisted slots table is now **in scope and implemented** as `recent_blocks`
+  — see `2026-05-22-epoch-ledger-db-backed-design.md`. A public `/api/v1/epochs`
+  endpoint remains out of scope.
 - Splitting missed slots from locally-built blocks (needs a beacon API).
 - A WebSocket / SSE push instead of polling.
 - Per-slot poll cadence (12s) so each slot pops individually — a one-constant
