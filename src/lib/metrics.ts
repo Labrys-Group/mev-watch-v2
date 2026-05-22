@@ -34,13 +34,19 @@ export interface RelayBreakdownEntry {
  * multiple relays is counted once per relay. We therefore measure censorship as
  * the censoring relays' *share of deliveries* — a ratio in which the multi-relay
  * counting cancels between numerator and denominator. See the methodology page.
+ *
+ * `date` (ISO `YYYY-MM-DD`) is the day being measured — relays whose OFAC
+ * posture changed are classified with the posture in effect on that date.
  */
-export function computeDailyStats(relays: RelayPayloadCount[]): DailyStatsResult {
+export function computeDailyStats(
+  relays: RelayPayloadCount[],
+  date: string,
+): DailyStatsResult {
   const totalDeliveries = relays.reduce((sum, r) => sum + r.numPayloads, 0);
 
   let censoring = 0;
   for (const r of relays) {
-    if (classifyRelay(r.relayId).posture === "censoring") {
+    if (classifyRelay(r.relayId, date).posture === "censoring") {
       censoring += r.numPayloads;
     }
   }
@@ -56,14 +62,19 @@ export function computeDailyStats(relays: RelayPayloadCount[]): DailyStatsResult
   };
 }
 
-/** Per-relay breakdown (share of MEV-boost deliveries) for the leaderboard. */
+/**
+ * Per-relay breakdown (share of MEV-boost deliveries) for the leaderboard.
+ *
+ * `date` (ISO `YYYY-MM-DD`) is the day being measured — see `computeDailyStats`.
+ */
 export function computeRelayBreakdown(
   relays: RelayPayloadCount[],
+  date: string,
 ): RelayBreakdownEntry[] {
   const totalDeliveries = relays.reduce((sum, r) => sum + r.numPayloads, 0);
 
   return relays.map((r) => {
-    const info = classifyRelay(r.relayId);
+    const info = classifyRelay(r.relayId, date);
     return {
       relayId: r.relayId,
       name: info.name,

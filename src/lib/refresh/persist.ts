@@ -8,8 +8,8 @@ import type { DayRelayStats } from "../data-source/types";
  * tables. Idempotent — re-running for the same date overwrites that day's rows.
  */
 export async function persistDailySnapshot(day: DayRelayStats): Promise<void> {
-  const stats = computeDailyStats(day.relays);
-  const breakdown = computeRelayBreakdown(day.relays);
+  const stats = computeDailyStats(day.relays, day.date);
+  const breakdown = computeRelayBreakdown(day.relays, day.date);
 
   await db
     .insert(dailyStats)
