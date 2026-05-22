@@ -19,9 +19,9 @@
   --accent-alt-color: #8F80EF;
 
   /* MEV Watch semantic colours — light mode (pastel) */
-  --ofac:    #F0A9A0;
+  --ofac:    #E07A6B;
   --ofac-fg: #5E1A13;
-  --neutral: #7DE9C4;
+  --neutral: #A4D7A9;
   --neutral-fg: #0A3D2C;
   --good:    #00A86B;
   --warn:    #C9543F;
@@ -62,7 +62,7 @@
   /* MEV Watch semantic colours — dark mode (saturated) */
   --ofac:    #FF6B6B;
   --ofac-fg: #0D0E16;
-  --neutral: #00EF9F;
+  --neutral: #7AD9A2;
   --neutral-fg: #0D0E16;
   --good:    #00EF9F;
   --warn:    #FF6B6B;
