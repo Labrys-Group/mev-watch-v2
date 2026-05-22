@@ -2,14 +2,16 @@ import type { LatestStats } from "@/lib/queries";
 import type { CSSVars } from "@/lib/css";
 import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
-import { BlockGrid } from "@/components/sections/block-grid";
+import { EpochLedger } from "@/components/sections/epoch-ledger";
+import { getLiveEpochs } from "@/lib/epochs/get-live-epochs";
 
 interface CompositionProps {
   latest: LatestStats;
 }
 
-export function Composition({ latest }: CompositionProps) {
-  const { censorshipPct, nonBoostPct, totalBlocks } = latest;
+export async function Composition({ latest }: CompositionProps) {
+  const { censorshipPct, totalBlocks } = latest;
+  const ledger = await getLiveEpochs();
 
   const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
   const neutralBlocks = totalBlocks - censoringBlocks;
@@ -35,12 +37,8 @@ export function Composition({ latest }: CompositionProps) {
         </>
       }
     >
-      {/* Tile grid — censoring / neutral / non-MEV-boost, hover for detail */}
-      <BlockGrid
-        censorshipPct={censorshipPct}
-        nonBoostPct={nonBoostPct}
-        totalBlocks={totalBlocks}
-      />
+      {/* Live epoch ledger — the latest 4 epochs of real per-slot data */}
+      <EpochLedger initial={ledger} />
 
       {/* Legend + footnote */}
       <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap border border-border-labrys border-t-0 px-4 py-2.5 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
@@ -66,7 +64,7 @@ export function Composition({ latest }: CompositionProps) {
           Non-MEV-Boost
         </span>
         <span className="ml-auto normal-case tracking-normal text-[10px] font-mono text-fg-muted">
-          Each tile ≈ 1/128 of the latest day&apos;s blocks. Hover a tile for
+          Each tile is one real slot · latest 4 epochs, live. Hover a tile for
           detail.
         </span>
       </div>
