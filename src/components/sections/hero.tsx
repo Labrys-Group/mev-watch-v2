@@ -65,19 +65,22 @@ export function Hero({ verdict }: HeroProps) {
             </span>
           </h1>
 
-          {/* Stat line — latest figure, trend arrow, preset verdict message */}
+          {/* Stat line — the figure + arrow as one unit, with the verdict
+              message wrapping in its own narrow column beside them */}
           <div
-            className="anim-fade-up mt-5 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
+            className="anim-fade-up mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
             style={{ "--delay": "540ms" } as CSSVars}
           >
-            <span
-              className="font-sans font-extrabold tracking-tight text-foreground"
-              style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
-            >
-              <CountUp value={verdict.current} decimals={1} suffix="%" />
-            </span>{" "}
-            <span className={`${trendColor} font-semibold`}>{verdict.arrow}</span>{" "}
-            <span>{verdict.message}</span>
+            <div className="flex shrink-0 items-baseline gap-2">
+              <span
+                className="font-sans font-extrabold tracking-tight text-foreground"
+                style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
+              >
+                <CountUp value={verdict.current} decimals={1} suffix="%" />
+              </span>
+              <span className={`${trendColor} font-semibold`}>{verdict.arrow}</span>
+            </div>
+            <p className="m-0 min-w-0 max-w-[24rem]">{verdict.message}</p>
           </div>
         </div>
 
