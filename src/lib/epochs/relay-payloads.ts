@@ -42,6 +42,14 @@ const TIMEOUT_MS = 4000;
 export class RelayPayloadSource implements PayloadSource {
   readonly name = "mev-boost relay data API";
 
+  /**
+   * @param revalidateSeconds Next.js data-cache TTL for each relay fetch.
+   *   The /api/epochs route uses the short default; the homepage server
+   *   render passes a long value so the relay fetch does not drag the
+   *   page's ISR revalidate window down.
+   */
+  constructor(private readonly revalidateSeconds: number = 15) {}
+
   async fetchRecentDeliveries(): Promise<RelayDeliveriesResult> {
     const settled = await Promise.allSettled(
       RELAYS.map((relay) => this.fetchOne(relay.dataApiHost, relay.id)),
@@ -74,7 +82,7 @@ export class RelayPayloadSource implements PayloadSource {
       const res = await fetch(`https://${host}${ENDPOINT}`, {
         headers: { accept: "application/json" },
         signal: controller.signal,
-        next: { revalidate: 15 },
+        next: { revalidate: this.revalidateSeconds },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const parsed = ResponseSchema.parse(await res.json());
