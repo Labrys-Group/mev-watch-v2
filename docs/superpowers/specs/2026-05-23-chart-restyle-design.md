@@ -21,8 +21,9 @@ metric are all untouched.
 
 Confirmed by the user against live mockups in the visual companion:
 
-- **Palette** — teal non-censored, coral censored, slate non-boosted. No
-  green/red pairing; colour-blind safe.
+- **Palette** — emerald-green non-censored, coral censored, slate non-boosted.
+  No green/red pairing; colour-blind safe. (The non-censored hue was refined
+  teal → emerald after a review pass.)
 - **Fills** — each band is a vertical gradient from its line fading to near-
   transparent. This reverses the original spec §8 decision ("flat fills, no
   gradients"), at the user's request.
@@ -42,7 +43,7 @@ the original spec. This **supersedes the values** set by the
 
 | Token | Role | Light | Dark |
 |---|---|---|---|
-| `--neutral` | non-censored band | `#2E9D95` (teal) | `#3FB8AF` (teal) |
+| `--neutral` | non-censored band | `#2AAE81` (emerald) | `#2FBE94` (emerald) |
 | `--ofac` | censored band | `#EC5F52` (coral) | `#FF6B6B` (coral — unchanged) |
 | `--non-boost` | non-boosted band | `#9197A8` (slate) | `#6E7488` (slate) |
 
@@ -79,6 +80,10 @@ contrast check fails.
 
 ## 6. Files
 
-- `src/app/globals.css` — six token-value changes (§3).
+- `src/app/globals.css` — the §3 token-value changes.
 - `src/components/sections/trend-chart.tsx` — gradient `<defs>`, `<Area>` fills,
   stroke weight, `activeDot` (§4).
+- `src/components/sections/epoch-ledger.tsx` — slot-tile numbers drop
+  `mix-blend-difference` (muddy on the new mid-tone tiles) for solid near-black
+  ink, legible on every category in both themes; pending-slot numbers lifted
+  from 25% to 50% opacity.
