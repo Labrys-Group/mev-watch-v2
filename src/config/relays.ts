@@ -15,17 +15,23 @@ export interface RelayInfo {
   /** Human-readable display name. */
   name: string;
   posture: RelayPosture;
+  /**
+   * Hostname of the relay's standard MEV-boost data API. Used to query
+   * `/relay/v1/data/bidtraces/proposer_payload_delivered`. Often equal to
+   * `id`, but recorded separately because `id` is not always a resolvable host.
+   */
+  dataApiHost: string;
 }
 
 export const RELAYS: RelayInfo[] = [
-  { id: "relay.ultrasound.money", name: "Ultra Sound", posture: "neutral" },
-  { id: "titanrelay.xyz", name: "Titan", posture: "neutral" },
-  { id: "bloxroute.max-profit.blxrbdn.com", name: "bloXroute Max Profit", posture: "censoring" },
-  { id: "bloxroute.regulated.blxrbdn.com", name: "bloXroute Regulated", posture: "censoring" },
-  { id: "aestus.live", name: "Aestus", posture: "neutral" },
-  { id: "boost-relay.flashbots.net", name: "Flashbots", posture: "censoring" },
-  { id: "agnostic-relay.net", name: "Agnostic Gnosis", posture: "neutral" },
-  { id: "relay.ethgas.com", name: "EthGas", posture: "unknown" },
+  { id: "relay.ultrasound.money", name: "Ultra Sound", posture: "neutral", dataApiHost: "relay.ultrasound.money" },
+  { id: "titanrelay.xyz", name: "Titan", posture: "neutral", dataApiHost: "titanrelay.xyz" },
+  { id: "bloxroute.max-profit.blxrbdn.com", name: "bloXroute Max Profit", posture: "censoring", dataApiHost: "bloxroute.max-profit.blxrbdn.com" },
+  { id: "bloxroute.regulated.blxrbdn.com", name: "bloXroute Regulated", posture: "censoring", dataApiHost: "bloxroute.regulated.blxrbdn.com" },
+  { id: "aestus.live", name: "Aestus", posture: "neutral", dataApiHost: "mainnet.aestus.live" },
+  { id: "boost-relay.flashbots.net", name: "Flashbots", posture: "censoring", dataApiHost: "boost-relay.flashbots.net" },
+  { id: "agnostic-relay.net", name: "Agnostic Gnosis", posture: "neutral", dataApiHost: "agnostic-relay.net" },
+  { id: "relay.ethgas.com", name: "EthGas", posture: "unknown", dataApiHost: "relay.ethgas.com" },
 ];
 
 const byId = new Map(RELAYS.map((r) => [r.id, r]));
@@ -35,5 +41,5 @@ const byId = new Map(RELAYS.map((r) => [r.id, r]));
  * synthetic entry with posture "unknown" so new relays never crash the pipeline.
  */
 export function classifyRelay(id: string): RelayInfo {
-  return byId.get(id) ?? { id, name: id, posture: "unknown" };
+  return byId.get(id) ?? { id, name: id, posture: "unknown", dataApiHost: id };
 }
