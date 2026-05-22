@@ -10,6 +10,7 @@ export async function GET() {
   const data = await getLiveEpochs();
   return NextResponse.json(data, {
     headers: {
+      "access-control-allow-origin": "*",
       "cache-control": "public, s-maxage=15, stale-while-revalidate=30",
     },
   });
