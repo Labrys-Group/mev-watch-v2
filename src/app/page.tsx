@@ -17,6 +17,7 @@ import {
   getBuilderLeaderboard,
   getLastRefresh,
 } from "@/lib/queries";
+import { computeHeroVerdict } from "@/lib/hero-verdict";
 
 // Re-rendered hourly; the refresh job updates the underlying data.
 export const revalidate = 3600;
@@ -41,6 +42,8 @@ export default async function Home() {
     );
   }
 
+  const verdict = computeHeroVerdict(trend);
+
   return (
     <div className="min-h-screen">
       {/* Status bar + nav stay pinned together as you scroll */}
@@ -54,7 +57,7 @@ export default async function Home() {
       </div>
       <div className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="space-y-4 py-5">
-          <Hero summary={summary} />
+          <Hero verdict={verdict} />
           <Reveal>
             <Composition latest={latest} />
           </Reveal>

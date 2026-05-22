@@ -1,19 +1,16 @@
-import { formatPercent } from "@/lib/format";
 import { CountUp } from "@/components/count-up";
 import type { CSSVars } from "@/lib/css";
-import type { StatsSummary } from "@/lib/queries";
+import type { HeroVerdict } from "@/lib/hero-verdict";
 
 interface HeroProps {
-  summary: StatsSummary;
+  verdict: HeroVerdict;
 }
 
-export function Hero({ summary }: HeroProps) {
-  const drop = (summary.peak - summary.current).toFixed(1);
-
-  const isFalling = summary.current <= summary.peak - 5;
-  const trendWord = isFalling ? "FALLING" : "HIGH";
-  const trendColor = isFalling ? "text-good" : "text-warn";
-  const trendGlow = isFalling ? "glow-good" : "glow-warn";
+export function Hero({ verdict }: HeroProps) {
+  const isGood = verdict.tone === "good";
+  const trendWord = verdict.headlineWord;
+  const trendColor = isGood ? "text-good" : "text-warn";
+  const trendGlow = isGood ? "glow-good" : "glow-warn";
 
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
@@ -23,7 +20,7 @@ export function Hero({ summary }: HeroProps) {
         className="pointer-events-none absolute inset-0"
         style={{
           background: `radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, ${
-            isFalling ? "var(--good)" : "var(--warn)"
+            isGood ? "var(--good)" : "var(--warn)"
           } 14%, transparent) 0%, transparent 58%)`,
         }}
       />
@@ -68,7 +65,7 @@ export function Hero({ summary }: HeroProps) {
             </span>
           </h1>
 
-          {/* Stat line */}
+          {/* Stat line — latest figure, trend arrow, preset verdict message */}
           <div
             className="anim-fade-up mt-5 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
             style={{ "--delay": "540ms" } as CSSVars}
@@ -77,16 +74,10 @@ export function Hero({ summary }: HeroProps) {
               className="font-sans font-extrabold tracking-tight text-foreground"
               style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
             >
-              <CountUp value={summary.current} decimals={1} suffix="%" />
+              <CountUp value={verdict.current} decimals={1} suffix="%" />
             </span>{" "}
-            <span className="text-good font-semibold">▼</span>{" "}
-            <span>
-              down {drop} pts from a{" "}
-              <span className="text-foreground font-semibold">
-                {formatPercent(summary.peak)}
-              </span>{" "}
-              peak
-            </span>
+            <span className={`${trendColor} font-semibold`}>{verdict.arrow}</span>{" "}
+            <span>{verdict.message}</span>
           </div>
         </div>
 
