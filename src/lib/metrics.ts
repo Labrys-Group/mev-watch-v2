@@ -8,8 +8,7 @@ export interface DailyStatsResult {
   censorshipPct: number;
   /** Neutral + unknown relays' share of deliveries (%). */
   neutralPct: number;
-  /** Reserved: non-MEV-boost (locally built) block share. Not derivable from
-   *  relayscan's aggregate API — always 0 until a per-block source is added. */
+  /** Non-MEV-boost (locally built) block share (%). */
   nonBoostPct: number;
   /** Total relay payload deliveries counted (a block delivered via N relays
    *  counts N times — relayscan's `num_payloads` is per relay). */
@@ -28,7 +27,23 @@ export interface RelayBreakdownEntry {
 }
 
 /**
- * Compute the day's censorship metric from relay payload counts.
+ * Non-MEV-boost block share (%) — the fraction of all execution-layer blocks
+ * that did not come through a relay. Clamped to [0, 100]; day-boundary noise
+ * between relayscan's UTC day and execution-block timestamps could otherwise
+ * nudge the raw value slightly out of range.
+ */
+export function nonBoostShare(
+  totalChainBlocks: number,
+  mevBoostBlocks: number,
+): number {
+  if (totalChainBlocks <= 0) return 0;
+  const pct = ((totalChainBlocks - mevBoostBlocks) / totalChainBlocks) * 100;
+  return Math.min(100, Math.max(0, pct));
+}
+
+/**
+ * Compute the day's censorship metric from relay payload counts, builder block
+ * counts, and the total on-chain block count.
  *
  * relayscan reports `num_payloads` per relay; a single block delivered via
  * multiple relays is counted once per relay. We therefore measure censorship as
@@ -37,9 +52,14 @@ export interface RelayBreakdownEntry {
  *
  * `date` (ISO `YYYY-MM-DD`) is the day being measured — relays whose OFAC
  * posture changed are classified with the posture in effect on that date.
+ *
+ * `totalChainBlocks` is the total execution-layer blocks proposed that UTC day;
+ * pass 0 if unavailable (non-boost share will be 0).
  */
 export function computeDailyStats(
   relays: RelayPayloadCount[],
+  builders: BuilderBlockCount[],
+  totalChainBlocks: number,
   date: string,
 ): DailyStatsResult {
   const totalDeliveries = relays.reduce((sum, r) => sum + r.numPayloads, 0);
@@ -54,10 +74,12 @@ export function computeDailyStats(
   const censorshipPct =
     totalDeliveries === 0 ? 0 : (censoring / totalDeliveries) * 100;
 
+  const mevBoostBlocks = builders.reduce((sum, b) => sum + b.numBlocks, 0);
+
   return {
     censorshipPct,
     neutralPct: totalDeliveries === 0 ? 0 : 100 - censorshipPct,
-    nonBoostPct: 0,
+    nonBoostPct: nonBoostShare(totalChainBlocks, mevBoostBlocks),
     totalBlocks: totalDeliveries,
   };
 }

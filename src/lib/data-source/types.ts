@@ -21,6 +21,12 @@ export interface DayRelayStats {
   builders: BuilderBlockCount[];
 }
 
+/** One day of relay stats plus the day's total on-chain block count. */
+export interface DaySnapshot extends DayRelayStats {
+  /** Total execution-layer blocks proposed that UTC day. */
+  totalChainBlocks: number;
+}
+
 /**
  * A source of MEV-boost relay statistics. Implementations wrap an external
  * provider (relayscan.io, Dune, ...) so the refresh pipeline stays agnostic.

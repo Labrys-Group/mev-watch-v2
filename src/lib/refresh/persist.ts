@@ -1,14 +1,19 @@
 import { db } from "../db";
 import { dailyStats, relayDailyStats, builderDailyStats } from "../db/schema";
 import { computeDailyStats, computeRelayBreakdown, computeBuilderBreakdown } from "../metrics";
-import type { DayRelayStats } from "../data-source/types";
+import type { DaySnapshot } from "../data-source/types";
 
 /**
  * Compute metrics for one day of relay stats and upsert them into the snapshot
  * tables. Idempotent — re-running for the same date overwrites that day's rows.
  */
-export async function persistDailySnapshot(day: DayRelayStats): Promise<void> {
-  const stats = computeDailyStats(day.relays, day.date);
+export async function persistDailySnapshot(day: DaySnapshot): Promise<void> {
+  const stats = computeDailyStats(
+    day.relays,
+    day.builders,
+    day.totalChainBlocks,
+    day.date,
+  );
   const breakdown = computeRelayBreakdown(day.relays, day.date);
 
   await db
@@ -19,6 +24,7 @@ export async function persistDailySnapshot(day: DayRelayStats): Promise<void> {
       neutralPct: stats.neutralPct,
       nonBoostPct: stats.nonBoostPct,
       totalBlocks: stats.totalBlocks,
+      totalChainBlocks: day.totalChainBlocks,
     })
     .onConflictDoUpdate({
       target: dailyStats.date,
@@ -27,6 +33,7 @@ export async function persistDailySnapshot(day: DayRelayStats): Promise<void> {
         neutralPct: stats.neutralPct,
         nonBoostPct: stats.nonBoostPct,
         totalBlocks: stats.totalBlocks,
+        totalChainBlocks: day.totalChainBlocks,
       },
     });
 
