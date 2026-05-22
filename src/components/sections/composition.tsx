@@ -4,7 +4,7 @@ import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
 import { EpochLedger } from "@/components/sections/epoch-ledger";
 import { getLiveEpochs } from "@/lib/epochs/get-live-epochs";
-import { RelayPayloadSource } from "@/lib/epochs/relay-payloads";
+import { recentBlocksStore } from "@/lib/epochs/recent-blocks-store";
 
 interface CompositionProps {
   latest: LatestStats;
@@ -12,10 +12,10 @@ interface CompositionProps {
 
 export async function Composition({ latest }: CompositionProps) {
   const { censorshipPct, totalBlocks } = latest;
-  // Fetch the initial ledger snapshot with a long relay-cache TTL so this
-  // server render does not pull the homepage's hourly ISR revalidate window
-  // down. The client EpochLedger polls /api/epochs every 30s for live data.
-  const ledger = await getLiveEpochs(new RelayPayloadSource(3600));
+  // Server-render the initial ledger straight from the recent_blocks table —
+  // a fast DB read, no relay fan-out. The client EpochLedger polls
+  // /api/epochs every 30s, which refreshes the table and the live data.
+  const ledger = await getLiveEpochs(recentBlocksStore);
 
   const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
   const neutralBlocks = totalBlocks - censoringBlocks;

@@ -57,9 +57,12 @@ export function createRecentBlocksStore(db: Db): RecentBlocksStore {
       const prune = db
         .delete(recentBlocks)
         .where(lt(recentBlocks.slot, head - WINDOW_SLOTS));
-      // One libSQL batch round-trip for every upsert plus the prune.
-      const statements = [...upserts, prune];
-      await db.batch(statements as Parameters<typeof db.batch>[0]);
+      // One libSQL batch round-trip: every upsert, then the prune. The cast
+      // bridges drizzle's non-empty-tuple batch signature — the array is
+      // always non-empty (prune is always present) and runtime-correct.
+      await db.batch(
+        [...upserts, prune] as unknown as Parameters<typeof db.batch>[0],
+      );
     },
   };
 }
