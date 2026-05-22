@@ -222,6 +222,21 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                   data={data}
                   margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
                 >
+                  {/* Per-band fills fade from the band's line down to near-transparent. */}
+                  <defs>
+                    <linearGradient id="fill-non-censored" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--neutral)" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="var(--neutral)" stopOpacity={0.03} />
+                    </linearGradient>
+                    <linearGradient id="fill-censored" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--ofac)" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="var(--ofac)" stopOpacity={0.03} />
+                    </linearGradient>
+                    <linearGradient id="fill-non-boost" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--non-boost)" stopOpacity={0.5} />
+                      <stop offset="100%" stopColor="var(--non-boost)" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid
                     strokeDasharray="0"
                     stroke="var(--border-labrys)"
@@ -267,10 +282,16 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                     dataKey="nonCensored"
                     stackId="1"
                     stroke="var(--neutral)"
-                    strokeWidth={1}
-                    fill="var(--neutral)"
-                    fillOpacity={0.9}
+                    strokeWidth={2}
+                    fill="url(#fill-non-censored)"
+                    fillOpacity={1}
                     dot={false}
+                    activeDot={{
+                      r: 3.5,
+                      strokeWidth: 2,
+                      stroke: "var(--background)",
+                      fill: "var(--neutral)",
+                    }}
                     isAnimationActive={!reduceMotion}
                     animationDuration={1100}
                     animationEasing="ease-out"
@@ -280,10 +301,16 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                     dataKey="censored"
                     stackId="1"
                     stroke="var(--ofac)"
-                    strokeWidth={1}
-                    fill="var(--ofac)"
-                    fillOpacity={0.9}
+                    strokeWidth={2}
+                    fill="url(#fill-censored)"
+                    fillOpacity={1}
                     dot={false}
+                    activeDot={{
+                      r: 3.5,
+                      strokeWidth: 2,
+                      stroke: "var(--background)",
+                      fill: "var(--ofac)",
+                    }}
                     isAnimationActive={!reduceMotion}
                     animationDuration={1100}
                     animationEasing="ease-out"
@@ -293,10 +320,16 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                     dataKey="nonBoost"
                     stackId="1"
                     stroke="var(--non-boost)"
-                    strokeWidth={1}
-                    fill="var(--non-boost)"
-                    fillOpacity={0.9}
+                    strokeWidth={2}
+                    fill="url(#fill-non-boost)"
+                    fillOpacity={1}
                     dot={false}
+                    activeDot={{
+                      r: 3.5,
+                      strokeWidth: 2,
+                      stroke: "var(--background)",
+                      fill: "var(--non-boost)",
+                    }}
                     isAnimationActive={!reduceMotion}
                     animationDuration={1100}
                     animationEasing="ease-out"

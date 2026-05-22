@@ -18,14 +18,14 @@
   --accent-color: #00A86B;
   --accent-alt-color: #8F80EF;
 
-  /* MEV Watch semantic colours — light mode (pastel) */
-  --ofac:    #E07A6B;
+  /* MEV Watch semantic colours — light mode (teal / coral / slate) */
+  --ofac:    #EC5F52;
   --ofac-fg: #5E1A13;
-  --neutral: #A4D7A9;
+  --neutral: #2E9D95;
   --neutral-fg: #0A3D2C;
   --good:    #00A86B;
   --warn:    #C9543F;
-  --non-boost: #C2C4D2;
+  --non-boost: #9197A8;
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -59,14 +59,14 @@
   --accent-color: #8F80EF;
   --accent-alt-color: #00EF9F;
 
-  /* MEV Watch semantic colours — dark mode (saturated) */
+  /* MEV Watch semantic colours — dark mode (teal / coral / slate) */
   --ofac:    #FF6B6B;
   --ofac-fg: #0D0E16;
-  --neutral: #7AD9A2;
+  --neutral: #3FB8AF;
   --neutral-fg: #0D0E16;
   --good:    #00EF9F;
   --warn:    #FF6B6B;
-  --non-boost: #565870;
+  --non-boost: #6E7488;
 
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
