@@ -31,3 +31,15 @@ export interface DataSource {
   /** Fetch one day of relay stats. Throws on network/parse failure. */
   fetchDay(date: string): Promise<DayRelayStats>;
 }
+
+/**
+ * A source of total execution-layer block counts, used to derive the
+ * non-MEV-boost share. Separate from `DataSource` — a different provider
+ * (an Ethereum RPC) answers a different question.
+ */
+export interface BlockCountSource {
+  /** The provider name. */
+  readonly name: string;
+  /** Total execution-layer blocks proposed during the given UTC date. */
+  totalBlocks(date: string): Promise<number>;
+}
