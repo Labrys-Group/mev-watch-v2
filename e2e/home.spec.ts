@@ -25,3 +25,13 @@ test("theme toggle flips the document theme", async ({ page }) => {
   await page.getByRole("button", { name: /toggle theme/i }).click();
   await expect(html).toHaveClass(/light/);
 });
+
+test("the composition section renders the live epoch ledger", async ({
+  page,
+}) => {
+  await page.goto("/");
+  // The ledger footnote is present regardless of relay liveness.
+  await expect(page.getByText(/one real slot/i)).toBeVisible();
+  // The in-progress epoch row is labelled live.
+  await expect(page.getByText(/live ·/i)).toBeVisible({ timeout: 15000 });
+});
