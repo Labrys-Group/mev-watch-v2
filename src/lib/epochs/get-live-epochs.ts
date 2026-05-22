@@ -1,6 +1,11 @@
-import { currentSlot, epochOf, epochSlotRange, SLOTS_PER_EPOCH } from "./chain-time";
+import {
+  currentSlot,
+  epochOf,
+  epochSlotRange,
+  SLOTS_PER_EPOCH,
+} from "./chain-time";
 import { classifySlot, type SlotCategory } from "./classify";
-import { RelayPayloadSource, type DeliveredPayload, type PayloadSource } from "./relay-payloads";
+import type { RecentBlocksStore, StoredBlock } from "./recent-blocks-store";
 import { RELAYS } from "@/config/relays";
 
 /** Number of epoch rows the ledger shows (in-progress + 3 completed). */
@@ -35,37 +40,30 @@ export interface LedgerData {
 }
 
 /**
- * Fetch + classify the latest EPOCH_ROWS epochs, newest first. Never throws —
- * on a total fetch failure it returns rows of nonboost/pending slots and
- * `relaysOk: 0` so the client can show a "reconnecting" state.
+ * Build the latest EPOCH_ROWS epochs, newest first, from the stored recent
+ * blocks. Pure DB → ledger: no relay APIs are touched. Never throws — a store
+ * read failure yields rows of nonboost/pending slots.
+ *
+ * `relaysOk`/`relaysTotal` default to "all healthy"; the /api/epochs route
+ * overrides them with the real ingest result. The homepage snapshot keeps the
+ * optimistic default until the first client poll.
  */
 export async function getLiveEpochs(
-  source: PayloadSource = new RelayPayloadSource(),
+  store: RecentBlocksStore,
   now: number = Date.now(),
 ): Promise<LedgerData> {
   const head = currentSlot(now);
   const headEpoch = epochOf(head);
 
-  let payloads: DeliveredPayload[] = [];
-  let okRelays: string[] = [];
-  let failedRelays: string[] = [];
+  let blocks: StoredBlock[] = [];
   try {
-    const result = await source.fetchRecentDeliveries();
-    payloads = result.payloads;
-    okRelays = result.okRelays;
-    failedRelays = result.failedRelays;
+    blocks = await store.readWindow();
   } catch {
-    // Total fetch failure: mark every relay failed so relaysTotal stays honest
-    // (relaysOk is 0); every slot then falls through to nonboost/pending.
-    failedRelays = RELAYS.map((r) => r.id);
+    blocks = [];
   }
 
-  const bySlot = new Map<number, DeliveredPayload[]>();
-  for (const p of payloads) {
-    const list = bySlot.get(p.slot);
-    if (list) list.push(p);
-    else bySlot.set(p.slot, [p]);
-  }
+  const bySlot = new Map<number, StoredBlock>();
+  for (const b of blocks) bySlot.set(b.slot, b);
 
   const epochs: EpochRow[] = [];
   for (let e = 0; e < EPOCH_ROWS; e++) {
@@ -76,21 +74,22 @@ export async function getLiveEpochs(
 
     for (let i = 0; i < SLOTS_PER_EPOCH; i++) {
       const slot = first + i;
-      const delivered = bySlot.get(slot) ?? [];
+      const block = bySlot.get(slot);
       const category: SlotCell["category"] =
         slot > head
           ? "pending"
-          : classifySlot(delivered.map((d) => d.relayId));
-      const best = delivered[0] ?? null;
+          : block
+            ? classifySlot(block.relays)
+            : "nonboost";
       slots.push({
         slot,
         indexInEpoch: i,
         category,
-        relays: delivered.map((d) => d.relayId),
-        builder: best?.builderPubkey ?? null,
-        valueWei: best?.valueWei ?? null,
-        blockNumber: best?.blockNumber ?? null,
-        numTx: best?.numTx ?? null,
+        relays: block?.relays ?? [],
+        builder: block?.builder ?? null,
+        valueWei: block?.valueWei ?? null,
+        blockNumber: block?.blockNumber ?? null,
+        numTx: block?.numTx ?? null,
       });
     }
     epochs.push({ epoch, inProgress, slots });
@@ -100,7 +99,7 @@ export async function getLiveEpochs(
     epochs,
     headSlot: head,
     fetchedAt: now,
-    relaysOk: okRelays.length,
-    relaysTotal: okRelays.length + failedRelays.length,
+    relaysOk: RELAYS.length,
+    relaysTotal: RELAYS.length,
   };
 }
