@@ -249,7 +249,7 @@ function SlotTile({ cell, epoch, isNext, delay, onHover }: SlotTileProps) {
     >
       <span
         className={`hidden font-mono text-[8px] leading-none sm:block ${
-          pending ? "text-fg-muted/50" : "text-white mix-blend-difference"
+          pending ? "text-fg-muted" : "text-[#0D0E16]"
         }`}
       >
         {cell.indexInEpoch}

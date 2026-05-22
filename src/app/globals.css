@@ -21,7 +21,7 @@
   /* MEV Watch semantic colours — light mode (teal / coral / slate) */
   --ofac:    #EC5F52;
   --ofac-fg: #5E1A13;
-  --neutral: #2E9D95;
+  --neutral: #2AAE81;
   --neutral-fg: #0A3D2C;
   --good:    #00A86B;
   --warn:    #C9543F;
@@ -62,7 +62,7 @@
   /* MEV Watch semantic colours — dark mode (teal / coral / slate) */
   --ofac:    #FF6B6B;
   --ofac-fg: #0D0E16;
-  --neutral: #3FB8AF;
+  --neutral: #2FBE94;
   --neutral-fg: #0D0E16;
   --good:    #00EF9F;
   --warn:    #FF6B6B;
