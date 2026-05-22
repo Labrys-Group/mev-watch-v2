@@ -32,13 +32,17 @@ export const relayDailyStats = sqliteTable(
   (t) => [unique("relay_daily_stats_relay_date_unq").on(t.relayKey, t.date)],
 );
 
-/** Rolling window of the most recent blocks — drives the live block grid. */
+/** Rolling window of recent delivered MEV-boost blocks — feeds the epoch ledger. */
 export const recentBlocks = sqliteTable("recent_blocks", {
   slot: integer("slot").primaryKey(),
   blockNumber: integer("block_number").notNull(),
-  relayKey: text("relay_key"),
-  category: text("category").notNull(),
-  ts: integer("ts", { mode: "timestamp" }).notNull(),
+  relays: text("relays").notNull(), // JSON array of relayscan relay ids
+  builder: text("builder").notNull(),
+  valueWei: text("value_wei").notNull(),
+  numTx: integer("num_tx").notNull(),
+  ingestedAt: integer("ingested_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
 });
 
 /** Audit log of every refresh run — drives "last updated" and alerting. */

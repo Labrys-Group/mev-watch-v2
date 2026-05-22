@@ -15,6 +15,13 @@
       "when": 1779361123983,
       "tag": "0001_bizarre_rockslide",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1779427128376,
+      "tag": "0002_reshape_recent_blocks",
+      "breakpoints": true
     }
   ]
 }
