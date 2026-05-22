@@ -84,6 +84,7 @@ In **Project Settings → Environment Variables**, add (for Production):
 | `DATABASE_AUTH_TOKEN` | the Turso token from step 1 |
 | `CRON_SECRET` | a long random string (e.g. `openssl rand -hex 32`) |
 | `SLACK_WEBHOOK_URL` | *(optional)* a Slack incoming-webhook URL for failure alerts |
+| `ETH_RPC_URL` | *(optional)* an Ethereum JSON-RPC URL for the non-MEV-boost block count; falls back to public RPCs when unset |
 
 Vercel automatically sends `Authorization: Bearer $CRON_SECRET` on cron
 invocations once `CRON_SECRET` is set — that is how `/api/refresh` is protected.
@@ -108,6 +109,21 @@ Now trigger the deploy.
 
 In **Project Settings → Domains**, add `mevwatch.info` and point its DNS at
 Vercel as instructed.
+
+## Upgrading an existing database
+
+When a release adds a Drizzle migration, an already-live Turso database must be
+migrated — and, for the non-MEV-boost data, backfilled. With `.env` temporarily
+pointing at Turso (as in steps 2–3):
+
+```bash
+pnpm db:migrate          # apply new migrations (e.g. the total_chain_blocks column)
+pnpm backfill-nonboost   # populate nonBoostPct / totalChainBlocks across all history
+```
+
+`backfill-nonboost` is idempotent and doubles as a repair tool for any day a
+live refresh recorded without a block count. Restore `.env` to the local file
+URL afterwards.
 
 ---
 
