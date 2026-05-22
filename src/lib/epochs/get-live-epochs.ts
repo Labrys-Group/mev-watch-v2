@@ -1,6 +1,7 @@
 import { currentSlot, epochOf, epochSlotRange, SLOTS_PER_EPOCH } from "./chain-time";
 import { classifySlot, type SlotCategory } from "./classify";
 import { RelayPayloadSource, type DeliveredPayload, type PayloadSource } from "./relay-payloads";
+import { RELAYS } from "@/config/relays";
 
 /** Number of epoch rows the ledger shows (in-progress + 3 completed). */
 export const EPOCH_ROWS = 4;
@@ -54,7 +55,9 @@ export async function getLiveEpochs(
     okRelays = result.okRelays;
     failedRelays = result.failedRelays;
   } catch {
-    // leave defaults — every slot becomes nonboost/pending, relaysOk stays 0
+    // Total fetch failure: mark every relay failed so relaysTotal stays honest
+    // (relaysOk is 0); every slot then falls through to nonboost/pending.
+    failedRelays = RELAYS.map((r) => r.id);
   }
 
   const bySlot = new Map<number, DeliveredPayload[]>();

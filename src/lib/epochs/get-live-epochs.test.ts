@@ -62,4 +62,16 @@ describe("getLiveEpochs", () => {
     const data = await getLiveEpochs(source([]), NOW);
     expect(data.epochs[1].slots[0].category).toBe("nonboost");
   });
+
+  it("returns safe defaults without throwing when the source fails", async () => {
+    const broken: PayloadSource = {
+      fetchRecentDeliveries: async () => {
+        throw new Error("network down");
+      },
+    };
+    const data = await getLiveEpochs(broken, NOW);
+    expect(data.epochs).toHaveLength(4);
+    expect(data.relaysOk).toBe(0);
+    expect(data.relaysTotal).toBeGreaterThan(0);
+  });
 });
