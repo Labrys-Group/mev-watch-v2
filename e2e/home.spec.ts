@@ -11,11 +11,14 @@ test("homepage renders the dashboard with real data", async ({ page }) => {
   await expect(page.getByText(/RELAY LEADERBOARD/i)).toBeVisible();
 });
 
-test("the trend chart renders its area series", async ({ page }) => {
+test("the trend chart renders three stacked bands", async ({ page }) => {
   await page.goto("/");
+  // Scroll the chart section into view to trigger the IntersectionObserver.
+  await page.getByText("02 / CENSORSHIP OVER TIME").scrollIntoViewIfNeeded();
   await expect(page.locator(".recharts-area-area").first()).toBeVisible({
     timeout: 15000,
   });
+  await expect(page.locator(".recharts-area-area")).toHaveCount(3);
 });
 
 test("theme toggle flips the document theme", async ({ page }) => {
