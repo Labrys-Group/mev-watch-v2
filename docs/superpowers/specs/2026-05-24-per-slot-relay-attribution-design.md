@@ -238,5 +238,5 @@ Hero, composition, leaderboard, FAQ, embed, status page copy: unchanged. They de
 
 - **Dune SLA**: the Dune free-tier has no SLA. If a daily refresh hits a Dune outage, the cron logs the failure and the dashboard's "last refresh" status surfaces it — no different from a relayscan outage today. A multi-day outage will leave the headline stale; this is acceptable per the existing system's posture.
 - **Dune table naming**: `mevboost.payloads_delivered` is the leading candidate but unverified end-to-end. If the canonical name differs, the SQL gets a one-line correction at implementation. Confirmed during implementation by running the query manually in Dune before wiring it up.
-- **Free-tier rate limit**: 3 concurrent executions × ~10s each = ~30 day-of-data per minute. Backfill (1,344 days) takes ~45 min at full throughput; tolerable. Daily refresh is one query per day, well under limits.
+- **Free-tier rate limit**: 3 concurrent executions × 10–15s per query. Backfill (1,344 days) takes the ~75–120 min quoted in §9; well within tolerance. Daily refresh is one query per day, far under any rate limit.
 - **bloXroute Max Profit classification**: the 17% load-bearing classification claim (the 2023-12-18 announcement) is out of scope for this spec but should be independently verified — flagged as a separate work item.
