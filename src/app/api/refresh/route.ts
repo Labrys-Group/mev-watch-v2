@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { refreshDay } from "@/lib/refresh";
-import { RelayscanDataSource } from "@/lib/data-source/relayscan";
+import { getDataSource } from "@/lib/data-source/factory";
 import { EthRpcBlockCountSource } from "@/lib/data-source/eth-rpc";
 
 export const runtime = "nodejs";
@@ -28,7 +28,7 @@ export async function GET(request: Request): Promise<Response> {
   const date = yesterdayUtc();
   const result = await refreshDay(
     date,
-    new RelayscanDataSource(),
+    getDataSource(),
     new EthRpcBlockCountSource(),
   );
 

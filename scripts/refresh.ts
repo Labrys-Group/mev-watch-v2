@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { refreshDay } from "../src/lib/refresh";
-import { RelayscanDataSource } from "../src/lib/data-source/relayscan";
+import { getDataSource } from "../src/lib/data-source/factory";
 import { EthRpcBlockCountSource } from "../src/lib/data-source/eth-rpc";
 
 /** Returns yesterday's date (UTC) as an ISO string — the most recent complete day. */
@@ -16,7 +16,7 @@ async function main() {
 
   const result = await refreshDay(
     date,
-    new RelayscanDataSource(),
+    getDataSource(),
     new EthRpcBlockCountSource(),
   );
 
