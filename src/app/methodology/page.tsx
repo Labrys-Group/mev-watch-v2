@@ -134,11 +134,11 @@ export default function MethodologyPage() {
               successful ingestion run.
             </p>
             <p className="font-mono text-sm text-fg-muted leading-relaxed">
-              Each API response includes a per-relay count of{" "}
-              <span className="text-foreground">payload deliveries</span>: the
-              number of times each relay successfully returned a signed execution
-              payload to a requesting validator. This is the raw figure used to
-              compute the censorship metric.
+              relayscan&apos;s daily JSON ships per-relay aggregate payload
+              counts and per-builder block counts. MEV Watch reads the builder
+              counts directly; the relay attribution is computed by the Dune
+              query above so that each block is counted once, against its
+              winning relay.
             </p>
           </Reveal>
 
