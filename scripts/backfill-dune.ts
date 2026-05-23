@@ -52,6 +52,12 @@ async function main() {
   const blockSource = new EthRpcBlockCountSource();
 
   const dates = [...dateRange(start, end)].filter((d) => !done.has(d));
+
+  if (dates.length === 0) {
+    console.log("Nothing to do — all dates in range already backfilled.");
+    process.exit(0);
+  }
+
   let ok = 0;
   let failed = 0;
   let inFlight = 0;
