@@ -8,30 +8,35 @@ interface LeaderboardProps {
 }
 
 const TH =
-  "text-left font-mono text-[10px] tracking-[0.14em] uppercase text-fg-muted px-2.5 py-2.5 bg-panel-alt border-t border-b border-border-labrys";
+  "text-left font-mono text-[10px] tracking-[0.14em] uppercase text-fg-muted px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 bg-panel-alt border-t border-b border-border-labrys";
 
 export function Leaderboard({ rows }: LeaderboardProps) {
+  // Caption surfaces the timeframe + the block-total so readers don't have to
+  // infer "WINDOW: 1D" from the cryptic aside (also invisible on mobile).
+  const totalBlocks = rows.reduce((sum, r) => sum + r.blocks, 0);
+
   return (
     <Section
       label="03 / RELAY LEADERBOARD"
-      title={
-        <>
-          Ranked by
-          <br />
-          block share.
-        </>
-      }
+      title="Ranked by block share."
       aside={
         <>
-          SORT: SHARE DESC // WINDOW: 1D
+          SORT: SHARE DESC
           <br />
           SOURCE: RELAYSCAN.IO + BEACON
         </>
       }
     >
-      {/* Table — scrolls horizontally on narrow screens */}
+      <p className="mb-3 border-b border-border-labrys pb-3 font-sans text-[13px] leading-snug text-fg-muted">
+        Top relays by share — last 24 hours ·{" "}
+        <strong className="font-semibold text-foreground">
+          {totalBlocks.toLocaleString()} blocks
+        </strong>
+        .
+      </p>
+      {/* Table — fits to width on phones; overflow guard for ultra-narrow */}
       <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
-        <table className="w-full min-w-[440px] border-collapse font-mono text-[12px]">
+        <table className="w-full border-collapse font-mono text-[12px]">
           <thead>
             <tr>
               <th className={`${TH} w-9`}>#</th>
@@ -64,22 +69,22 @@ export function Leaderboard({ rows }: LeaderboardProps) {
                     style={{ "--delay": `${index * 45}ms` } as CSSVars}
                   >
                     {/* Rank */}
-                    <td className="px-2.5 py-2.5 align-middle font-mono text-[12px] text-fg-muted tabular-nums transition-colors duration-200 group-hover:text-accent-brand">
+                    <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle font-mono text-[12px] text-fg-muted tabular-nums transition-colors duration-200 group-hover:text-accent-brand">
                       {rank}
                     </td>
 
                     {/* Relay name + id */}
-                    <td className="px-2.5 py-2.5 align-middle">
+                    <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle">
                       <div className="font-sans font-bold text-[13.5px] tracking-[-0.01em] text-foreground leading-snug transition-colors duration-200 group-hover:text-accent-brand">
                         {row.name}
                       </div>
-                      <div className="font-mono text-[10.5px] text-fg-muted mt-0.5 leading-tight">
+                      <div className="hidden font-mono text-[10.5px] text-fg-muted mt-0.5 leading-tight break-all sm:block">
                         {row.relayId}
                       </div>
                     </td>
 
                     {/* Posture badge */}
-                    <td className="px-2.5 py-2.5 align-middle">
+                    <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle">
                       {isCensoring ? (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-warn border-warn">
                           OFAC
@@ -96,7 +101,7 @@ export function Leaderboard({ rows }: LeaderboardProps) {
                     </td>
 
                     {/* Share — mini-bar + percent */}
-                    <td className="px-2.5 py-2.5 align-middle">
+                    <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle">
                       <span className="inline-flex items-center gap-2.5">
                         {/* Mini bar — hidden on the smallest screens */}
                         <span className="relative hidden sm:inline-block w-[88px] h-1.5 bg-foreground/5 shrink-0 align-middle">
@@ -127,7 +132,7 @@ export function Leaderboard({ rows }: LeaderboardProps) {
                     </td>
 
                     {/* Block count */}
-                    <td className="px-2.5 py-2.5 align-middle text-right font-mono text-[13px] tracking-[0.02em] tabular-nums text-foreground">
+                    <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle text-right font-mono text-[13px] tracking-[0.02em] tabular-nums text-foreground">
                       {row.blocks.toLocaleString()}
                     </td>
                   </tr>

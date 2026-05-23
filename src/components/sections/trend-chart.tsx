@@ -104,6 +104,17 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
 
+  // Phones get a sparser x-axis so the date labels never collide.
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   // Defer mounting the chart until it scrolls into view so the area
   // sweep animation plays exactly when the reader reaches it.
   const chartRef = useRef<HTMLDivElement>(null);
@@ -138,18 +149,15 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
     () => getSlice(trend, range).map(toCompositionPoint),
     [trend, range],
   );
-  const ticks = useMemo(() => sparseTickIndices(data), [data]);
+  const ticks = useMemo(
+    () => sparseTickIndices(data, isNarrow ? 3 : 8),
+    [data, isNarrow],
+  );
 
   return (
     <Section
       label="02 / CENSORSHIP OVER TIME"
-      title={
-        <>
-          Censorship % since
-          <br />
-          the Merge.
-        </>
-      }
+      title="Censorship % since the Merge."
       aside={
         <>
           <span>SHARE OF ALL BLOCKS</span>

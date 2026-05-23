@@ -23,11 +23,7 @@ export async function Composition({ latest }: CompositionProps) {
   return (
     <Section
       label="01 / POST-MERGE COMPOSITION"
-      title={
-        <>
-          Censoring vs. <br /> neutral relays.
-        </>
-      }
+      title="Censoring vs. neutral relays."
       aside={
         <>
           <span>DISTRIBUTION OF MEV-BOOST BLOCKS</span>
@@ -67,9 +63,14 @@ export async function Composition({ latest }: CompositionProps) {
           />
           Non-MEV-Boost
         </span>
-        <span className="ml-auto normal-case tracking-normal text-[10px] font-mono text-fg-muted">
-          Each tile is one real slot · latest 4 epochs, live. Hover a tile for
-          detail.
+        <span className="normal-case tracking-normal text-[10px] font-mono text-fg-muted sm:ml-auto">
+          Each tile is one real slot · latest 4 epochs, live.
+          {/* Hover hint only on devices that can actually hover; touch
+              devices no longer wire up tap-to-detail. */}
+          <span className="hidden [@media(hover:hover)]:inline">
+            {" "}
+            Hover a tile for detail.
+          </span>
         </span>
       </div>
 

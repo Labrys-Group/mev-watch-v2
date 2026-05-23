@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { CSSVars } from "@/lib/css";
 import { classifyRelay } from "@/config/relays";
 import { diffLedger } from "@/lib/epochs/diff";
@@ -12,7 +12,6 @@ import type {
 
 /** Client poll interval. A slot is 12s; 30s surfaces 2-3 new slots per poll. */
 export const POLL_MS = 30_000;
-const COLS = 32;
 
 type FilledCategory = "censoring" | "neutral" | "nonboost";
 
@@ -52,9 +51,22 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
   const [exiting, setExiting] = useState<EpochRow | null>(null);
   const [entering, setEntering] = useState<number | null>(null);
   const [exitCollapsed, setExitCollapsed] = useState(false);
+  // Tap-to-detail on phones produced a tiny floating tooltip on tile-sized
+  // tap targets — readers couldn't dismiss it. Gate the interaction behind
+  // real hover + pointer support so only true mouse devices wire it up.
+  const [hoverEnabled, setHoverEnabled] = useState(false);
 
   const prevRef = useRef<LedgerData>(initial);
   const staggerNext = useRef(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setHoverEnabled(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   // Poll the API immediately on mount, then every POLL_MS.
   useEffect(() => {
@@ -131,7 +143,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
 
   return (
     <div
-      className="relative border border-border-labrys bg-background p-4"
+      className="relative border border-border-labrys bg-background p-3 sm:p-4"
       onMouseLeave={() => setHover(null)}
     >
       <div className="space-y-1">
@@ -149,6 +161,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
                 rowIdx={isExiting ? data.epochs.length : rowIdx}
                 stagger={stagger}
                 onHover={setHover}
+                hoverEnabled={hoverEnabled}
               />
             </div>
           );
@@ -172,31 +185,38 @@ interface EpochRowViewProps {
   rowIdx: number;
   stagger: boolean;
   onHover: (h: HoverState | null) => void;
+  hoverEnabled: boolean;
 }
 
-function EpochRowView({ row, rowIdx, stagger, onHover }: EpochRowViewProps) {
+function EpochRowView({
+  row,
+  rowIdx,
+  stagger,
+  onHover,
+  hoverEnabled,
+}: EpochRowViewProps) {
   const filled = row.slots.filter((s) => s.category !== "pending").length;
   const nextIdx = row.inProgress
     ? row.slots.findIndex((s) => s.category === "pending")
     : -1;
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-[82px] shrink-0 text-right">
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex items-baseline justify-between gap-2 sm:w-[82px] sm:shrink-0 sm:flex-col sm:items-end sm:justify-start sm:gap-0 sm:text-right">
         <div className="font-mono text-[12px] font-semibold leading-none text-foreground">
           {row.epoch.toLocaleString()}
         </div>
         <div
-          className={`mt-1 font-mono text-[8px] uppercase tracking-[0.1em] ${
+          className={`font-mono text-[8px] uppercase tracking-[0.1em] sm:mt-1 ${
             row.inProgress ? "text-good" : "text-fg-muted"
           }`}
         >
           {row.inProgress ? `● live · ${filled}/32` : "epoch"}
         </div>
       </div>
+      {/* 32 slots: 2 rows of 16 on mobile, a single row of 32 from sm up. */}
       <div
-        className="grid flex-1 gap-[2px]"
-        style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
+        className="grid gap-[2px] grid-cols-[repeat(16,minmax(0,1fr))] sm:flex-1 sm:grid-cols-[repeat(32,minmax(0,1fr))]"
         aria-label={`Epoch ${row.epoch}: ${filled} of 32 slots delivered`}
       >
         {row.slots.map((cell, col) => (
@@ -207,6 +227,7 @@ function EpochRowView({ row, rowIdx, stagger, onHover }: EpochRowViewProps) {
             isNext={col === nextIdx}
             delay={stagger ? (rowIdx + col) * 15 : 0}
             onHover={onHover}
+            hoverEnabled={hoverEnabled}
           />
         ))}
       </div>
@@ -220,9 +241,17 @@ interface SlotTileProps {
   isNext: boolean;
   delay: number;
   onHover: (h: HoverState | null) => void;
+  hoverEnabled: boolean;
 }
 
-function SlotTile({ cell, epoch, isNext, delay, onHover }: SlotTileProps) {
+function SlotTile({
+  cell,
+  epoch,
+  isNext,
+  delay,
+  onHover,
+  hoverEnabled,
+}: SlotTileProps) {
   const pending = cell.category === "pending";
   const meta = pending ? null : CAT_META[cell.category as FilledCategory];
 
@@ -234,18 +263,22 @@ function SlotTile({ cell, epoch, isNext, delay, onHover }: SlotTileProps) {
       }`
     : `epoch-tile flex aspect-square cursor-crosshair items-center justify-center transition-transform duration-100 hover:z-20 hover:scale-[1.55] ${meta!.bg}`;
 
+  // Track the cursor itself (not the tile rect) so the tooltip lands beside
+  // the pointer rather than pinned to the slot's bottom-centre. Touch devices
+  // skip the handlers entirely (no tap-to-detail).
+  const showDetail =
+    pending || !hoverEnabled
+      ? undefined
+      : (e: MouseEvent<HTMLDivElement>) => {
+          onHover({ cell, epoch, x: e.clientX, y: e.clientY });
+        };
+
   return (
     <div
       className={className}
       style={{ "--delay": `${delay}ms` } as CSSVars}
-      onMouseEnter={
-        pending
-          ? undefined
-          : (e) => {
-              const r = e.currentTarget.getBoundingClientRect();
-              onHover({ cell, epoch, x: r.left + r.width / 2, y: r.bottom });
-            }
-      }
+      onMouseEnter={showDetail}
+      onMouseMove={showDetail}
     >
       <span
         className={`hidden font-mono text-[8px] leading-none sm:block ${
@@ -258,22 +291,36 @@ function SlotTile({ cell, epoch, isNext, delay, onHover }: SlotTileProps) {
   );
 }
 
+/** Width used for edge-flip calc — keep in sync with the `max-w-` class. */
+const TOOLTIP_W = 280;
+/** Generous over-estimate of the tooltip's height for the bottom-edge flip. */
+const TOOLTIP_H_EST = 110;
+const CURSOR_OFFSET = 14;
+
 function SlotTooltip({ hover }: { hover: HoverState }) {
   const { cell, epoch } = hover;
   const meta =
     cell.category === "pending"
       ? null
       : CAT_META[cell.category as FilledCategory];
-  const left =
-    typeof window !== "undefined"
-      ? Math.min(Math.max(hover.x, 110), window.innerWidth - 110)
-      : hover.x;
   const relayNames = cell.relays.map((id) => classifyRelay(id).name);
+
+  // Default: place to the bottom-right of the cursor. Flip horizontally near
+  // the right edge, flip vertically near the bottom edge, and clamp to the
+  // viewport so the tooltip never lands off-screen on the opposite edge.
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+  let left = hover.x + CURSOR_OFFSET;
+  let top = hover.y + CURSOR_OFFSET;
+  if (left + TOOLTIP_W > vw - 8) left = hover.x - TOOLTIP_W - CURSOR_OFFSET;
+  if (top + TOOLTIP_H_EST > vh - 8) top = hover.y - TOOLTIP_H_EST - CURSOR_OFFSET;
+  if (left < 8) left = 8;
+  if (top < 8) top = 8;
 
   return (
     <div
-      className="pointer-events-none fixed z-[70] -translate-x-1/2 border border-border-labrys bg-panel px-3 py-2 font-mono shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
-      style={{ left, top: hover.y + 8 }}
+      className="pointer-events-none fixed z-[70] max-w-[280px] border border-border-labrys bg-panel px-3 py-2 font-mono shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+      style={{ left, top }}
     >
       <div className="text-[9.5px] uppercase tracking-[0.14em] text-fg-muted">
         Slot {cell.slot.toLocaleString()} · Epoch {epoch.toLocaleString()}
@@ -286,7 +333,7 @@ function SlotTooltip({ hover }: { hover: HoverState }) {
         {meta ? meta.label : "Pending"}
       </div>
       {relayNames.length > 0 && (
-        <div className="mt-0.5 text-[10px] tracking-[0.04em] text-fg-muted">
+        <div className="mt-0.5 text-[10px] tracking-[0.04em] text-fg-muted break-words">
           via {relayNames.join(", ")}
         </div>
       )}
