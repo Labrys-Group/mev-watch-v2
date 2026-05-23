@@ -23,13 +23,13 @@ export default async function ExplorerPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-[1280px] px-6">
+      <main className="mx-auto max-w-[1280px] px-4 md:px-6">
           {/* Page heading */}
           <Reveal className="py-12 border-b border-border-labrys">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// relay explorer"}
             </p>
-            <h1 className="font-sans font-bold text-4xl tracking-tight text-foreground leading-tight m-0">
+            <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight text-foreground leading-tight m-0">
               Relay directory &amp; leaderboard
             </h1>
             <p className="font-mono text-sm text-fg-muted mt-4 leading-relaxed max-w-2xl">
@@ -54,13 +54,13 @@ export default async function ExplorerPage() {
                 <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
                   01 / LATEST LEADERBOARD
                 </div>
-                <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
+                <h2 className="font-sans font-bold text-[26px] sm:text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
                   Ranked by
                   <br />
                   block share.
                 </h2>
               </div>
-              <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed">
+              <div className="hidden text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed sm:block">
                 SORT: SHARE DESC // WINDOW: 1D
                 <br />
                 SOURCE: RELAYSCAN.IO + BEACON
@@ -68,22 +68,22 @@ export default async function ExplorerPage() {
             </div>
 
             <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-              <table className="w-full min-w-[480px] border-collapse font-mono text-[13px]">
+              <table className="w-full border-collapse font-mono text-[13px]">
               <thead>
                 <tr>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys w-10">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 bg-panel-alt border-t border-b border-border-labrys w-10">
                     #
                   </th>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     RELAY
                   </th>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     POSTURE
                   </th>
-                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
+                  <th className="text-left font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     SHARE
                   </th>
-                  <th className="text-right font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-3 py-3.5 bg-panel-alt border-t border-b border-border-labrys">
+                  <th className="text-right font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 bg-panel-alt border-t border-b border-border-labrys">
                     BLOCKS
                   </th>
                 </tr>
@@ -113,22 +113,22 @@ export default async function ExplorerPage() {
                         style={{ "--delay": `${index * 40}ms` } as CSSVars}
                       >
                         {/* Rank */}
-                        <td className="px-3 py-3.5 align-middle font-mono text-[13px] text-fg-muted tabular-nums transition-colors duration-200 group-hover:text-accent-brand">
+                        <td className="px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 align-middle font-mono text-[13px] text-fg-muted tabular-nums transition-colors duration-200 group-hover:text-accent-brand">
                           {rank}
                         </td>
 
                         {/* Relay name + id */}
-                        <td className="px-3 py-3.5 align-middle">
+                        <td className="px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 align-middle">
                           <div className="font-sans font-bold text-[15px] tracking-[-0.01em] text-foreground leading-snug transition-colors duration-200 group-hover:text-accent-brand">
                             {row.name}
                           </div>
-                          <div className="font-mono text-[11px] text-fg-muted mt-0.5 leading-tight">
+                          <div className="hidden font-mono text-[11px] text-fg-muted mt-0.5 leading-tight break-all sm:block">
                             {row.relayId}
                           </div>
                         </td>
 
                         {/* Posture badge */}
-                        <td className="px-3 py-3.5 align-middle">
+                        <td className="px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 align-middle">
                           {isCensoring ? (
                             <span className="inline-block font-mono text-[10px] tracking-[0.12em] uppercase px-2 py-[3px] border text-warn border-warn">
                               OFAC
@@ -145,10 +145,10 @@ export default async function ExplorerPage() {
                         </td>
 
                         {/* Share — mini-bar + percent */}
-                        <td className="px-3 py-3.5 align-middle">
+                        <td className="px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 align-middle">
                           <span className="inline-flex items-center gap-2.5">
-                            {/* Mini bar */}
-                            <span className="relative inline-block w-[140px] h-1.5 bg-foreground/5 shrink-0 align-middle">
+                            {/* Mini bar — hidden on the smallest screens */}
+                            <span className="relative hidden sm:inline-block w-[140px] h-1.5 bg-foreground/5 shrink-0 align-middle">
                               <span
                                 className={`grow-bar absolute left-0 top-0 bottom-0 ${
                                   isCensoring ? "bg-ofac" : "bg-neutral-relay"
@@ -178,7 +178,7 @@ export default async function ExplorerPage() {
                         </td>
 
                         {/* Block count */}
-                        <td className="px-3 py-3.5 align-middle text-right font-mono text-[14px] tracking-[0.02em] tabular-nums text-foreground">
+                        <td className="px-2 py-3 max-[360px]:px-1 sm:px-3 sm:py-3.5 align-middle text-right font-mono text-[14px] tracking-[0.02em] tabular-nums text-foreground">
                           {row.blocks.toLocaleString()}
                         </td>
                       </tr>
@@ -197,13 +197,13 @@ export default async function ExplorerPage() {
                 <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted mb-2">
                   02 / RELAY DIRECTORY
                 </div>
-                <h2 className="font-sans font-bold text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
+                <h2 className="font-sans font-bold text-[26px] sm:text-[34px] leading-[1.05] tracking-[-0.02em] text-foreground m-0">
                   Canonical relay
                   <br />
                   reference.
                 </h2>
               </div>
-              <div className="text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed max-w-xs">
+              <div className="hidden text-right font-mono text-[10.5px] tracking-[0.12em] uppercase text-fg-muted leading-relaxed max-w-xs sm:block">
                 CLASSIFICATION IS EDITORIAL
                 <br />
                 SOURCE:{" "}
@@ -232,8 +232,8 @@ export default async function ExplorerPage() {
 
             {/* Directory table */}
             <div className="border border-border-labrys overflow-hidden">
-              {/* Header row */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys bg-panel">
+              {/* Header row — hidden on phones; rows read as stacked cards */}
+              <div className="hidden grid-cols-[1fr_auto_2fr] border-b border-border-labrys bg-panel sm:grid">
                 <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-4 py-3 border-r border-border-labrys">
                   Relay
                 </div>
@@ -254,15 +254,15 @@ export default async function ExplorerPage() {
                 return (
                   <div
                     key={relay.id}
-                    className={`reveal-item grid grid-cols-[1fr_auto_2fr] transition-colors duration-200 hover:bg-panel-alt ${!isLast ? "border-b border-border-labrys" : ""}`}
+                    className={`reveal-item grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] transition-colors duration-200 hover:bg-panel-alt ${!isLast ? "border-b border-border-labrys" : ""}`}
                     style={
                       { "--delay": `${Math.min(idx, 14) * 35}ms` } as CSSVars
                     }
                   >
-                    <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+                    <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                       {relay.name}
                     </div>
-                    <div className="px-4 py-3 border-r border-border-labrys flex items-center">
+                    <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys flex items-center">
                       {isCensoring ? (
                         <span className="inline-block font-mono text-[10px] tracking-[0.12em] uppercase px-2 py-[3px] border text-warn border-warn">
                           OFAC
@@ -277,7 +277,7 @@ export default async function ExplorerPage() {
                         </span>
                       )}
                     </div>
-                    <div className="font-mono text-xs text-fg-muted px-4 py-3 break-all">
+                    <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                       {relay.id}
                     </div>
                   </div>

@@ -13,13 +13,13 @@ export default function MethodologyPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-[900px] px-6 py-12">
+      <main className="mx-auto max-w-[900px] px-4 md:px-6 py-12">
           {/* Page title */}
           <Reveal className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// methodology"}
             </p>
-            <h1 className="font-sans font-bold text-4xl tracking-tight text-foreground leading-tight m-0">
+            <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight text-foreground leading-tight m-0">
               How MEV Watch measures Ethereum censorship
             </h1>
             <p className="font-mono text-sm text-fg-muted mt-4 leading-relaxed max-w-2xl">
@@ -201,8 +201,8 @@ export default function MethodologyPage() {
 
             {/* Relay table */}
             <div className="border border-border-labrys mt-6 overflow-hidden">
-              {/* Table header */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys bg-background">
+              {/* Table header — hidden on phones; rows read as stacked cards */}
+              <div className="hidden grid-cols-[1fr_auto_2fr] border-b border-border-labrys bg-background sm:grid">
                 <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-4 py-3 border-r border-border-labrys">
                   Relay
                 </div>
@@ -215,121 +215,121 @@ export default function MethodologyPage() {
               </div>
 
               {/* Ultra Sound */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   Ultra Sound
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   relay.ultrasound.money
                 </div>
               </div>
 
               {/* Titan */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   Titan
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   titanrelay.xyz
                 </div>
               </div>
 
               {/* bloXroute Max Profit */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   bloXroute Max Profit
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
                     censoring
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   bloxroute.max-profit.blxrbdn.com
                 </div>
               </div>
 
               {/* bloXroute Regulated */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   bloXroute Regulated
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
                     censoring
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   bloxroute.regulated.blxrbdn.com
                 </div>
               </div>
 
               {/* Aestus */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   Aestus
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   aestus.live
                 </div>
               </div>
 
               {/* Flashbots */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   Flashbots
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
                     censoring
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   boost-relay.flashbots.net
                 </div>
               </div>
 
               {/* Agnostic Gnosis */}
-              <div className="grid grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   Agnostic Gnosis
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
                     neutral
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   agnostic-relay.net
                 </div>
               </div>
 
               {/* EthGas */}
-              <div className="grid grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-4 py-3 border-r border-border-labrys">
+              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt">
+                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
                   EthGas
                 </div>
-                <div className="px-4 py-3 border-r border-border-labrys">
+                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                   <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted border border-border-labrys px-2 py-0.5">
                     unknown
                   </span>
                 </div>
-                <div className="font-mono text-xs text-fg-muted px-4 py-3">
+                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
                   relay.ethgas.com
                 </div>
               </div>

@@ -23,13 +23,13 @@ export default async function StatusPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-[900px] px-6 py-12">
+      <main className="mx-auto max-w-[900px] px-4 md:px-6 py-12">
           {/* Page title */}
           <Reveal className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// status"}
             </p>
-            <h1 className="font-sans font-bold text-4xl tracking-tight text-foreground leading-tight m-0">
+            <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight text-foreground leading-tight m-0">
               Data pipeline status
             </h1>
             <p className="font-mono text-sm text-fg-muted mt-4 leading-relaxed max-w-2xl">
@@ -126,8 +126,8 @@ export default async function StatusPage() {
               </div>
             ) : (
               <div className="border border-border-labrys overflow-hidden">
-                {/* Table header */}
-                <div className="grid grid-cols-[2fr_1fr_1fr_3fr] border-b border-border-labrys bg-panel">
+                {/* Table header — hidden on phones; rows read as stacked cards */}
+                <div className="hidden grid-cols-[2fr_1fr_1fr_3fr] border-b border-border-labrys bg-panel sm:grid">
                   <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-fg-muted px-4 py-3 border-r border-border-labrys">
                     Time
                   </div>
@@ -146,7 +146,7 @@ export default async function StatusPage() {
                 {recentRefreshes.map((run, idx) => (
                   <div
                     key={idx}
-                    className={`reveal-item grid grid-cols-[2fr_1fr_1fr_3fr] transition-colors duration-200 hover:bg-panel-alt ${
+                    className={`reveal-item grid grid-cols-[1fr_auto] sm:grid-cols-[2fr_1fr_1fr_3fr] transition-colors duration-200 hover:bg-panel-alt ${
                       idx < recentRefreshes.length - 1
                         ? "border-b border-border-labrys"
                         : ""
@@ -158,7 +158,7 @@ export default async function StatusPage() {
                     <div className="font-mono text-sm text-foreground px-4 py-3 border-r border-border-labrys">
                       {formatRelativeTime(run.ranAt)}
                     </div>
-                    <div className="px-4 py-3 border-r border-border-labrys">
+                    <div className="px-4 py-3 sm:border-r sm:border-border-labrys">
                       <span
                         className={`font-mono text-[10px] tracking-[0.12em] uppercase border px-2 py-0.5 ${
                           run.status === "ok"
@@ -169,10 +169,10 @@ export default async function StatusPage() {
                         {run.status}
                       </span>
                     </div>
-                    <div className="font-mono text-xs text-fg-muted px-4 py-3 border-r border-border-labrys">
+                    <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-4 py-3 sm:col-span-1 sm:border-t-0 sm:border-r">
                       {run.source || "—"}
                     </div>
-                    <div className="font-mono text-xs text-fg-muted px-4 py-3 leading-relaxed">
+                    <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-4 py-3 leading-relaxed sm:col-span-1 sm:border-t-0">
                       {run.message ?? "—"}
                     </div>
                   </div>

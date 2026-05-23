@@ -33,19 +33,19 @@ export function ShareStrip() {
   }
 
   return (
-    <div className="flex mt-8 border border-border-labrys">
+    <div className="mt-8 grid grid-cols-2 border border-border-labrys sm:flex">
       <a
         href={`https://twitter.com/intent/tweet?text=${TWEET_TEXT}&url=${TWEET_URL}`}
         target="_blank"
         rel="noopener noreferrer"
-        className={`${ITEM_CLASS} border-r border-border-labrys`}
+        className={`${ITEM_CLASS} border-r border-b border-border-labrys sm:border-b-0`}
       >
         Share on X
       </a>
       <button
         type="button"
         onClick={handleCopyLink}
-        className={`${ITEM_CLASS} border-r border-border-labrys`}
+        className={`${ITEM_CLASS} border-b border-border-labrys sm:border-r sm:border-b-0`}
       >
         {copyLinkLabel}
       </button>
