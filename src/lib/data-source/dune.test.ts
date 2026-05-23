@@ -92,6 +92,19 @@ describe("DuneDataSource", () => {
     ).rejects.toThrow(/failed/i);
   });
 
+  it("throws when the poll reports an unknown state", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(okResponse({ execution_id: "exec-1" }))
+        .mockResolvedValueOnce(okResponse({ state: "QUERY_STATE_CANCELLED" })),
+    );
+    await expect(
+      new DuneDataSource("k", 1).fetchDay("2026-05-21"),
+    ).rejects.toThrow(/unexpected state/i);
+  });
+
   it("throws when the result shape is invalid", async () => {
     vi.stubGlobal(
       "fetch",

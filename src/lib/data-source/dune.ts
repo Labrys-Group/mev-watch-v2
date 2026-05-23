@@ -74,10 +74,14 @@ export class DuneDataSource implements DataSource {
       }
       const { state } = StatusResponse.parse(await response.json());
       if (state === "QUERY_STATE_COMPLETED") return;
-      if (state === "QUERY_STATE_FAILED") {
-        throw new Error(`dune execution ${executionId} reported FAILED`);
+      if (state === "QUERY_STATE_PENDING" || state === "QUERY_STATE_EXECUTING") {
+        await sleep(POLL_INTERVAL_MS);
+        continue;
       }
-      await sleep(POLL_INTERVAL_MS);
+      // FAILED, CANCELLED, EXPIRED, or any other terminal/unknown state.
+      throw new Error(
+        `dune execution ${executionId} returned unexpected state: ${state}`,
+      );
     }
     throw new Error(
       `dune execution ${executionId} did not complete within ${POLL_TIMEOUT_MS}ms`,
