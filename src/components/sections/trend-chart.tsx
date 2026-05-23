@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { TrendPoint, StatsSummary } from "@/lib/queries";
+import { toCompositionPoint, type CompositionPoint } from "@/lib/composition";
 import { formatPercent, formatDateShort } from "@/lib/format";
 import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
@@ -30,18 +31,69 @@ function getSlice(trend: TrendPoint[], range: Range): TrendPoint[] {
   return trend.slice(-count);
 }
 
-/** Pick a sparse subset of indices for X-axis ticks — at most ~8 ticks. */
-function sparseTickIndices(data: TrendPoint[], maxTicks = 8): string[] {
+/** Pick a sparse subset of dates for X-axis ticks — at most ~8 ticks. */
+function sparseTickIndices(data: { date: string }[], maxTicks = 8): string[] {
   if (data.length === 0) return [];
   const step = Math.max(1, Math.floor(data.length / maxTicks));
   const ticks: string[] = [];
   for (let i = 0; i < data.length; i += step) {
     ticks.push(data[i].date);
   }
-  // Always include the last point
+  // Always include the last point.
   const last = data[data.length - 1].date;
   if (!ticks.includes(last)) ticks.push(last);
   return ticks;
+}
+
+/** One legend entry — a colour swatch plus its label. */
+function LegendSwatch({ className, label }: { className: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        className={`inline-block w-2.5 h-2.5 shrink-0 ${className}`}
+        aria-hidden="true"
+      />
+      {label}
+    </span>
+  );
+}
+
+interface TooltipItem {
+  payload: CompositionPoint;
+}
+
+/** Custom tooltip — the three band percentages plus the headline rate. */
+function ChartTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: TooltipItem[];
+  label?: string | number;
+}) {
+  if (!active || !payload || payload.length === 0) return null;
+  const point = payload[0].payload;
+  return (
+    <div className="border border-border-labrys bg-panel px-3 py-2 font-mono text-[11px] tracking-[0.06em] text-foreground">
+      <div className="text-fg-muted mb-1.5">{formatDateShort(String(label))}</div>
+      <div className="flex items-center justify-between gap-5">
+        <LegendSwatch className="bg-non-boost" label="Non-boosted" />
+        <span>{formatPercent(point.nonBoost)}</span>
+      </div>
+      <div className="flex items-center justify-between gap-5">
+        <LegendSwatch className="bg-ofac" label="Censored" />
+        <span>{formatPercent(point.censored)}</span>
+      </div>
+      <div className="flex items-center justify-between gap-5">
+        <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
+        <span>{formatPercent(point.nonCensored)}</span>
+      </div>
+      <div className="mt-1.5 pt-1.5 border-t border-border-labrys text-fg-muted normal-case">
+        Censorship rate {formatPercent(point.censorshipPct)} of MEV-boost
+      </div>
+    </div>
+  );
 }
 
 export function TrendChart({ trend, summary }: TrendChartProps) {
@@ -51,6 +103,17 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+
+  // Phones get a sparser x-axis so the date labels never collide.
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   // Defer mounting the chart until it scrolls into view so the area
   // sweep animation plays exactly when the reader reaches it.
@@ -82,22 +145,22 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
     return () => observer.disconnect();
   }, []);
 
-  const data = useMemo(() => getSlice(trend, range), [trend, range]);
-  const ticks = useMemo(() => sparseTickIndices(data), [data]);
+  const data = useMemo<CompositionPoint[]>(
+    () => getSlice(trend, range).map(toCompositionPoint),
+    [trend, range],
+  );
+  const ticks = useMemo(
+    () => sparseTickIndices(data, isNarrow ? 3 : 8),
+    [data, isNarrow],
+  );
 
   return (
     <Section
       label="02 / CENSORSHIP OVER TIME"
-      title={
-        <>
-          Censorship % since
-          <br />
-          the Merge.
-        </>
-      }
+      title="Censorship % since the Merge."
       aside={
         <>
-          <span>7D ROLLING AVG</span>
+          <span>SHARE OF ALL BLOCKS</span>
           <br />
           <span>SEP 2022 — NOW</span>
         </>
@@ -105,7 +168,7 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
     >
       {/* Recessed chart well */}
       <div className="border border-border-labrys bg-background">
-        {/* Stat header row */}
+        {/* Stat header row — the headline censorship metric (share of MEV-boost) */}
         <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
           <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             NOW
@@ -127,10 +190,10 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
           </div>
         </div>
 
-        {/* Range toggle + chart */}
+        {/* Range toggle + legend + chart */}
         <div className="p-0">
-          {/* Segment control toolbar */}
-          <div className="flex items-center justify-between px-4 pt-4 pb-0">
+          <div className="flex items-center justify-between gap-3 flex-wrap px-4 pt-4 pb-0">
+            {/* Segment control toolbar */}
             <div className="inline-flex border border-border-labrys">
               {RANGE_LABELS.map((r, i) => (
                 <button
@@ -151,6 +214,12 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                 </button>
               ))}
             </div>
+            {/* Legend */}
+            <div className="flex items-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
+              <LegendSwatch className="bg-non-boost" label="Non-boosted" />
+              <LegendSwatch className="bg-ofac" label="Censored" />
+              <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
+            </div>
           </div>
 
           {/* Chart */}
@@ -161,18 +230,19 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                   data={data}
                   margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
                 >
+                  {/* Per-band fills fade from the band's line down to near-transparent. */}
                   <defs>
-                    <linearGradient id="accentGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop
-                        offset="0%"
-                        stopColor="var(--accent-color)"
-                        stopOpacity={0.55}
-                      />
-                      <stop
-                        offset="100%"
-                        stopColor="var(--accent-color)"
-                        stopOpacity={0}
-                      />
+                    <linearGradient id="fill-non-censored" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--neutral)" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="var(--neutral)" stopOpacity={0.03} />
+                    </linearGradient>
+                    <linearGradient id="fill-censored" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--ofac)" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="var(--ofac)" stopOpacity={0.03} />
+                    </linearGradient>
+                    <linearGradient id="fill-non-boost" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--non-boost)" stopOpacity={0.5} />
+                      <stop offset="100%" stopColor="var(--non-boost)" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -211,34 +281,62 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                     ticks={[0, 25, 50, 75, 100]}
                   />
                   <Tooltip
-                    contentStyle={{
-                      background: "var(--panel)",
-                      border: "1px solid var(--border-labrys)",
-                      borderRadius: 0,
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 11,
-                      color: "var(--foreground)",
-                      letterSpacing: "0.08em",
-                    }}
-                    labelFormatter={(label) => formatDateShort(String(label))}
-                    formatter={(value) => [
-                      formatPercent(typeof value === "number" ? value : Number(value)),
-                      "Censorship",
-                    ]}
+                    content={<ChartTooltip />}
                     cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
+                  />
+                  {/* Declared bottom-to-top: non-censored, censored, non-boosted */}
+                  <Area
+                    type="monotone"
+                    dataKey="nonCensored"
+                    stackId="1"
+                    stroke="var(--neutral)"
+                    strokeWidth={2}
+                    fill="url(#fill-non-censored)"
+                    fillOpacity={1}
+                    dot={false}
+                    activeDot={{
+                      r: 3.5,
+                      strokeWidth: 2,
+                      stroke: "var(--background)",
+                      fill: "var(--neutral)",
+                    }}
+                    isAnimationActive={!reduceMotion}
+                    animationDuration={1100}
+                    animationEasing="ease-out"
                   />
                   <Area
                     type="monotone"
-                    dataKey="censorshipPct"
-                    stroke="var(--accent-color)"
+                    dataKey="censored"
+                    stackId="1"
+                    stroke="var(--ofac)"
                     strokeWidth={2}
-                    fill="url(#accentGradient)"
+                    fill="url(#fill-censored)"
+                    fillOpacity={1}
                     dot={false}
                     activeDot={{
-                      r: 4,
-                      stroke: "var(--foreground)",
-                      strokeWidth: 1.5,
-                      fill: "var(--accent-color)",
+                      r: 3.5,
+                      strokeWidth: 2,
+                      stroke: "var(--background)",
+                      fill: "var(--ofac)",
+                    }}
+                    isAnimationActive={!reduceMotion}
+                    animationDuration={1100}
+                    animationEasing="ease-out"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="nonBoost"
+                    stackId="1"
+                    stroke="var(--non-boost)"
+                    strokeWidth={2}
+                    fill="url(#fill-non-boost)"
+                    fillOpacity={1}
+                    dot={false}
+                    activeDot={{
+                      r: 3.5,
+                      strokeWidth: 2,
+                      stroke: "var(--background)",
+                      fill: "var(--non-boost)",
                     }}
                     isAnimationActive={!reduceMotion}
                     animationDuration={1100}

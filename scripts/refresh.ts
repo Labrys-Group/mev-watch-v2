@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { refreshDay } from "../src/lib/refresh";
 import { RelayscanDataSource } from "../src/lib/data-source/relayscan";
+import { EthRpcBlockCountSource } from "../src/lib/data-source/eth-rpc";
 
 /** Returns yesterday's date (UTC) as an ISO string — the most recent complete day. */
 function yesterdayUtc(): string {
@@ -13,7 +14,11 @@ async function main() {
   const date = process.argv[2] ?? yesterdayUtc();
   console.log(`Refreshing relay stats for ${date}...`);
 
-  const result = await refreshDay(date, new RelayscanDataSource());
+  const result = await refreshDay(
+    date,
+    new RelayscanDataSource(),
+    new EthRpcBlockCountSource(),
+  );
 
   if (result.status === "ok") {
     console.log(`OK — ${date} refreshed.`);

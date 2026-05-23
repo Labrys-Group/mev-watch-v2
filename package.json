@@ -15,6 +15,7 @@
     "db:check": "tsx scripts/check-db.ts",
     "refresh": "tsx scripts/refresh.ts",
     "seed-history": "tsx scripts/seed-history.ts",
+    "backfill-nonboost": "tsx scripts/backfill-nonboost.ts",
     "db:summary": "tsx scripts/db-summary.ts"
   },
   "dependencies": {

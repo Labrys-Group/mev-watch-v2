@@ -13,13 +13,13 @@ export default function ApiDocsPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-[900px] px-6 py-12">
+      <main className="mx-auto max-w-[900px] px-4 md:px-6 py-12">
           {/* Page title */}
           <Reveal className="mb-10 border-b border-border-labrys pb-8">
             <p className="font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand mb-4">
               {"// api reference"}
             </p>
-            <h1 className="font-sans font-bold text-4xl tracking-tight text-foreground leading-tight m-0">
+            <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight text-foreground leading-tight m-0">
               Public API
             </h1>
             <p className="font-mono text-sm text-fg-muted mt-4 leading-relaxed max-w-2xl">

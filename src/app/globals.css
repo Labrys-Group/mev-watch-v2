@@ -16,16 +16,16 @@
   --grid-line:     #0D0E1626;
   --nav-item:      #0D0E1680;
   --accent-color: #00A86B;
-  --accent-alt-color: #4F0CE5;
+  --accent-alt-color: #8F80EF;
 
-  /* MEV Watch semantic colours — light mode (pastel) */
-  --ofac:    #F0A9A0;
+  /* MEV Watch semantic colours — light mode (teal / coral / slate) */
+  --ofac:    #EC5F52;
   --ofac-fg: #5E1A13;
-  --neutral: #7DE9C4;
+  --neutral: #2AAE81;
   --neutral-fg: #0A3D2C;
   --good:    #00A86B;
   --warn:    #C9543F;
-  --non-boost: #C2C4D2;
+  --non-boost: #9197A8;
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -56,17 +56,17 @@
   --border-labrys: #FFFFFF14;
   --grid-line:     #FFFFFF1F;
   --nav-item:      #FFFFFF80;
-  --accent-color: #4F0CE5;
+  --accent-color: #8F80EF;
   --accent-alt-color: #00EF9F;
 
-  /* MEV Watch semantic colours — dark mode (saturated) */
+  /* MEV Watch semantic colours — dark mode (teal / coral / slate) */
   --ofac:    #FF6B6B;
   --ofac-fg: #0D0E16;
-  --neutral: #00EF9F;
+  --neutral: #2FBE94;
   --neutral-fg: #0D0E16;
   --good:    #00EF9F;
   --warn:    #FF6B6B;
-  --non-boost: #565870;
+  --non-boost: #6E7488;
 
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -279,6 +279,30 @@ details[open]::details-content {
   animation-delay: var(--delay, 0ms);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Epoch ledger — live per-slot composition grid.
+   `.epoch-tile` animates on mount; React remounts a tile (via a
+   category-keyed key) only when its slot newly fills, so each new
+   slot pops once. Rows collapse/expand via a grid-template-rows
+   transition so the epoch shift needs no measured pixel heights.
+   ────────────────────────────────────────────────────────────── */
+.epoch-tile {
+  animation: mw-tile-pop 0.52s cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+.epoch-row-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.epoch-row-wrap--collapsed {
+  grid-template-rows: 0fr;
+}
+.epoch-row-wrap > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Page-wide blueprint grid — fixed behind all content, radially
    feathered so it dissolves inward into the background colour. */
 .bg-grid {
@@ -354,8 +378,12 @@ details[open]::details-content {
   .is-visible .grow-bar,
   .is-visible .reveal-item,
   .is-visible .reveal-row,
-  .is-visible .tile {
+  .is-visible .tile,
+  .epoch-tile {
     animation: none !important;
+  }
+  .epoch-row-wrap {
+    transition: none !important;
   }
   .nav-underline::after {
     transition: none !important;

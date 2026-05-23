@@ -21,6 +21,12 @@ export interface DayRelayStats {
   builders: BuilderBlockCount[];
 }
 
+/** One day of relay stats plus the day's total on-chain block count. */
+export interface DaySnapshot extends DayRelayStats {
+  /** Total execution-layer blocks proposed that UTC day. */
+  totalChainBlocks: number;
+}
+
 /**
  * A source of MEV-boost relay statistics. Implementations wrap an external
  * provider (relayscan.io, Dune, ...) so the refresh pipeline stays agnostic.
@@ -30,4 +36,16 @@ export interface DataSource {
   readonly name: string;
   /** Fetch one day of relay stats. Throws on network/parse failure. */
   fetchDay(date: string): Promise<DayRelayStats>;
+}
+
+/**
+ * A source of total execution-layer block counts, used to derive the
+ * non-MEV-boost share. Separate from `DataSource` — a different provider
+ * (an Ethereum RPC) answers a different question.
+ */
+export interface BlockCountSource {
+  /** The provider name. */
+  readonly name: string;
+  /** Total execution-layer blocks proposed during the given UTC date. */
+  totalBlocks(date: string): Promise<number>;
 }

@@ -1,6 +1,5 @@
 import { Section } from "@/components/section";
 import type { CSSVars } from "@/lib/css";
-import { ShareStrip } from "./share-strip";
 
 const STEPS = [
   {
@@ -29,33 +28,39 @@ export function WhatToDo() {
   return (
     <Section
       label="05 / WHAT TO DO"
-      title={
-        <>
-          Keep Ethereum
-          <br />
-          credibly neutral.
-        </>
-      }
+      title="Keep Ethereum credibly neutral."
       aside="FOR: VALIDATORS, STAKERS, BUILDERS"
     >
       {/* Callout panel */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] border border-border-labrys overflow-hidden">
-        {/* Left side */}
-        <div className="p-5 md:p-7 border-b border-border-labrys md:border-b-0 md:border-r md:border-border-labrys bg-background">
-          <h3 className="font-sans font-bold text-[24px] sm:text-[30px] leading-none tracking-[-0.025em] text-foreground m-0">
-            <span className="text-warn font-mono font-semibold">BAD</span>
-            <span className="text-fg-muted mx-1.5">&nbsp;==&nbsp;</span>
-            <span className="text-warn font-mono font-semibold">CENSORSHIP</span>
-          </h3>
-          <p className="font-mono text-[12.5px] leading-[1.6] text-fg-muted mt-3.5">
-            Adopt a non-censoring MEV-Boost relay. The cost to you is zero. The
-            cost to Ethereum of doing nothing is{" "}
-            <strong className="text-foreground font-semibold">
-              the right to transact.
-            </strong>
-          </p>
+        {/* Left side — hero-styled callout with warn-tinted wash + faded grid */}
+        <div className="relative overflow-hidden p-5 md:p-7 border-b border-border-labrys md:border-b-0 md:border-r md:border-border-labrys bg-panel flex flex-col justify-center">
+          {/* Warn-tinted radial wash */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, var(--warn) 14%, transparent) 0%, transparent 58%)",
+            }}
+          />
+          {/* Faded grid background texture */}
+          <div aria-hidden="true" className="faded-grid pointer-events-none absolute inset-0" />
 
-          <ShareStrip />
+          <div className="relative">
+            <h3 className="font-sans font-bold text-[24px] sm:text-[30px] leading-none tracking-[-0.025em] text-foreground m-0">
+              <span className="text-warn font-mono font-semibold">BAD</span>
+              <span className="text-fg-muted mx-1.5">&nbsp;==&nbsp;</span>
+              <span className="text-warn font-mono font-semibold">CENSORSHIP</span>
+            </h3>
+            <p className="font-mono text-[12.5px] leading-[1.6] text-fg-muted mt-3.5">
+              Adopt a non-censoring MEV-Boost relay. The cost to you is zero. The
+              cost to Ethereum of doing nothing is{" "}
+              <strong className="text-foreground font-semibold">
+                the right to transact.
+              </strong>
+            </p>
+          </div>
         </div>
 
         {/* Right side — validator steps */}

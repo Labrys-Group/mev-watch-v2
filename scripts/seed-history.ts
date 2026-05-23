@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { refreshDay } from "../src/lib/refresh";
 import { RelayscanDataSource } from "../src/lib/data-source/relayscan";
+import { EthRpcBlockCountSource } from "../src/lib/data-source/eth-rpc";
 
 /** MEV-boost began at the Merge; relayscan has data from shortly after. */
 const DEFAULT_START = "2022-09-15";
@@ -26,12 +27,13 @@ async function main() {
   const start = process.argv[2] ?? DEFAULT_START;
   const end = process.argv[3] ?? yesterdayUtc();
   const source = new RelayscanDataSource();
+  const blockSource = new EthRpcBlockCountSource();
 
   let ok = 0;
   let failed = 0;
 
   for (const date of dateRange(start, end)) {
-    const result = await refreshDay(date, source);
+    const result = await refreshDay(date, source, blockSource);
     if (result.status === "ok") {
       ok += 1;
     } else {

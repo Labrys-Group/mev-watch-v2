@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { refreshDay } from "@/lib/refresh";
 import { RelayscanDataSource } from "@/lib/data-source/relayscan";
+import { EthRpcBlockCountSource } from "@/lib/data-source/eth-rpc";
 
 export const runtime = "nodejs";
 // Always run fresh — never serve a cached refresh.
@@ -25,7 +26,11 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const date = yesterdayUtc();
-  const result = await refreshDay(date, new RelayscanDataSource());
+  const result = await refreshDay(
+    date,
+    new RelayscanDataSource(),
+    new EthRpcBlockCountSource(),
+  );
 
   return NextResponse.json(result, {
     status: result.status === "ok" ? 200 : 500,
