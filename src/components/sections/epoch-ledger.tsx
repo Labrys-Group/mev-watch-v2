@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import type { CSSVars } from "@/lib/css";
 import { classifyRelay } from "@/config/relays";
 import { diffLedger } from "@/lib/epochs/diff";
@@ -317,7 +318,11 @@ function SlotTooltip({ hover }: { hover: HoverState }) {
   if (left < 8) left = 8;
   if (top < 8) top = 8;
 
-  return (
+  // Portal to document.body so the ancestor <Reveal>'s `transform` and
+  // `will-change: transform` don't re-anchor `position: fixed` to the section.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="pointer-events-none fixed z-[70] max-w-[280px] border border-border-labrys bg-panel px-3 py-2 font-mono shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
       style={{ left, top }}
@@ -342,7 +347,8 @@ function SlotTooltip({ hover }: { hover: HoverState }) {
           {formatEth(cell.valueWei)} ETH · {cell.numTx ?? 0} txns
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }
 
