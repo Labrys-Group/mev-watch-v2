@@ -44,6 +44,9 @@ next-env.d.ts
 # superpowers brainstorm scratch
 .superpowers
 
+# understand-anything skill cache (knowledge graph, fingerprints)
+.understand-anything/
+
 # env & local infra
 .env
 .env*.local
