@@ -262,15 +262,15 @@ details[open]::details-content {
 .grow-bar {
   transform-origin: left center;
 }
-.is-visible .grow-bar {
+.grow-bar {
   animation: mw-bar-grow 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: var(--delay, 140ms);
 }
-.is-visible .reveal-item {
+.reveal-item {
   animation: mw-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: var(--delay, 0ms);
 }
-.is-visible .reveal-row {
+.reveal-row {
   animation: mw-fade-in 0.5s ease-out backwards;
   animation-delay: var(--delay, 0ms);
 }
@@ -375,10 +375,10 @@ details[open]::details-content {
   .line-rise,
   .cursor-blink,
   .status-sheen,
-  .is-visible .grow-bar,
-  .is-visible .reveal-item,
-  .is-visible .reveal-row,
-  .is-visible .tile,
+  .grow-bar,
+  .reveal-item,
+  .reveal-row,
+  .tile,
   .epoch-tile {
     animation: none !important;
   }
