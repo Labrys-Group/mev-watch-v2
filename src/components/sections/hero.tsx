@@ -61,12 +61,35 @@ export function Hero({ verdict }: HeroProps) {
           </h1>
         </div>
 
-        {/* Right column — readme callout (top), then % + note */}
+        {/* Right column — % + note (top), then readme callout */}
         <div className="flex flex-col gap-5">
+          {/* Stat line — figure + arrow on the left, message wrapping in its
+              own narrow column beside them. Never stacks vertically. */}
+          <div
+            className="anim-fade-up flex items-center gap-x-4 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
+            style={{ "--delay": "360ms" } as CSSVars}
+          >
+            <div className="flex shrink-0 items-baseline gap-2">
+              <span
+                className="font-sans font-extrabold tracking-tight text-foreground"
+                style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
+              >
+                <CountUp value={verdict.current} decimals={1} suffix="%" />
+              </span>
+              <span
+                className={`font-sans font-extrabold tracking-tight ${trendColor}`}
+                style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
+              >
+                {verdict.arrow}
+              </span>
+            </div>
+            <p className="m-0 min-w-0 flex-1">{verdict.message}</p>
+          </div>
+
           {/* Readme terminal lede box */}
           <div
             className="anim-fade-up relative font-mono text-[12.5px] leading-[1.65] text-fg-muted p-4 border border-border-labrys bg-panel"
-            style={{ "--delay": "360ms" } as CSSVars}
+            style={{ "--delay": "540ms" } as CSSVars}
           >
             {/* $ cat ./readme.md label */}
             <span
@@ -88,29 +111,6 @@ export function Hero({ verdict }: HeroProps) {
                 className="cursor-blink ml-1 inline-block h-[1.05em] w-[7px] translate-y-[0.2em] bg-accent-brand align-baseline"
               />
             </p>
-          </div>
-
-          {/* Stat line — figure + arrow on the left, message wrapping in its
-              own narrow column beside them. Never stacks vertically. */}
-          <div
-            className="anim-fade-up flex items-center gap-x-4 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
-            style={{ "--delay": "540ms" } as CSSVars}
-          >
-            <div className="flex shrink-0 items-baseline gap-2">
-              <span
-                className="font-sans font-extrabold tracking-tight text-foreground"
-                style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
-              >
-                <CountUp value={verdict.current} decimals={1} suffix="%" />
-              </span>
-              <span
-                className={`font-sans font-extrabold tracking-tight ${trendColor}`}
-                style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
-              >
-                {verdict.arrow}
-              </span>
-            </div>
-            <p className="m-0 min-w-0 flex-1">{verdict.message}</p>
           </div>
         </div>
       </div>
