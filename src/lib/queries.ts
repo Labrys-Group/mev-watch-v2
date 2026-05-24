@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { dailyStats, relayDailyStats, refreshLog, builderDailyStats } from "@/lib/db/schema";
@@ -79,7 +80,7 @@ export async function safeQuery<T>(
 }
 
 /** Full censorship trend, oldest first — drives the trend chart. */
-export async function getTrend(): Promise<TrendPoint[]> {
+export const getTrend = cache(async (): Promise<TrendPoint[]> => {
   return safeQuery(
     "getTrend",
     async () =>
@@ -93,10 +94,10 @@ export async function getTrend(): Promise<TrendPoint[]> {
         .orderBy(dailyStats.date),
     [],
   );
-}
+});
 
 /** The most recent day's composition. */
-export async function getLatestStats(): Promise<LatestStats | null> {
+export const getLatestStats = cache(async (): Promise<LatestStats | null> => {
   return safeQuery(
     "getLatestStats",
     async () => {
@@ -116,7 +117,7 @@ export async function getLatestStats(): Promise<LatestStats | null> {
     },
     null,
   );
-}
+});
 
 /**
  * Peak / current / trough summary across all history. Inherits `getTrend`'s
@@ -127,7 +128,7 @@ export async function getStatsSummary(): Promise<StatsSummary | null> {
 }
 
 /** The most recent day's per-relay leaderboard, sorted by share descending. */
-export async function getLeaderboard(): Promise<LeaderboardRow[]> {
+export const getLeaderboard = cache(async (): Promise<LeaderboardRow[]> => {
   return safeQuery(
     "getLeaderboard",
     async () => {
@@ -155,7 +156,7 @@ export async function getLeaderboard(): Promise<LeaderboardRow[]> {
     },
     [],
   );
-}
+});
 
 export interface BuilderRow {
   builderId: string;
@@ -164,7 +165,7 @@ export interface BuilderRow {
 }
 
 /** The most recent day's per-builder leaderboard, sorted by share descending. */
-export async function getBuilderLeaderboard(): Promise<BuilderRow[]> {
+export const getBuilderLeaderboard = cache(async (): Promise<BuilderRow[]> => {
   return safeQuery(
     "getBuilderLeaderboard",
     async () => {
@@ -190,10 +191,10 @@ export async function getBuilderLeaderboard(): Promise<BuilderRow[]> {
     },
     [],
   );
-}
+});
 
 /** The latest refresh-log entry — powers the "last updated" indicator. */
-export async function getLastRefresh(): Promise<RefreshInfo | null> {
+export const getLastRefresh = cache(async (): Promise<RefreshInfo | null> => {
   return safeQuery(
     "getLastRefresh",
     async () => {
@@ -212,7 +213,7 @@ export async function getLastRefresh(): Promise<RefreshInfo | null> {
     },
     null,
   );
-}
+});
 
 /** The most recent N refresh-log entries, newest first — powers the status page. */
 export async function getRecentRefreshes(limit = 20): Promise<RefreshInfo[]> {
