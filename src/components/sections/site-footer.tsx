@@ -163,16 +163,16 @@ export function SiteFooter() {
                 <Image
                   src="/mev-watch-logo-light.png"
                   alt="MEV Watch"
-                  width={1702}
-                  height={413}
+                  width={2280}
+                  height={584}
                   sizes="150px"
                   className="block h-9 w-auto max-w-none dark:hidden"
                 />
                 <Image
                   src="/mev-watch-logo-dark.png"
                   alt="MEV Watch"
-                  width={1694}
-                  height={408}
+                  width={2280}
+                  height={584}
                   sizes="150px"
                   className="hidden h-9 w-auto max-w-none dark:block"
                 />
