@@ -344,7 +344,12 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
                   />
                 </AreaChart>
               </ResponsiveContainer>
-            ) : null}
+            ) : (
+              <div
+                className="h-full w-full animate-pulse bg-foreground/5"
+                aria-hidden="true"
+              />
+            )}
           </div>
         </div>
       </div>
