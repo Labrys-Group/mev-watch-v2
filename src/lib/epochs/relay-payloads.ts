@@ -34,8 +34,11 @@ const DeliveredPayloadSchema = z.object({
 });
 const ResponseSchema = z.array(DeliveredPayloadSchema);
 
+// bloXroute caps limit at 100; >100 returns HTTP 400. Other relays accept
+// 200+, but 100 is the safe common max — keeps every relay healthy without
+// silently dropping the censoring side (see spec §6).
 const ENDPOINT =
-  "/relay/v1/data/bidtraces/proposer_payload_delivered?limit=200";
+  "/relay/v1/data/bidtraces/proposer_payload_delivered?limit=100";
 const TIMEOUT_MS = 4000;
 
 /** Fetches recent delivered payloads from every configured relay's data API. */

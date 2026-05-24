@@ -42,6 +42,22 @@ describe("RelayPayloadSource", () => {
     expect(RELAYS.map((r) => r.id)).toContain(first.relayId);
   });
 
+  it("requests limit=100 (bloXroute's documented max — anything higher returns HTTP 400)", async () => {
+    const fetchMock = vi.fn(
+      async () => new Response(JSON.stringify(SAMPLE), { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await new RelayPayloadSource().fetchRecentDeliveries();
+
+    expect(fetchMock).toHaveBeenCalled();
+    for (const call of fetchMock.mock.calls) {
+      const url = String(call[0]);
+      expect(url).toContain("limit=100");
+      expect(url).not.toContain("limit=200");
+    }
+  });
+
   it("skips a relay whose API fails, keeping the rest", async () => {
     vi.stubGlobal(
       "fetch",
