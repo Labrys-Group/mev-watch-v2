@@ -58,6 +58,39 @@ describe("RelayPayloadSource", () => {
     }
   });
 
+  it("emits a structured console.warn naming the relay and the failure reason", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (String(url).includes("flashbots")) {
+          return new Response(
+            '{"code":400,"message":"limit too high"}',
+            { status: 400 },
+          );
+        }
+        return new Response(JSON.stringify(SAMPLE), { status: 200 });
+      }),
+    );
+
+    await new RelayPayloadSource().fetchRecentDeliveries();
+
+    const flashbotsWarn = warnSpy.mock.calls.find((call) =>
+      call.some(
+        (arg) => typeof arg === "string" && arg.includes("flashbots"),
+      ),
+    );
+    expect(flashbotsWarn).toBeDefined();
+    const context = flashbotsWarn?.find(
+      (arg) => typeof arg === "object" && arg !== null,
+    ) as Record<string, unknown> | undefined;
+    expect(context).toMatchObject({
+      relayId: "boost-relay.flashbots.net",
+      host: "boost-relay.flashbots.net",
+    });
+    expect(String(context?.message ?? "")).toContain("400");
+  });
+
   it("skips a relay whose API fails, keeping the rest", async () => {
     vi.stubGlobal(
       "fetch",

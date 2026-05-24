@@ -63,12 +63,20 @@ export class RelayPayloadSource implements PayloadSource {
     const failedRelays: string[] = [];
 
     settled.forEach((result, i) => {
-      const relayId = RELAYS[i].id;
+      const relay = RELAYS[i];
       if (result.status === "fulfilled") {
         payloads.push(...result.value);
-        okRelays.push(relayId);
+        okRelays.push(relay.id);
       } else {
-        failedRelays.push(relayId);
+        failedRelays.push(relay.id);
+        const reason = result.reason;
+        console.warn(`relay-payloads: ${relay.id} failed`, {
+          relayId: relay.id,
+          host: relay.dataApiHost,
+          errorClass:
+            reason instanceof Error ? reason.constructor.name : typeof reason,
+          message: reason instanceof Error ? reason.message : String(reason),
+        });
       }
     });
 
