@@ -11,6 +11,7 @@ export function Hero({ verdict }: HeroProps) {
   const trendWord = verdict.headlineWord;
   const trendColor = isGood ? "text-good" : "text-warn";
   const trendGlow = isGood ? "glow-good" : "glow-warn";
+  const trendBorder = isGood ? "border-good" : "border-warn";
 
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
@@ -64,18 +65,13 @@ export function Hero({ verdict }: HeroProps) {
         {/* Right column — % stat (top), readme callout anchored to the bottom
             so the headline and the readme share a baseline at lg widths. */}
         <div className="flex h-full flex-col gap-5">
-          {/* Stat card — bordered to match the readme's visual weight,
-              labelled `// latest` in the same terminal-label style. */}
+          {/* Stat card — 2px verdict-coloured border, no label. The colour
+              of the frame carries the trend reading; the figure speaks for
+              itself without a terminal-label introduction. */}
           <div
-            className="anim-fade-up relative flex items-center gap-x-4 p-4 border border-border-labrys bg-panel font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
+            className={`anim-fade-up flex items-center gap-x-4 p-4 border-2 bg-panel font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted ${trendBorder}`}
             style={{ "--delay": "360ms" } as CSSVars}
           >
-            <span
-              className="absolute -top-[9px] left-3.5 px-2 bg-background font-mono text-[10px] font-semibold tracking-[0.1em] text-accent-brand"
-              aria-hidden="true"
-            >
-              // latest
-            </span>
             <div className="flex shrink-0 items-baseline gap-2">
               <span
                 className="font-sans font-extrabold tracking-tight text-foreground"
