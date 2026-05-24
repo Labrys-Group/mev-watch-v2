@@ -13,12 +13,6 @@ test("embed page renders the metric card", async ({ page }) => {
   await expect(page.getByText(/%/).first()).toBeVisible();
 });
 
-test("api-docs page renders", async ({ page }) => {
-  const res = await page.goto("/api-docs");
-  expect(res?.status()).toBeLessThan(400);
-  await expect(page.getByText(/api/i).first()).toBeVisible();
-});
-
 test("status page renders", async ({ page }) => {
   const res = await page.goto("/status");
   expect(res?.status()).toBeLessThan(400);

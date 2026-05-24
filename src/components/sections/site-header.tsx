@@ -10,7 +10,6 @@ import { MevMark } from "@/components/mev-mark";
 const NAV_LINKS = [
   { label: "OVERVIEW", href: "/" },
   { label: "METHODOLOGY", href: "/methodology" },
-  { label: "API", href: "/api-docs" },
 ] as const;
 
 export function SiteHeader() {
