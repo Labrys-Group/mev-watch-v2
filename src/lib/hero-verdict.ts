@@ -33,8 +33,8 @@ export interface HeroVerdict {
 const COPY: Record<HeroState, Pick<HeroVerdict, "headlineWord" | "tone" | "arrow">> = {
   falling: { headlineWord: "FALLING", tone: "good", arrow: "▼" },
   rising: { headlineWord: "RISING", tone: "bad", arrow: "▲" },
-  contained: { headlineWord: "CONTAINED", tone: "good", arrow: "▬" },
-  winning: { headlineWord: "WINNING", tone: "bad", arrow: "▬" },
+  contained: { headlineWord: "CONTAINED", tone: "good", arrow: "-" },
+  winning: { headlineWord: "WINNING", tone: "bad", arrow: "-" },
 };
 
 /** Add `days` (may be negative) to an ISO `YYYY-MM-DD` date. */

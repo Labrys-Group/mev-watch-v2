@@ -24,6 +24,8 @@ export async function Composition({ latest }: CompositionProps) {
     <Section
       label="01 / POST-MERGE COMPOSITION"
       title="Censoring vs. neutral relays."
+      pattern="line-grid"
+      accent="var(--accent-alt-color)"
       aside={
         <>
           <span>DISTRIBUTION OF MEV-BOOST BLOCKS</span>
@@ -114,22 +116,6 @@ export async function Composition({ latest }: CompositionProps) {
           <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted mt-1.5">
             MEV-boost deliveries
           </div>
-        </div>
-      </div>
-
-      {/* Insight row — positive toned */}
-      <div
-        className="reveal-item mt-5 flex gap-3.5 items-start p-4 border border-good bg-good/10"
-        style={{ "--delay": "300ms" } as CSSVars}
-      >
-        <div className="font-mono text-good text-base tracking-[0.05em] leading-none shrink-0">
-          [+]
-        </div>
-        <div className="font-mono text-[12.5px] leading-[1.55] text-fg-muted">
-          <strong className="text-good font-semibold">
-            Resistance is winning
-          </strong>{" "}
-          — neutral relays now deliver the majority of MEV-boost blocks.
         </div>
       </div>
     </Section>

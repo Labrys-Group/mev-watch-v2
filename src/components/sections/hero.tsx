@@ -13,7 +13,7 @@ export function Hero({ verdict }: HeroProps) {
   const trendGlow = isGood ? "glow-good" : "glow-warn";
 
   return (
-    <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
+    <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-4 md:p-7">
       {/* Verdict-tinted wash — a faint colour cue for the current trend */}
       <div
         aria-hidden="true"
@@ -28,47 +28,71 @@ export function Hero({ verdict }: HeroProps) {
       <div aria-hidden="true" className="faded-grid pointer-events-none absolute inset-0" />
 
       {/* Hero content — layered above grid */}
-      <div className="relative grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-end">
-        {/* Left column — headline & stat */}
+      <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+        {/* Left column — tag line + headline */}
         <div>
           {/* Tag line */}
           <div
-            className="anim-fade-up inline-flex items-center gap-2.5 font-mono text-[10px] tracking-[0.18em] uppercase text-accent-brand mb-4"
+            className="anim-fade-up inline-flex items-center gap-2.5 font-mono text-[10px] font-semibold tracking-[0.18em] uppercase text-accent-brand mb-4"
             style={{ "--delay": "80ms" } as CSSVars}
           >
             <span aria-hidden="true">{"// "}</span>
             PUBLIC TRANSPARENCY TOOL
           </div>
 
-          {/* Display headline — masked line-by-line rise */}
+          {/* Display headline — "CENSORSHIP IS" on one line, trend word below */}
           <h1
             className="font-sans font-extrabold leading-[0.95] tracking-[-0.035em] m-0 text-foreground"
             style={{ fontSize: "clamp(2.5rem, 7vw, 4rem)" }}
           >
             <span className="line-mask block">
               <span className="line-rise" style={{ "--delay": "160ms" } as CSSVars}>
-                CENSORSHIP
-              </span>
-            </span>
-            <span className="line-mask block">
-              <span className="line-rise" style={{ "--delay": "260ms" } as CSSVars}>
-                IS
+                CENSORSHIP IS
               </span>
             </span>
             <span className="line-mask block">
               <span
                 className={`line-rise ${trendColor} ${trendGlow}`}
-                style={{ "--delay": "360ms" } as CSSVars}
+                style={{ "--delay": "260ms" } as CSSVars}
               >
                 {trendWord}
               </span>
             </span>
           </h1>
+        </div>
 
-          {/* Stat line — the figure + arrow as one unit, with the verdict
-              message wrapping in its own narrow column beside them */}
+        {/* Right column — readme callout (top), then % + note */}
+        <div className="flex flex-col gap-5">
+          {/* Readme terminal lede box */}
           <div
-            className="anim-fade-up mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
+            className="anim-fade-up relative font-mono text-[12.5px] leading-[1.65] text-fg-muted p-4 border border-border-labrys bg-panel"
+            style={{ "--delay": "360ms" } as CSSVars}
+          >
+            {/* $ cat ./readme.md label */}
+            <span
+              className="absolute -top-[9px] left-3.5 px-2 bg-background font-mono text-[10px] font-semibold tracking-[0.1em] text-accent-brand"
+              aria-hidden="true"
+            >
+              $ cat ./readme.md
+            </span>
+
+            <p className="m-0">
+              Some MEV-Boost relays filter OFAC-sanctioned transactions.{" "}
+              <strong className="text-foreground font-semibold">
+                MEV Watch tracks how much of Ethereum&apos;s block flow still passes
+                through them
+              </strong>{" "}
+              — and shows that share falling over time.
+              <span
+                aria-hidden="true"
+                className="cursor-blink ml-1 inline-block h-[1.05em] w-[7px] translate-y-[0.2em] bg-accent-brand align-baseline"
+              />
+            </p>
+          </div>
+
+          {/* Stat line — the figure + arrow, with the verdict message beside */}
+          <div
+            className="anim-fade-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
             style={{ "--delay": "540ms" } as CSSVars}
           >
             <div className="flex shrink-0 items-baseline gap-2">
@@ -82,33 +106,6 @@ export function Hero({ verdict }: HeroProps) {
             </div>
             <p className="m-0 min-w-0 max-w-[24rem]">{verdict.message}</p>
           </div>
-        </div>
-
-        {/* Right column — terminal lede box */}
-        <div
-          className="anim-fade-up relative font-mono text-[12.5px] leading-[1.65] text-fg-muted max-w-sm lg:max-w-none p-4 border border-border-labrys bg-panel"
-          style={{ "--delay": "660ms" } as CSSVars}
-        >
-          {/* $ cat ./readme.md label */}
-          <span
-            className="absolute -top-[9px] left-3.5 px-2 bg-background font-mono text-[10px] tracking-[0.1em] text-accent-brand"
-            aria-hidden="true"
-          >
-            $ cat ./readme.md
-          </span>
-
-          <p className="m-0">
-            Some MEV-Boost relays filter OFAC-sanctioned transactions.{" "}
-            <strong className="text-foreground font-semibold">
-              MEV Watch tracks how much of Ethereum&apos;s block flow still passes
-              through them
-            </strong>{" "}
-            — and shows that share falling over time.
-            <span
-              aria-hidden="true"
-              className="cursor-blink ml-1 inline-block h-[1.05em] w-[7px] translate-y-[0.2em] bg-accent-brand align-baseline"
-            />
-          </p>
         </div>
       </div>
     </section>
