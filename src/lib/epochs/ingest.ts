@@ -3,10 +3,13 @@ import { RELAYS } from "@/config/relays";
 import type { DeliveredPayload, PayloadSource } from "./relay-payloads";
 import type { RecentBlocksStore, StoredBlock } from "./recent-blocks-store";
 
-/** Relay-health counts from one ingest run. */
+/** Relay-health summary from one ingest run. */
 export interface IngestResult {
   relaysOk: number;
   relaysTotal: number;
+  /** Ids of relays whose API failed this run. Empty when the source itself
+   *  threw (no per-relay info to report) or when every relay succeeded. */
+  failedRelays: string[];
 }
 
 /** Fold per-relay delivered payloads into one StoredBlock per slot. */
@@ -49,8 +52,9 @@ export async function ingestRecentBlocks(
     return {
       relaysOk: okRelays.length,
       relaysTotal: okRelays.length + failedRelays.length,
+      failedRelays,
     };
   } catch {
-    return { relaysOk: 0, relaysTotal: RELAYS.length };
+    return { relaysOk: 0, relaysTotal: RELAYS.length, failedRelays: [] };
   }
 }

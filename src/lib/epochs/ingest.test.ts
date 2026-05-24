@@ -65,6 +65,38 @@ describe("ingestRecentBlocks", () => {
     expect(result.relaysTotal).toBe(1);
   });
 
+  it("propagates the failedRelays list (not just the count) into IngestResult", async () => {
+    const { store } = fakeStore();
+    const source: PayloadSource = {
+      fetchRecentDeliveries: async () => ({
+        payloads: [payload(100, "relay.ultrasound.money")],
+        okRelays: ["relay.ultrasound.money"],
+        failedRelays: [
+          "bloxroute.max-profit.blxrbdn.com",
+          "bloxroute.regulated.blxrbdn.com",
+        ],
+      }),
+    };
+    const result = await ingestRecentBlocks(source, store);
+    expect(result.failedRelays).toEqual([
+      "bloxroute.max-profit.blxrbdn.com",
+      "bloxroute.regulated.blxrbdn.com",
+    ]);
+    expect(result.relaysOk).toBe(1);
+    expect(result.relaysTotal).toBe(3);
+  });
+
+  it("returns an empty failedRelays list when the source itself throws", async () => {
+    const { store } = fakeStore();
+    const source: PayloadSource = {
+      fetchRecentDeliveries: async () => {
+        throw new Error("network down");
+      },
+    };
+    const result = await ingestRecentBlocks(source, store);
+    expect(result.failedRelays).toEqual([]);
+  });
+
   it("returns relaysOk 0 and leaves the store untouched when the source throws", async () => {
     const { store, upserted } = fakeStore();
     const source: PayloadSource = {
