@@ -155,9 +155,9 @@ export function SiteFooter() {
   return (
     <footer className="bg-panel-alt border-t border-border-labrys mt-6">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-9">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-[2fr_1fr_1fr]">
-          {/* Brand column */}
-          <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-[2fr_1fr_1fr]">
+          {/* Brand column — full width on mobile, single col on desktop */}
+          <div className="col-span-2 flex flex-col gap-5 sm:col-span-1">
             <div className="flex items-center gap-2 leading-none">
               <span className="inline-flex h-[30px] items-center overflow-hidden">
                 <Image
@@ -190,13 +190,32 @@ export function SiteFooter() {
           </div>
 
           <FooterLinkList heading="SITE" links={SITE_LINKS} />
-          <div className="flex flex-col">
-            <FooterLinkList heading="CONNECT" links={CONNECT_LINKS} />
+          <div>
+            <h5 className="font-mono text-[10px] tracking-[0.18em] uppercase text-fg-muted/50 m-0 mb-4">
+              CONNECT
+            </h5>
+            <ul className="list-none m-0 p-0 flex items-center gap-5 mb-2">
+              {CONNECT_LINKS.map(({ label, href, Icon }) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={LINK_CLASS + " mb-0"}
+                  >
+                    {Icon ? (
+                      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                    ) : null}
+                    <span>{label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
             <a
               href="https://labrys.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-auto self-end inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.06em] text-fg-muted hover:text-accent-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
+              className="inline-flex items-center gap-2 w-fit font-mono text-[12px] tracking-[0.06em] text-fg-muted hover:text-accent-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
             >
               <span>Made with</span>
               <Heart
