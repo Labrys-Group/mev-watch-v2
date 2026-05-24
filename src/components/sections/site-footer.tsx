@@ -3,7 +3,6 @@ import { MevMark } from "@/components/mev-mark";
 
 const DATA_LINKS = [
   { label: "Methodology", href: "/methodology", external: false },
-  { label: "Relays", href: "/explorer", external: false },
   { label: "API", href: "/api-docs", external: false },
   { label: "Status", href: "/status", external: false },
 ] as const;
@@ -12,7 +11,7 @@ const RESOURCE_LINKS = [
   { label: "Embed widget", href: "/embed", external: false },
   {
     label: "GitHub",
-    href: "https://github.com/Labrys-Group/mev-watch",
+    href: "https://github.com/joshroyLabrys/mev-watch-v2",
     external: true,
   },
 ] as const;
@@ -122,7 +121,7 @@ export function SiteFooter() {
             </a>{" "}
             ·{" "}
             <a
-              href="https://github.com/Labrys-Group/mev-watch"
+              href="https://github.com/joshroyLabrys/mev-watch-v2"
               target="_blank"
               rel="noopener noreferrer"
               className="text-fg-muted hover:text-accent-brand transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"

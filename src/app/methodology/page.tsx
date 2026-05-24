@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { Reveal } from "@/components/reveal";
+import { RELAYS } from "@/config/relays";
 
 export const metadata: Metadata = {
   title: "Methodology | MEV Watch",
@@ -111,11 +112,12 @@ export default function MethodologyPage() {
               </code>
             </div>
             <p className="font-mono text-sm text-fg-muted leading-relaxed mb-4">
-              A scheduled job fetches the previous day&apos;s stats each morning
-              and writes them as an immutable snapshot to the MEV Watch database.
-              The site reads only its own snapshot store — it does not query
-              relayscan.io on page load — so the displayed data reflects the last
-              successful ingestion run.
+              A scheduled job runs shortly after each UTC day rolls over,
+              fetching the previous day&apos;s stats and writing them as an
+              immutable snapshot to the MEV Watch database. The site reads only
+              its own snapshot store — it does not query relayscan.io on page
+              load — so the displayed data reflects the last successful
+              ingestion run.
             </p>
             <p className="font-mono text-sm text-fg-muted leading-relaxed">
               Each API response includes a per-relay count of{" "}
@@ -199,7 +201,8 @@ export default function MethodologyPage() {
               whenever relays are added or change their policy.
             </p>
 
-            {/* Relay table */}
+            {/* Relay table — rendered from src/config/relays.ts so methodology
+                copy and the metric calculation share one source of truth. */}
             <div className="border border-border-labrys mt-6 overflow-hidden">
               {/* Table header — hidden on phones; rows read as stacked cards */}
               <div className="hidden grid-cols-[1fr_auto_2fr] border-b border-border-labrys bg-background sm:grid">
@@ -214,125 +217,38 @@ export default function MethodologyPage() {
                 </div>
               </div>
 
-              {/* Ultra Sound */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  Ultra Sound
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
-                    neutral
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  relay.ultrasound.money
-                </div>
-              </div>
+              {RELAYS.map((relay, idx) => {
+                const isLast = idx === RELAYS.length - 1;
+                const postureCls =
+                  relay.posture === "censoring"
+                    ? "text-warn border-warn"
+                    : relay.posture === "neutral"
+                      ? "text-good border-good"
+                      : "text-fg-muted border-border-labrys";
 
-              {/* Titan */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  Titan
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
-                    neutral
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  titanrelay.xyz
-                </div>
-              </div>
-
-              {/* bloXroute Max Profit */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  bloXroute Max Profit
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
-                    censoring
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  bloxroute.max-profit.blxrbdn.com
-                </div>
-              </div>
-
-              {/* bloXroute Regulated */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  bloXroute Regulated
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
-                    censoring
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  bloxroute.regulated.blxrbdn.com
-                </div>
-              </div>
-
-              {/* Aestus */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  Aestus
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
-                    neutral
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  aestus.live
-                </div>
-              </div>
-
-              {/* Flashbots */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  Flashbots
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-warn border border-warn px-2 py-0.5">
-                    censoring
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  boost-relay.flashbots.net
-                </div>
-              </div>
-
-              {/* Agnostic Gnosis */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] border-b border-border-labrys transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  Agnostic Gnosis
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-good border border-good px-2 py-0.5">
-                    neutral
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  agnostic-relay.net
-                </div>
-              </div>
-
-              {/* EthGas */}
-              <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt">
-                <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
-                  EthGas
-                </div>
-                <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
-                  <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted border border-border-labrys px-2 py-0.5">
-                    unknown
-                  </span>
-                </div>
-                <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
-                  relay.ethgas.com
-                </div>
-              </div>
+                return (
+                  <div
+                    key={relay.id}
+                    className={`grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_2fr] transition-colors hover:bg-panel-alt ${
+                      isLast ? "" : "border-b border-border-labrys"
+                    }`}
+                  >
+                    <div className="font-sans font-bold text-sm text-foreground px-3 py-2.5 sm:px-4 sm:py-3 border-r border-border-labrys">
+                      {relay.name}
+                    </div>
+                    <div className="px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
+                      <span
+                        className={`font-mono text-[10px] tracking-[0.12em] uppercase border px-2 py-0.5 ${postureCls}`}
+                      >
+                        {relay.posture}
+                      </span>
+                    </div>
+                    <div className="col-span-2 border-t border-border-labrys font-mono text-xs text-fg-muted px-3 py-2.5 break-all sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3">
+                      {relay.id}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <p className="font-mono text-[11px] text-fg-muted mt-4 leading-relaxed">
@@ -422,13 +338,16 @@ export default function MethodologyPage() {
                 </span>
                 <div>
                   <p className="font-sans font-bold text-sm text-foreground mb-1">
-                    Daily granularity only — no live per-block stream
+                    Headline metric is daily — the live ledger is a separate view
                   </p>
                   <p className="font-mono text-[12px] text-fg-muted leading-relaxed">
-                    Data is updated once per day from a daily snapshot. A
-                    real-time, per-block stream of censorship data is not
-                    currently available. Intra-day changes in relay composition
-                    are not captured until the following day&apos;s update.
+                    The headline censorship percentage is a daily snapshot.
+                    Intra-day changes in relay composition do not move it until
+                    the next UTC day&apos;s ingestion run. The epoch ledger on
+                    the dashboard polls the relays&apos; own data APIs and
+                    displays per-slot outcomes on a much shorter refresh
+                    window, but is scoped to the last ~1024 slots and is not
+                    used to compute the headline percentage.
                   </p>
                 </div>
               </li>
@@ -440,7 +359,7 @@ export default function MethodologyPage() {
             <p className="font-mono text-[11px] text-fg-muted leading-relaxed">
               Questions or corrections?{" "}
               <a
-                href="https://github.com/Labrys-Group/mev-watch"
+                href="https://github.com/joshroyLabrys/mev-watch-v2"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent-brand hover:underline transition-colors"

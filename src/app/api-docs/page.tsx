@@ -246,7 +246,7 @@ export default function ApiDocsPage() {
             <p className="font-mono text-[11px] text-fg-muted leading-relaxed">
               Found a bug or want to request a new endpoint?{" "}
               <a
-                href="https://github.com/Labrys-Group/mev-watch"
+                href="https://github.com/joshroyLabrys/mev-watch-v2"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent-brand hover:underline transition-colors"

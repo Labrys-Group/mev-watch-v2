@@ -9,7 +9,6 @@ import { MevMark } from "@/components/mev-mark";
 
 const NAV_LINKS = [
   { label: "OVERVIEW", href: "/" },
-  { label: "RELAYS", href: "/explorer" },
   { label: "METHODOLOGY", href: "/methodology" },
   { label: "API", href: "/api-docs" },
 ] as const;
@@ -51,7 +50,7 @@ export function SiteHeader() {
                   href={href}
                   aria-current={isActive ? "page" : undefined}
                   data-active={isActive}
-                  className={`nav-underline relative font-mono text-[11px] tracking-[0.12em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm ${
+                  className={`nav-underline relative font-mono text-[12px] tracking-[0.12em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm ${
                     isActive
                       ? "text-foreground"
                       : "text-fg-muted hover:text-accent-brand"
@@ -98,7 +97,7 @@ export function SiteHeader() {
                 href={href}
                 onClick={() => setMenuOpen(false)}
                 aria-current={isActive ? "page" : undefined}
-                className={`block border-b border-border-labrys px-4 py-3 font-mono text-[11px] tracking-[0.12em] uppercase transition-colors last:border-b-0 ${
+                className={`block border-b border-border-labrys px-4 py-3 font-mono text-[12px] tracking-[0.12em] uppercase transition-colors last:border-b-0 ${
                   isActive
                     ? "bg-panel-alt text-foreground"
                     : "text-fg-muted hover:text-accent-brand"
