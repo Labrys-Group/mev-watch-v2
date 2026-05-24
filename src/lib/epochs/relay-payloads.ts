@@ -34,8 +34,11 @@ const DeliveredPayloadSchema = z.object({
 });
 const ResponseSchema = z.array(DeliveredPayloadSchema);
 
+// bloXroute caps limit at 100; >100 returns HTTP 400. Other relays accept
+// 200+, but 100 is the safe common max — keeps every relay healthy without
+// silently dropping the censoring side (see spec §6).
 const ENDPOINT =
-  "/relay/v1/data/bidtraces/proposer_payload_delivered?limit=200";
+  "/relay/v1/data/bidtraces/proposer_payload_delivered?limit=100";
 const TIMEOUT_MS = 4000;
 
 /** Fetches recent delivered payloads from every configured relay's data API. */
@@ -60,12 +63,26 @@ export class RelayPayloadSource implements PayloadSource {
     const failedRelays: string[] = [];
 
     settled.forEach((result, i) => {
-      const relayId = RELAYS[i].id;
+      const relay = RELAYS[i];
       if (result.status === "fulfilled") {
         payloads.push(...result.value);
-        okRelays.push(relayId);
+        okRelays.push(relay.id);
       } else {
-        failedRelays.push(relayId);
+        failedRelays.push(relay.id);
+        const reason = result.reason;
+        // Expected 4s AbortController timeouts fire on every poll for any
+        // chronically slow relay — warning here would drown new failures (e.g.
+        // a fresh bloXroute HTTP 400) under repeating AbortError noise.
+        const isTimeout = reason instanceof Error && reason.name === "AbortError";
+        if (!isTimeout) {
+          console.warn(`relay-payloads: ${relay.id} failed`, {
+            relayId: relay.id,
+            host: relay.dataApiHost,
+            errorClass:
+              reason instanceof Error ? reason.constructor.name : typeof reason,
+            message: reason instanceof Error ? reason.message : String(reason),
+          });
+        }
       }
     });
 

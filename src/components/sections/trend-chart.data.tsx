@@ -21,5 +21,5 @@ export async function TrendChartData() {
     );
   }
 
-  return <TrendChart trend={trend} summary={summary} />;
+  return <TrendChart trend={trend} />;
 }

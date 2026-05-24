@@ -1,0 +1,4759 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "mev-watch",
+    "languages": [
+      "css",
+      "example",
+      "html",
+      "json",
+      "markdown",
+      "mjs",
+      "sql",
+      "typescript",
+      "unknown",
+      "yaml"
+    ],
+    "frameworks": [
+      "React",
+      "Next.js",
+      "Vitest",
+      "Tailwind CSS",
+      "Drizzle ORM",
+      "Recharts"
+    ],
+    "description": "MEV Watch v2 (mevwatch.info) is a public transparency tool tracking OFAC censorship of Ethereum MEV-boost blocks, built as a single Next.js 16 application. Censorship data comes from the relayscan.io public JSON API; the censorship metric is the censoring relays' share of MEV-boost relay payload deliveries, stored in libSQL via Drizzle ORM with a public read-only JSON API served under /api/v1/.",
+    "analyzedAt": "2026-05-22T12:31:45.405Z",
+    "gitCommitHash": "17bd6eac046ffa8304ac27e54ef0933e7e128b1b"
+  },
+  "nodes": [
+    {
+      "id": "file:src/config/faq.ts",
+      "type": "file",
+      "name": "faq.ts",
+      "filePath": "src/config/faq.ts",
+      "summary": "Static editorial config exporting the FAQ_ITEMS array displayed on the MEV Watch transparency page.",
+      "tags": [
+        "config",
+        "data-model",
+        "content"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/config/relays.test.ts",
+      "type": "file",
+      "name": "relays.test.ts",
+      "filePath": "src/config/relays.test.ts",
+      "summary": "Unit tests verifying the RELAYS config and classifyRelay lookup function behave correctly.",
+      "tags": [
+        "test",
+        "config",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/config/relays.ts",
+      "type": "file",
+      "name": "relays.ts",
+      "filePath": "src/config/relays.ts",
+      "summary": "Editorial configuration of known MEV-boost relays with their OFAC censorship posture, and a classifyRelay lookup helper keyed by relay ID.",
+      "tags": [
+        "config",
+        "data-model",
+        "utility",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/config/relays.ts:classifyRelay",
+      "type": "function",
+      "name": "classifyRelay",
+      "filePath": "src/config/relays.ts",
+      "lineRange": [
+        37,
+        39
+      ],
+      "summary": "Looks up a relay's metadata object from the RELAYS map by relay ID, returning name and censorship posture.",
+      "tags": [
+        "utility",
+        "config",
+        "lookup"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/api-response.ts",
+      "type": "file",
+      "name": "api-response.ts",
+      "filePath": "src/lib/api-response.ts",
+      "summary": "Thin wrapper around NextResponse.json that attaches standard CORS and cache-control headers to all public API responses.",
+      "tags": [
+        "utility",
+        "api-handler",
+        "middleware"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/api-response.ts:apiJson",
+      "type": "function",
+      "name": "apiJson",
+      "filePath": "src/lib/api-response.ts",
+      "lineRange": [
+        7,
+        14
+      ],
+      "summary": "Constructs a NextResponse.json with standardized CORS and cache headers for the public /api/v1 endpoints.",
+      "tags": [
+        "utility",
+        "api-handler",
+        "middleware"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/css.ts",
+      "type": "file",
+      "name": "css.ts",
+      "filePath": "src/lib/css.ts",
+      "summary": "Minimal CSS utility module; likely re-exports or defines minor CSS helper constants used in component styling.",
+      "tags": [
+        "utility",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/data-source/relayscan.test.ts",
+      "type": "file",
+      "name": "relayscan.test.ts",
+      "filePath": "src/lib/data-source/relayscan.test.ts",
+      "summary": "Integration tests for the RelayscanDataSource adapter, exercising the HTTP fetch and Zod schema parse against fixture data.",
+      "tags": [
+        "test",
+        "service",
+        "data-pipeline"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/lib/data-source/relayscan.ts",
+      "type": "file",
+      "name": "relayscan.ts",
+      "filePath": "src/lib/data-source/relayscan.ts",
+      "summary": "DataSource adapter for the relayscan.io public JSON API; fetches and Zod-parses daily relay and builder payload counts for a given date.",
+      "tags": [
+        "service",
+        "data-pipeline",
+        "api-handler",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/lib/data-source/relayscan.ts:RelayscanDataSource",
+      "type": "class",
+      "name": "RelayscanDataSource",
+      "filePath": "src/lib/data-source/relayscan.ts",
+      "lineRange": [
+        25,
+        57
+      ],
+      "summary": "Implements the DataSource interface by fetching daily stats from relayscan.io/stats/day/{date}/json and normalizing the response into typed relay and builder records.",
+      "tags": [
+        "service",
+        "data-pipeline",
+        "api-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/lib/data-source/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "src/lib/data-source/types.ts",
+      "summary": "Shared TypeScript types and the DataSource interface contract used by the relayscan adapter and the refresh pipeline.",
+      "tags": [
+        "type-definition",
+        "data-pipeline"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/db/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "src/lib/db/index.ts",
+      "summary": "Drizzle ORM client singleton that connects to the libSQL database using the URL from getDatabaseUrl, exported as db.",
+      "tags": [
+        "singleton",
+        "data-model",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/db/schema.ts",
+      "type": "file",
+      "name": "schema.ts",
+      "filePath": "src/lib/db/schema.ts",
+      "summary": "Drizzle ORM table definitions for dailyStats, relayDailyStats, recentBlocks, refreshLog, and builderDailyStats — the full libSQL schema for MEV Watch.",
+      "tags": [
+        "data-model",
+        "schema-definition",
+        "database"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses Drizzle ORM SQLite table builders; each export is a table reference consumed by queries and persist functions."
+    },
+    {
+      "id": "file:src/lib/env.test.ts",
+      "type": "file",
+      "name": "env.test.ts",
+      "filePath": "src/lib/env.test.ts",
+      "summary": "Unit tests for the getDatabaseUrl environment helper, checking env-var precedence and error handling.",
+      "tags": [
+        "test",
+        "config",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/env.ts",
+      "type": "file",
+      "name": "env.ts",
+      "filePath": "src/lib/env.ts",
+      "summary": "Reads and validates the DATABASE_URL environment variable, throwing a clear error when it is absent.",
+      "tags": [
+        "config",
+        "utility",
+        "validation",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/env.ts:getDatabaseUrl",
+      "type": "function",
+      "name": "getDatabaseUrl",
+      "filePath": "src/lib/env.ts",
+      "lineRange": [
+        5,
+        13
+      ],
+      "summary": "Returns the DATABASE_URL env var, throwing if missing, so callers receive a clear error instead of a silent undefined.",
+      "tags": [
+        "config",
+        "utility",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/format.test.ts",
+      "type": "file",
+      "name": "format.test.ts",
+      "filePath": "src/lib/format.test.ts",
+      "summary": "Unit tests covering formatPercent, formatRelativeTime, and formatDateShort with edge-case inputs.",
+      "tags": [
+        "test",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/format.ts",
+      "type": "file",
+      "name": "format.ts",
+      "filePath": "src/lib/format.ts",
+      "summary": "Display formatting utilities for percentage values, relative timestamps, and short ISO date strings used across UI components.",
+      "tags": [
+        "utility",
+        "serialization",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/format.ts:formatPercent",
+      "type": "function",
+      "name": "formatPercent",
+      "filePath": "src/lib/format.ts",
+      "lineRange": [
+        7,
+        9
+      ],
+      "summary": "Formats a numeric ratio as a percentage string with configurable decimal places.",
+      "tags": [
+        "utility",
+        "serialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/format.ts:formatRelativeTime",
+      "type": "function",
+      "name": "formatRelativeTime",
+      "filePath": "src/lib/format.ts",
+      "lineRange": [
+        12,
+        20
+      ],
+      "summary": "Returns a human-readable relative time string (e.g. '3 hours ago') by comparing two Date objects.",
+      "tags": [
+        "utility",
+        "serialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/format.ts:formatDateShort",
+      "type": "function",
+      "name": "formatDateShort",
+      "filePath": "src/lib/format.ts",
+      "lineRange": [
+        25,
+        28
+      ],
+      "summary": "Converts an ISO date string to a compact display form (e.g. '22 May 26') for use in trend charts and tables.",
+      "tags": [
+        "utility",
+        "serialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/metrics.test.ts",
+      "type": "file",
+      "name": "metrics.test.ts",
+      "filePath": "src/lib/metrics.test.ts",
+      "summary": "Unit tests for computeDailyStats, computeRelayBreakdown, and computeBuilderBreakdown, verifying OFAC censorship percentage calculations.",
+      "tags": [
+        "test",
+        "data-pipeline",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/lib/metrics.ts",
+      "type": "file",
+      "name": "metrics.ts",
+      "filePath": "src/lib/metrics.ts",
+      "summary": "Core censorship-metric computation layer: derives daily OFAC censorship percentage, per-relay share, and per-builder share from raw relayscan payload counts.",
+      "tags": [
+        "data-pipeline",
+        "utility",
+        "service",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/metrics.ts:computeDailyStats",
+      "type": "function",
+      "name": "computeDailyStats",
+      "filePath": "src/lib/metrics.ts",
+      "lineRange": [
+        38,
+        57
+      ],
+      "summary": "Aggregates relay payload counts into a daily censorship percentage and total block counts using classifyRelay to partition censoring vs neutral relays.",
+      "tags": [
+        "data-pipeline",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/metrics.ts:computeRelayBreakdown",
+      "type": "function",
+      "name": "computeRelayBreakdown",
+      "filePath": "src/lib/metrics.ts",
+      "lineRange": [
+        60,
+        77
+      ],
+      "summary": "Computes each relay's share of total MEV-boost payloads and its censorship rate for the given day.",
+      "tags": [
+        "data-pipeline",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/metrics.ts:computeBuilderBreakdown",
+      "type": "function",
+      "name": "computeBuilderBreakdown",
+      "filePath": "src/lib/metrics.ts",
+      "lineRange": [
+        86,
+        95
+      ],
+      "summary": "Derives each builder's block count and share percentage from raw builder payload data.",
+      "tags": [
+        "data-pipeline",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/queries.test.ts",
+      "type": "file",
+      "name": "queries.test.ts",
+      "filePath": "src/lib/queries.test.ts",
+      "summary": "Unit tests for the queries module, verifying database query functions return expected shapes.",
+      "tags": [
+        "test",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/queries.ts",
+      "type": "file",
+      "name": "queries.ts",
+      "filePath": "src/lib/queries.ts",
+      "summary": "All read-only database query functions for MEV Watch: trend series, latest stats, relay and builder leaderboards, and refresh-log accessors used by page routes and the public API.",
+      "tags": [
+        "data-model",
+        "service",
+        "api-handler",
+        "tested"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses Drizzle ORM fluent query builder with desc() ordering; getStatsSummary composes getTrend and summarise for the API /summary endpoint."
+    },
+    {
+      "id": "function:src/lib/queries.ts:summarise",
+      "type": "function",
+      "name": "summarise",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        42,
+        56
+      ],
+      "summary": "Converts a raw trend row array into a summary object with current censorship percentage, direction, and 7/30-day averages.",
+      "tags": [
+        "data-pipeline",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getTrend",
+      "type": "function",
+      "name": "getTrend",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        59,
+        65
+      ],
+      "summary": "Queries the last 30 days of daily censorship percentages from dailyStats ordered by date descending.",
+      "tags": [
+        "data-model",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getLatestStats",
+      "type": "function",
+      "name": "getLatestStats",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        68,
+        82
+      ],
+      "summary": "Returns the most recent daily stats row with full block counts and percentage breakdown.",
+      "tags": [
+        "data-model",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getStatsSummary",
+      "type": "function",
+      "name": "getStatsSummary",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        85,
+        87
+      ],
+      "summary": "Composes getTrend and summarise to produce the full summary object served by the /api/v1/summary endpoint.",
+      "tags": [
+        "api-handler",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getLeaderboard",
+      "type": "function",
+      "name": "getLeaderboard",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        90,
+        112
+      ],
+      "summary": "Fetches relay leaderboard data joining the most recent daily stats date with relay-level records, enriching each row with relay name and censorship posture via classifyRelay.",
+      "tags": [
+        "data-model",
+        "service",
+        "api-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getBuilderLeaderboard",
+      "type": "function",
+      "name": "getBuilderLeaderboard",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        121,
+        141
+      ],
+      "summary": "Fetches builder leaderboard data for the most recent date from builderDailyStats, sorted by block count descending.",
+      "tags": [
+        "data-model",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getLastRefresh",
+      "type": "function",
+      "name": "getLastRefresh",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        144,
+        152
+      ],
+      "summary": "Returns the single most recent refresh log entry for health-check and status page display.",
+      "tags": [
+        "service",
+        "monitoring"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/queries.ts:getRecentRefreshes",
+      "type": "function",
+      "name": "getRecentRefreshes",
+      "filePath": "src/lib/queries.ts",
+      "lineRange": [
+        155,
+        167
+      ],
+      "summary": "Returns the N most recent refresh log entries with outcome and error info for the /status admin page.",
+      "tags": [
+        "service",
+        "monitoring"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/refresh/index.test.ts",
+      "type": "file",
+      "name": "index.test.ts",
+      "filePath": "src/lib/refresh/index.test.ts",
+      "summary": "Unit tests for refreshDay using a fakeSource factory to inject controlled DataSource stubs and verify persist/log/slack interactions.",
+      "tags": [
+        "test",
+        "data-pipeline",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/refresh/index.test.ts:fakeSource",
+      "type": "function",
+      "name": "fakeSource",
+      "filePath": "src/lib/refresh/index.test.ts",
+      "lineRange": [
+        5,
+        15
+      ],
+      "summary": "Test factory that builds a mock DataSource with vi.fn stubs, accepting overrides to simulate different fetch scenarios.",
+      "tags": [
+        "test",
+        "factory"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/refresh/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "src/lib/refresh/index.ts",
+      "summary": "Orchestrates the daily data refresh pipeline: fetches relay stats from a DataSource, persists the snapshot, writes the audit log, and sends a Slack alert on failure.",
+      "tags": [
+        "service",
+        "data-pipeline",
+        "entry-point",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/refresh/index.ts:refreshDay",
+      "type": "function",
+      "name": "refreshDay",
+      "filePath": "src/lib/refresh/index.ts",
+      "lineRange": [
+        37,
+        57
+      ],
+      "summary": "Runs one full refresh cycle for a given date: fetch → persist → log, with error catch that writes a failed log entry and fires a Slack alert.",
+      "tags": [
+        "service",
+        "data-pipeline",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/lib/refresh/persist.ts",
+      "type": "file",
+      "name": "persist.ts",
+      "filePath": "src/lib/refresh/persist.ts",
+      "summary": "Persists a daily snapshot to libSQL: upserts dailyStats, relayDailyStats, and builderDailyStats rows using Drizzle onConflictDoUpdate for idempotent re-runs.",
+      "tags": [
+        "data-pipeline",
+        "data-model",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/lib/refresh/persist.ts:persistDailySnapshot",
+      "type": "function",
+      "name": "persistDailySnapshot",
+      "filePath": "src/lib/refresh/persist.ts",
+      "lineRange": [
+        10,
+        70
+      ],
+      "summary": "Computes metric breakdowns from raw relay/builder data and upserts all three daily stat tables in a single transactional batch using Drizzle ORM.",
+      "tags": [
+        "data-pipeline",
+        "data-model"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses Drizzle's onConflictDoUpdate for idempotent upserts — safe to call multiple times for the same date."
+    },
+    {
+      "id": "file:src/lib/refresh/slack.test.ts",
+      "type": "file",
+      "name": "slack.test.ts",
+      "filePath": "src/lib/refresh/slack.test.ts",
+      "summary": "Unit tests for sendSlackAlert verifying the fetch call payload and no-op behavior when SLACK_WEBHOOK_URL is absent.",
+      "tags": [
+        "test",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/refresh/slack.ts",
+      "type": "file",
+      "name": "slack.ts",
+      "filePath": "src/lib/refresh/slack.ts",
+      "summary": "Sends an alert message to a Slack webhook URL, silently no-opping when the env var is not set.",
+      "tags": [
+        "service",
+        "monitoring",
+        "utility",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/refresh/slack.ts:sendSlackAlert",
+      "type": "function",
+      "name": "sendSlackAlert",
+      "filePath": "src/lib/refresh/slack.ts",
+      "lineRange": [
+        5,
+        17
+      ],
+      "summary": "Posts a JSON payload to the SLACK_WEBHOOK_URL env var; skips the request entirely when the var is undefined.",
+      "tags": [
+        "service",
+        "monitoring"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/utils.ts",
+      "type": "file",
+      "name": "utils.ts",
+      "filePath": "src/lib/utils.ts",
+      "summary": "shadcn/ui class merge utility combining clsx and tailwind-merge into the cn() helper used throughout UI components.",
+      "tags": [
+        "utility",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/lib/utils.ts:cn",
+      "type": "function",
+      "name": "cn",
+      "filePath": "src/lib/utils.ts",
+      "lineRange": [
+        4,
+        6
+      ],
+      "summary": "Merges Tailwind class strings using clsx for conditional logic and twMerge to deduplicate conflicting utilities.",
+      "tags": [
+        "utility",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/globals.css",
+      "type": "file",
+      "name": "globals.css",
+      "filePath": "src/app/globals.css",
+      "summary": "Global CSS stylesheet defining the Labrys design token system — CSS custom properties for colors, typography, and spacing — plus Tailwind v4 base layers, light/dark theme switching, and animation utilities for the motion system and background grid.",
+      "tags": [
+        "markup",
+        "design-tokens",
+        "theming",
+        "tailwind",
+        "animation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/app/layout.tsx",
+      "type": "file",
+      "name": "layout.tsx",
+      "filePath": "src/app/layout.tsx",
+      "summary": "Next.js App Router root layout that wraps the entire application with ThemeProvider and ScrollProgress, sets global metadata, and applies the Inter font.",
+      "tags": [
+        "entry-point",
+        "component",
+        "layout",
+        "next-js"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/app/layout.tsx:RootLayout",
+      "type": "function",
+      "name": "RootLayout",
+      "filePath": "src/app/layout.tsx",
+      "lineRange": [
+        23,
+        44
+      ],
+      "summary": "Root layout component that wraps all pages with ThemeProvider and renders the ScrollProgress indicator and page children inside the document body.",
+      "tags": [
+        "component",
+        "layout",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "src/app/page.tsx",
+      "summary": "Homepage server component that fetches all dashboard data in parallel (stats, summary, trend, leaderboards, last refresh) and composes the full single-page layout from section components.",
+      "tags": [
+        "entry-point",
+        "component",
+        "data-fetching",
+        "next-js"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/app/page.tsx:Home",
+      "type": "function",
+      "name": "Home",
+      "filePath": "src/app/page.tsx",
+      "lineRange": [
+        24,
+        81
+      ],
+      "summary": "Async server component that concurrently fetches all dashboard data via Promise.all and renders the full homepage by composing Hero, TrendChart, Composition, Leaderboard, BuilderLeaderboard, WhatToDo, Faq, and ShareStrip sections.",
+      "tags": [
+        "entry-point",
+        "component",
+        "data-fetching"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/count-up.tsx",
+      "type": "file",
+      "name": "count-up.tsx",
+      "filePath": "src/components/count-up.tsx",
+      "summary": "Animated number counter component that uses IntersectionObserver to trigger a requestAnimationFrame-based ease-in-out count animation when scrolled into view, respecting reduced-motion preferences.",
+      "tags": [
+        "component",
+        "animation",
+        "utility",
+        "accessibility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/count-up.tsx:CountUp",
+      "type": "function",
+      "name": "CountUp",
+      "filePath": "src/components/count-up.tsx",
+      "lineRange": [
+        22,
+        93
+      ],
+      "summary": "React component that animates a numeric value from zero to the target when entering the viewport, with configurable decimals, prefix, suffix, duration, and reduced-motion support.",
+      "tags": [
+        "component",
+        "animation",
+        "accessibility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/mev-mark.tsx",
+      "type": "file",
+      "name": "mev-mark.tsx",
+      "filePath": "src/components/mev-mark.tsx",
+      "summary": "SVG logomark component for MEV Watch, rendering the brand graphic used in the site header and footer.",
+      "tags": [
+        "component",
+        "branding",
+        "svg"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/mev-mark.tsx:MevMark",
+      "type": "function",
+      "name": "MevMark",
+      "filePath": "src/components/mev-mark.tsx",
+      "lineRange": [
+        10,
+        22
+      ],
+      "summary": "Renders the MEV Watch SVG logomark with an optional className prop for styling.",
+      "tags": [
+        "component",
+        "branding",
+        "svg"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/reveal.tsx",
+      "type": "file",
+      "name": "reveal.tsx",
+      "filePath": "src/components/reveal.tsx",
+      "summary": "Scroll-triggered fade-in wrapper component that uses IntersectionObserver and requestAnimationFrame to animate children into view with an optional delay.",
+      "tags": [
+        "component",
+        "animation",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/reveal.tsx:Reveal",
+      "type": "function",
+      "name": "Reveal",
+      "filePath": "src/components/reveal.tsx",
+      "lineRange": [
+        21,
+        59
+      ],
+      "summary": "Wraps children in a container that fades in when scrolled into view using IntersectionObserver, with configurable CSS delay.",
+      "tags": [
+        "component",
+        "animation",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/scroll-progress.tsx",
+      "type": "file",
+      "name": "scroll-progress.tsx",
+      "filePath": "src/components/scroll-progress.tsx",
+      "summary": "Fixed-position scroll progress indicator that renders a thin bar at the top of the viewport tracking reading progress via throttled scroll and resize event listeners.",
+      "tags": [
+        "component",
+        "ui",
+        "scroll",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/scroll-progress.tsx:ScrollProgress",
+      "type": "function",
+      "name": "ScrollProgress",
+      "filePath": "src/components/scroll-progress.tsx",
+      "lineRange": [
+        9,
+        48
+      ],
+      "summary": "React component rendering a fixed top-bar that reflects the document's vertical scroll position as a percentage width, using RAF-throttled event listeners.",
+      "tags": [
+        "component",
+        "ui",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/section.tsx",
+      "type": "file",
+      "name": "section.tsx",
+      "filePath": "src/components/section.tsx",
+      "summary": "Reusable section layout primitive providing a labelled heading row with optional aside content and a child slot, used as the structural wrapper for all homepage sections.",
+      "tags": [
+        "component",
+        "layout",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/section.tsx:Section",
+      "type": "function",
+      "name": "Section",
+      "filePath": "src/components/section.tsx",
+      "lineRange": [
+        18,
+        39
+      ],
+      "summary": "Layout wrapper rendering a labelled section heading with optional aside slot and child content area, used as the structural shell for dashboard sections.",
+      "tags": [
+        "component",
+        "layout"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/sections/block-grid.tsx",
+      "type": "file",
+      "name": "block-grid.tsx",
+      "filePath": "src/components/sections/block-grid.tsx",
+      "summary": "Visual block grid representing 1000 Ethereum blocks color-coded by OFAC censorship status (censored, non-boost, compliant), with hover tooltips showing category details and block counts.",
+      "tags": [
+        "component",
+        "visualization",
+        "censorship-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/block-grid.tsx:BlockGrid",
+      "type": "function",
+      "name": "BlockGrid",
+      "filePath": "src/components/sections/block-grid.tsx",
+      "lineRange": [
+        38,
+        101
+      ],
+      "summary": "Renders a 1000-tile block grid where each tile is color-coded by block category (censored, non-boost, or compliant) derived from the given percentages, with mouse-over tooltip tracking.",
+      "tags": [
+        "component",
+        "visualization",
+        "censorship-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/block-grid.tsx:BlockTooltip",
+      "type": "function",
+      "name": "BlockTooltip",
+      "filePath": "src/components/sections/block-grid.tsx",
+      "lineRange": [
+        111,
+        140
+      ],
+      "summary": "Floating tooltip rendered on block hover showing the tile index, category label, and estimated blocks represented per tile.",
+      "tags": [
+        "component",
+        "ui",
+        "tooltip"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/sections/builder-leaderboard.tsx",
+      "type": "file",
+      "name": "builder-leaderboard.tsx",
+      "filePath": "src/components/sections/builder-leaderboard.tsx",
+      "summary": "Builder leaderboard section displaying the top block builders ranked by block count, with a proportional bar visualization and censorship percentage per builder.",
+      "tags": [
+        "component",
+        "data-display",
+        "leaderboard",
+        "censorship-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/builder-leaderboard.tsx:BuilderLeaderboard",
+      "type": "function",
+      "name": "BuilderLeaderboard",
+      "filePath": "src/components/sections/builder-leaderboard.tsx",
+      "lineRange": [
+        13,
+        111
+      ],
+      "summary": "Renders a ranked table of block builders with proportional bar charts for block share and color-coded censorship percentage badges.",
+      "tags": [
+        "component",
+        "data-display",
+        "leaderboard"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/sections/composition.tsx",
+      "type": "file",
+      "name": "composition.tsx",
+      "filePath": "src/components/sections/composition.tsx",
+      "summary": "Block composition section showing the breakdown of MEV-boost blocks into censoring, non-boost, and compliant categories using the BlockGrid visualization and animated CountUp stats.",
+      "tags": [
+        "component",
+        "data-display",
+        "visualization",
+        "censorship-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/composition.tsx:Composition",
+      "type": "function",
+      "name": "Composition",
+      "filePath": "src/components/sections/composition.tsx",
+      "lineRange": [
+        11,
+        134
+      ],
+      "summary": "Renders the block composition section with animated count statistics, a BlockGrid heatmap, and a legend explaining each block category.",
+      "tags": [
+        "component",
+        "data-display",
+        "visualization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/sections/faq.tsx",
+      "type": "file",
+      "name": "faq.tsx",
+      "filePath": "src/components/sections/faq.tsx",
+      "summary": "FAQ section rendering a grid of question-and-answer pairs sourced from the faq config, displayed in a two-column bordered layout.",
+      "tags": [
+        "component",
+        "content",
+        "faq"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/sections/faq.tsx:Faq",
+      "type": "function",
+      "name": "Faq",
+      "filePath": "src/components/sections/faq.tsx",
+      "lineRange": [
+        11,
+        53
+      ],
+      "summary": "Renders FAQ items from config in a 2-column grid with bordered cells and hover highlights, using the Section wrapper.",
+      "tags": [
+        "component",
+        "content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/sections/hero.tsx",
+      "type": "file",
+      "name": "hero.tsx",
+      "filePath": "src/components/sections/hero.tsx",
+      "summary": "Hero section displaying the primary OFAC censorship metric as a large animated percentage, trend direction word, peak delta, and a contextual subtitle derived from summary statistics.",
+      "tags": [
+        "component",
+        "hero",
+        "censorship-data",
+        "data-display"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/hero.tsx:Hero",
+      "type": "function",
+      "name": "Hero",
+      "filePath": "src/components/sections/hero.tsx",
+      "lineRange": [
+        10,
+        122
+      ],
+      "summary": "Renders the hero banner with animated censorship percentage, trend direction label, peak-to-current delta, and descriptive subtitle using CountUp and format utilities.",
+      "tags": [
+        "component",
+        "hero",
+        "data-display"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/sections/leaderboard.tsx",
+      "type": "file",
+      "name": "leaderboard.tsx",
+      "filePath": "src/components/sections/leaderboard.tsx",
+      "summary": "Relay leaderboard section ranking MEV-boost relays by block count with proportional bar charts, OFAC compliance badges, and methodology tags for each relay.",
+      "tags": [
+        "component",
+        "data-display",
+        "leaderboard",
+        "censorship-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/leaderboard.tsx:Leaderboard",
+      "type": "function",
+      "name": "Leaderboard",
+      "filePath": "src/components/sections/leaderboard.tsx",
+      "lineRange": [
+        13,
+        142
+      ],
+      "summary": "Renders a ranked relay table with proportional bar charts, OFAC methodology badge (filtering/censoring/neutral), and formatted block counts.",
+      "tags": [
+        "component",
+        "data-display",
+        "leaderboard"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/sections/share-strip.tsx",
+      "type": "file",
+      "name": "share-strip.tsx",
+      "filePath": "src/components/sections/share-strip.tsx",
+      "summary": "Social sharing and citation strip with clipboard copy buttons for the page URL and an academic-style citation string, with transient confirmation label feedback.",
+      "tags": [
+        "component",
+        "sharing",
+        "clipboard",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/sections/share-strip.tsx:ShareStrip",
+      "type": "function",
+      "name": "ShareStrip",
+      "filePath": "src/components/sections/share-strip.tsx",
+      "lineRange": [
+        14,
+        63
+      ],
+      "summary": "Renders share and cite buttons that copy the page URL or a formatted academic citation to the clipboard, with temporary success label state.",
+      "tags": [
+        "component",
+        "sharing",
+        "clipboard"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/sections/site-footer.tsx",
+      "type": "file",
+      "name": "site-footer.tsx",
+      "filePath": "src/components/sections/site-footer.tsx",
+      "summary": "Site footer component with the MEV Watch logomark, grouped navigation link lists for Resources and Data, and copyright information.",
+      "tags": [
+        "component",
+        "layout",
+        "navigation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/site-footer.tsx:FooterLinkList",
+      "type": "function",
+      "name": "FooterLinkList",
+      "filePath": "src/components/sections/site-footer.tsx",
+      "lineRange": [
+        32,
+        68
+      ],
+      "summary": "Renders a headed column of footer navigation links, iterating over a links array to produce anchor elements.",
+      "tags": [
+        "component",
+        "navigation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/sections/site-footer.tsx:SiteFooter",
+      "type": "function",
+      "name": "SiteFooter",
+      "filePath": "src/components/sections/site-footer.tsx",
+      "lineRange": [
+        70,
+        187
+      ],
+      "summary": "Full-width footer layout rendering the MevMark logo, two FooterLinkList columns, and a copyright/attribution line.",
+      "tags": [
+        "component",
+        "layout",
+        "navigation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/sections/site-header.tsx",
+      "type": "file",
+      "name": "site-header.tsx",
+      "filePath": "src/components/sections/site-header.tsx",
+      "summary": "Sticky site header with the MEV Watch logo, desktop navigation links with active-route highlighting, a theme toggle, and a mobile hamburger menu.",
+      "tags": [
+        "component",
+        "layout",
+        "navigation",
+        "responsive"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/site-header.tsx:SiteHeader",
+      "type": "function",
+      "name": "SiteHeader",
+      "filePath": "src/components/sections/site-header.tsx",
+      "lineRange": [
+        17,
+        115
+      ],
+      "summary": "Renders the sticky navigation header with desktop nav links (active route detection via usePathname), theme toggle, and a mobile slide-down menu toggled by hamburger button.",
+      "tags": [
+        "component",
+        "navigation",
+        "responsive"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/sections/status-bar.tsx",
+      "type": "file",
+      "name": "status-bar.tsx",
+      "filePath": "src/components/sections/status-bar.tsx",
+      "summary": "Status bar component displaying the latest data date, current censorship percentage, and time since the last data refresh in a compact multi-cell layout.",
+      "tags": [
+        "component",
+        "data-display",
+        "status"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/status-bar.tsx:StatusBar",
+      "type": "function",
+      "name": "StatusBar",
+      "filePath": "src/components/sections/status-bar.tsx",
+      "lineRange": [
+        9,
+        114
+      ],
+      "summary": "Renders a horizontal strip of StatusCell indicators for latest date, censorship rate, and refresh age using formatPercent and formatRelativeTime helpers.",
+      "tags": [
+        "component",
+        "data-display",
+        "status"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/status-bar.tsx:StatusCell",
+      "type": "function",
+      "name": "StatusCell",
+      "filePath": "src/components/sections/status-bar.tsx",
+      "lineRange": [
+        123,
+        136
+      ],
+      "summary": "Small presentational cell rendering a label-value pair within the StatusBar layout.",
+      "tags": [
+        "component",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/sections/trend-chart.tsx",
+      "type": "file",
+      "name": "trend-chart.tsx",
+      "filePath": "src/components/sections/trend-chart.tsx",
+      "summary": "Interactive SVG trend chart for censorship percentage over time with range selectors (30/90/180/all days), sparse axis tick computation, hover crosshair tooltip, and IntersectionObserver-triggered animation.",
+      "tags": [
+        "component",
+        "chart",
+        "visualization",
+        "censorship-data"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses a fully custom SVG chart (no charting library) with manual coordinate math, sparse-tick algorithm, and RAF-based intersection animation."
+    },
+    {
+      "id": "function:src/components/sections/trend-chart.tsx:TrendChart",
+      "type": "function",
+      "name": "TrendChart",
+      "filePath": "src/components/sections/trend-chart.tsx",
+      "lineRange": [
+        47,
+        255
+      ],
+      "summary": "Renders a custom SVG line chart of daily censorship percentages with time-range buttons, hover tooltip, and scroll-triggered reveal animation using useMemo for slice and tick computations.",
+      "tags": [
+        "component",
+        "chart",
+        "visualization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/sections/trend-chart.tsx:getSlice",
+      "type": "function",
+      "name": "getSlice",
+      "filePath": "src/components/sections/trend-chart.tsx",
+      "lineRange": [
+        27,
+        31
+      ],
+      "summary": "Returns the tail slice of the trend data array corresponding to the selected time range in days.",
+      "tags": [
+        "utility",
+        "data-transform"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/sections/trend-chart.tsx:sparseTickIndices",
+      "type": "function",
+      "name": "sparseTickIndices",
+      "filePath": "src/components/sections/trend-chart.tsx",
+      "lineRange": [
+        34,
+        45
+      ],
+      "summary": "Computes a sparse set of tick indices for the x-axis by evenly distributing up to maxTicks ticks across the data length, always including the last index.",
+      "tags": [
+        "utility",
+        "chart",
+        "algorithm"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/sections/what-to-do.tsx",
+      "type": "file",
+      "name": "what-to-do.tsx",
+      "filePath": "src/components/sections/what-to-do.tsx",
+      "summary": "Action-oriented section listing steps users can take to reduce OFAC censorship (e.g. switching validators, staking with non-censoring operators), with icon cards and external links.",
+      "tags": [
+        "component",
+        "content",
+        "calls-to-action"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/sections/what-to-do.tsx:WhatToDo",
+      "type": "function",
+      "name": "WhatToDo",
+      "filePath": "src/components/sections/what-to-do.tsx",
+      "lineRange": [
+        28,
+        84
+      ],
+      "summary": "Renders a grid of action cards from the STEPS config array, each with an icon, title, description, and external link button.",
+      "tags": [
+        "component",
+        "content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/theme-provider.tsx",
+      "type": "file",
+      "name": "theme-provider.tsx",
+      "filePath": "src/components/theme-provider.tsx",
+      "summary": "Thin wrapper around next-themes ThemeProvider configured for system-default theme detection, used in the root layout to enable light/dark mode switching.",
+      "tags": [
+        "component",
+        "theming",
+        "provider"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/theme-provider.tsx:ThemeProvider",
+      "type": "function",
+      "name": "ThemeProvider",
+      "filePath": "src/components/theme-provider.tsx",
+      "lineRange": [
+        5,
+        11
+      ],
+      "summary": "Wraps children in the next-themes ThemeProvider with attribute='class' and defaultTheme='system' for OS-level dark mode detection.",
+      "tags": [
+        "component",
+        "theming"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/theme-toggle.test.tsx",
+      "type": "file",
+      "name": "theme-toggle.test.tsx",
+      "filePath": "src/components/theme-toggle.test.tsx",
+      "summary": "Unit test for the ThemeToggle component verifying it renders without errors using a ThemeProvider wrapper.",
+      "tags": [
+        "test",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/theme-toggle.tsx",
+      "type": "file",
+      "name": "theme-toggle.tsx",
+      "filePath": "src/components/theme-toggle.tsx",
+      "summary": "Icon button component that toggles between light and dark themes using the next-themes useTheme hook, rendering sun/moon icons based on current theme.",
+      "tags": [
+        "component",
+        "theming",
+        "ui",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/theme-toggle.tsx:ThemeToggle",
+      "type": "function",
+      "name": "ThemeToggle",
+      "filePath": "src/components/theme-toggle.tsx",
+      "lineRange": [
+        7,
+        24
+      ],
+      "summary": "Renders a button that cycles between light and dark themes via useTheme, displaying sun or moon SVG icons based on the active theme.",
+      "tags": [
+        "component",
+        "theming"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/ui/button.tsx",
+      "type": "file",
+      "name": "button.tsx",
+      "filePath": "src/components/ui/button.tsx",
+      "summary": "Shadcn/ui Button primitive with CVA variant system (default, destructive, outline, ghost, link) and size variants, supporting asChild polymorphic rendering via Radix Slot.",
+      "tags": [
+        "component",
+        "ui",
+        "design-system"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses class-variance-authority (CVA) for variant management and Radix UI Slot for the asChild pattern."
+    },
+    {
+      "id": "function:src/components/ui/button.tsx:Button",
+      "type": "function",
+      "name": "Button",
+      "filePath": "src/components/ui/button.tsx",
+      "lineRange": [
+        44,
+        65
+      ],
+      "summary": "Polymorphic button component combining CVA variant classes via cn, with support for asChild rendering through Radix Slot.",
+      "tags": [
+        "component",
+        "ui",
+        "design-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:data/.gitkeep",
+      "type": "file",
+      "name": ".gitkeep",
+      "filePath": "data/.gitkeep",
+      "summary": "Empty placeholder file that ensures the data directory is tracked by git for local libSQL database storage.",
+      "tags": [
+        "placeholder",
+        "data",
+        "git"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:drizzle/0000_melted_slyde.sql:daily_stats",
+      "type": "table",
+      "name": "daily_stats",
+      "filePath": "drizzle/0000_melted_slyde.sql",
+      "lineRange": [
+        1,
+        8
+      ],
+      "summary": "Stores daily OFAC censorship percentage snapshots including censoring, neutral, and non-boost relay shares plus total block count.",
+      "tags": [
+        "database",
+        "migration",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:drizzle/0000_melted_slyde.sql:recent_blocks",
+      "type": "table",
+      "name": "recent_blocks",
+      "filePath": "drizzle/0000_melted_slyde.sql",
+      "lineRange": [
+        10,
+        16
+      ],
+      "summary": "Stores recent MEV-boost block records with slot, block number, relay key, OFAC category, and timestamp.",
+      "tags": [
+        "database",
+        "migration",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:drizzle/0000_melted_slyde.sql:refresh_log",
+      "type": "table",
+      "name": "refresh_log",
+      "filePath": "drizzle/0000_melted_slyde.sql",
+      "lineRange": [
+        18,
+        24
+      ],
+      "summary": "Audit log table recording each data refresh run with status, source, and message for operational health monitoring.",
+      "tags": [
+        "database",
+        "migration",
+        "monitoring"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:drizzle/0000_melted_slyde.sql:relay_daily_stats",
+      "type": "table",
+      "name": "relay_daily_stats",
+      "filePath": "drizzle/0000_melted_slyde.sql",
+      "lineRange": [
+        26,
+        33
+      ],
+      "summary": "Per-relay daily statistics tracking block count, share percentage, and censorship rate for individual MEV-boost relays.",
+      "tags": [
+        "database",
+        "migration",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:drizzle/0001_bizarre_rockslide.sql:builder_daily_stats",
+      "type": "table",
+      "name": "builder_daily_stats",
+      "filePath": "drizzle/0001_bizarre_rockslide.sql",
+      "lineRange": [
+        1,
+        7
+      ],
+      "summary": "Per-builder daily statistics tracking block count and share percentage for individual block builders.",
+      "tags": [
+        "database",
+        "migration",
+        "schema-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:drizzle/meta/_journal.json",
+      "type": "config",
+      "name": "_journal.json",
+      "filePath": "drizzle/meta/_journal.json",
+      "summary": "Drizzle ORM migration journal tracking applied migration entries, dialect, and version for the libSQL database.",
+      "tags": [
+        "configuration",
+        "database",
+        "migration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:drizzle/meta/0000_snapshot.json",
+      "type": "config",
+      "name": "0000_snapshot.json",
+      "filePath": "drizzle/meta/0000_snapshot.json",
+      "summary": "Drizzle ORM schema snapshot for migration 0000 describing the initial table structure including daily_stats, recent_blocks, refresh_log, and relay_daily_stats.",
+      "tags": [
+        "configuration",
+        "database",
+        "schema-definition"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:drizzle/meta/0001_snapshot.json",
+      "type": "config",
+      "name": "0001_snapshot.json",
+      "filePath": "drizzle/meta/0001_snapshot.json",
+      "summary": "Drizzle ORM schema snapshot for migration 0001 describing the full table structure including the added builder_daily_stats table.",
+      "tags": [
+        "configuration",
+        "database",
+        "schema-definition"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:e2e/home.spec.ts",
+      "type": "file",
+      "name": "home.spec.ts",
+      "filePath": "e2e/home.spec.ts",
+      "summary": "Playwright end-to-end test for the homepage, verifying key UI elements such as the censorship percentage display and charts are rendered correctly.",
+      "tags": [
+        "test",
+        "e2e",
+        "playwright"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:e2e/pages.spec.ts",
+      "type": "file",
+      "name": "pages.spec.ts",
+      "filePath": "e2e/pages.spec.ts",
+      "summary": "Playwright end-to-end tests covering multiple application pages (explorer, methodology, status, embed) to verify navigation and basic rendering.",
+      "tags": [
+        "test",
+        "e2e",
+        "playwright"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:e2e/smoke.spec.ts",
+      "type": "file",
+      "name": "smoke.spec.ts",
+      "filePath": "e2e/smoke.spec.ts",
+      "summary": "Minimal Playwright smoke test that verifies the app loads and returns a 200 response.",
+      "tags": [
+        "test",
+        "e2e",
+        "smoke-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/check-db.ts",
+      "type": "file",
+      "name": "check-db.ts",
+      "filePath": "scripts/check-db.ts",
+      "summary": "CLI script that verifies the database connection by inserting a test record into refresh_log and exiting with status code.",
+      "tags": [
+        "script",
+        "database",
+        "health-check"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/check-db.ts:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/check-db.ts",
+      "lineRange": [
+        5,
+        14
+      ],
+      "summary": "Inserts a connection-check row into the refresh_log table and logs success or failure before calling process.exit.",
+      "tags": [
+        "script",
+        "database",
+        "health-check"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/db-summary.ts",
+      "type": "file",
+      "name": "db-summary.ts",
+      "filePath": "scripts/db-summary.ts",
+      "summary": "CLI script that queries the database and prints snapshot row counts plus the latest daily censorship metrics to stdout.",
+      "tags": [
+        "script",
+        "database",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/db-summary.ts:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/db-summary.ts",
+      "lineRange": [
+        10,
+        29
+      ],
+      "summary": "Queries daily_stats, relay_daily_stats, and builder_daily_stats tables and prints row counts and latest censorship percentages.",
+      "tags": [
+        "script",
+        "database",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/refresh.ts",
+      "type": "file",
+      "name": "refresh.ts",
+      "filePath": "scripts/refresh.ts",
+      "summary": "CLI entry point for manually triggering a single-day data refresh, defaulting to yesterday's UTC date, used by the pnpm refresh command.",
+      "tags": [
+        "script",
+        "data-pipeline",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/refresh.ts:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/refresh.ts",
+      "lineRange": [
+        12,
+        25
+      ],
+      "summary": "Resolves the target date from CLI args or defaults to yesterday, calls refreshDay, and exits with success or error code.",
+      "tags": [
+        "script",
+        "data-pipeline",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/seed-history.ts",
+      "type": "file",
+      "name": "seed-history.ts",
+      "filePath": "scripts/seed-history.ts",
+      "summary": "CLI script that backfills historical daily snapshots over a date range by iterating from a start date to an end date, with rate-limiting sleep between requests.",
+      "tags": [
+        "script",
+        "data-pipeline",
+        "backfill"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/seed-history.ts:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/seed-history.ts",
+      "lineRange": [
+        25,
+        47
+      ],
+      "summary": "Iterates over a date range and calls refreshDay for each date, logging warnings on failure and sleeping between requests to avoid rate limiting.",
+      "tags": [
+        "script",
+        "data-pipeline",
+        "backfill"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/app/api-docs/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "src/app/api-docs/page.tsx",
+      "summary": "Next.js page rendering the public API documentation for the /api/v1 endpoints, with inline code examples and schema descriptions.",
+      "tags": [
+        "component",
+        "documentation",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/app/api-docs/page.tsx:ApiDocsPage",
+      "type": "function",
+      "name": "ApiDocsPage",
+      "filePath": "src/app/api-docs/page.tsx",
+      "lineRange": [
+        12,
+        264
+      ],
+      "summary": "Server component rendering the full API documentation page with endpoint descriptions, request/response examples, and schema tables.",
+      "tags": [
+        "component",
+        "documentation",
+        "api-schema"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/app/api/refresh/route.test.ts",
+      "type": "file",
+      "name": "route.test.ts",
+      "filePath": "src/app/api/refresh/route.test.ts",
+      "summary": "Unit tests for the /api/refresh route handler verifying authentication header enforcement and correct HTTP responses.",
+      "tags": [
+        "test",
+        "api-handler",
+        "unit-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/api/refresh/route.ts",
+      "type": "file",
+      "name": "route.ts",
+      "filePath": "src/app/api/refresh/route.ts",
+      "summary": "Next.js API route handler for /api/refresh that validates a secret authorization header then triggers the daily data refresh pipeline.",
+      "tags": [
+        "api-handler",
+        "data-pipeline",
+        "security",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/app/api/refresh/route.ts:GET",
+      "type": "function",
+      "name": "GET",
+      "filePath": "src/app/api/refresh/route.ts",
+      "lineRange": [
+        20,
+        33
+      ],
+      "summary": "Validates the Authorization header against the CRON_SECRET env var, then calls refreshDay for yesterday's date and returns JSON status.",
+      "tags": [
+        "api-handler",
+        "security",
+        "data-pipeline"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/api/v1/relays/route.ts",
+      "type": "file",
+      "name": "route.ts",
+      "filePath": "src/app/api/v1/relays/route.ts",
+      "summary": "Next.js Edge API route for GET /api/v1/relays that returns relay leaderboard data as JSON.",
+      "tags": [
+        "api-handler",
+        "edge-runtime",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/api/v1/summary/route.ts",
+      "type": "file",
+      "name": "route.ts",
+      "filePath": "src/app/api/v1/summary/route.ts",
+      "summary": "Next.js Edge API route for GET /api/v1/summary returning the latest censorship stats and 30-day summary as JSON.",
+      "tags": [
+        "api-handler",
+        "edge-runtime",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/api/v1/trend/route.ts",
+      "type": "file",
+      "name": "route.ts",
+      "filePath": "src/app/api/v1/trend/route.ts",
+      "summary": "Next.js Edge API route for GET /api/v1/trend returning the censorship trend time-series data as JSON.",
+      "tags": [
+        "api-handler",
+        "edge-runtime",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/app/embed/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "src/app/embed/page.tsx",
+      "summary": "Embeddable widget page rendering a compact censorship percentage display suitable for embedding on external sites.",
+      "tags": [
+        "component",
+        "embed",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/app/embed/page.tsx:EmbedPage",
+      "type": "function",
+      "name": "EmbedPage",
+      "filePath": "src/app/embed/page.tsx",
+      "lineRange": [
+        14,
+        78
+      ],
+      "summary": "Server component that fetches latest stats and summary, then renders a compact embeddable censorship percentage widget.",
+      "tags": [
+        "component",
+        "embed",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/app/explorer/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "src/app/explorer/page.tsx",
+      "summary": "Next.js page rendering the relay and builder explorer with detailed leaderboard tables, bar charts, and OFAC classification details for each relay.",
+      "tags": [
+        "component",
+        "data-model",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/app/explorer/page.tsx:ExplorerPage",
+      "type": "function",
+      "name": "ExplorerPage",
+      "filePath": "src/app/explorer/page.tsx",
+      "lineRange": [
+        20,
+        323
+      ],
+      "summary": "Server component that fetches relay leaderboard data and renders a comprehensive explorer with per-relay stats tables and visual share bars.",
+      "tags": [
+        "component",
+        "data-model",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/app/methodology/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "src/app/methodology/page.tsx",
+      "summary": "Next.js page explaining the OFAC censorship measurement methodology, including relay classification criteria, metric computation, and data sourcing details.",
+      "tags": [
+        "component",
+        "documentation",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/app/methodology/page.tsx:MethodologyPage",
+      "type": "function",
+      "name": "MethodologyPage",
+      "filePath": "src/app/methodology/page.tsx",
+      "lineRange": [
+        12,
+        455
+      ],
+      "summary": "Server component rendering detailed methodology documentation with sections on relay classification, censorship metric derivation, and data pipeline explanation.",
+      "tags": [
+        "component",
+        "documentation",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/app/status/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "src/app/status/page.tsx",
+      "summary": "Next.js page displaying the operational status of the data refresh pipeline, showing last refresh time, recent refresh history, and latest stats.",
+      "tags": [
+        "component",
+        "monitoring",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/app/status/page.tsx:StatusPage",
+      "type": "function",
+      "name": "StatusPage",
+      "filePath": "src/app/status/page.tsx",
+      "lineRange": [
+        16,
+        187
+      ],
+      "summary": "Server component that fetches last refresh record, recent refresh logs, and latest stats, then renders a status dashboard with health indicators.",
+      "tags": [
+        "component",
+        "monitoring",
+        "data-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.env.example",
+      "type": "config",
+      "name": ".env.example",
+      "filePath": ".env.example",
+      "summary": "Environment variable template defining DATABASE_URL, DATABASE_AUTH_TOKEN, CRON_SECRET, and SLACK_WEBHOOK_URL — the four runtime secrets required to connect to Turso, authorize the cron refresh route, and send Slack failure alerts.",
+      "tags": [
+        "configuration",
+        "environment",
+        "security",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:AGENTS.md",
+      "type": "document",
+      "name": "AGENTS.md",
+      "filePath": "AGENTS.md",
+      "summary": "Brief agent-oriented note warning that this project uses Next.js 16 App Router, which differs from the Next.js versions that most AI coding agents were trained on.",
+      "tags": [
+        "documentation",
+        "onboarding",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "Primary developer-guide for Claude Code, covering project purpose, pnpm commands, architecture conventions (App Router, Tailwind v4, libSQL/Drizzle, path aliases), and data-pipeline overview across all 5 completed phases.",
+      "tags": [
+        "documentation",
+        "onboarding",
+        "configuration",
+        "development"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:components.json",
+      "type": "config",
+      "name": "components.json",
+      "filePath": "components.json",
+      "summary": "shadcn/ui configuration selecting the radix-nova style, enabling RSC and TSX, pointing Tailwind at `src/app/globals.css`, and mapping component/utility path aliases for the CLI code-generator.",
+      "tags": [
+        "configuration",
+        "ui",
+        "shadcn",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/DEPLOYMENT.md",
+      "type": "document",
+      "name": "DEPLOYMENT.md",
+      "filePath": "docs/DEPLOYMENT.md",
+      "summary": "Step-by-step production deployment guide covering Turso database creation, schema migration, history seeding, Vercel deployment, environment variable setup, and custom domain configuration for MEV Watch v2.",
+      "tags": [
+        "documentation",
+        "deployment",
+        "infrastructure",
+        "database"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-1-foundation.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-phase-1-foundation.md",
+      "filePath": "docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-1-foundation.md",
+      "summary": "Detailed implementation plan for Phase 1 (Foundation), covering 13 tasks including monorepo removal, Next.js scaffold, Vitest/Playwright setup, shadcn/ui config, Labrys design tokens, fonts, theme provider, libSQL database setup, Drizzle ORM, and the terminal-shell home page.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "foundation",
+        "development"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+      "filePath": "docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+      "summary": "Implementation plan for Phase 2 (Data Layer), specifying 9 tasks covering OFAC relay classification config, DataSource adapter, relayscan.io data source, metric computation, snapshot persistence, refresh orchestration, and the pnpm refresh/seed-history scripts.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "data-pipeline",
+        "development"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-3-core-ui.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-phase-3-core-ui.md",
+      "filePath": "docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-3-core-ui.md",
+      "summary": "Implementation plan for Phase 3 (Core UI), detailing 16 tasks for the data-query layer, formatting helpers, all homepage section components (Hero, Composition, Leaderboard, TrendChart, FAQ, Footer), secondary pages (Methodology, Explorer, Embed), and e2e tests.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "ui",
+        "development"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-4-deployment.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-phase-4-deployment.md",
+      "filePath": "docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-4-deployment.md",
+      "summary": "Implementation plan for Phase 4 (Deployment), covering Turso auth-token support, Slack failure alerts, the secret-protected cron refresh API route, Vercel cron configuration via vercel.json, and the deployment guide.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "deployment",
+        "development"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-5-iteration.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-phase-5-iteration.md",
+      "filePath": "docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-5-iteration.md",
+      "summary": "Implementation plan for Phase 5 (Iteration), covering builder snapshot table, builder data parsing and persistence, builder leaderboard component, the public JSON API under /api/v1/, API documentation page, status page, and final e2e verification.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "api",
+        "development"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-restyle.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-restyle.md",
+      "filePath": "docs/superpowers/plans/2026-05-21-mev-watch-v2-restyle.md",
+      "summary": "Implementation plan for the visual re-style pass, defining the faded-grid background pattern, shared Section panel component, and per-section restyle tasks for Hero, StatusBar, Header, Footer, Composition, Leaderboard, WhatToDo, TrendChart, and FAQ.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "ui",
+        "design"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md",
+      "type": "document",
+      "name": "2026-05-21-mev-watch-v2-overhaul-design.md",
+      "filePath": "docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md",
+      "summary": "Primary design specification for the MEV Watch v2 complete overhaul, covering goals, architecture (Next.js 16, libSQL/Drizzle, relayscan.io adapter), data layer design, all pages, design system (Labrys tokens, mint/blurple theming), testing strategy, 5-phase build plan, and v1 migration notes.",
+      "tags": [
+        "documentation",
+        "design-spec",
+        "architecture",
+        "data-pipeline"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/superpowers/specs/2026-05-22-live-epoch-ledger-design.md",
+      "type": "document",
+      "name": "2026-05-22-live-epoch-ledger-design.md",
+      "filePath": "docs/superpowers/specs/2026-05-22-live-epoch-ledger-design.md",
+      "summary": "Design spec for the Live Epoch Ledger feature, detailing the new `src/lib/epochs/` data layer (chain-time, relay-payloads, classify, get-live-epochs), the `/api/epochs` route, the animated epoch-ledger React component, and integration with the Composition section.",
+      "tags": [
+        "documentation",
+        "design-spec",
+        "api",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:drizzle.config.ts",
+      "type": "config",
+      "name": "drizzle.config.ts",
+      "filePath": "drizzle.config.ts",
+      "summary": "Drizzle Kit configuration pointing the migration tooling at `src/lib/db/schema.ts` and the local libSQL database file under `data/`, enabling `pnpm db:generate` and `pnpm db:migrate`.",
+      "tags": [
+        "configuration",
+        "database",
+        "drizzle",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:eslint.config.mjs",
+      "type": "config",
+      "name": "eslint.config.mjs",
+      "filePath": "eslint.config.mjs",
+      "summary": "ESLint flat-config applying Next.js core-web-vitals and TypeScript rules to the project source.",
+      "tags": [
+        "configuration",
+        "linting",
+        "code-quality",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mockup-b-terminal.html",
+      "type": "file",
+      "name": "mockup-b-terminal.html",
+      "filePath": "mockup-b-terminal.html",
+      "summary": "Standalone HTML design mockup for the terminal-shell homepage aesthetic, used as the visual reference during initial UI implementation. Contains self-contained CSS and markup with no external dependencies.",
+      "tags": [
+        "markup",
+        "design",
+        "prototype",
+        "ui"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Fully self-contained single-file prototype with inline styles and scripts — not part of the Next.js build."
+    },
+    {
+      "id": "config:next.config.ts",
+      "type": "config",
+      "name": "next.config.ts",
+      "filePath": "next.config.ts",
+      "summary": "Minimal Next.js 16 configuration exporting the default NextConfig object; no custom rewrites, redirects, or bundler overrides are applied.",
+      "tags": [
+        "configuration",
+        "nextjs",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Project manifest defining all npm scripts (dev, build, lint, test, e2e, db:*, refresh, seed-history), runtime dependencies (Next.js, Drizzle, libSQL, Recharts, shadcn/ui primitives), and devDependencies (Vitest, Playwright, TypeScript).",
+      "tags": [
+        "configuration",
+        "build-system",
+        "dependencies",
+        "scripts"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:playwright.config.ts",
+      "type": "config",
+      "name": "playwright.config.ts",
+      "filePath": "playwright.config.ts",
+      "summary": "Playwright end-to-end test configuration targeting Chromium, setting the base URL to localhost:3000, and automatically starting the Next.js dev server before running the e2e suite.",
+      "tags": [
+        "configuration",
+        "testing",
+        "e2e",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:pnpm-workspace.yaml",
+      "type": "config",
+      "name": "pnpm-workspace.yaml",
+      "filePath": "pnpm-workspace.yaml",
+      "summary": "Minimal pnpm workspace configuration listing ignored built dependencies (esbuild) to suppress platform-specific build warnings in this single-package workspace.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "package-manager"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:postcss.config.mjs",
+      "type": "config",
+      "name": "postcss.config.mjs",
+      "filePath": "postcss.config.mjs",
+      "summary": "PostCSS configuration enabling the `@tailwindcss/postcss` plugin required by Tailwind CSS v4's new PostCSS-first build pipeline.",
+      "tags": [
+        "configuration",
+        "css",
+        "tailwind",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Standard Next.js project README with getting-started instructions (pnpm dev), links to Next.js learning resources, and a pointer to Vercel deployment.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "onboarding"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript compiler configuration enabling strict mode and the `@/*` path alias mapping to `src/*`, along with Next.js plugin integration for incremental type-checking.",
+      "tags": [
+        "configuration",
+        "typescript",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:vercel.json",
+      "type": "config",
+      "name": "vercel.json",
+      "filePath": "vercel.json",
+      "summary": "Vercel deployment configuration defining a daily cron job (`0 6 * * *`) that calls the secret-protected `/api/refresh` route to fetch and persist the previous day's relay censorship statistics.",
+      "tags": [
+        "configuration",
+        "deployment",
+        "cron",
+        "infrastructure"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:vitest.config.ts",
+      "type": "config",
+      "name": "vitest.config.ts",
+      "filePath": "vitest.config.ts",
+      "summary": "Vitest unit-test configuration enabling the jsdom environment, the `@/*` path alias, a global setup file (`vitest.setup.ts`), and TypeScript support via Vite.",
+      "tags": [
+        "configuration",
+        "testing",
+        "unit-test",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:vitest.setup.ts",
+      "type": "config",
+      "name": "vitest.setup.ts",
+      "filePath": "vitest.setup.ts",
+      "summary": "Vitest global setup file importing `@testing-library/jest-dom` matchers and any project-wide test utilities needed before each test suite runs.",
+      "tags": [
+        "configuration",
+        "testing",
+        "unit-test",
+        "setup"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/config/relays.ts",
+      "target": "function:src/config/relays.ts:classifyRelay",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/config/relays.ts",
+      "target": "function:src/config/relays.ts:classifyRelay",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/api-response.ts",
+      "target": "function:src/lib/api-response.ts:apiJson",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/api-response.ts",
+      "target": "function:src/lib/api-response.ts:apiJson",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/data-source/relayscan.ts",
+      "target": "class:src/lib/data-source/relayscan.ts:RelayscanDataSource",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/data-source/relayscan.ts",
+      "target": "class:src/lib/data-source/relayscan.ts:RelayscanDataSource",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/env.ts",
+      "target": "function:src/lib/env.ts:getDatabaseUrl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/env.ts",
+      "target": "function:src/lib/env.ts:getDatabaseUrl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "function:src/lib/format.ts:formatPercent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "function:src/lib/format.ts:formatPercent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "function:src/lib/format.ts:formatRelativeTime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "function:src/lib/format.ts:formatRelativeTime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "function:src/lib/format.ts:formatDateShort",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "function:src/lib/format.ts:formatDateShort",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "function:src/lib/metrics.ts:computeDailyStats",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "function:src/lib/metrics.ts:computeDailyStats",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "function:src/lib/metrics.ts:computeRelayBreakdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "function:src/lib/metrics.ts:computeRelayBreakdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "function:src/lib/metrics.ts:computeBuilderBreakdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "function:src/lib/metrics.ts:computeBuilderBreakdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:summarise",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:summarise",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getTrend",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getTrend",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getLatestStats",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getLatestStats",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getStatsSummary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getStatsSummary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getLeaderboard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getLeaderboard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getBuilderLeaderboard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getBuilderLeaderboard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getLastRefresh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getLastRefresh",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getRecentRefreshes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "function:src/lib/queries.ts:getRecentRefreshes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/refresh/index.test.ts",
+      "target": "function:src/lib/refresh/index.test.ts:fakeSource",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "function:src/lib/refresh/index.ts:refreshDay",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "function:src/lib/refresh/index.ts:refreshDay",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/refresh/persist.ts",
+      "target": "function:src/lib/refresh/persist.ts:persistDailySnapshot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/refresh/persist.ts",
+      "target": "function:src/lib/refresh/persist.ts:persistDailySnapshot",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/refresh/slack.ts",
+      "target": "function:src/lib/refresh/slack.ts:sendSlackAlert",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/refresh/slack.ts",
+      "target": "function:src/lib/refresh/slack.ts:sendSlackAlert",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/utils.ts",
+      "target": "function:src/lib/utils.ts:cn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/utils.ts",
+      "target": "function:src/lib/utils.ts:cn",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/config/relays.test.ts",
+      "target": "file:src/config/relays.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/data-source/relayscan.test.ts",
+      "target": "file:src/lib/data-source/relayscan.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/data-source/relayscan.ts",
+      "target": "file:src/lib/data-source/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/db/index.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/db/index.ts",
+      "target": "file:src/lib/env.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/env.test.ts",
+      "target": "file:src/lib/env.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/format.test.ts",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/metrics.test.ts",
+      "target": "file:src/lib/metrics.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "file:src/config/relays.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "file:src/lib/data-source/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/queries.test.ts",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "file:src/config/relays.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "file:src/lib/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.test.ts",
+      "target": "file:src/lib/data-source/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.test.ts",
+      "target": "file:src/lib/refresh/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "file:src/lib/data-source/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "file:src/lib/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "file:src/lib/refresh/persist.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "file:src/lib/refresh/slack.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/persist.ts",
+      "target": "file:src/lib/data-source/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/persist.ts",
+      "target": "file:src/lib/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/persist.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/persist.ts",
+      "target": "file:src/lib/metrics.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/refresh/slack.test.ts",
+      "target": "file:src/lib/refresh/slack.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/config/relays.ts",
+      "target": "file:src/config/relays.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/data-source/relayscan.ts",
+      "target": "file:src/lib/data-source/relayscan.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/env.ts",
+      "target": "file:src/lib/env.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/format.ts",
+      "target": "file:src/lib/format.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/metrics.ts",
+      "target": "file:src/lib/metrics.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/queries.ts",
+      "target": "file:src/lib/queries.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/refresh/index.ts",
+      "target": "file:src/lib/refresh/index.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/lib/refresh/slack.ts",
+      "target": "file:src/lib/refresh/slack.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "file:src/app/layout.tsx",
+      "target": "file:src/app/globals.css",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/layout.tsx",
+      "target": "file:src/components/scroll-progress.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/layout.tsx",
+      "target": "file:src/components/theme-provider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/reveal.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/builder-leaderboard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/composition.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/faq.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/hero.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/leaderboard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/site-footer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/site-header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/status-bar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/trend-chart.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/components/sections/what-to-do.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/reveal.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/block-grid.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/builder-leaderboard.tsx",
+      "target": "file:src/components/section.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/builder-leaderboard.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/builder-leaderboard.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/builder-leaderboard.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "file:src/components/count-up.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "file:src/components/section.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "file:src/components/sections/block-grid.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/faq.tsx",
+      "target": "file:src/components/section.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/faq.tsx",
+      "target": "file:src/config/faq.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/faq.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/hero.tsx",
+      "target": "file:src/components/count-up.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/hero.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/hero.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/hero.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/leaderboard.tsx",
+      "target": "file:src/components/section.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/leaderboard.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/leaderboard.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/leaderboard.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/site-footer.tsx",
+      "target": "file:src/components/mev-mark.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/site-header.tsx",
+      "target": "file:src/components/mev-mark.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/site-header.tsx",
+      "target": "file:src/components/theme-toggle.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/status-bar.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "file:src/components/count-up.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "file:src/components/section.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/what-to-do.tsx",
+      "target": "file:src/components/section.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/what-to-do.tsx",
+      "target": "file:src/components/sections/share-strip.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/sections/what-to-do.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/theme-toggle.test.tsx",
+      "target": "file:src/components/theme-provider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/theme-toggle.test.tsx",
+      "target": "file:src/components/theme-toggle.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/theme-toggle.tsx",
+      "target": "file:src/components/ui/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ui/button.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/layout.tsx",
+      "target": "function:src/app/layout.tsx:RootLayout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/layout.tsx",
+      "target": "function:src/app/layout.tsx:RootLayout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "function:src/app/page.tsx:Home",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "function:src/app/page.tsx:Home",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/count-up.tsx",
+      "target": "function:src/components/count-up.tsx:CountUp",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/count-up.tsx",
+      "target": "function:src/components/count-up.tsx:CountUp",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/mev-mark.tsx",
+      "target": "function:src/components/mev-mark.tsx:MevMark",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/mev-mark.tsx",
+      "target": "function:src/components/mev-mark.tsx:MevMark",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/reveal.tsx",
+      "target": "function:src/components/reveal.tsx:Reveal",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/reveal.tsx",
+      "target": "function:src/components/reveal.tsx:Reveal",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/scroll-progress.tsx",
+      "target": "function:src/components/scroll-progress.tsx:ScrollProgress",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/scroll-progress.tsx",
+      "target": "function:src/components/scroll-progress.tsx:ScrollProgress",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/section.tsx",
+      "target": "function:src/components/section.tsx:Section",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/section.tsx",
+      "target": "function:src/components/section.tsx:Section",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/block-grid.tsx",
+      "target": "function:src/components/sections/block-grid.tsx:BlockGrid",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/block-grid.tsx",
+      "target": "function:src/components/sections/block-grid.tsx:BlockGrid",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/block-grid.tsx",
+      "target": "function:src/components/sections/block-grid.tsx:BlockTooltip",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/builder-leaderboard.tsx",
+      "target": "function:src/components/sections/builder-leaderboard.tsx:BuilderLeaderboard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/builder-leaderboard.tsx",
+      "target": "function:src/components/sections/builder-leaderboard.tsx:BuilderLeaderboard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "function:src/components/sections/composition.tsx:Composition",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/composition.tsx",
+      "target": "function:src/components/sections/composition.tsx:Composition",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/faq.tsx",
+      "target": "function:src/components/sections/faq.tsx:Faq",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/faq.tsx",
+      "target": "function:src/components/sections/faq.tsx:Faq",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/hero.tsx",
+      "target": "function:src/components/sections/hero.tsx:Hero",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/hero.tsx",
+      "target": "function:src/components/sections/hero.tsx:Hero",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/leaderboard.tsx",
+      "target": "function:src/components/sections/leaderboard.tsx:Leaderboard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/leaderboard.tsx",
+      "target": "function:src/components/sections/leaderboard.tsx:Leaderboard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/share-strip.tsx",
+      "target": "function:src/components/sections/share-strip.tsx:ShareStrip",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/share-strip.tsx",
+      "target": "function:src/components/sections/share-strip.tsx:ShareStrip",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/site-footer.tsx",
+      "target": "function:src/components/sections/site-footer.tsx:FooterLinkList",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/site-footer.tsx",
+      "target": "function:src/components/sections/site-footer.tsx:SiteFooter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/site-footer.tsx",
+      "target": "function:src/components/sections/site-footer.tsx:SiteFooter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/site-header.tsx",
+      "target": "function:src/components/sections/site-header.tsx:SiteHeader",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/site-header.tsx",
+      "target": "function:src/components/sections/site-header.tsx:SiteHeader",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/status-bar.tsx",
+      "target": "function:src/components/sections/status-bar.tsx:StatusBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/status-bar.tsx",
+      "target": "function:src/components/sections/status-bar.tsx:StatusBar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/status-bar.tsx",
+      "target": "function:src/components/sections/status-bar.tsx:StatusCell",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "function:src/components/sections/trend-chart.tsx:TrendChart",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "function:src/components/sections/trend-chart.tsx:TrendChart",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "function:src/components/sections/trend-chart.tsx:getSlice",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/trend-chart.tsx",
+      "target": "function:src/components/sections/trend-chart.tsx:sparseTickIndices",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/what-to-do.tsx",
+      "target": "function:src/components/sections/what-to-do.tsx:WhatToDo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/sections/what-to-do.tsx",
+      "target": "function:src/components/sections/what-to-do.tsx:WhatToDo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/theme-provider.tsx",
+      "target": "function:src/components/theme-provider.tsx:ThemeProvider",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/theme-provider.tsx",
+      "target": "function:src/components/theme-provider.tsx:ThemeProvider",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/theme-toggle.tsx",
+      "target": "function:src/components/theme-toggle.tsx:ThemeToggle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/theme-toggle.tsx",
+      "target": "function:src/components/theme-toggle.tsx:ThemeToggle",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/ui/button.tsx",
+      "target": "function:src/components/ui/button.tsx:Button",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/ui/button.tsx",
+      "target": "function:src/components/ui/button.tsx:Button",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/theme-toggle.tsx",
+      "target": "file:src/components/theme-toggle.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "function:src/app/layout.tsx:RootLayout",
+      "target": "file:src/components/scroll-progress.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/layout.tsx:RootLayout",
+      "target": "file:src/components/theme-provider.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/hero.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/trend-chart.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/composition.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/leaderboard.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/builder-leaderboard.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/what-to-do.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/faq.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/app/page.tsx:Home",
+      "target": "file:src/components/sections/status-bar.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/components/sections/composition.tsx:Composition",
+      "target": "file:src/components/sections/block-grid.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/components/sections/composition.tsx:Composition",
+      "target": "file:src/components/count-up.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/components/sections/hero.tsx:Hero",
+      "target": "file:src/components/count-up.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/components/sections/site-footer.tsx:SiteFooter",
+      "target": "function:src/components/sections/site-footer.tsx:FooterLinkList",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/components/sections/what-to-do.tsx:WhatToDo",
+      "target": "file:src/components/sections/share-strip.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/check-db.ts",
+      "target": "function:scripts/check-db.ts:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/check-db.ts",
+      "target": "file:src/lib/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/check-db.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/db-summary.ts",
+      "target": "function:scripts/db-summary.ts:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/db-summary.ts",
+      "target": "file:src/lib/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/db-summary.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/refresh.ts",
+      "target": "function:scripts/refresh.ts:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/refresh.ts",
+      "target": "file:src/lib/data-source/relayscan.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/refresh.ts",
+      "target": "file:src/lib/refresh/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/seed-history.ts",
+      "target": "function:scripts/seed-history.ts:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/seed-history.ts",
+      "target": "file:src/lib/data-source/relayscan.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:scripts/seed-history.ts",
+      "target": "file:src/lib/refresh/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api-docs/page.tsx",
+      "target": "function:src/app/api-docs/page.tsx:ApiDocsPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/api-docs/page.tsx",
+      "target": "function:src/app/api-docs/page.tsx:ApiDocsPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/api-docs/page.tsx",
+      "target": "file:src/components/reveal.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api-docs/page.tsx",
+      "target": "file:src/components/sections/site-footer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api-docs/page.tsx",
+      "target": "file:src/components/sections/site-header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/refresh/route.test.ts",
+      "target": "file:src/app/api/refresh/route.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/refresh/route.ts",
+      "target": "function:src/app/api/refresh/route.ts:GET",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/api/refresh/route.ts",
+      "target": "function:src/app/api/refresh/route.ts:GET",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/api/refresh/route.ts",
+      "target": "file:src/lib/data-source/relayscan.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/refresh/route.ts",
+      "target": "file:src/lib/refresh/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/v1/relays/route.ts",
+      "target": "file:src/lib/api-response.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/v1/relays/route.ts",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/v1/summary/route.ts",
+      "target": "file:src/lib/api-response.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/v1/summary/route.ts",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/v1/trend/route.ts",
+      "target": "file:src/lib/api-response.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/v1/trend/route.ts",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/embed/page.tsx",
+      "target": "function:src/app/embed/page.tsx:EmbedPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/embed/page.tsx",
+      "target": "function:src/app/embed/page.tsx:EmbedPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/embed/page.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/embed/page.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "function:src/app/explorer/page.tsx:ExplorerPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "function:src/app/explorer/page.tsx:ExplorerPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/components/reveal.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/components/sections/site-footer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/components/sections/site-header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/config/relays.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/explorer/page.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/methodology/page.tsx",
+      "target": "function:src/app/methodology/page.tsx:MethodologyPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/methodology/page.tsx",
+      "target": "function:src/app/methodology/page.tsx:MethodologyPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/methodology/page.tsx",
+      "target": "file:src/components/reveal.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/methodology/page.tsx",
+      "target": "file:src/components/sections/site-footer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/methodology/page.tsx",
+      "target": "file:src/components/sections/site-header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "function:src/app/status/page.tsx:StatusPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "function:src/app/status/page.tsx:StatusPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "file:src/components/reveal.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "file:src/components/sections/site-footer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "file:src/components/sections/site-header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "file:src/lib/css.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "file:src/lib/format.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/status/page.tsx",
+      "target": "file:src/lib/queries.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:drizzle/0000_melted_slyde.sql:daily_stats",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:drizzle/0000_melted_slyde.sql:recent_blocks",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:drizzle/0000_melted_slyde.sql:refresh_log",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:drizzle/0000_melted_slyde.sql:relay_daily_stats",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:drizzle/0001_bizarre_rockslide.sql:builder_daily_stats",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/app/api/refresh/route.ts",
+      "target": "file:src/app/api/refresh/route.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Direction corrected (was test → production)"
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:src/app/layout.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:src/lib/db/index.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:next.config.ts",
+      "target": "file:src/app/layout.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:drizzle.config.ts",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:drizzle.config.ts",
+      "target": "file:src/lib/db/index.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:vercel.json",
+      "target": "file:src/app/api/refresh/route.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:vitest.config.ts",
+      "target": "config:vitest.setup.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:playwright.config.ts",
+      "target": "file:e2e/home.spec.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:eslint.config.mjs",
+      "target": "file:src/app/layout.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:postcss.config.mjs",
+      "target": "file:src/app/globals.css",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:components.json",
+      "target": "file:src/components/ui/button.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:src/app/layout.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:pnpm-workspace.yaml",
+      "target": "config:package.json",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.env.example",
+      "target": "file:src/lib/db/index.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.env.example",
+      "target": "file:src/app/api/refresh/route.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:src/app/layout.tsx",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/lib/metrics.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/config/relays.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/app/api/refresh/route.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/DEPLOYMENT.md",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/DEPLOYMENT.md",
+      "target": "config:vercel.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md",
+      "target": "file:src/config/relays.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md",
+      "target": "file:src/lib/metrics.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-05-22-live-epoch-ledger-design.md",
+      "target": "file:src/config/relays.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-05-22-live-epoch-ledger-design.md",
+      "target": "file:src/app/api/refresh/route.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-1-foundation.md",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-1-foundation.md",
+      "target": "file:src/app/layout.tsx",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+      "target": "file:src/config/relays.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+      "target": "file:src/lib/metrics.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+      "target": "file:src/lib/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-3-core-ui.md",
+      "target": "file:src/app/page.tsx",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-4-deployment.md",
+      "target": "file:src/app/api/refresh/route.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-4-deployment.md",
+      "target": "config:vercel.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-5-iteration.md",
+      "target": "file:src/app/api/v1/summary/route.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-restyle.md",
+      "target": "file:src/app/globals.css",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:ui",
+      "name": "UI Layer",
+      "description": "Next.js App Router pages, global styles, and all React components — from the root layout and route pages to homepage section components, charts, theme controls, and the shadcn/ui button primitive.",
+      "nodeIds": [
+        "file:src/app/globals.css",
+        "file:src/app/layout.tsx",
+        "file:src/app/page.tsx",
+        "file:src/app/api-docs/page.tsx",
+        "file:src/app/embed/page.tsx",
+        "file:src/app/explorer/page.tsx",
+        "file:src/app/methodology/page.tsx",
+        "file:src/app/status/page.tsx",
+        "file:src/components/count-up.tsx",
+        "file:src/components/mev-mark.tsx",
+        "file:src/components/reveal.tsx",
+        "file:src/components/scroll-progress.tsx",
+        "file:src/components/section.tsx",
+        "file:src/components/sections/block-grid.tsx",
+        "file:src/components/sections/builder-leaderboard.tsx",
+        "file:src/components/sections/composition.tsx",
+        "file:src/components/sections/faq.tsx",
+        "file:src/components/sections/hero.tsx",
+        "file:src/components/sections/leaderboard.tsx",
+        "file:src/components/sections/share-strip.tsx",
+        "file:src/components/sections/site-footer.tsx",
+        "file:src/components/sections/site-header.tsx",
+        "file:src/components/sections/status-bar.tsx",
+        "file:src/components/sections/trend-chart.tsx",
+        "file:src/components/sections/what-to-do.tsx",
+        "file:src/components/theme-provider.tsx",
+        "file:src/components/theme-toggle.tsx",
+        "file:src/components/ui/button.tsx"
+      ]
+    },
+    {
+      "id": "layer:api",
+      "name": "API Layer",
+      "description": "Next.js serverless route handlers exposing the public read-only JSON API (/api/v1/summary, /api/v1/trend, /api/v1/relays) and the secret-protected cron refresh trigger (/api/refresh).",
+      "nodeIds": [
+        "file:src/app/api/refresh/route.ts",
+        "file:src/app/api/v1/relays/route.ts",
+        "file:src/app/api/v1/summary/route.ts",
+        "file:src/app/api/v1/trend/route.ts"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service Layer",
+      "description": "Core business logic and data pipeline: the relayscan.io HTTP adapter, OFAC censorship metric computation, read-only database query functions, refresh orchestration with idempotent persistence and Slack alerts, and the CLI scripts that invoke the pipeline manually.",
+      "nodeIds": [
+        "file:src/lib/data-source/relayscan.ts",
+        "file:src/lib/data-source/types.ts",
+        "file:src/lib/metrics.ts",
+        "file:src/lib/queries.ts",
+        "file:src/lib/refresh/index.ts",
+        "file:src/lib/refresh/persist.ts",
+        "file:src/lib/refresh/slack.ts",
+        "file:scripts/check-db.ts",
+        "file:scripts/db-summary.ts",
+        "file:scripts/refresh.ts",
+        "file:scripts/seed-history.ts"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "Data Layer",
+      "description": "Drizzle ORM schema definitions, the libSQL client singleton, SQL migration files for all five database tables (dailyStats, relayDailyStats, builderDailyStats, recentBlocks, refreshLog), migration journal and snapshots, and the local database directory placeholder.",
+      "nodeIds": [
+        "file:src/lib/db/index.ts",
+        "file:src/lib/db/schema.ts",
+        "table:drizzle/0000_melted_slyde.sql:daily_stats",
+        "table:drizzle/0000_melted_slyde.sql:recent_blocks",
+        "table:drizzle/0000_melted_slyde.sql:refresh_log",
+        "table:drizzle/0000_melted_slyde.sql:relay_daily_stats",
+        "table:drizzle/0001_bizarre_rockslide.sql:builder_daily_stats",
+        "config:drizzle/meta/_journal.json",
+        "config:drizzle/meta/0000_snapshot.json",
+        "config:drizzle/meta/0001_snapshot.json",
+        "file:data/.gitkeep"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Configuration Layer",
+      "description": "Editorial OFAC relay classifications and FAQ content, environment variable validation, and all root-level tooling configuration files covering Next.js, TypeScript, ESLint, PostCSS, Drizzle Kit, Vitest, Playwright, pnpm, shadcn/ui, and Vercel deployment.",
+      "nodeIds": [
+        "file:src/config/faq.ts",
+        "file:src/config/relays.ts",
+        "file:src/lib/env.ts",
+        "config:.env.example",
+        "config:components.json",
+        "config:drizzle.config.ts",
+        "config:eslint.config.mjs",
+        "config:next.config.ts",
+        "config:package.json",
+        "config:playwright.config.ts",
+        "config:pnpm-workspace.yaml",
+        "config:postcss.config.mjs",
+        "config:tsconfig.json",
+        "config:vercel.json",
+        "config:vitest.config.ts",
+        "config:vitest.setup.ts"
+      ]
+    },
+    {
+      "id": "layer:utility",
+      "name": "Utility Layer",
+      "description": "Shared low-level helpers consumed across the stack: percentage and date formatting functions, the Tailwind-aware cn() class merge utility, a CSS helper module, and the CORS/cache-control response wrapper for all public API endpoints.",
+      "nodeIds": [
+        "file:src/lib/api-response.ts",
+        "file:src/lib/css.ts",
+        "file:src/lib/format.ts",
+        "file:src/lib/utils.ts"
+      ]
+    },
+    {
+      "id": "layer:test",
+      "name": "Test Layer",
+      "description": "All automated test coverage for MEV Watch: Vitest unit tests for relay config, data-source adapter, environment helpers, format utilities, metric computation, query functions, and refresh pipeline, plus Playwright end-to-end specs for the homepage, secondary pages, and API routes.",
+      "nodeIds": [
+        "file:src/config/relays.test.ts",
+        "file:src/lib/data-source/relayscan.test.ts",
+        "file:src/lib/env.test.ts",
+        "file:src/lib/format.test.ts",
+        "file:src/lib/metrics.test.ts",
+        "file:src/lib/queries.test.ts",
+        "file:src/lib/refresh/index.test.ts",
+        "file:src/lib/refresh/slack.test.ts",
+        "file:src/components/theme-toggle.test.tsx",
+        "file:src/app/api/refresh/route.test.ts",
+        "file:e2e/home.spec.ts",
+        "file:e2e/pages.spec.ts",
+        "file:e2e/smoke.spec.ts"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Project-level documentation and design references: onboarding guides (README, CLAUDE.md, AGENTS.md), the production deployment guide, phased implementation plans and design specifications for the v2 overhaul and visual restyling, and the standalone terminal-shell HTML mockup used as the original design reference.",
+      "nodeIds": [
+        "document:AGENTS.md",
+        "document:CLAUDE.md",
+        "document:README.md",
+        "document:docs/DEPLOYMENT.md",
+        "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-1-foundation.md",
+        "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-2-data-layer.md",
+        "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-3-core-ui.md",
+        "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-4-deployment.md",
+        "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-phase-5-iteration.md",
+        "document:docs/superpowers/plans/2026-05-21-mev-watch-v2-restyle.md",
+        "document:docs/superpowers/specs/2026-05-21-mev-watch-v2-overhaul-design.md",
+        "document:docs/superpowers/specs/2026-05-22-live-epoch-ledger-design.md",
+        "file:mockup-b-terminal.html"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Purpose & Architecture",
+      "description": "CLAUDE.md is the authoritative developer guide for MEV Watch v2, a public transparency tool tracking how many Ethereum MEV-boost blocks are built by OFAC-censoring relays. It explains the five-phase build, the pnpm command set, the Next.js 16 App Router conventions, and the full data pipeline from relayscan.io through libSQL to the rendered homepage — making it the best place to start before touching any code.",
+      "nodeIds": [
+        "document:CLAUDE.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "App Shell & Root Layout",
+      "description": "The root layout (`src/app/layout.tsx`) bootstraps the entire application by wrapping every page with the ThemeProvider (light/dark switching) and the ScrollProgress indicator, sets global metadata, and loads the Inter font. Reading it alongside `globals.css` shows the Labrys design-token system — CSS custom properties for mint/blurple accent colors, the background grid animation, and Tailwind v4 base layers — which are inherited by every component downstream.",
+      "nodeIds": [
+        "file:src/app/layout.tsx",
+        "file:src/app/globals.css"
+      ],
+      "languageLesson": "Next.js App Router uses a file-system hierarchy of `layout.tsx` files. The root layout wraps every route; nested layouts wrap subsets. This is fundamentally different from the `_app.tsx` pattern in the older Pages Router."
+    },
+    {
+      "order": 3,
+      "title": "Editorial Relay Config",
+      "description": "Before any data is fetched, the application needs to know which relays are OFAC-censoring. `src/config/relays.ts` is that editorial ground truth: a hardcoded list of known MEV-boost relays annotated with their censorship posture, plus a `classifyRelay` lookup helper. This file is the highest fan-in leaf in the service and metric layers — both `metrics.ts` and `queries.ts` import it directly — making it one of the most important files to understand early.",
+      "nodeIds": [
+        "file:src/config/relays.ts"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Data Source Contract & Adapter",
+      "description": "The `DataSource` interface in `src/lib/data-source/types.ts` defines the contract for fetching raw relay payload counts for a given date, decoupling the refresh pipeline from any particular external API. `src/lib/data-source/relayscan.ts` implements that interface against the relayscan.io public JSON API, fetching and Zod-parsing daily per-relay and per-builder payload counts. This adapter is the only place the codebase makes an outbound HTTP call to an external service.",
+      "nodeIds": [
+        "file:src/lib/data-source/types.ts",
+        "file:src/lib/data-source/relayscan.ts"
+      ],
+      "languageLesson": "The DataSource interface is a TypeScript structural-type contract: any object with a matching `fetchDay` method satisfies it. This enables dependency injection — the refresh pipeline accepts any DataSource, making unit tests easy by passing a fake implementation instead of the real HTTP adapter."
+    },
+    {
+      "order": 5,
+      "title": "Censorship Metric Computation",
+      "description": "With raw payload counts in hand, `src/lib/metrics.ts` is where the OFAC censorship percentage is actually derived. It takes the relayscan data and the relay classifications from Step 3 and computes three numbers: the overall daily censorship rate, per-relay share, and per-builder share. The key insight is that using each relay's share of total MEV-boost payloads as the weight cancels the multi-relay double-counting that would result from a naive block count.",
+      "nodeIds": [
+        "file:src/lib/metrics.ts"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Database Schema & Client",
+      "description": "The computed metrics are stored in a libSQL database (local file in dev, Turso in production) using the Drizzle ORM. `src/lib/db/schema.ts` defines all five tables — `dailyStats`, `relayDailyStats`, `builderDailyStats`, `recentBlocks`, and `refreshLog` — and is the highest fan-in file in the entire graph, imported by the queries, persistence, and refresh modules. `src/lib/db/index.ts` exports the singleton `db` client configured via the DATABASE_URL env var validated in `src/lib/env.ts`.",
+      "nodeIds": [
+        "file:src/lib/db/schema.ts",
+        "file:src/lib/db/index.ts",
+        "file:src/lib/env.ts"
+      ],
+      "languageLesson": "Drizzle ORM uses a code-first schema: you define tables as TypeScript objects, then `pnpm db:generate` compares them to the live schema and emits a SQL migration file. Running `pnpm db:migrate` applies it. The schema file is the single source of truth for both runtime queries and migration generation."
+    },
+    {
+      "order": 7,
+      "title": "SQL Migration Tables",
+      "description": "The Drizzle migration files under `drizzle/` materialize the schema from Step 6 into actual SQL DDL. The `daily_stats` table stores the per-day censorship aggregate; `relay_daily_stats` and `builder_daily_stats` hold per-relay and per-builder breakdowns; `refresh_log` is an audit trail for every pipeline run. These tables are what the homepage and public API ultimately read, making them the physical backbone of all displayed data.",
+      "nodeIds": [
+        "table:drizzle/0000_melted_slyde.sql:daily_stats",
+        "table:drizzle/0000_melted_slyde.sql:relay_daily_stats",
+        "table:drizzle/0001_bizarre_rockslide.sql:builder_daily_stats",
+        "table:drizzle/0000_melted_slyde.sql:refresh_log"
+      ],
+      "languageLesson": "SQL migrations should be idempotent and ordered. Drizzle uses an `onConflictDoUpdate` (upsert) pattern so that re-running a refresh for the same date overwrites rather than duplicates rows, keeping the pipeline safe to retry."
+    },
+    {
+      "order": 8,
+      "title": "Daily Refresh Pipeline",
+      "description": "The orchestration layer lives in `src/lib/refresh/index.ts` (`refreshDay`), which wires together all the pieces seen so far: it calls the DataSource adapter to fetch a day's raw data, passes the result through the metrics layer, then delegates persistence to `src/lib/refresh/persist.ts` which upserts all five table types via Drizzle. If anything fails, `src/lib/refresh/slack.ts` fires a webhook alert. This is the highest-value function in the entire codebase — everything else exists to support or consume it.",
+      "nodeIds": [
+        "file:src/lib/refresh/index.ts",
+        "file:src/lib/refresh/persist.ts",
+        "file:src/lib/refresh/slack.ts"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Cron Trigger & Deployment Config",
+      "description": "In production, the refresh pipeline is invoked automatically via `src/app/api/refresh/route.ts`, a Next.js API route that validates a secret `Authorization` header before calling `refreshDay`. `vercel.json` configures Vercel to call this route daily at 06:00 UTC via a cron job expression. Together these two files close the loop between the data pipeline and the cloud platform — the cron fires the route, the route guards the secret, the route calls the pipeline.",
+      "nodeIds": [
+        "file:src/app/api/refresh/route.ts",
+        "config:vercel.json"
+      ],
+      "languageLesson": "Vercel cron jobs use standard cron syntax (`0 6 * * *` = 6am UTC daily). They invoke an HTTP route on the same deployment, so the route must be protected by a secret header — otherwise anyone could trigger an expensive pipeline run."
+    },
+    {
+      "order": 10,
+      "title": "Database Query Layer",
+      "description": "Pages and API routes never touch the refresh pipeline directly; they only read pre-computed snapshots through `src/lib/queries.ts`. This file (fan-out 20, fan-in 13 — the most-connected file in the graph) exports all read-only functions: `getLatestStats`, `summarise`, `getTrend`, `getLeaderboard`, `getBuilderLeaderboard`, and `getLastRefresh`. Centralizing queries here means every consumer gets consistent, type-safe data shapes without duplicating SQL.",
+      "nodeIds": [
+        "file:src/lib/queries.ts"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Homepage Composition",
+      "description": "The homepage (`src/app/page.tsx`) is a Next.js server component that fans out to `queries.ts` for all data in parallel, then composes the full single-page dashboard from section components. It imports ten section components and the `Reveal` scroll-animation wrapper, acting as the composition root for the entire user-facing view. Understanding this file shows exactly which data each section needs and in what shape — it is the bridge between the data layer and the UI layer.",
+      "nodeIds": [
+        "file:src/app/page.tsx",
+        "file:src/components/reveal.tsx"
+      ]
+    },
+    {
+      "order": 12,
+      "title": "Key Homepage Sections",
+      "description": "The hero section (`src/components/sections/hero.tsx`) renders the primary OFAC censorship metric as a large animated percentage with trend direction — it is what users see first and the single number the entire project exists to compute. The trend chart (`src/components/sections/trend-chart.tsx`) extends that into a historical SVG time series with range selectors and a crosshair tooltip. Both depend on `src/lib/format.ts` (the display formatting helpers) and the `CountUp` animation primitive, which together provide the polished data-journalism feel of the site.",
+      "nodeIds": [
+        "file:src/components/sections/hero.tsx",
+        "file:src/components/sections/trend-chart.tsx",
+        "file:src/lib/format.ts"
+      ],
+      "languageLesson": "React server components (RSC) like `page.tsx` fetch data at request time with no client-side JavaScript. Client components like `trend-chart.tsx` add interactivity. Next.js App Router lets you mix them in the same tree — server components pass pre-fetched data as props to client components, avoiding waterfalls while keeping the browser bundle small."
+    },
+    {
+      "order": 13,
+      "title": "Leaderboard Sections",
+      "description": "The relay leaderboard (`src/components/sections/leaderboard.tsx`) and builder leaderboard (`src/components/sections/builder-leaderboard.tsx`) rank MEV-boost participants by block count with proportional bar charts and OFAC compliance badges. Both lean on the shared `Section` layout primitive (`src/components/section.tsx`), which is the high fan-in structural wrapper for every homepage panel. These sections complete the picture of where censorship originates — down to specific relay operators and block builders.",
+      "nodeIds": [
+        "file:src/components/sections/leaderboard.tsx",
+        "file:src/components/sections/builder-leaderboard.tsx",
+        "file:src/components/section.tsx"
+      ]
+    },
+    {
+      "order": 14,
+      "title": "Public JSON API",
+      "description": "MEV Watch exposes its data as a public read-only JSON API under `/api/v1/`. The three route handlers — `summary`, `trend`, and `relays` — each call the same `queries.ts` functions the homepage uses, then wrap the response with `src/lib/api-response.ts` to attach standard CORS and cache-control headers. This makes the censorship data programmatically accessible to researchers and dashboards without any authentication.",
+      "nodeIds": [
+        "file:src/app/api/v1/summary/route.ts",
+        "file:src/app/api/v1/trend/route.ts",
+        "file:src/app/api/v1/relays/route.ts",
+        "file:src/lib/api-response.ts"
+      ]
+    },
+    {
+      "order": 15,
+      "title": "Testing & Quality Assurance",
+      "description": "The project has comprehensive test coverage at two levels. Vitest unit tests sit beside every core module — `metrics.test.ts` verifies the censorship percentage calculation with controlled inputs, `relayscan.test.ts` exercises the HTTP adapter against fixtures, and `queries.test.ts` checks query shapes. Playwright e2e tests in `e2e/home.spec.ts` and `e2e/pages.spec.ts` spin up the full Next.js dev server and assert that the censorship display, charts, and secondary pages all render correctly in a real Chromium browser.",
+      "nodeIds": [
+        "file:src/lib/metrics.test.ts",
+        "file:src/lib/data-source/relayscan.test.ts",
+        "file:e2e/home.spec.ts",
+        "file:e2e/pages.spec.ts"
+      ],
+      "languageLesson": "Vitest and Playwright serve complementary roles: Vitest runs fast, isolated unit tests in a jsdom environment with no network, while Playwright drives a real browser against a running server. The split lets you run unit tests on every save and reserve the slower e2e suite for pre-merge verification."
+    }
+  ]
+}

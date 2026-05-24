@@ -17,8 +17,10 @@ export function Leaderboard({ rows }: LeaderboardProps) {
 
   return (
     <Section
-      label="03 / RELAY LEADERBOARD"
+      label="04 / RELAY LEADERBOARD"
       title="Ranked by block share."
+      pattern="ticks"
+      accent="var(--accent-color)"
       aside={
         <>
           SORT: SHARE DESC

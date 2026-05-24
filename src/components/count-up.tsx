@@ -35,6 +35,14 @@ export function CountUp({
     const el = ref.current;
     if (!el) return;
 
+    // After the intro count-up has played once, subsequent value changes
+    // (e.g. the trend-chart range toggle) snap to the new value instead
+    // of re-triggering the scroll-into-view animation.
+    if (started.current) {
+      setDisplay(value);
+      return;
+    }
+
     const run = () => {
       if (started.current) return;
       started.current = true;

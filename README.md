@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MEV Watch
 
-## Getting Started
+A public transparency tool tracking OFAC censorship of Ethereum MEV-boost blocks.
 
-First, run the development server:
+Live at **[mevwatch.info](https://mevwatch.info)**.
+
+The site reports, daily, the share of MEV-boost relay payload deliveries that go through OFAC-censoring relays, plus a live epoch ledger showing the most recent slots and the relays that won them. The OFAC-posture classification of each relay is editorial and tracked in `src/config/relays.ts`.
+
+## Stack
+
+Next.js 16 App Router · Tailwind v4 + shadcn/ui · libSQL (Turso in prod, local file in dev) · Drizzle ORM · Vitest + Playwright · deployed on Vercel.
+
+## Quick start
+
+Requires Node 20+ and pnpm.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env       # local libSQL file is the default
+pnpm db:migrate            # apply schema
+pnpm refresh               # fetch yesterday's snapshot
+pnpm dev                   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Common commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What it does |
+|---|---|
+| `pnpm dev` | start the dev server |
+| `pnpm build` | production build |
+| `pnpm lint` / `pnpm test` | ESLint / Vitest |
+| `pnpm test:e2e` | Playwright (auto-starts the dev server) |
+| `pnpm db:generate` / `pnpm db:migrate` | generate / apply a Drizzle migration |
+| `pnpm refresh [date]` | fetch + store one day of relay stats (default: yesterday) |
+| `pnpm seed-history [start] [end]` | backfill historical daily snapshots |
+| `pnpm backfill-nonboost` | repair tool: populate `nonBoostPct` / `totalChainBlocks` across history |
+| `pnpm db:summary` | print snapshot row count and the latest day |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture pointers
 
-## Learn More
+- **Data pipeline** — `src/lib/refresh/` (daily snapshot, written by the `/api/refresh` cron) and `src/lib/epochs/` (live per-request polling of each relay's data API).
+- **Schema** — `src/lib/db/schema.ts`. Migrations in `drizzle/`.
+- **Metric** — `src/lib/metrics.ts` (per-payload share). A per-slot honest metric is in flight; see `docs/superpowers/specs/2026-05-24-per-slot-honest-metric-design.md`.
+- **Editorial relay config** — `src/config/relays.ts`.
+- **Public API** — `src/app/api/v1/{summary,trend,relays}` (read-only JSON). Refresh health at `/status`.
 
-To learn more about Next.js, take a look at the following resources:
+## Docs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Design and decisions: `docs/superpowers/specs/`
+- Phased implementation plans: `docs/superpowers/plans/`
+- Methodology (user-facing): `/methodology` on the live site, source at `src/app/methodology/page.tsx`
+- Production deploy + ops: `docs/DEPLOYMENT.md`
+- Working-with-the-codebase guide for AI tools: `CLAUDE.md`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+UNLICENSED — public-good transparency tool by [Labrys](https://labrys.io); contributions welcome via issue or PR.

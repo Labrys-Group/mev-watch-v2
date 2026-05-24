@@ -1016,6 +1016,7 @@ Open http://localhost:3000 with devtools open and the network tab set to "disabl
 - The Labrys nav + WhatToDo + FAQ + footer should be visible **instantly** (no fade-up wait).
 - Each data-driven section should either show its Suspense skeleton (matching the section's outer dimensions) or the populated data — never a blank gap and never a layout shift between skeleton and real content.
 - The TrendChart populated state should show populated stats + range toggle + legend, but the chart well shows a gray pulse placeholder until you scroll the chart into view. When the chart well intersects, Recharts mounts and the area-sweep animation plays. Verify the sweep timing still feels right.
+- The trend chart range toggle (ALL / 1Y / 90D) updates NOW / PEAK / TROUGH immediately on click (regression check for the earlier CountUp bug).
 - If you point the dev server at an empty DB (rename your local sqlite file, or use a fresh dev env), each data section should render its inline empty state with the `pnpm seed-history` hint — not a stuck skeleton.
 
 If any section flashes blank before its skeleton or causes a layout jump, fix the skeleton dimensions to match the real component before continuing.

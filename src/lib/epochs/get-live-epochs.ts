@@ -11,6 +11,15 @@ import { RELAYS } from "@/config/relays";
 /** Number of epoch rows the ledger shows (in-progress + 3 completed). */
 export const EPOCH_ROWS = 4;
 
+/**
+ * How many of the most-recent slots stay `pending` when no relay row has
+ * arrived yet, rather than flipping to `nonboost`. Covers worst-case
+ * relay-publish lag plus the 15s relay fetch-cache and 20s CDN cache —
+ * at 12s/slot, 3 slots (36s) is a safe revalidation window so we don't
+ * mislabel a just-landed block as non-MEV-boost before its relay reports.
+ */
+export const NONBOOST_GRACE_SLOTS = 3;
+
 /** One slot tile's data. `category` "pending" means the slot has not happened. */
 export interface SlotCell {
   slot: number;
@@ -75,12 +84,11 @@ export async function getLiveEpochs(
     for (let i = 0; i < SLOTS_PER_EPOCH; i++) {
       const slot = first + i;
       const block = bySlot.get(slot);
-      const category: SlotCell["category"] =
-        slot > head
-          ? "pending"
-          : block
-            ? classifySlot(block.relays)
-            : "nonboost";
+      let category: SlotCell["category"];
+      if (slot > head) category = "pending";
+      else if (block) category = classifySlot(block.relays);
+      else if (slot > head - NONBOOST_GRACE_SLOTS) category = "pending";
+      else category = "nonboost";
       slots.push({
         slot,
         indexInEpoch: i,

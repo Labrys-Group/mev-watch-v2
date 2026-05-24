@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import type { CSSVars } from "@/lib/css";
 import { classifyRelay } from "@/config/relays";
 import { diffLedger } from "@/lib/epochs/diff";
@@ -10,8 +11,8 @@ import type {
   SlotCell,
 } from "@/lib/epochs/get-live-epochs";
 
-/** Client poll interval. A slot is 12s; 30s surfaces 2-3 new slots per poll. */
-export const POLL_MS = 30_000;
+/** Client poll interval. A slot is 12s; 10s keeps the pulse close to real-time. */
+export const POLL_MS = 10_000;
 
 type FilledCategory = "censoring" | "neutral" | "nonboost";
 
@@ -221,7 +222,7 @@ function EpochRowView({
       >
         {row.slots.map((cell, col) => (
           <SlotTile
-            key={`${cell.slot}:${cell.category}`}
+            key={`${cell.slot}:${cell.category === "pending" ? "p" : "f"}`}
             cell={cell}
             epoch={row.epoch}
             isNext={col === nextIdx}
@@ -261,7 +262,7 @@ function SlotTile({
           ? "border-solid border-fg-muted/50"
           : "border-dashed border-border-labrys"
       }`
-    : `epoch-tile flex aspect-square cursor-crosshair items-center justify-center transition-transform duration-100 hover:z-20 hover:scale-[1.55] ${meta!.bg}`;
+    : `epoch-tile flex aspect-square cursor-crosshair items-center justify-center transition-[transform,background-color] duration-[500ms] ease-out hover:z-20 hover:scale-[1.55] hover:duration-100 ${meta!.bg}`;
 
   // Track the cursor itself (not the tile rect) so the tooltip lands beside
   // the pointer rather than pinned to the slot's bottom-centre. Touch devices
@@ -317,7 +318,11 @@ function SlotTooltip({ hover }: { hover: HoverState }) {
   if (left < 8) left = 8;
   if (top < 8) top = 8;
 
-  return (
+  // Portal to document.body so the ancestor <Reveal>'s `transform` and
+  // `will-change: transform` don't re-anchor `position: fixed` to the section.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="pointer-events-none fixed z-[70] max-w-[280px] border border-border-labrys bg-panel px-3 py-2 font-mono shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
       style={{ left, top }}
@@ -342,7 +347,8 @@ function SlotTooltip({ hover }: { hover: HoverState }) {
           {formatEth(cell.valueWei)} ETH · {cell.numTx ?? 0} txns
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }
 

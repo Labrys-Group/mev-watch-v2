@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { formatPercent, formatRelativeTime } from "@/lib/format";
 
 interface StatusBarProps {
@@ -66,48 +67,31 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
           </div>
         </a>
 
-        {/* NETWORK — hidden on small screens, visible from md up */}
-        <div className="hidden md:flex justify-between items-center gap-3 px-3 py-2 border-r border-border-labrys text-[10px] tracking-[0.1em] uppercase">
-          <span>NETWORK</span>
-          <strong className="text-foreground font-semibold tracking-normal normal-case">
-            ETH MAINNET
-          </strong>
-        </div>
+        <StatusCell label="NETWORK" value="ETH MAINNET" mdOnly />
 
-        {/* STATUS — always visible, with pulsing dot */}
-        <div className="flex justify-between items-center gap-3 px-3 py-2 border-r border-border-labrys text-[10px] tracking-[0.1em] uppercase">
-          <span>STATUS</span>
-          <strong className="text-good font-semibold tracking-normal normal-case flex items-center gap-1.5">
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
-              style={{ boxShadow: "0 0 6px var(--good)" }}
-            />
-            LIVE
-          </strong>
-        </div>
+        <StatusCell
+          label="STATUS"
+          valueClassName="text-good flex items-center gap-1.5"
+          value={
+            <>
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
+                style={{ boxShadow: "0 0 6px var(--good)" }}
+              />
+              LIVE
+            </>
+          }
+        />
 
-        {/* DATA THROUGH — hidden on small screens, visible from md up */}
-        <div className="hidden md:flex justify-between items-center gap-3 px-3 py-2 border-r border-border-labrys text-[10px] tracking-[0.1em] uppercase">
-          <span>DATA THROUGH</span>
-          <strong className="text-foreground font-semibold tracking-normal normal-case">
-            {latestDate}
-          </strong>
-        </div>
+        <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
 
-        {/* CENSORSHIP — always visible */}
         <StatusCell
           label="CENSORSHIP"
           value={formatPercent(censorshipPct)}
           valueClassName="text-warn"
         />
 
-        {/* UPDATED — hidden on small screens, visible from md up */}
-        <div className="hidden md:flex justify-between items-center gap-3 px-3 py-2 text-[10px] tracking-[0.1em] uppercase">
-          <span>UPDATED</span>
-          <strong className="text-foreground font-semibold tracking-normal normal-case">
-            {updatedText}
-          </strong>
-        </div>
+        <StatusCell label="UPDATED" value={updatedText} mdOnly isLast />
       </div>
     </div>
   );
@@ -115,15 +99,23 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
 
 interface StatusCellProps {
   label: string;
-  value: string;
+  value: ReactNode;
+  /** Extra classes layered onto the `<strong>` value. Overrides `text-foreground`
+   *  if a colour is provided. */
   valueClassName?: string;
+  /** Drops the right-hand divider; use on the final cell in the row. */
   isLast?: boolean;
+  /** Hide below the `md` breakpoint. The Labrys logo + STATUS + CENSORSHIP
+   *  stay; everything else collapses on narrow screens. */
+  mdOnly?: boolean;
 }
 
-function StatusCell({ label, value, valueClassName, isLast }: StatusCellProps) {
+function StatusCell({ label, value, valueClassName, isLast, mdOnly }: StatusCellProps) {
+  const visibility = mdOnly ? "hidden md:flex" : "flex";
+  const divider = isLast ? "" : " border-r border-border-labrys";
   return (
     <div
-      className={`flex justify-between items-center gap-3 px-3 py-2 text-[10px] tracking-[0.1em] uppercase${isLast ? "" : " border-r border-border-labrys"}`}
+      className={`${visibility} justify-between items-center gap-3 px-3 py-2 text-[12px] tracking-[0.1em] uppercase${divider}`}
     >
       <span>{label}</span>
       <strong

@@ -286,9 +286,12 @@ details[open]::details-content {
    slot pops once. Rows collapse/expand via a grid-template-rows
    transition so the epoch shift needs no measured pixel heights.
    ────────────────────────────────────────────────────────────── */
-.epoch-tile {
+.is-visible .epoch-tile {
   animation: mw-tile-pop 0.52s cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
-  animation-delay: var(--delay, 0ms);
+  /* +400ms base so the pop fires after the parent .reveal fade-up is mostly
+     complete — without it, the pop runs against a 0→1 opacity parent and is
+     visually masked. */
+  animation-delay: calc(400ms + var(--delay, 0ms));
 }
 .epoch-row-wrap {
   display: grid;
@@ -382,6 +385,7 @@ details[open]::details-content {
   .epoch-tile {
     animation: none !important;
   }
+  .epoch-tile,
   .epoch-row-wrap {
     transition: none !important;
   }

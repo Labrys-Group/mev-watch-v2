@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { TrendPoint, StatsSummary } from "@/lib/queries";
+import type { TrendPoint } from "@/lib/queries";
 import { toCompositionPoint, type CompositionPoint } from "@/lib/composition";
 import { formatPercent, formatDateShort } from "@/lib/format";
 import { Section } from "@/components/section";
@@ -18,7 +18,6 @@ import { CountUp } from "@/components/count-up";
 
 interface TrendChartProps {
   trend: TrendPoint[];
-  summary: StatsSummary;
 }
 
 type Range = "ALL" | "1Y" | "90D";
@@ -96,7 +95,7 @@ function ChartTooltip({
   );
 }
 
-export function TrendChart({ trend, summary }: TrendChartProps) {
+export function TrendChart({ trend }: TrendChartProps) {
   const [range, setRange] = useState<Range>("ALL");
   const [reduceMotion] = useState(
     () =>
@@ -145,10 +144,29 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
     return () => observer.disconnect();
   }, []);
 
+  const slice = useMemo(() => getSlice(trend, range), [trend, range]);
   const data = useMemo<CompositionPoint[]>(
-    () => getSlice(trend, range).map(toCompositionPoint),
-    [trend, range],
+    () => slice.map(toCompositionPoint),
+    [slice],
   );
+  // Recompute headline stats from whatever range is selected so NOW / PEAK /
+  // TROUGH reflect the visible window, not the full series. Inlined (rather
+  // than importing `summarise` from `@/lib/queries`) so this client component
+  // doesn't pull the server-only db layer into the browser bundle.
+  const rangeStats = useMemo(() => {
+    if (slice.length === 0) return { current: 0, peak: 0, trough: 0 };
+    let peak = slice[0].censorshipPct;
+    let trough = slice[0].censorshipPct;
+    for (const p of slice) {
+      if (p.censorshipPct > peak) peak = p.censorshipPct;
+      if (p.censorshipPct < trough) trough = p.censorshipPct;
+    }
+    return {
+      current: slice[slice.length - 1].censorshipPct,
+      peak,
+      trough,
+    };
+  }, [slice]);
   const ticks = useMemo(
     () => sparseTickIndices(data, isNarrow ? 3 : 8),
     [data, isNarrow],
@@ -158,6 +176,8 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
     <Section
       label="02 / CENSORSHIP OVER TIME"
       title="Censorship % since the Merge."
+      pattern="diagonal-hatch"
+      accent="var(--warn)"
       aside={
         <>
           <span>SHARE OF ALL BLOCKS</span>
@@ -173,19 +193,19 @@ export function TrendChart({ trend, summary }: TrendChartProps) {
           <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             NOW
             <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-foreground mt-1 normal-case">
-              <CountUp value={summary.current} decimals={1} suffix="%" />
+              <CountUp value={rangeStats.current} decimals={1} suffix="%" />
             </strong>
           </div>
           <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
             PEAK
             <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-warn mt-1 normal-case">
-              <CountUp value={summary.peak} decimals={1} suffix="%" />
+              <CountUp value={rangeStats.peak} decimals={1} suffix="%" />
             </strong>
           </div>
           <div className="p-3 transition-colors duration-200 hover:bg-panel-alt">
             TROUGH
             <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-good mt-1 normal-case">
-              <CountUp value={summary.trough} decimals={1} suffix="%" />
+              <CountUp value={rangeStats.trough} decimals={1} suffix="%" />
             </strong>
           </div>
         </div>

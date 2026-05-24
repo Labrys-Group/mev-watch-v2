@@ -17,8 +17,10 @@ export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
 
   return (
     <Section
-      label="04 / BUILDER LEADERBOARD"
+      label="05 / BUILDER LEADERBOARD"
       title="Ranked by block share."
+      pattern="ticks"
+      accent="var(--neutral)"
       aside={
         <>
           SORT: SHARE DESC
