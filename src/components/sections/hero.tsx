@@ -13,7 +13,7 @@ export function Hero({ verdict }: HeroProps) {
   const trendGlow = isGood ? "glow-good" : "glow-warn";
 
   return (
-    <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-4 md:p-7">
+    <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
       {/* Verdict-tinted wash — a faint colour cue for the current trend */}
       <div
         aria-hidden="true"
@@ -28,7 +28,7 @@ export function Hero({ verdict }: HeroProps) {
       <div aria-hidden="true" className="faded-grid pointer-events-none absolute inset-0" />
 
       {/* Hero content — layered above grid */}
-      <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+      <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-stretch">
         {/* Left column — tag line + headline */}
         <div>
           {/* Tag line */}
@@ -61,14 +61,21 @@ export function Hero({ verdict }: HeroProps) {
           </h1>
         </div>
 
-        {/* Right column — % + note (top), then readme callout */}
-        <div className="flex flex-col gap-5">
-          {/* Stat line — figure + arrow on the left, message wrapping in its
-              own narrow column beside them. Never stacks vertically. */}
+        {/* Right column — % stat (top), readme callout anchored to the bottom
+            so the headline and the readme share a baseline at lg widths. */}
+        <div className="flex h-full flex-col gap-5">
+          {/* Stat card — bordered to match the readme's visual weight,
+              labelled `// latest` in the same terminal-label style. */}
           <div
-            className="anim-fade-up flex items-center gap-x-4 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
+            className="anim-fade-up relative flex items-center gap-x-4 p-4 border border-border-labrys bg-panel font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
             style={{ "--delay": "360ms" } as CSSVars}
           >
+            <span
+              className="absolute -top-[9px] left-3.5 px-2 bg-background font-mono text-[10px] font-semibold tracking-[0.1em] text-accent-brand"
+              aria-hidden="true"
+            >
+              // latest
+            </span>
             <div className="flex shrink-0 items-baseline gap-2">
               <span
                 className="font-sans font-extrabold tracking-tight text-foreground"
@@ -86,9 +93,11 @@ export function Hero({ verdict }: HeroProps) {
             <p className="m-0 min-w-0 flex-1">{verdict.message}</p>
           </div>
 
-          {/* Readme terminal lede box */}
+          {/* Readme terminal lede box — mt-auto pushes it to the bottom of
+              the column when the grid stretches, giving the stat card breathing
+              room above it on lg viewports. */}
           <div
-            className="anim-fade-up relative font-mono text-[12.5px] leading-[1.65] text-fg-muted p-4 border border-border-labrys bg-panel"
+            className="anim-fade-up relative mt-auto font-mono text-[12.5px] leading-[1.65] text-fg-muted p-4 border border-border-labrys bg-panel"
             style={{ "--delay": "540ms" } as CSSVars}
           >
             {/* $ cat ./readme.md label */}
