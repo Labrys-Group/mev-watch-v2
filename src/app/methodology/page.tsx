@@ -483,30 +483,6 @@ export default function MethodologyPage() {
             </Section>
           </Reveal>
 
-          {/* Footer note — quiet panel, mono caps chip + corrections link */}
-          <Reveal>
-            <div className="rounded-[var(--radius)] border border-border-labrys bg-panel-alt px-5 py-4">
-              <p className="font-mono text-[11.5px] text-fg-muted leading-relaxed m-0">
-                <span
-                  className="font-mono text-[10px] tracking-[0.14em] uppercase text-accent-brand mr-2"
-                  aria-hidden="true"
-                >
-                  {"// corrections"}
-                </span>
-                Questions or corrections?{" "}
-                <a
-                  href="https://github.com/joshroyLabrys/mev-watch-v2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-brand hover:underline transition-colors"
-                >
-                  Open an issue on GitHub
-                </a>
-                . The relay classification and all supporting data are public
-                and open-source.
-              </p>
-            </div>
-          </Reveal>
         </div>
       </main>
       <SiteFooter />
