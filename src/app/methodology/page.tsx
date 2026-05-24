@@ -105,22 +105,6 @@ export default function MethodologyPage() {
               , a Flashbots-maintained relay analytics service. MEV Watch
               consumes its public JSON API at the endpoint:
             </p>
-            <p className="font-mono text-sm text-fg-muted leading-relaxed mb-4">
-              Per-relay block attribution comes from{" "}
-              <a
-                href="https://dune.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent-brand hover:underline transition-colors"
-              >
-                Dune Analytics
-              </a>
-              . A saved query joins each relay&apos;s bid traces against the
-              canonical Ethereum block hash, so each slot is attributed to one
-              relay — its actual winner. relayscan&apos;s daily JSON publishes
-              per-relay aggregates only, which double-count when multiple relays
-              deliver for the same slot.
-            </p>
             <div className="border border-border-labrys bg-background px-4 py-3 mb-4">
               <code className="font-mono text-xs text-foreground tracking-wide">
                 GET /stats/day/&#123;date&#125;/json
@@ -134,11 +118,11 @@ export default function MethodologyPage() {
               successful ingestion run.
             </p>
             <p className="font-mono text-sm text-fg-muted leading-relaxed">
-              relayscan&apos;s daily JSON ships per-relay aggregate payload
-              counts and per-builder block counts. MEV Watch reads the builder
-              counts directly; the relay attribution is computed by the Dune
-              query above so that each block is counted once, against its
-              winning relay.
+              Each API response includes a per-relay count of{" "}
+              <span className="text-foreground">payload deliveries</span>: the
+              number of times each relay successfully returned a signed execution
+              payload to a requesting validator. This is the raw figure used to
+              compute the censorship metric.
             </p>
           </Reveal>
 
@@ -160,29 +144,33 @@ export default function MethodologyPage() {
                 Censorship %{" "}
                 <span className="text-fg-muted font-normal">=</span>{" "}
                 <span className="text-accent-brand">
-                  blocks won by censoring relays
+                  deliveries via censoring relays
                 </span>{" "}
                 <span className="text-fg-muted font-normal">/</span>{" "}
                 <span className="text-foreground">
-                  unique MEV-boost blocks delivered
+                  total deliveries across all relays
                 </span>
               </p>
             </div>
 
             <p className="font-mono text-sm text-fg-muted leading-relaxed mb-4">
-              Each MEV-boost block is attributed to a single{" "}
-              <span className="text-foreground">winning relay</span> — the relay
-              whose signed payload became the canonical chain block. The
-              denominator is the count of unique blocks delivered through
-              MEV-boost that day; the numerator is the subset of those blocks
-              whose winning relay applies OFAC sanctions filtering.
+              Both the numerator and denominator count{" "}
+              <span className="text-foreground">payload deliveries</span>, not
+              unique blocks. This is intentional. When a validator connects to
+              multiple relays, more than one relay may deliver a payload for the
+              same slot — relayscan counts each delivery separately, meaning a
+              single block can contribute more than once to the total. Using a
+              ratio (share) rather than a raw block count is the honest
+              approach: the multi-relay double-counting cancels between numerator
+              and denominator, so the ratio accurately reflects the relative
+              weight of censoring relay flow.
             </p>
             <p className="font-mono text-sm text-fg-muted leading-relaxed">
-              The per-slot dedup matters. Multiple relays can claim they
-              delivered a payload for the same slot, but only one relay&apos;s
-              block hash matches the chain. Counting that single winner — rather
-              than summing every relay&apos;s claimed deliveries — is what makes
-              the ratio match what an observer sees watching blocks land.
+              Concretely: if censoring relays collectively deliver 40 out of 100
+              total payloads on a given day, the censorship percentage is 40%,
+              regardless of whether some of those payloads corresponded to the
+              same underlying block. The ratio is consistent because any
+              double-counting affects both sides equally.
             </p>
           </Reveal>
 

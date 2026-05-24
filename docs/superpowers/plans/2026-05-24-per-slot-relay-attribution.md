@@ -1,6 +1,6 @@
 # Per-Slot Relay Attribution Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Status: CANCELLED (2026-05-24).** Dune has no public table for MEV-boost per-slot relay attribution — verified via Dune MCP (`mev_boost` / `mevboost` schemas absent; `beacon.blocks` carries no relay info). The Dune adapter, composite source, backfill script, and SQL stub were removed; relayscan remains the sole data source. The historical content below is preserved for context.
 
 **Goal:** Replace relayscan's per-relay payload-delivery aggregates with a per-slot winning-relay attribution sourced from Dune Analytics. Same metric definition, same chart, same schema — but every block counts once, attributed to its actual winning relay. Expected effect: the headline % on 2026-05-21 drops from 33.4% to ~10–15%.
 

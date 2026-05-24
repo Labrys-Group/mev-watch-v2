@@ -1,5 +1,7 @@
 # Per-Slot Relay Attribution — Design
 
+> **Status: CANCELLED (2026-05-24).** This design assumes a `mevboost.payloads_delivered` (or similarly named) table exists on Dune that joins each relay's bid traces against the canonical chain block hash. Verification on Dune confirmed no such public table exists — the `mev_boost`/`mevboost` schemas are absent and the closest canonical dataset (`beacon.blocks`) carries no relay attribution. Implementing this would require maintaining a self-uploaded community dataset (CSV pushed into `dune.<team>.payloads_delivered`), which defeats the "external source of truth" premise. The Dune fallback was removed; relayscan stays the sole data source. The historical content below is preserved for context.
+
 **Date:** 2026-05-24
 **Status:** Draft, awaiting user review
 **Topic:** Replace relayscan's per-relay payload-delivery aggregates with a per-slot winning-relay attribution from Dune. The headline %, trend chart, and leaderboard surface the same metric definition over a more honest underlying count — one block per slot, attributed to its actual winning relay.

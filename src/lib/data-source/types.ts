@@ -29,7 +29,7 @@ export interface DaySnapshot extends DayRelayStats {
 
 /**
  * A source of MEV-boost relay statistics. Implementations wrap an external
- * provider (relayscan.io, Dune, ...) so the refresh pipeline stays agnostic.
+ * provider (relayscan.io) so the refresh pipeline stays agnostic.
  */
 export interface DataSource {
   /** The provider name, recorded in the refresh audit log. */
