@@ -62,16 +62,16 @@ export default async function Home() {
             <Composition latest={latest} />
           </Reveal>
           <Reveal>
-            <TrendChart trend={trend} summary={summary} />
+            <TrendChart trend={trend} />
+          </Reveal>
+          <Reveal>
+            <WhatToDo />
           </Reveal>
           <Reveal>
             <Leaderboard rows={leaderboard} />
           </Reveal>
           <Reveal>
             <BuilderLeaderboard rows={builders} />
-          </Reveal>
-          <Reveal>
-            <WhatToDo />
           </Reveal>
           <Reveal>
             <Faq />

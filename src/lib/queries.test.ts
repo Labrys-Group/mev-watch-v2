@@ -10,6 +10,7 @@ const TREND = [
 describe("summarise", () => {
   it("reports current, peak, and trough", () => {
     const s = summarise(TREND);
+    if (!s) throw new Error("summarise returned null for a non-empty trend");
     expect(s.current).toBe(31);
     expect(s.peak).toBe(80);
     expect(s.peakDate).toBe("2022-11-01");

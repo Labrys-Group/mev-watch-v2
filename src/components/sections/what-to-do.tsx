@@ -27,9 +27,11 @@ const STEPS = [
 export function WhatToDo() {
   return (
     <Section
-      label="05 / WHAT TO DO"
+      label="03 / WHAT TO DO"
       title="Keep Ethereum credibly neutral."
       aside="FOR: VALIDATORS, STAKERS, BUILDERS"
+      pattern="arcs"
+      accent="var(--good)"
     >
       {/* Callout panel */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] border border-border-labrys overflow-hidden">

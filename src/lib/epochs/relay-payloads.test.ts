@@ -50,7 +50,8 @@ describe("RelayPayloadSource", () => {
 
   it("requests limit at or below bloXroute's documented max of 100 (anything higher returns HTTP 400)", async () => {
     const fetchMock = vi.fn(
-      async () => new Response(JSON.stringify(SAMPLE), { status: 200 }),
+      async (_input: string | URL | Request, _init?: RequestInit) =>
+        new Response(JSON.stringify(SAMPLE), { status: 200 }),
     );
     vi.stubGlobal("fetch", fetchMock);
 

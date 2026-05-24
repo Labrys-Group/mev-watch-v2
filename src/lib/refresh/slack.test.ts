@@ -10,7 +10,10 @@ afterEach(() => {
 describe("sendSlackAlert", () => {
   it("posts to the webhook when configured", async () => {
     process.env.SLACK_WEBHOOK_URL = "https://hooks.slack.example/abc";
-    const fetchMock = vi.fn(async () => new Response("ok", { status: 200 }));
+    const fetchMock = vi.fn(
+      async (_input: string | URL | Request, _init?: RequestInit) =>
+        new Response("ok", { status: 200 }),
+    );
     vi.stubGlobal("fetch", fetchMock);
 
     await sendSlackAlert("something broke");

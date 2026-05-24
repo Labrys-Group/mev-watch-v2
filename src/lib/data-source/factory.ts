@@ -4,9 +4,15 @@ import type { DataSource } from "./types";
 /**
  * Returns the active relay data source.
  *
- * Reads DATA_SOURCE_MODE so a stale env var from a previous deploy (e.g. a
- * leftover `composite` from the cancelled per-slot-relay-attribution cutover)
- * fails loudly instead of silently degrading. Only `relayscan` is supported.
+ * Today `relayscan` is the only supported value; the factory exists because the
+ * per-slot honest-metric work (`docs/superpowers/specs/2026-05-24-per-slot-honest-metric-design.md`)
+ * adds a parallel `PerSlotDataSource` that runs alongside relayscan. Keeping
+ * the env-var dispatch in place means that:
+ *   (a) a stale value from a previous deploy fails loudly instead of silently
+ *       degrading — see the cancelled `composite` cutover that motivated the
+ *       guard originally;
+ *   (b) when Phase B lands, switching pipelines is a config change, not a
+ *       refactor of every caller.
  *
  * Returns a fresh instance per call — callers in hot loops (e.g. seed-history)
  * should hoist the result.

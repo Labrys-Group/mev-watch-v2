@@ -14,7 +14,10 @@ export const dailyStats = sqliteTable("daily_stats", {
   nonBoostPct: real("non_boost_pct").notNull(),
   totalBlocks: integer("total_blocks").notNull(),
   /** Total execution-layer blocks proposed that UTC day. 0 = not yet
-   *  backfilled (a real day always has ~7,150+). */
+   *  backfilled (a real day always has ~7,150+). After applying migration
+   *  0003 to an existing database, run `pnpm backfill-nonboost` to populate
+   *  this column across historical days — otherwise censorship % is computed
+   *  against a zero non-boost share and reads as inflated. */
   totalChainBlocks: integer("total_chain_blocks").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()

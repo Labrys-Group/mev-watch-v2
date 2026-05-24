@@ -103,6 +103,8 @@ export function Faq() {
       label="06 / FAQ"
       title="Frequently asked."
       aside="QUICK ANSWERS // METHODOLOGY LINKED"
+      pattern="line-grid"
+      accent="var(--fg-muted)"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 border border-border-labrys">
         {pairs.map((pair, p) => (
