@@ -159,22 +159,24 @@ export function SiteFooter() {
           {/* Brand column */}
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2 leading-none">
-              <Image
-                src="/mev-watch-logo-light.png"
-                alt="MEV Watch"
-                width={1702}
-                height={413}
-                sizes="288px"
-                className="block h-16 w-auto dark:hidden"
-              />
-              <Image
-                src="/mev-watch-logo-dark.png"
-                alt="MEV Watch"
-                width={1694}
-                height={408}
-                sizes="288px"
-                className="hidden h-16 w-auto dark:block"
-              />
+              <span className="inline-flex h-[30px] items-center overflow-hidden">
+                <Image
+                  src="/mev-watch-logo-light.png"
+                  alt="MEV Watch"
+                  width={1702}
+                  height={413}
+                  sizes="150px"
+                  className="block h-9 w-auto max-w-none dark:hidden"
+                />
+                <Image
+                  src="/mev-watch-logo-dark.png"
+                  alt="MEV Watch"
+                  width={1694}
+                  height={408}
+                  sizes="150px"
+                  className="hidden h-9 w-auto max-w-none dark:block"
+                />
+              </span>
               <span className="font-mono text-[16px] tracking-[0.06em] text-fg-muted">
                 {" // MONITOR"}
               </span>

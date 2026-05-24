@@ -25,24 +25,26 @@ export function SiteHeader() {
           aria-label="MEV Watch home"
           className="inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
         >
-          <Image
-            src="/mev-watch-logo-light.png"
-            alt="MEV Watch"
-            width={1702}
-            height={413}
-            priority
-            sizes="240px"
-            className="block h-14 w-auto dark:hidden md:h-16"
-          />
-          <Image
-            src="/mev-watch-logo-dark.png"
-            alt="MEV Watch"
-            width={1694}
-            height={408}
-            priority
-            sizes="240px"
-            className="hidden h-14 w-auto dark:block md:h-16"
-          />
+          <span className="inline-flex h-[30px] items-center overflow-hidden">
+            <Image
+              src="/mev-watch-logo-light.png"
+              alt="MEV Watch"
+              width={1702}
+              height={413}
+              priority
+              sizes="150px"
+              className="block h-9 w-auto max-w-none dark:hidden"
+            />
+            <Image
+              src="/mev-watch-logo-dark.png"
+              alt="MEV Watch"
+              width={1694}
+              height={408}
+              priority
+              sizes="150px"
+              className="hidden h-9 w-auto max-w-none dark:block"
+            />
+          </span>
           <span className="hidden font-mono text-[16px] tracking-[0.04em] text-fg-muted sm:inline">
             {" // MONITOR"}
           </span>
