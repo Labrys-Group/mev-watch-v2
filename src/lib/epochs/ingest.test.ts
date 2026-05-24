@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { foldPayloads, ingestRecentBlocks } from "./ingest";
+import { RELAYS } from "@/config/relays";
 import type { DeliveredPayload, PayloadSource } from "./relay-payloads";
 import type { RecentBlocksStore, StoredBlock } from "./recent-blocks-store";
 
@@ -86,7 +87,7 @@ describe("ingestRecentBlocks", () => {
     expect(result.relaysTotal).toBe(3);
   });
 
-  it("returns an empty failedRelays list when the source itself throws", async () => {
+  it("reports every configured relay as failed when the source itself throws (preserves failedRelays.length === relaysTotal - relaysOk)", async () => {
     const { store } = fakeStore();
     const source: PayloadSource = {
       fetchRecentDeliveries: async () => {
@@ -94,7 +95,10 @@ describe("ingestRecentBlocks", () => {
       },
     };
     const result = await ingestRecentBlocks(source, store);
-    expect(result.failedRelays).toEqual([]);
+    expect(result.failedRelays).toEqual(RELAYS.map((r) => r.id));
+    expect(result.failedRelays.length).toBe(
+      result.relaysTotal - result.relaysOk,
+    );
   });
 
   it("returns relaysOk 0 and leaves the store untouched when the source throws", async () => {

@@ -1,10 +1,18 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { getDatabaseUrl } from "./env";
 
-const original = { ...process.env };
+// Mutate the keys we touch and restore each individually — never reassign
+// `process.env`, which would replace Node's host object with a plain object
+// (loses Windows case-insensitive lookup, breaks the object identity that
+// later tests in the same vitest worker may capture).
+const original = process.env.DATABASE_URL;
 
 afterEach(() => {
-  process.env = { ...original };
+  if (original === undefined) {
+    delete process.env.DATABASE_URL;
+  } else {
+    process.env.DATABASE_URL = original;
+  }
 });
 
 describe("getDatabaseUrl", () => {

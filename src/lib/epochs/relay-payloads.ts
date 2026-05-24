@@ -70,13 +70,19 @@ export class RelayPayloadSource implements PayloadSource {
       } else {
         failedRelays.push(relay.id);
         const reason = result.reason;
-        console.warn(`relay-payloads: ${relay.id} failed`, {
-          relayId: relay.id,
-          host: relay.dataApiHost,
-          errorClass:
-            reason instanceof Error ? reason.constructor.name : typeof reason,
-          message: reason instanceof Error ? reason.message : String(reason),
-        });
+        // Expected 4s AbortController timeouts fire on every poll for any
+        // chronically slow relay — warning here would drown new failures (e.g.
+        // a fresh bloXroute HTTP 400) under repeating AbortError noise.
+        const isTimeout = reason instanceof Error && reason.name === "AbortError";
+        if (!isTimeout) {
+          console.warn(`relay-payloads: ${relay.id} failed`, {
+            relayId: relay.id,
+            host: relay.dataApiHost,
+            errorClass:
+              reason instanceof Error ? reason.constructor.name : typeof reason,
+            message: reason instanceof Error ? reason.message : String(reason),
+          });
+        }
       }
     });
 

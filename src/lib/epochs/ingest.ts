@@ -7,8 +7,13 @@ import type { RecentBlocksStore, StoredBlock } from "./recent-blocks-store";
 export interface IngestResult {
   relaysOk: number;
   relaysTotal: number;
-  /** Ids of relays whose API failed this run. Empty when the source itself
-   *  threw (no per-relay info to report) or when every relay succeeded. */
+  /**
+   * Ids of relays whose API failed this run. Maintains the invariant
+   * `failedRelays.length === relaysTotal - relaysOk`: when the source itself
+   * throws, every configured relay is reported as failed (no per-relay info,
+   * so the safe assumption is total failure) — never an empty list paired
+   * with `relaysOk === 0`.
+   */
   failedRelays: string[];
 }
 
@@ -55,6 +60,10 @@ export async function ingestRecentBlocks(
       failedRelays,
     };
   } catch {
-    return { relaysOk: 0, relaysTotal: RELAYS.length, failedRelays: [] };
+    return {
+      relaysOk: 0,
+      relaysTotal: RELAYS.length,
+      failedRelays: RELAYS.map((r) => r.id),
+    };
   }
 }

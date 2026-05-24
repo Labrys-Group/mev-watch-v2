@@ -1,6 +1,12 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { RelayPayloadSource } from "./relay-payloads";
 import { RELAYS } from "@/config/relays";
+
+beforeEach(() => {
+  // Silence the per-relay failure warn for every test in this file — the
+  // single test that asserts the warn shape installs its own spy below.
+  vi.spyOn(console, "warn").mockImplementation(() => {});
+});
 
 const SAMPLE = [
   {
@@ -42,7 +48,7 @@ describe("RelayPayloadSource", () => {
     expect(RELAYS.map((r) => r.id)).toContain(first.relayId);
   });
 
-  it("requests limit=100 (bloXroute's documented max — anything higher returns HTTP 400)", async () => {
+  it("requests limit at or below bloXroute's documented max of 100 (anything higher returns HTTP 400)", async () => {
     const fetchMock = vi.fn(
       async () => new Response(JSON.stringify(SAMPLE), { status: 200 }),
     );
@@ -52,9 +58,11 @@ describe("RelayPayloadSource", () => {
 
     expect(fetchMock).toHaveBeenCalled();
     for (const call of fetchMock.mock.calls) {
-      const url = String(call[0]);
-      expect(url).toContain("limit=100");
-      expect(url).not.toContain("limit=200");
+      const url = new URL(String(call[0]));
+      const limit = url.searchParams.get("limit");
+      expect(limit).not.toBeNull();
+      expect(Number(limit)).toBeGreaterThan(0);
+      expect(Number(limit)).toBeLessThanOrEqual(100);
     }
   });
 
@@ -90,6 +98,30 @@ describe("RelayPayloadSource", () => {
     });
     expect(String(context?.message ?? "")).toContain("400");
   });
+
+  it("does NOT warn for AbortError timeouts (expected per-poll noise; would drown new failures)", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        // Simulate fetch rejecting with an AbortError when the signal aborts.
+        // The implementation's TIMEOUT_MS triggers controller.abort().
+        await new Promise<void>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            const err = new Error("The operation was aborted.");
+            err.name = "AbortError";
+            reject(err);
+          });
+        });
+        return new Response("[]", { status: 200 });
+      }),
+    );
+
+    const result = await new RelayPayloadSource().fetchRecentDeliveries();
+
+    expect(result.failedRelays.length).toBe(RELAYS.length);
+    expect(warnSpy).not.toHaveBeenCalled();
+  }, 10_000);
 
   it("skips a relay whose API fails, keeping the rest", async () => {
     vi.stubGlobal(

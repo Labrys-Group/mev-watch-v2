@@ -389,7 +389,10 @@ export default function MethodologyPage() {
                     not part of the MEV-Boost flow and therefore not counted in
                     either the numerator or the denominator. The non-boost
                     composition band on the dashboard shows their share of the
-                    overall chain separately.
+                    overall chain separately. Because local blocks tend to be
+                    censorship-neutral, the censorship percentage may overstate
+                    the true proportion of all Ethereum blocks that are
+                    censored.
                   </p>
                 </div>
               </li>
