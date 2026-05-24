@@ -21,13 +21,7 @@ export function Leaderboard({ rows }: LeaderboardProps) {
       title="Ranked by block share."
       pattern="ticks"
       accent="var(--accent-color)"
-      aside={
-        <>
-          SORT: SHARE DESC
-          <br />
-          SOURCE: RELAYSCAN.IO + BEACON
-        </>
-      }
+      aside={<>SOURCE: RELAYSCAN.IO + BEACON</>}
     >
       <p className="mb-3 border-b border-border-labrys pb-3 font-sans text-[13px] leading-snug text-fg-muted">
         Top relays by share — last 24 hours ·{" "}

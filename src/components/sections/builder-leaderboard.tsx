@@ -21,13 +21,7 @@ export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
       title="Ranked by block share."
       pattern="ticks"
       accent="var(--neutral)"
-      aside={
-        <>
-          SORT: SHARE DESC
-          <br />
-          SOURCE: RELAYSCAN.IO + BEACON
-        </>
-      }
+      aside={<>SOURCE: RELAYSCAN.IO + BEACON</>}
     >
       <p className="mb-3 border-b border-border-labrys pb-3 font-sans text-[13px] leading-snug text-fg-muted">
         Top builders by share — last 24 hours ·{" "}
