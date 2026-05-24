@@ -176,16 +176,23 @@ The fix is small but the scope (per decision #6) extends to closing the silent-f
 - A per-relay `pageSize` override on `RelayInfo` is a reasonable forward-compat hook; default 100, opt up to 200 only for relays that explicitly support it. Out of scope to wire any individual relay up to a larger size in this phase.
 
 ### 6.2 Observability fix
-- `fetchOne` in `relay-payloads.ts`: on a rejected promise, `console.warn` a structured line with `{ relayId, host, status, errorClass, message }` before re-throwing.
-- `ingest.ts`: include `failedRelays: string[]` (not just the count) in `IngestResult`, propagated to whatever calls `ingestRecentBlocks`.
-- `refresh_log.message` records the `failedRelays` list as JSON for the day's run.
-- `/status` page (already exists) gains a per-relay health table: relay id, last-success age, last-failure age, last-failure reason. Sourced from a rolling read of `refresh_log` over the last N runs.
+
+Split across Phase A and Phase C because the two code paths feeding the observability story serialise differently:
+
+**Lands in Phase A** (live epoch ledger path):
+- `relay-payloads.ts`: on a per-relay rejection, emit a structured `console.warn` with `{ relayId, host, errorClass, message }`. Visible in Vercel logs and locally during dev.
+- `ingest.ts`: extend `IngestResult` with `failedRelays: string[]` (not just the count). Downstream callers can persist or surface it.
+
+**Lands in Phase C** (daily refresh path, naturally fits when `PerSlotDataSource` arrives):
+- `refresh_log.message` records the `failedRelays` list as JSON for the day's run. (Phase A's relayscan-driven daily refresh has no per-relay granularity to log; `PerSlotDataSource` does by construction, so this lands when that path is wired in.)
+- `/status` page gains a per-relay health table: relay id, last-success age, last-failure age, last-failure reason. Sourced from a rolling read of `refresh_log` over the last N runs.
 
 ### 6.3 Gate
 Phase A ships separately. Verification:
 1. After deployment, `recent_blocks` shows bloXroute records within one ingest cycle (~15s post-cron / `/api/epochs` hit).
-2. `/status` shows both bloXroute rows as healthy.
-3. Manual probe of `refresh_log` confirms `failedRelays` is now stored (forcing a synthetic failure to confirm the path).
+2. Vercel logs show a structured `relay-payloads: <id> failed { ... }` line whenever a per-relay polling failure occurs (force one in a dev env to confirm).
+
+The `/status` per-relay table and `refresh_log` persistence land with Phase C per §6.2.
 
 No per-slot code lands until Phase A is green.
 

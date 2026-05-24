@@ -182,66 +182,24 @@ GET .../?limit=100
 
 ---
 
-## Task 4: Persist `failedRelays` in `refresh_log.message`
+## Task 4 & 5: **DEFERRED to Phase C**
 
-**Files:**
-- Modify: `src/lib/refresh/index.ts`
-- Test: `src/lib/refresh/index.test.ts` (if it exists; otherwise create)
+Original scope: persist `failedRelays` in `refresh_log.message` (Task 4), render per-relay health on `/status` (Task 5).
 
-- [ ] **Step 1: Locate the refresh entry-point** that writes to `refresh_log`. Inspect what's already serialised into `message`.
+**Why deferred:** the plan conflated two code paths during initial drafting. `refresh_log` is fed by `refreshDay()` (`src/lib/refresh/index.ts`), which calls **relayscan** — a single whole-day aggregate with no per-relay failure granularity. Per-relay failures live in the **live epoch ledger** path (`ingestRecentBlocks` in `src/lib/epochs/ingest.ts`), which writes to `recent_blocks` and never touches `refresh_log`.
 
-- [ ] **Step 2: Failing test**
+Wiring Task 4-5 in Phase A would require either:
+1. A new `relay_health` table (schema migration scope creep in a bug-fix PR), or
+2. Retrofitting `refresh_log` to accept rows from the live-ingest path (semantic muddle).
 
-  Mock a failed-bloXroute scenario; assert `refresh_log.message` contains a parseable JSON array of failed relay IDs.
+Phase C wires `PerSlotDataSource` into `refreshDay()`. That data source has per-relay failure data by construction (it walks each relay's bidtraces individually). When it writes a refresh_log row, the `failedRelays` list goes into `refresh_log.message` naturally — no retrofit. Task 4 lands there. Task 5 (rendering on `/status`) follows the same window.
 
-- [ ] **Step 3: Implement** — JSON-encode `{ ok: string[], failed: string[] }` and append/embed in the message string. Keep human-readable prefix so the audit log still reads naturally.
+**Phase A still delivers:**
+- The bug fix itself (Task 1) — bloXroute stops silently dropping.
+- The structured warn log (Task 2) — every per-relay rejection emits a Vercel-visible warn line with relay id + reason. The next regression will be visible in logs, not invisible.
+- `failedRelays` exposed on `IngestResult` (Task 3) — the data is now available to whatever caller wants to persist or surface it.
 
-  Example message format:
-  ```
-  Refreshed 2026-05-24: 12 relays ok; failed=["bloxroute.max-profit.blxrbdn.com"]
-  ```
-
-- [ ] **Step 4: Run all refresh tests; confirm no regressions.**
-
----
-
-## Task 5: Render per-relay health on `/status`
-
-**Files:**
-- Modify: `src/app/status/page.tsx`
-- New helper: `src/lib/refresh/relay-health.ts`
-- Test: `src/lib/refresh/relay-health.test.ts`
-
-- [ ] **Step 1: Define `RelayHealth` shape**
-
-  ```ts
-  export interface RelayHealth {
-    relayId: string;
-    lastSuccessAt: Date | null;
-    lastFailureAt: Date | null;
-    lastFailureReason: string | null;
-  }
-  ```
-
-- [ ] **Step 2: Read `refresh_log` rows for the last N runs (e.g. 30) and reduce to `RelayHealth[]`**
-
-  Parse the JSON-embedded ok/failed lists from Task 4. For each relay in `RELAYS`, compute the latest success/failure timestamps.
-
-- [ ] **Step 3: Failing test** — fixture refresh_log rows, assert the reducer pulls the most recent success and failure correctly.
-
-- [ ] **Step 4: Render on /status**
-
-  Add a section "Per-relay health" — a small table:
-
-  ```
-  Relay                          Last OK       Last Fail     Reason
-  relay.ultrasound.money         2m ago        —             —
-  bloxroute.max-profit.blxrbdn   2m ago        3d ago        HTTP 400 (pre-fix)
-  ```
-
-  Style consistent with the rest of `/status`. Use existing helpers for "time ago" formatting.
-
-- [ ] **Step 5: Snapshot test on the rendered HTML.**
+Phase A's success criterion (bloXroute records reappearing in `recent_blocks` after deploy) does not require persistence. Verification stays in Task 6.
 
 ---
 
