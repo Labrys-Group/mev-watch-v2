@@ -90,9 +90,10 @@ export function Hero({ verdict }: HeroProps) {
             </p>
           </div>
 
-          {/* Stat line — the figure + arrow, with the verdict message beside */}
+          {/* Stat line — figure + arrow on the left, message wrapping in its
+              own narrow column beside them. Never stacks vertically. */}
           <div
-            className="anim-fade-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
+            className="anim-fade-up flex items-center gap-x-4 font-mono text-[13px] tracking-[0.04em] leading-snug text-fg-muted"
             style={{ "--delay": "540ms" } as CSSVars}
           >
             <div className="flex shrink-0 items-baseline gap-2">
@@ -102,9 +103,14 @@ export function Hero({ verdict }: HeroProps) {
               >
                 <CountUp value={verdict.current} decimals={1} suffix="%" />
               </span>
-              <span className={`${trendColor} font-semibold`}>{verdict.arrow}</span>
+              <span
+                className={`font-sans font-extrabold tracking-tight ${trendColor}`}
+                style={{ fontSize: "clamp(1.7rem, 3.4vw, 2.1rem)" }}
+              >
+                {verdict.arrow}
+              </span>
             </div>
-            <p className="m-0 min-w-0 max-w-[24rem]">{verdict.message}</p>
+            <p className="m-0 min-w-0 flex-1">{verdict.message}</p>
           </div>
         </div>
       </div>
