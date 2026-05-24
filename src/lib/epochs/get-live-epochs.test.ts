@@ -38,9 +38,30 @@ describe("getLiveEpochs", () => {
   it("marks not-yet-happened slots of the in-progress epoch as pending", async () => {
     const data = await getLiveEpochs(store([]), NOW);
     const top = data.epochs[0];
-    expect(top.slots[10].category).not.toBe("pending"); // == head, happened
     expect(top.slots[11].category).toBe("pending"); // > head
     expect(top.slots[31].category).toBe("pending");
+  });
+
+  it("keeps the most-recent slots pending while inside the nonboost grace window", async () => {
+    // head is at slot index 10. With NONBOOST_GRACE_SLOTS = 3, an undelivered
+    // slot at indices 8, 9, 10 should be pending (settling), while index 7
+    // and earlier should commit to nonboost.
+    const data = await getLiveEpochs(store([]), NOW);
+    const top = data.epochs[0];
+    expect(top.slots[10].category).toBe("pending");
+    expect(top.slots[9].category).toBe("pending");
+    expect(top.slots[8].category).toBe("pending");
+    expect(top.slots[7].category).toBe("nonboost");
+  });
+
+  it("classifies in-grace slots from relay data when available", async () => {
+    // A relay row landed for the head slot — the grace window should not
+    // override an actually-delivered block.
+    const data = await getLiveEpochs(
+      store([block(HEAD_SLOT, ["boost-relay.flashbots.net"])]),
+      NOW,
+    );
+    expect(data.epochs[0].slots[10].category).toBe("censoring");
   });
 
   it("classifies a slot censoring when a censoring relay delivered it", async () => {

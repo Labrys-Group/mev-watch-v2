@@ -385,6 +385,7 @@ details[open]::details-content {
   .epoch-tile {
     animation: none !important;
   }
+  .epoch-tile,
   .epoch-row-wrap {
     transition: none !important;
   }

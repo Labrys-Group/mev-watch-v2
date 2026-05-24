@@ -11,8 +11,8 @@ import type {
   SlotCell,
 } from "@/lib/epochs/get-live-epochs";
 
-/** Client poll interval. A slot is 12s; 30s surfaces 2-3 new slots per poll. */
-export const POLL_MS = 30_000;
+/** Client poll interval. A slot is 12s; 10s keeps the pulse close to real-time. */
+export const POLL_MS = 10_000;
 
 type FilledCategory = "censoring" | "neutral" | "nonboost";
 
@@ -222,7 +222,7 @@ function EpochRowView({
       >
         {row.slots.map((cell, col) => (
           <SlotTile
-            key={`${cell.slot}:${cell.category}`}
+            key={`${cell.slot}:${cell.category === "pending" ? "p" : "f"}`}
             cell={cell}
             epoch={row.epoch}
             isNext={col === nextIdx}
@@ -262,7 +262,7 @@ function SlotTile({
           ? "border-solid border-fg-muted/50"
           : "border-dashed border-border-labrys"
       }`
-    : `epoch-tile flex aspect-square cursor-crosshair items-center justify-center transition-transform duration-100 hover:z-20 hover:scale-[1.55] ${meta!.bg}`;
+    : `epoch-tile flex aspect-square cursor-crosshair items-center justify-center transition-[transform,background-color] duration-[500ms] ease-out hover:z-20 hover:scale-[1.55] hover:duration-100 ${meta!.bg}`;
 
   // Track the cursor itself (not the tile rect) so the tooltip lands beside
   // the pointer rather than pinned to the slot's bottom-centre. Touch devices

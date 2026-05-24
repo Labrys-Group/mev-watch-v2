@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { MevMark } from "@/components/mev-mark";
 
 const NAV_LINKS = [
   { label: "OVERVIEW", href: "/" },
@@ -23,19 +23,29 @@ export function SiteHeader() {
         <Link
           href="/"
           aria-label="MEV Watch home"
-          className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
+          className="inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
         >
-          {/* MEV Watch block mark */}
-          <div className="w-8 h-8 grid place-items-center shrink-0 transition-transform duration-300 ease-out group-hover:scale-110">
-            <MevMark className="w-[18px] h-[18px]" />
-          </div>
-          {/* Brand name */}
-          <div className="font-mono text-[13px] tracking-[0.04em]">
-            <span className="text-foreground font-semibold">MEVWATCH</span>
-            <span className="hidden text-fg-muted sm:inline">
-              {" // MONITOR"}
-            </span>
-          </div>
+          <Image
+            src="/mev-watch-logo-light.png"
+            alt="MEV Watch"
+            width={1702}
+            height={413}
+            priority
+            sizes="240px"
+            className="block h-14 w-auto dark:hidden md:h-16"
+          />
+          <Image
+            src="/mev-watch-logo-dark.png"
+            alt="MEV Watch"
+            width={1694}
+            height={408}
+            priority
+            sizes="240px"
+            className="hidden h-14 w-auto dark:block md:h-16"
+          />
+          <span className="hidden font-mono text-[16px] tracking-[0.04em] text-fg-muted sm:inline">
+            {" // MONITOR"}
+          </span>
         </Link>
 
         {/* Desktop nav + theme toggle */}
