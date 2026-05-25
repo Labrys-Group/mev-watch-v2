@@ -37,7 +37,7 @@ const SNAPSHOT: MevWatchSnapshot = {
   ],
 };
 
-describe("JSON-backed MEV Watch data derivation", () => {
+describe("MEV Watch data derivation", () => {
   it("derives date-aware trend metrics from raw daily snapshots", () => {
     expect(deriveTrend(SNAPSHOT)).toEqual([
       { date: "2023-12-17", censorshipPct: 0, nonBoostPct: 10 },

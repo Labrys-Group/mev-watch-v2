@@ -1,5 +1,4 @@
 import { z } from "zod";
-import rawSnapshot from "../data/mev-watch.json";
 import {
   computeBuilderBreakdown,
   computeDailyStats,
@@ -61,9 +60,6 @@ export interface BuilderRow {
   blocks: number;
   sharePct: number;
 }
-
-export const MEV_WATCH_SNAPSHOT: MevWatchSnapshot =
-  MevWatchSnapshotSchema.parse(rawSnapshot);
 
 function sortedDays(snapshot: MevWatchSnapshot): MevWatchDay[] {
   return [...snapshot.days].sort((a, b) => a.date.localeCompare(b.date));

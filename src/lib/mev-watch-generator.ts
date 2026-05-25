@@ -1,5 +1,4 @@
 import { promises as fs } from "node:fs";
-import path from "node:path";
 import { z } from "zod";
 import {
   MevWatchDaySchema,
@@ -7,11 +6,20 @@ import {
   type MevWatchDay,
   type MevWatchSnapshot,
 } from "./mev-watch-data";
+import { DEFAULT_START_DATE } from "./mev-watch-generator-constants";
+import {
+  createReadOnlyMevWatchDatabase,
+  initializeMevWatchDatabase,
+  readSnapshotFromDatabase,
+  readSourceEndDate,
+  SQLITE_DATA_PATH,
+  upsertDay,
+} from "./mev-watch-sqlite";
 
 export type { MevWatchDay, MevWatchSnapshot } from "./mev-watch-data";
 
-export const DEFAULT_START_DATE = "2022-09-15";
-export const DATA_PATH = path.join(process.cwd(), "src/data/mev-watch.json");
+export { DEFAULT_START_DATE } from "./mev-watch-generator-constants";
+export const DATA_PATH = SQLITE_DATA_PATH;
 
 const RelayscanRelaySchema = z.object({
   relay: z.string(),
@@ -105,9 +113,17 @@ export function mergeSnapshotDays(
 export async function readSnapshot(
   filePath = DATA_PATH,
 ): Promise<MevWatchSnapshot> {
+  if (filePath.endsWith(".json")) {
+    return readJsonSnapshot(filePath);
+  }
+
   try {
-    const text = await fs.readFile(filePath, "utf8");
-    return MevWatchSnapshotSchema.parse(JSON.parse(text));
+    const db = createReadOnlyMevWatchDatabase(filePath);
+    try {
+      return readSnapshotFromDatabase(db);
+    } finally {
+      db.close();
+    }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return emptySnapshot();
@@ -120,8 +136,22 @@ export async function writeSnapshot(
   snapshot: MevWatchSnapshot,
   filePath = DATA_PATH,
 ): Promise<void> {
+  if (filePath.endsWith(".json")) {
+    await writeJsonSnapshot(snapshot, filePath);
+    return;
+  }
+
   const parsed = MevWatchSnapshotSchema.parse(snapshot);
-  await fs.writeFile(filePath, `${JSON.stringify(parsed, null, 2)}\n`);
+  const db = initializeMevWatchDatabase(filePath, {
+    generatedAt: parsed.generatedAt,
+  });
+  try {
+    for (const day of parsed.days) {
+      upsertDay(db, day, parsed.generatedAt);
+    }
+  } finally {
+    db.close();
+  }
 }
 
 export async function fetchRelayscanDay(
@@ -296,7 +326,118 @@ export async function updateDataFile(opts: {
   writeEvery?: number;
 } = {}): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
   const filePath = opts.filePath ?? DATA_PATH;
-  const snapshot = await readSnapshot(filePath);
+  if (filePath.endsWith(".json")) {
+    return updateJsonDataFile(opts);
+  }
+
+  const db = initializeMevWatchDatabase(filePath);
+  try {
+    const existingSnapshot = readSnapshotFromDatabase(db);
+    const sourceEndDate = readSourceEndDate(db);
+    const start = sourceEndDate
+      ? addUtcDays(sourceEndDate, 1)
+      : existingSnapshot.sourceStartDate;
+    const end = yesterdayUtc(opts.now);
+    const dates = buildDateRange(start, end);
+    if (dates.length === 0) {
+      return { changed: false, fetchedDates: [], snapshot: existingSnapshot };
+    }
+
+    const fetchDay = opts.fetchDay ?? fetchMevWatchDay;
+    const sleepMs = opts.sleepMs ?? 300;
+    const concurrency = Math.max(1, Math.floor(opts.concurrency ?? 1));
+    const writeEvery = Math.max(0, Math.floor(opts.writeEvery ?? 0));
+    const days = new Array<MevWatchDay>(dates.length);
+    let nextIndex = 0;
+    let completed = 0;
+    let persistedThrough = 0;
+
+    const flush = async () => {
+      if (opts.dryRun) return;
+      const contiguousDays: MevWatchDay[] = [];
+      for (const day of days) {
+        if (!day) break;
+        contiguousDays.push(day);
+      }
+      if (contiguousDays.length <= persistedThrough) return;
+      const generatedAt = new Date().toISOString();
+      for (const day of contiguousDays.slice(persistedThrough)) {
+        upsertDay(db, day, generatedAt);
+      }
+      persistedThrough = contiguousDays.length;
+    };
+
+    async function worker() {
+      while (nextIndex < dates.length) {
+        const currentIndex = nextIndex;
+        nextIndex += 1;
+        const date = dates[currentIndex];
+        days[currentIndex] = await fetchDay(date);
+        completed += 1;
+        opts.onProgress?.({ date, index: completed, total: dates.length });
+        if (writeEvery > 0 && completed % writeEvery === 0) {
+          await flush();
+        }
+        if (sleepMs > 0) await sleep(sleepMs);
+      }
+    }
+
+    const workerResults = await Promise.allSettled(
+      Array.from({ length: Math.min(concurrency, dates.length) }, () => worker()),
+    );
+    const workerFailure = workerResults.find(
+      (result): result is PromiseRejectedResult => result.status === "rejected",
+    );
+    if (workerFailure) throw workerFailure.reason;
+
+    await flush();
+    if (!opts.dryRun && persistedThrough < dates.length) {
+      const generatedAt = new Date().toISOString();
+      for (const day of days.slice(persistedThrough)) {
+        upsertDay(db, day, generatedAt);
+      }
+    }
+    const next = opts.dryRun
+      ? mergeSnapshotDays(existingSnapshot, days)
+      : readSnapshotFromDatabase(db);
+    return { changed: true, fetchedDates: dates, snapshot: next };
+  } finally {
+    db.close();
+  }
+}
+
+async function readJsonSnapshot(filePath: string): Promise<MevWatchSnapshot> {
+  try {
+    const text = await fs.readFile(filePath, "utf8");
+    return MevWatchSnapshotSchema.parse(JSON.parse(text));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return emptySnapshot();
+    }
+    throw error;
+  }
+}
+
+async function writeJsonSnapshot(
+  snapshot: MevWatchSnapshot,
+  filePath: string,
+): Promise<void> {
+  const parsed = MevWatchSnapshotSchema.parse(snapshot);
+  await fs.writeFile(filePath, `${JSON.stringify(parsed, null, 2)}\n`);
+}
+
+async function updateJsonDataFile(opts: {
+  filePath?: string;
+  dryRun?: boolean;
+  now?: Date;
+  fetchDay?: (date: string) => Promise<MevWatchDay>;
+  onProgress?: (progress: UpdateProgress) => void;
+  sleepMs?: number;
+  concurrency?: number;
+  writeEvery?: number;
+} = {}): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
+  const filePath = opts.filePath ?? DATA_PATH;
+  const snapshot = await readJsonSnapshot(filePath);
   const start = nextMissingStartDate(snapshot);
   const end = yesterdayUtc(opts.now);
   const dates = buildDateRange(start, end);
@@ -323,7 +464,7 @@ export async function updateDataFile(opts: {
     }
     if (contiguousDays.length <= persistedThrough) return;
     const next = mergeSnapshotDays(snapshot, contiguousDays);
-    writeChain = writeChain.then(() => writeSnapshot(next, filePath));
+    writeChain = writeChain.then(() => writeJsonSnapshot(next, filePath));
     await writeChain;
     persistedThrough = contiguousDays.length;
   };
@@ -343,15 +484,19 @@ export async function updateDataFile(opts: {
     }
   }
 
-  await Promise.all(
+  const workerResults = await Promise.allSettled(
     Array.from({ length: Math.min(concurrency, dates.length) }, () => worker()),
   );
+  const workerFailure = workerResults.find(
+    (result): result is PromiseRejectedResult => result.status === "rejected",
+  );
+  if (workerFailure) throw workerFailure.reason;
 
   await flush();
   await writeChain;
   const next = mergeSnapshotDays(snapshot, days);
   if (!opts.dryRun && persistedThrough < dates.length) {
-    await writeSnapshot(next, filePath);
+    await writeJsonSnapshot(next, filePath);
   }
   return { changed: true, fetchedDates: dates, snapshot: next };
 }

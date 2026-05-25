@@ -259,11 +259,10 @@ export default function MethodologyPage() {
 
               <div className="space-y-4 font-mono text-sm leading-relaxed text-fg-muted max-w-2xl mt-4">
                 <p className="m-0">
-                  A scheduled GitHub Actions workflow runs shortly after each
-                  UTC day rolls over, fetching the previous day&apos;s stats and
-                  committing them to a checked-in JSON snapshot. The site reads
-                  only that local snapshot — it does not query relayscan.io on
-                  page load.
+                  A scheduled Vercel Cron job runs shortly after each UTC day
+                  rolls over, fetching the previous day&apos;s stats and writing
+                  them into a SQLite artifact stored in Vercel Blob. Normal page
+                  loads read only that artifact — they do not query relayscan.io.
                 </p>
                 <p className="m-0">
                   Each API response includes a per-relay count of{" "}

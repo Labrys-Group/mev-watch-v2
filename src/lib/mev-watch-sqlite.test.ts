@@ -1,0 +1,105 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+import {
+  createReadOnlyMevWatchDatabase,
+  initializeMevWatchDatabase,
+  readSnapshotFromDatabase,
+  upsertDay,
+} from "./mev-watch-sqlite";
+
+async function withTempDb<T>(run: (dbPath: string) => Promise<T>): Promise<T> {
+  const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-sqlite-"));
+  try {
+    return await run(path.join(dir, "mev-watch.sqlite"));
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
+describe("SQLite MEV Watch artifact", () => {
+  it("stores raw daily rows and reads the snapshot back in date order", async () => {
+    await withTempDb(async (dbPath) => {
+      const db = initializeMevWatchDatabase(dbPath, {
+        generatedAt: "2026-05-26T01:00:00.000Z",
+      });
+      try {
+        upsertDay(
+          db,
+          {
+            date: "2023-12-18",
+            totalChainBlocks: 10_000,
+            relays: [{ relayId: "relay.ultrasound.money", numPayloads: 300 }],
+            builders: [{ builderId: "builder-a", numBlocks: 9_000 }],
+          },
+          "2026-05-26T01:00:00.000Z",
+        );
+        upsertDay(
+          db,
+          {
+            date: "2023-12-17",
+            totalChainBlocks: 10_000,
+            relays: [
+              {
+                relayId: "bloxroute.max-profit.blxrbdn.com",
+                numPayloads: 100,
+              },
+            ],
+            builders: [{ builderId: "builder-b", numBlocks: 8_000 }],
+          },
+          "2026-05-26T01:00:00.000Z",
+        );
+      } finally {
+        db.close();
+      }
+
+      const readDb = createReadOnlyMevWatchDatabase(dbPath);
+      try {
+        expect(readSnapshotFromDatabase(readDb)).toEqual({
+          schemaVersion: 1,
+          generatedAt: "2026-05-26T01:00:00.000Z",
+          sourceStartDate: "2023-12-17",
+          sourceEndDate: "2023-12-18",
+          days: [
+            {
+              date: "2023-12-17",
+              totalChainBlocks: 10_000,
+              relays: [
+                {
+                  relayId: "bloxroute.max-profit.blxrbdn.com",
+                  numPayloads: 100,
+                },
+              ],
+              builders: [{ builderId: "builder-b", numBlocks: 8_000 }],
+            },
+            {
+              date: "2023-12-18",
+              totalChainBlocks: 10_000,
+              relays: [{ relayId: "relay.ultrasound.money", numPayloads: 300 }],
+              builders: [{ builderId: "builder-a", numBlocks: 9_000 }],
+            },
+          ],
+        });
+      } finally {
+        readDb.close();
+      }
+    });
+  });
+
+  it("opens runtime databases read-only", async () => {
+    await withTempDb(async (dbPath) => {
+      const db = initializeMevWatchDatabase(dbPath);
+      db.close();
+
+      const readDb = createReadOnlyMevWatchDatabase(dbPath);
+      try {
+        expect(() => {
+          readDb.exec("INSERT INTO days (date, total_chain_blocks) VALUES ('2026-05-25', 0)");
+        }).toThrow();
+      } finally {
+        readDb.close();
+      }
+    });
+  });
+});
