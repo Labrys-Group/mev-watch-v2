@@ -29,7 +29,7 @@ pnpm dev                     # http://localhost:3000
 | Command | What it does |
 |---|---|
 | `pnpm dev` | start the dev server |
-| `pnpm build` | production build |
+| `pnpm build` | refresh missing data, then run the production build |
 | `pnpm lint` / `pnpm test` | ESLint / Vitest |
 | `pnpm test:e2e` | Playwright (auto-starts the dev server) |
 | `pnpm update-data` | fetch missing complete UTC days and rewrite `src/data/mev-watch.json` |

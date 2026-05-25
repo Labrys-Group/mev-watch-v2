@@ -37,7 +37,7 @@ jobs:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
 
       - name: Validate generated data
-        run: pnpm test src/lib/mev-watch-data.test.ts src/lib/mev-watch-generator.test.ts src/config/relays.test.ts src/lib/queries.test.ts
+        run: pnpm test src/lib/build-path.test.ts src/lib/mev-watch-data.test.ts src/lib/mev-watch-generator.test.ts src/config/relays.test.ts src/lib/queries.test.ts
 
       - name: Commit data changes
         run: |
