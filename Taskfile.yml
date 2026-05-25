@@ -1,0 +1,10 @@
+# https://taskfile.dev
+
+version: "3"
+
+dotenv: [".env"]
+
+tasks:
+  update-data:
+    cmds:
+      - pnpm update-data

@@ -286,4 +286,54 @@ describe("updateDataFile", () => {
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  it("does not persist non-contiguous completed days", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.json");
+    await writeFile(
+      filePath,
+      `${JSON.stringify({
+        ...EMPTY,
+        sourceEndDate: "2022-09-15",
+        days: [
+          {
+            date: "2022-09-15",
+            relays: [],
+            builders: [],
+            totalChainBlocks: 0,
+          },
+        ],
+      })}\n`,
+    );
+
+    try {
+      await expect(
+        updateDataFile({
+          filePath,
+          now: new Date("2022-09-20T12:00:00Z"),
+          sleepMs: 0,
+          concurrency: 3,
+          writeEvery: 2,
+          fetchDay: async (date) => {
+            if (date === "2022-09-16") {
+              await new Promise((resolve) => setTimeout(resolve, 50));
+            }
+            if (date === "2022-09-19") throw new Error("upstream failed");
+            return {
+              date,
+              relays: [],
+              builders: [],
+              totalChainBlocks: 0,
+            };
+          },
+        }),
+      ).rejects.toThrow("upstream failed");
+
+      const snapshot = await readSnapshot(filePath);
+      expect(snapshot.days.map((day) => day.date)).not.toContain("2022-09-17");
+      expect(snapshot.sourceEndDate).toBe("2022-09-15");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
 });

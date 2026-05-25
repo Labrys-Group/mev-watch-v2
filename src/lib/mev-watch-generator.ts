@@ -316,12 +316,16 @@ export async function updateDataFile(opts: {
 
   const flush = async () => {
     if (opts.dryRun) return;
-    const completedDays = days.filter((day): day is MevWatchDay => Boolean(day));
-    if (completedDays.length <= persistedThrough) return;
-    const next = mergeSnapshotDays(snapshot, completedDays);
+    const contiguousDays: MevWatchDay[] = [];
+    for (const day of days) {
+      if (!day) break;
+      contiguousDays.push(day);
+    }
+    if (contiguousDays.length <= persistedThrough) return;
+    const next = mergeSnapshotDays(snapshot, contiguousDays);
     writeChain = writeChain.then(() => writeSnapshot(next, filePath));
     await writeChain;
-    persistedThrough = completedDays.length;
+    persistedThrough = contiguousDays.length;
   };
 
   async function worker() {
