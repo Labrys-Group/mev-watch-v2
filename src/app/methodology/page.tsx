@@ -56,7 +56,7 @@ const LIMITATIONS: Limitation[] = [
         Relay operators sometimes change their filtering policy without public
         announcement. The{" "}
         <code className="font-mono text-xs text-foreground border border-border-labrys px-1 py-0.5">
-          relays.ts
+          relays.json
         </code>{" "}
         classification is updated manually when changes are detected. There may
         be a lag between a real-world posture change and the update reflected
@@ -66,15 +66,13 @@ const LIMITATIONS: Limitation[] = [
   },
   {
     n: "04",
-    title: "Headline is daily; the live ledger is a separate view",
+    title: "Headline is daily",
     body: (
       <>
         The headline censorship percentage is a daily snapshot. Intra-day
         changes in relay composition do not move it until the next UTC
-        day&apos;s ingestion run. The epoch ledger on the dashboard polls the
-        relays&apos; own data APIs and displays per-slot outcomes on a much
-        shorter refresh window, but is scoped to the last ~1024 slots and is
-        not used to compute the headline percentage.
+        day&apos;s checked-in data snapshot is generated. The dashboard does not
+        poll relay APIs on page load.
       </>
     ),
   },
@@ -261,12 +259,11 @@ export default function MethodologyPage() {
 
               <div className="space-y-4 font-mono text-sm leading-relaxed text-fg-muted max-w-2xl mt-4">
                 <p className="m-0">
-                  A scheduled job runs shortly after each UTC day rolls over,
-                  fetching the previous day&apos;s stats and writing them as an
-                  immutable snapshot to the MEV Watch database. The site reads
-                  only its own snapshot store — it does not query relayscan.io
-                  on page load — so the displayed data reflects the last
-                  successful ingestion run.
+                  A scheduled GitHub Actions workflow runs shortly after each
+                  UTC day rolls over, fetching the previous day&apos;s stats and
+                  committing them to a checked-in JSON snapshot. The site reads
+                  only that local snapshot — it does not query relayscan.io on
+                  page load.
                 </p>
                 <p className="m-0">
                   Each API response includes a per-relay count of{" "}
@@ -359,7 +356,7 @@ export default function MethodologyPage() {
                 editorial judgement — it cannot be inferred from on-chain data
                 alone. MEV Watch maintains this classification by hand in{" "}
                 <code className="font-mono text-xs text-foreground border border-border-labrys px-1.5 py-0.5">
-                  src/config/relays.ts
+                  src/data/relays.json
                 </code>
                 . Posture assignments are sourced from the{" "}
                 <a
@@ -374,7 +371,7 @@ export default function MethodologyPage() {
                 whenever relays are added or change their policy.
               </p>
 
-              {/* Relay table — rendered from src/config/relays.ts so methodology
+              {/* Relay table — rendered from src/data/relays.json so methodology
                   copy and the metric calculation share one source of truth.
                   Header row uses bg-panel-alt to match the home leaderboard. */}
               <div className="border border-border-labrys overflow-hidden">

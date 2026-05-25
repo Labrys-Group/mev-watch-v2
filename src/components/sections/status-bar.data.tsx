@@ -18,7 +18,7 @@ export async function StatusBarData() {
         <div className="flex items-center gap-3 px-3 py-2 text-[12px] tracking-[0.1em] uppercase">
           <span className="text-warn">DB EMPTY</span>
           <span className="normal-case tracking-normal text-foreground">
-            run <code className="font-mono">pnpm seed-history</code> to backfill snapshots
+            run <code className="font-mono">pnpm update-data</code> to generate the data snapshot
           </span>
         </div>
       </div>

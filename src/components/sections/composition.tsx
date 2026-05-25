@@ -2,21 +2,13 @@ import type { LatestStats } from "@/lib/queries";
 import type { CSSVars } from "@/lib/css";
 import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
-import { EpochLedger } from "@/components/sections/epoch-ledger";
-import { getLiveEpochs } from "@/lib/epochs/get-live-epochs";
-import { recentBlocksStore } from "@/lib/epochs/recent-blocks-store";
 
 interface CompositionProps {
   latest: LatestStats;
 }
 
-export async function Composition({ latest }: CompositionProps) {
-  const { censorshipPct, totalBlocks } = latest;
-  // Server-render the initial ledger straight from the recent_blocks table —
-  // a fast DB read, no relay fan-out. The client EpochLedger polls
-  // /api/epochs every 30s, which refreshes the table and the live data.
-  const ledger = await getLiveEpochs(recentBlocksStore);
-
+export function Composition({ latest }: CompositionProps) {
+  const { censorshipPct, neutralPct, nonBoostPct, totalBlocks } = latest;
   const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
   const neutralBlocks = totalBlocks - censoringBlocks;
 
@@ -28,7 +20,7 @@ export async function Composition({ latest }: CompositionProps) {
       accent="var(--accent-alt-color)"
       aside={
         <>
-          <span>DISTRIBUTION OF MEV-BOOST BLOCKS</span>
+          <span>DAILY MEV-BOOST DELIVERY DISTRIBUTION</span>
           <br />
           <span>
             N&nbsp;={" "}
@@ -39,41 +31,25 @@ export async function Composition({ latest }: CompositionProps) {
         </>
       }
     >
-      {/* Live epoch ledger — the latest 4 epochs of real per-slot data */}
-      <EpochLedger initial={ledger} />
-
-      {/* Legend + footnote */}
-      <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap border border-border-labrys border-t-0 px-4 py-2.5 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-        <span className="inline-flex items-center gap-2">
-          <span
-            className="inline-block w-2.5 h-2.5 shrink-0 bg-ofac"
-            aria-hidden="true"
-          />
-          OFAC Censoring
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span
-            className="inline-block w-2.5 h-2.5 shrink-0 bg-neutral-relay"
-            aria-hidden="true"
-          />
-          Neutral
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span
-            className="inline-block w-2.5 h-2.5 shrink-0 bg-non-boost"
-            aria-hidden="true"
-          />
-          Non-MEV-Boost
-        </span>
-        <span className="normal-case tracking-normal text-[10px] font-mono text-fg-muted sm:ml-auto">
-          Each tile is one real slot · latest 4 epochs, live.
-          {/* Hover hint only on devices that can actually hover; touch
-              devices no longer wire up tap-to-detail. */}
-          <span className="hidden [@media(hover:hover)]:inline">
-            {" "}
-            Hover a tile for detail.
-          </span>
-        </span>
+      <div className="grid grid-cols-1 border border-border-labrys bg-background sm:grid-cols-3">
+        <CompositionBand
+          label="OFAC Censoring"
+          value={censorshipPct}
+          swatch="bg-ofac"
+          delay="80ms"
+        />
+        <CompositionBand
+          label="Neutral + unknown"
+          value={neutralPct}
+          swatch="bg-neutral-relay"
+          delay="140ms"
+        />
+        <CompositionBand
+          label="Non-MEV-Boost"
+          value={nonBoostPct}
+          swatch="bg-non-boost"
+          delay="200ms"
+        />
       </div>
 
       {/* Block-count cards */}
@@ -119,5 +95,29 @@ export async function Composition({ latest }: CompositionProps) {
         </div>
       </div>
     </Section>
+  );
+}
+
+interface CompositionBandProps {
+  label: string;
+  value: number;
+  swatch: string;
+  delay: string;
+}
+
+function CompositionBand({ label, value, swatch, delay }: CompositionBandProps) {
+  return (
+    <div
+      className="reveal-item border-b border-border-labrys p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
+      style={{ "--delay": delay } as CSSVars}
+    >
+      <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] uppercase text-fg-muted">
+        <span className={`inline-block h-2.5 w-2.5 shrink-0 ${swatch}`} />
+        {label}
+      </div>
+      <div className="mt-2 font-sans text-[30px] font-bold leading-none tracking-[-0.025em] text-foreground">
+        <CountUp value={value} decimals={1} suffix="%" />
+      </div>
+    </div>
   );
 }

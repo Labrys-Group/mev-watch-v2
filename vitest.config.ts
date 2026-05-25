@@ -8,10 +8,6 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
-    env: {
-      // libSQL in-memory DB so db-touching modules load without a real database.
-      DATABASE_URL: ":memory:",
-    },
   },
   resolve: {
     alias: {

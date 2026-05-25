@@ -14,6 +14,61 @@ describe("RELAYS config", () => {
       expect(["censoring", "neutral", "unknown"]).toContain(r.posture);
     }
   });
+
+  it("matches the verified current relay table", () => {
+    expect(RELAYS.map(({ id, name, posture }) => ({ id, name, posture }))).toEqual([
+      {
+        id: "relay.ultrasound.money",
+        name: "Ultra Sound",
+        posture: "neutral",
+      },
+      {
+        id: "relay-filtered.ultrasound.money",
+        name: "Ultra Sound Filtered",
+        posture: "censoring",
+      },
+      {
+        id: "titanrelay.xyz",
+        name: "Titan Relay",
+        posture: "neutral",
+      },
+      {
+        id: "regional.titanrelay.xyz",
+        name: "Titan Relay Regional",
+        posture: "censoring",
+      },
+      {
+        id: "bloxroute.max-profit.blxrbdn.com",
+        name: "bloXroute Max Profit",
+        posture: "censoring",
+      },
+      {
+        id: "bloxroute.regulated.blxrbdn.com",
+        name: "bloXroute Regulated",
+        posture: "censoring",
+      },
+      {
+        id: "aestus.live",
+        name: "Aestus",
+        posture: "neutral",
+      },
+      {
+        id: "boost-relay.flashbots.net",
+        name: "Flashbots",
+        posture: "censoring",
+      },
+      {
+        id: "agnostic-relay.net",
+        name: "Agnostic Gnosis",
+        posture: "neutral",
+      },
+      {
+        id: "relay.ethgas.com",
+        name: "EthGas",
+        posture: "unknown",
+      },
+    ]);
+  });
 });
 
 describe("classifyRelay", () => {

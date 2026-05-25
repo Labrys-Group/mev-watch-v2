@@ -1,1 +1,0 @@
-ALTER TABLE `daily_stats` ADD `total_chain_blocks` integer DEFAULT 0 NOT NULL;

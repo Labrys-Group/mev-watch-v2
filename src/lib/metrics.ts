@@ -1,7 +1,16 @@
 // Relative import (not "@/config/relays"): this module is transitively
 // imported by tsx scripts, which do not resolve the @/* path alias.
 import { classifyRelay } from "../config/relays";
-import type { RelayPayloadCount, BuilderBlockCount } from "./data-source/types";
+
+export interface RelayPayloadCount {
+  relayId: string;
+  numPayloads: number;
+}
+
+export interface BuilderBlockCount {
+  builderId: string;
+  numBlocks: number;
+}
 
 export interface DailyStatsResult {
   /** Censoring relays' share of all MEV-boost relay payload deliveries (%). */

@@ -10,7 +10,7 @@ test("embed page renders the metric card", async ({ page }) => {
   const res = await page.goto("/embed");
   expect(res?.status()).toBeLessThan(400);
   await expect(page.getByText(/MEV WATCH/i).first()).toBeVisible();
-  await expect(page.getByText(/%/).first()).toBeVisible();
+  await expect(page.getByText(/Data unavailable/i)).toBeVisible();
 });
 
 test("status page renders", async ({ page }) => {

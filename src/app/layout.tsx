@@ -18,7 +18,7 @@ const splineSansMono = Spline_Sans_Mono({
 const SITE_URL = "https://www.mevwatch.info";
 const SITE_NAME = "MEV Watch";
 const SITE_DESCRIPTION =
-  "A public transparency tool tracking OFAC censorship of Ethereum MEV-boost blocks. Daily metrics, relay leaderboards, and a live per-slot ledger.";
+  "A public transparency tool tracking OFAC censorship of Ethereum MEV-boost blocks. Daily metrics and relay leaderboards.";
 const GA_MEASUREMENT_ID = "G-542FSGYLE8";
 
 export const metadata: Metadata = {
