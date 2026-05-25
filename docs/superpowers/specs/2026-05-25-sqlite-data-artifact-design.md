@@ -188,3 +188,17 @@ Manual checks:
 - Should the generated SQLite file be committed under `src/data/` or a top-level `data/` directory with explicit tracing includes?
 - Should the updater keep an optional JSON export command for debugging and review?
 - Should we store derived daily metrics in SQLite as a materialized table, or keep deriving them in TypeScript for continuity with the current metrics implementation?
+
+## Addendum: Vercel-hosted fallback
+
+The primary plan remains GitHub-hosted generation: GitHub Actions writes the SQLite artifact and commits it for Vercel to read as a bundled, read-only file.
+
+If hosting the generated SQLite artifact on GitHub is not an option, use a Vercel-native fallback instead:
+
+- Store the generated SQLite database in Vercel Blob.
+- Run the updater from a Vercel Cron job rather than GitHub Actions.
+- Keep SQLite as the canonical data format.
+- Have the runtime download or cache the Blob-backed SQLite file for read-only queries.
+- Ensure only the cron updater writes a replacement database artifact; normal app routes must remain read-only.
+
+This fallback changes artifact hosting and scheduling only. The schema, app-facing query helpers, public API shapes, and metric derivation rules stay the same as the primary SQLite design.
