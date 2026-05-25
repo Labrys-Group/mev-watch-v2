@@ -132,26 +132,45 @@ export async function readSnapshot(
   }
 }
 
-export async function writeSnapshot(
+export async function appendSnapshotDays(
   snapshot: MevWatchSnapshot,
   filePath = DATA_PATH,
 ): Promise<void> {
+  const parsed = MevWatchSnapshotSchema.parse(snapshot);
+
   if (filePath.endsWith(".json")) {
-    await writeJsonSnapshot(snapshot, filePath);
+    const existing = await readJsonSnapshot(filePath);
+    assertAppendOnlyDays(existing.sourceEndDate, parsed.days);
+    await writeJsonSnapshot(
+      mergeSnapshotDays(existing, parsed.days, parsed.generatedAt),
+      filePath,
+    );
     return;
   }
 
-  const parsed = MevWatchSnapshotSchema.parse(snapshot);
   const db = initializeMevWatchDatabase(filePath, {
     generatedAt: parsed.generatedAt,
   });
   try {
+    assertAppendOnlyDays(readSourceEndDate(db), parsed.days);
     for (const day of parsed.days) {
       upsertDay(db, day, parsed.generatedAt);
     }
   } finally {
     db.close();
   }
+}
+
+function assertAppendOnlyDays(
+  sourceEndDate: string | null,
+  days: MevWatchDay[],
+): void {
+  if (!sourceEndDate) return;
+  const staleDay = days.find((day) => day.date <= sourceEndDate);
+  if (!staleDay) return;
+  throw new Error(
+    `appendSnapshotDays only accepts days after existing sourceEndDate (${sourceEndDate}); received ${staleDay.date}`,
+  );
 }
 
 export async function fetchRelayscanDay(

@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import {
+  appendSnapshotDays,
   buildDateRange,
   fetchMevWatchDay,
   fetchRelayscanDay,
@@ -10,7 +11,6 @@ import {
   nextMissingStartDate,
   readSnapshot,
   updateDataFile,
-  writeSnapshot,
   type MevWatchSnapshot,
 } from "./mev-watch-generator";
 
@@ -23,7 +23,7 @@ const EMPTY: MevWatchSnapshot = {
 };
 
 async function seedSqliteSnapshot(filePath: string): Promise<void> {
-  await writeSnapshot(
+  await appendSnapshotDays(
     {
       ...EMPTY,
       sourceEndDate: "2022-09-15",
@@ -90,6 +90,48 @@ describe("MEV Watch data generator planning helpers", () => {
         { date: "2026-05-21", relays: [], builders: [], totalChainBlocks: 3 },
       ],
     });
+  });
+});
+
+describe("appendSnapshotDays", () => {
+  it("rejects days at or before the existing source end date", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
+
+    try {
+      await expect(
+        appendSnapshotDays(
+          {
+            ...EMPTY,
+            sourceEndDate: "2022-09-15",
+            days: [
+              {
+                date: "2022-09-15",
+                relays: [],
+                builders: [],
+                totalChainBlocks: 1,
+              },
+            ],
+          },
+          filePath,
+        ),
+      ).rejects.toThrow(
+        "appendSnapshotDays only accepts days after existing sourceEndDate",
+      );
+
+      const snapshot = await readSnapshot(filePath);
+      expect(snapshot.days).toEqual([
+        {
+          date: "2022-09-15",
+          relays: [],
+          builders: [],
+          totalChainBlocks: 0,
+        },
+      ]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 
