@@ -1,124 +1,2240 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-25T06:11:12.145Z",
-  "sourceStartDate": "2026-05-24",
-  "sourceEndDate": "2026-05-24",
+  "generatedAt": "2026-05-25T06:30:58.656Z",
+  "sourceStartDate": "2022-09-15",
+  "sourceEndDate": "2022-10-15",
   "days": [
     {
-      "date": "2026-05-24",
+      "date": "2022-09-15",
       "relays": [
         {
-          "relayId": "relay.ultrasound.money",
-          "numPayloads": 4056
-        },
-        {
-          "relayId": "titanrelay.xyz",
-          "numPayloads": 3037
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 445
         },
         {
           "relayId": "bloxroute.max-profit.blxrbdn.com",
-          "numPayloads": 2367
+          "numPayloads": 50
         },
         {
           "relayId": "bloxroute.regulated.blxrbdn.com",
-          "numPayloads": 1808
+          "numPayloads": 8
         },
         {
-          "relayId": "aestus.live",
-          "numPayloads": 1045
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 6
         },
         {
-          "relayId": "boost-relay.flashbots.net",
-          "numPayloads": 489
-        },
-        {
-          "relayId": "agnostic-relay.net",
-          "numPayloads": 265
-        },
-        {
-          "relayId": "relay.ethgas.com",
-          "numPayloads": 101
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 4
         }
       ],
       "builders": [
         {
-          "builderId": "Titan (titanbuilder.xyz)",
-          "numBlocks": 3442
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 407
         },
         {
-          "builderId": "BuilderNet",
-          "numBlocks": 1431
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 64
         },
         {
-          "builderId": "    Quasar (quasar.win)    ",
-          "numBlocks": 1210
+          "builderId": "Buildoooooooooooooor",
+          "numBlocks": 30
         },
         {
-          "builderId": "Eureka (eurekabuilder.xyz)",
-          "numBlocks": 259
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 8
         },
         {
-          "builderId": "bobTheBuilder.xyz",
-          "numBlocks": 105
+          "builderId": "",
+          "numBlocks": 4
+        }
+      ],
+      "totalChainBlocks": 6727
+    },
+    {
+      "date": "2022-09-16",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1122
         },
         {
-          "builderId": "Builder+ www.btcs.com/builder",
-          "numBlocks": 81
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 176
         },
         {
-          "builderId": "bombora.build     ",
-          "numBlocks": 73
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 15
         },
         {
-          "builderId": "beaverbuild.org",
-          "numBlocks": 44
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 3
         },
         {
-          "builderId": "bananabuild.org     ",
-          "numBlocks": 14
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 1
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1071
         },
         {
-          "builderId": "Ty For The Block",
-          "numBlocks": 7
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 191
         },
         {
-          "builderId": "Nethermind v1.36.0",
+          "builderId": "Buildoooooooooooooor",
+          "numBlocks": 43
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 8
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7092
+    },
+    {
+      "date": "2022-09-17",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1144
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 213
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 52
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 24
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 11
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 5
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1117
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 289
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 27
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 11
+        },
+        {
+          "builderId": "",
+          "numBlocks": 5
+        }
+      ],
+      "totalChainBlocks": 7130
+    },
+    {
+      "date": "2022-09-18",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1220
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 215
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 50
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 37
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 6
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 4
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 1
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1155
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 302
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 66
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
           "numBlocks": 6
         },
         {
           "builderId": "",
+          "numBlocks": 4
+        }
+      ],
+      "totalChainBlocks": 7130
+    },
+    {
+      "date": "2022-09-19",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1208
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 234
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 35
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 26
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 6
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 1
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 1
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1146
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 295
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 57
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
           "numBlocks": 6
         },
         {
-          "builderId": "      geth go1.24.13 linux",
-          "numBlocks": 3
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 6
         },
         {
-          "builderId": "      geth go1.25.4 linux",
-          "numBlocks": 3
+          "builderId": "",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7125
+    },
+    {
+      "date": "2022-09-20",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1401
         },
         {
-          "builderId": "ethgas-realtime-rpc",
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 327
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 31
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 28
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 16
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 5
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 3
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1311
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 371
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 76
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 31
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 19
+        },
+        {
+          "builderId": "",
+          "numBlocks": 3
+        }
+      ],
+      "totalChainBlocks": 7138
+    },
+    {
+      "date": "2022-09-21",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1808
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 153
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 43
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 27
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 21
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 11
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 8
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1609
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 264
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 74
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 70
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 43
+        },
+        {
+          "builderId": "",
+          "numBlocks": 11
+        }
+      ],
+      "totalChainBlocks": 7054
+    },
+    {
+      "date": "2022-09-22",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 1719
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 260
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 68
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 58
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 34
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 7
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 7
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1206
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 549
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 191
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 103
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 68
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 15
+        },
+        {
+          "builderId": "      geth go1.18.5 linux",
+          "numBlocks": 12
+        },
+        {
+          "builderId": "",
+          "numBlocks": 7
+        }
+      ],
+      "totalChainBlocks": 7152
+    },
+    {
+      "date": "2022-09-23",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2080
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 215
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 66
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 57
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 41
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 15
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 4
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1572
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 660
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 121
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 57
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 23
+        },
+        {
+          "builderId": "      geth go1.18.5 linux",
+          "numBlocks": 17
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 7
+        },
+        {
+          "builderId": "",
+          "numBlocks": 4
+        },
+        {
+          "builderId": "Have we thought this through?",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7167
+    },
+    {
+      "date": "2022-09-24",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2106
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 202
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 125
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 54
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 47
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 34
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 3
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1384
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 638
+        },
+        {
+          "builderId": "      geth go1.18.5 linux",
+          "numBlocks": 156
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 125
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 95
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 82
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 34
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 19
+        },
+        {
+          "builderId": "",
+          "numBlocks": 3
+        }
+      ],
+      "totalChainBlocks": 7168
+    },
+    {
+      "date": "2022-09-25",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2211
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 183
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 105
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 53
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 39
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 21
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 6
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1452
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 588
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 257
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 105
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 66
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 63
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 26
+        },
+        {
+          "builderId": "",
+          "numBlocks": 6
+        }
+      ],
+      "totalChainBlocks": 7168
+    },
+    {
+      "date": "2022-09-26",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2314
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 180
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 96
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 81
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 80
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 22
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 4
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1623
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 777
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 96
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 80
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 61
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 49
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 41
+        },
+        {
+          "builderId": "",
+          "numBlocks": 4
+        }
+      ],
+      "totalChainBlocks": 7148
+    },
+    {
+      "date": "2022-09-27",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2247
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 305
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 109
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 77
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 73
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 23
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1604
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 868
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 110
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 99
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 59
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 46
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 36
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 9
+        }
+      ],
+      "totalChainBlocks": 7141
+    },
+    {
+      "date": "2022-09-28",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2211
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 623
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 256
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 138
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 48
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 14
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 3
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1711
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 1033
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 129
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 98
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 48
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 29
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 21
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 14
+        },
+        {
+          "builderId": "",
+          "numBlocks": 3
+        }
+      ],
+      "totalChainBlocks": 7162
+    },
+    {
+      "date": "2022-09-29",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2466
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 422
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 174
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 145
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 81
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 21
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 9
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1786
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 748
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 313
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 91
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 81
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 69
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 19
+        },
+        {
+          "builderId": "",
+          "numBlocks": 4
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
           "numBlocks": 2
+        }
+      ],
+      "totalChainBlocks": 7154
+    },
+    {
+      "date": "2022-09-30",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2637
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 421
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 220
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 129
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 106
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 34
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 26
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1692
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 822
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 426
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 126
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 123
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 64
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 28
+        },
+        {
+          "builderId": "",
+          "numBlocks": 23
+        },
+        {
+          "builderId": "abc",
+          "numBlocks": 15
+        }
+      ],
+      "totalChainBlocks": 7162
+    },
+    {
+      "date": "2022-10-01",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2550
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 352
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 163
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 103
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 90
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 62
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 56
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1774
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 833
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 271
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 154
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 126
+        },
+        {
+          "builderId": "",
+          "numBlocks": 83
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 43
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 40
+        },
+        {
+          "builderId": "abc",
+          "numBlocks": 36
+        },
+        {
+          "builderId": "miao?",
+          "numBlocks": 5
+        }
+      ],
+      "totalChainBlocks": 7137
+    },
+    {
+      "date": "2022-10-02",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2779
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 258
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 82
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 69
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 64
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 52
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 36
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1984
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 617
+        },
+        {
+          "builderId": "",
+          "numBlocks": 216
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 206
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 143
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 64
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 51
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 22
+        },
+        {
+          "builderId": "miao?",
+          "numBlocks": 14
+        }
+      ],
+      "totalChainBlocks": 7175
+    },
+    {
+      "date": "2022-10-03",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2818
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 212
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 72
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 67
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 54
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 53
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 43
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1879
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 550
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 284
+        },
+        {
+          "builderId": "",
+          "numBlocks": 227
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 181
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 110
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 55
+        },
+        {
+          "builderId": "miao?",
+          "numBlocks": 17
+        }
+      ],
+      "totalChainBlocks": 7157
+    },
+    {
+      "date": "2022-10-04",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2845
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 176
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 111
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 70
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 66
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 58
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 56
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1853
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 655
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 355
+        },
+        {
+          "builderId": "",
+          "numBlocks": 170
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 123
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 113
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 54
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 20
+        },
+        {
+          "builderId": "miao?",
+          "numBlocks": 6
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7132
+    },
+    {
+      "date": "2022-10-05",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2894
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 240
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 133
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 66
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 60
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 48
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 32
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1970
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 713
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 259
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 182
+        },
+        {
+          "builderId": "",
+          "numBlocks": 159
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 95
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 50
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 28
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 2
+        },
+        {
+          "builderId": "miao?",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7148
+    },
+    {
+      "date": "2022-10-06",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2921
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 207
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 146
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 61
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 53
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 46
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 35
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1929
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 593
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 355
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 196
+        },
+        {
+          "builderId": "",
+          "numBlocks": 129
+        },
+        {
+          "builderId": "      geth go1.18.6 linux",
+          "numBlocks": 96
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 67
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 51
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 42
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 2
+        },
+        {
+          "builderId": "miao?01",
+          "numBlocks": 2
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7157
+    },
+    {
+      "date": "2022-10-07",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2937
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 219
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 151
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 70
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 63
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 53
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 43
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1779
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 635
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 380
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 355
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 137
+        },
+        {
+          "builderId": "",
+          "numBlocks": 125
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 68
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 35
+        },
+        {
+          "builderId": "      geth go1.19.1 darwin",
+          "numBlocks": 4
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 4
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 2
+        }
+      ],
+      "totalChainBlocks": 7146
+    },
+    {
+      "date": "2022-10-08",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2707
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 241
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 233
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 147
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 113
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 47
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 44
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1669
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 656
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 411
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 299
+        },
+        {
+          "builderId": "",
+          "numBlocks": 154
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 129
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 113
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 87
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "      geth go1.19.1 darwin",
+          "numBlocks": 1
         },
         {
           "builderId": "I can haz block?",
           "numBlocks": 1
         },
         {
-          "builderId": "0x75",
-          "numBlocks": 1
-        },
-        {
-          "builderId": "Powered by bloXroute",
-          "numBlocks": 1
-        },
-        {
-          "builderId": "Builder+ btcs.com | ethgas.com",
+          "builderId": "miao?01",
           "numBlocks": 1
         }
       ],
-      "totalChainBlocks": 7178
+      "totalChainBlocks": 7169
+    },
+    {
+      "date": "2022-10-09",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2551
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 265
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 202
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 167
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 166
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 148
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 40
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1621
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 513
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 445
+        },
+        {
+          "builderId": "",
+          "numBlocks": 297
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 253
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 162
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 126
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 105
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 6
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 5
+        },
+        {
+          "builderId": "miao?01",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "Flashbots   TornadoCash",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7162
+    },
+    {
+      "date": "2022-10-10",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 2750
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 219
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 218
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 176
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 160
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 148
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 51
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1656
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 598
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 475
+        },
+        {
+          "builderId": "",
+          "numBlocks": 347
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 257
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 146
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 144
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 86
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 6
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 1
+        },
+        {
+          "builderId": "miao?01",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7165
+    },
+    {
+      "date": "2022-10-11",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 3024
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 200
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 182
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 177
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 167
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 138
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 67
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1791
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 650
+        },
+        {
+          "builderId": "",
+          "numBlocks": 415
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 383
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 320
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 169
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 110
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 71
+        },
+        {
+          "builderId": "block mined by oren",
+          "numBlocks": 13
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 8
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7164
+    },
+    {
+      "date": "2022-10-12",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 3005
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 217
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 211
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 164
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 153
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 136
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 87
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1713
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 638
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 453
+        },
+        {
+          "builderId": "",
+          "numBlocks": 438
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 295
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 127
+        },
+        {
+          "builderId": "      geth go1.18.7 linux",
+          "numBlocks": 93
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 83
+        },
+        {
+          "builderId": "  Buildooooooooooooooooooooooor",
+          "numBlocks": 67
+        },
+        {
+          "builderId": "block mined by oren",
+          "numBlocks": 25
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 10
+        },
+        {
+          "builderId": "      geth go1.19.2 linux",
+          "numBlocks": 7
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "we waste yrs not wasting hrs",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7164
+    },
+    {
+      "date": "2022-10-13",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 3250
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 192
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 145
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 141
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 132
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 125
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 73
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 2024
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 580
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 407
+        },
+        {
+          "builderId": "",
+          "numBlocks": 340
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 303
+        },
+        {
+          "builderId": "  Buildooooooooooooooooooooooor",
+          "numBlocks": 169
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 113
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 43
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 25
+        },
+        {
+          "builderId": "      geth go1.19.2 linux",
+          "numBlocks": 7
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 6
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 5
+        },
+        {
+          "builderId": "block mined by oren",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "youtube.com/watch?v=dQw4w9WgXcQ",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7157
+    },
+    {
+      "date": "2022-10-14",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 3323
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 262
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 179
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 122
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 102
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 94
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 72
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1677
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 703
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 623
+        },
+        {
+          "builderId": "",
+          "numBlocks": 365
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 361
+        },
+        {
+          "builderId": "  Buildooooooooooooooooooooooor",
+          "numBlocks": 200
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 91
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 39
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 28
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 14
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 4
+        },
+        {
+          "builderId": "      geth go1.19.2 linux",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "block mined by oren",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7162
+    },
+    {
+      "date": "2022-10-15",
+      "relays": [
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 3074
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 354
+        },
+        {
+          "relayId": "mainnet-relay.securerpc.com",
+          "numPayloads": 336
+        },
+        {
+          "relayId": "bloxroute.ethical.blxrbdn.com",
+          "numPayloads": 140
+        },
+        {
+          "relayId": "relay.edennetwork.io",
+          "numPayloads": 129
+        },
+        {
+          "relayId": "builder-relay-mainnet.blocknative.com",
+          "numPayloads": 85
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 83
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "",
+          "numBlocks": 1631
+        },
+        {
+          "builderId": "Illuminate Dmocratize Dstribute",
+          "numBlocks": 1092
+        },
+        {
+          "builderId": "builder0x69",
+          "numBlocks": 581
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 382
+        },
+        {
+          "builderId": "      geth go1.19.1 linux",
+          "numBlocks": 189
+        },
+        {
+          "builderId": "  Buildooooooooooooooooooooooor",
+          "numBlocks": 121
+        },
+        {
+          "builderId": "      geth go1.18.2 linux",
+          "numBlocks": 66
+        },
+        {
+          "builderId": "Manifold",
+          "numBlocks": 46
+        },
+        {
+          "builderId": "      geth go1.18.1 linux",
+          "numBlocks": 38
+        },
+        {
+          "builderId": "\"\"",
+          "numBlocks": 12
+        },
+        {
+          "builderId": "      geth go1.19.2 linux",
+          "numBlocks": 4
+        },
+        {
+          "builderId": "miao?01",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7167
     }
   ]
 }

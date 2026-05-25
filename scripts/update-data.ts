@@ -8,6 +8,7 @@ import {
 
 async function main() {
   const dryRun = process.argv.includes("--dry-run");
+  const concurrency = Number(process.env.UPDATE_DATA_CONCURRENCY ?? 8);
   if (dryRun) {
     const snapshot = await readSnapshot();
     const start = nextMissingStartDate(snapshot);
@@ -21,7 +22,14 @@ async function main() {
     return;
   }
 
-  const result = await updateDataFile({ dryRun });
+  const result = await updateDataFile({
+    dryRun,
+    concurrency,
+    writeEvery: 25,
+    onProgress: ({ date, index, total }) => {
+      console.log(`[${index}/${total}] fetched ${date}`);
+    },
+  });
 
   if (result.fetchedDates.length === 0) {
     console.log("MEV Watch data is already current.");

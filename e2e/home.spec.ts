@@ -1,20 +1,24 @@
 import { test, expect } from "@playwright/test";
 
-test("homepage renders the dashboard shell", async ({ page }) => {
+test("homepage renders the dashboard with checked-in data", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /Database is empty/i }).first(),
+    page.getByRole("heading", { name: /CENSORSHIP IS/i }).first(),
   ).toBeVisible();
-  // Leaderboard section is present.
+  await expect(page.getByText(/%/).first()).toBeVisible();
   await expect(page.getByText(/RELAY LEADERBOARD/i)).toBeVisible();
 });
 
-test("the trend chart renders an empty snapshot state", async ({ page }) => {
+test("the trend chart renders the checked-in snapshot series", async ({ page }) => {
   await page.goto("/");
   await page.getByText("02 / CENSORSHIP OVER TIME").scrollIntoViewIfNeeded();
-  await expect(
-    page.locator("section").filter({ hasText: "02 / CENSORSHIP OVER TIME" }),
-  ).toContainText(/No daily snapshots yet/i);
+  const section = page.locator("section").filter({
+    hasText: "02 / CENSORSHIP OVER TIME",
+  });
+  await expect(section).toContainText(/SEP 2022/i);
+  await expect(section.locator(".recharts-area-area").first()).toBeVisible({
+    timeout: 15000,
+  });
 });
 
 test("theme toggle flips the document theme", async ({ page }) => {
@@ -34,6 +38,6 @@ test("the composition section does not poll the removed live epoch API", async (
   });
 
   await page.goto("/");
-  await expect(page.getByText(/No daily snapshots yet/i).first()).toBeVisible();
+  await expect(page.getByText(/DAILY MEV-BOOST DELIVERY DISTRIBUTION/i)).toBeVisible();
   expect(epochRequests).toEqual([]);
 });

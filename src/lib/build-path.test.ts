@@ -12,7 +12,8 @@ describe("production build path", () => {
   });
 
   it("ships with an initial checked-in data snapshot", () => {
+    expect(snapshot.sourceStartDate).toBe("2022-09-15");
     expect(snapshot.sourceEndDate).not.toBeNull();
-    expect(snapshot.days.length).toBeGreaterThan(0);
+    expect(snapshot.days.length).toBeGreaterThan(1);
   });
 });

@@ -31,6 +31,11 @@ const RelayscanDaySchema = z.object({
   builders: z.array(RelayscanBuilderSchema),
 });
 
+interface FetchRelayscanDayOpts {
+  attempts?: number;
+  retryDelayMs?: number;
+}
+
 const PUBLIC_RPCS = [
   "https://ethereum-rpc.publicnode.com",
   "https://eth.llamarpc.com",
@@ -119,25 +124,51 @@ export async function writeSnapshot(
   await fs.writeFile(filePath, `${JSON.stringify(parsed, null, 2)}\n`);
 }
 
-export async function fetchRelayscanDay(date: string): Promise<Omit<MevWatchDay, "totalChainBlocks">> {
-  const response = await fetch(`https://www.relayscan.io/stats/day/${date}/json`, {
-    headers: { accept: "application/json" },
-  });
-  if (!response.ok) {
-    throw new Error(`relayscan request failed for ${date}: HTTP ${response.status}`);
+export async function fetchRelayscanDay(
+  date: string,
+  opts: FetchRelayscanDayOpts = {},
+): Promise<Omit<MevWatchDay, "totalChainBlocks">> {
+  const attempts = opts.attempts ?? 3;
+  const retryDelayMs = opts.retryDelayMs ?? 1000;
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(`https://www.relayscan.io/stats/day/${date}/json`, {
+        headers: { accept: "application/json" },
+      });
+      if (!response.ok) {
+        const retryable = response.status >= 500 && response.status < 600;
+        if (retryable && attempt < attempts) {
+          lastError = new Error(`HTTP ${response.status}`);
+          await sleep(retryDelayMs);
+          continue;
+        }
+        throw new Error(`relayscan request failed for ${date}: HTTP ${response.status}`);
+      }
+      const parsed = RelayscanDaySchema.parse(await response.json());
+      return {
+        date: parsed.date,
+        relays: parsed.relays.map((relay) => ({
+          relayId: relay.relay,
+          numPayloads: relay.num_payloads,
+        })),
+        builders: parsed.builders.map((builder) => ({
+          builderId: builder.info.extra_data,
+          numBlocks: builder.info.num_blocks,
+        })),
+      };
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        await sleep(retryDelayMs);
+        continue;
+      }
+    }
   }
-  const parsed = RelayscanDaySchema.parse(await response.json());
-  return {
-    date: parsed.date,
-    relays: parsed.relays.map((relay) => ({
-      relayId: relay.relay,
-      numPayloads: relay.num_payloads,
-    })),
-    builders: parsed.builders.map((builder) => ({
-      builderId: builder.info.extra_data,
-      numBlocks: builder.info.num_blocks,
-    })),
-  };
+
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new Error(`relayscan request failed for ${date}: ${message}`);
 }
 
 interface JsonRpcResponse<T> {
@@ -221,21 +252,48 @@ export async function fetchTotalChainBlocks(
   return firstOfNextDay - firstOfDay;
 }
 
-export async function fetchMevWatchDay(date: string): Promise<MevWatchDay> {
-  const [day, totalChainBlocks] = await Promise.all([
-    fetchRelayscanDay(date),
-    fetchTotalChainBlocks(date),
-  ]);
+interface FetchMevWatchDayDeps {
+  fetchRelayscanDay?: typeof fetchRelayscanDay;
+  fetchTotalChainBlocks?: typeof fetchTotalChainBlocks;
+  warn?: (message: string) => void;
+}
+
+export async function fetchMevWatchDay(
+  date: string,
+  deps: FetchMevWatchDayDeps = {},
+): Promise<MevWatchDay> {
+  const fetchRelayDay = deps.fetchRelayscanDay ?? fetchRelayscanDay;
+  const fetchBlockCount = deps.fetchTotalChainBlocks ?? fetchTotalChainBlocks;
+  const warn = deps.warn ?? console.warn;
+
+  const day = await fetchRelayDay(date);
+  let totalChainBlocks = 0;
+  try {
+    totalChainBlocks = await fetchBlockCount(date);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    warn(`block count unavailable for ${date}: ${message}`);
+  }
   return { ...day, totalChainBlocks };
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export interface UpdateProgress {
+  date: string;
+  index: number;
+  total: number;
+}
 
 export async function updateDataFile(opts: {
   filePath?: string;
   dryRun?: boolean;
   now?: Date;
   fetchDay?: (date: string) => Promise<MevWatchDay>;
+  onProgress?: (progress: UpdateProgress) => void;
+  sleepMs?: number;
+  concurrency?: number;
+  writeEvery?: number;
 } = {}): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
   const filePath = opts.filePath ?? DATA_PATH;
   const snapshot = await readSnapshot(filePath);
@@ -247,13 +305,49 @@ export async function updateDataFile(opts: {
   }
 
   const fetchDay = opts.fetchDay ?? fetchMevWatchDay;
-  const days: MevWatchDay[] = [];
-  for (const date of dates) {
-    days.push(await fetchDay(date));
-    await sleep(300);
+  const sleepMs = opts.sleepMs ?? 300;
+  const concurrency = Math.max(1, Math.floor(opts.concurrency ?? 1));
+  const writeEvery = Math.max(0, Math.floor(opts.writeEvery ?? 0));
+  const days = new Array<MevWatchDay>(dates.length);
+  let nextIndex = 0;
+  let completed = 0;
+  let persistedThrough = 0;
+  let writeChain = Promise.resolve();
+
+  const flush = async () => {
+    if (opts.dryRun) return;
+    const completedDays = days.filter((day): day is MevWatchDay => Boolean(day));
+    if (completedDays.length <= persistedThrough) return;
+    const next = mergeSnapshotDays(snapshot, completedDays);
+    writeChain = writeChain.then(() => writeSnapshot(next, filePath));
+    await writeChain;
+    persistedThrough = completedDays.length;
+  };
+
+  async function worker() {
+    while (nextIndex < dates.length) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      const date = dates[currentIndex];
+      days[currentIndex] = await fetchDay(date);
+      completed += 1;
+      opts.onProgress?.({ date, index: completed, total: dates.length });
+      if (writeEvery > 0 && completed % writeEvery === 0) {
+        await flush();
+      }
+      if (sleepMs > 0) await sleep(sleepMs);
+    }
   }
 
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, dates.length) }, () => worker()),
+  );
+
+  await flush();
+  await writeChain;
   const next = mergeSnapshotDays(snapshot, days);
-  if (!opts.dryRun) await writeSnapshot(next, filePath);
+  if (!opts.dryRun && persistedThrough < dates.length) {
+    await writeSnapshot(next, filePath);
+  }
   return { changed: true, fetchedDates: dates, snapshot: next };
 }
