@@ -30,12 +30,18 @@ invocations when `CRON_SECRET` is configured.
 `vercel.json` invokes `/api/cron/update-data` daily at 03:30 UTC. The route:
 
 1. Validates the cron `Authorization` header.
-2. Downloads the current SQLite artifact from Vercel Blob to `/tmp`.
-3. Fetches missing complete UTC days.
-4. Writes successful days to SQLite as they complete.
-5. Uploads the refreshed artifact back to Vercel Blob.
+2. Acquires `data/mev-watch.sqlite.lock` in Vercel Blob.
+3. Downloads the current SQLite artifact from Vercel Blob to `/tmp`.
+4. Fetches missing complete UTC days.
+5. Writes successful days to SQLite as they complete.
+6. Uploads the refreshed artifact back to Vercel Blob.
+7. Releases the lock in a `finally` path.
 
 Normal pages and public API routes never write to SQLite.
+
+The lock expires after 15 minutes. If another refresh already holds an
+unexpired lock, the cron route returns `200` with `skipped: true` so Vercel does
+not mark the scheduled invocation as failed.
 
 ## Initial Blob Seed
 
