@@ -39,10 +39,8 @@ pnpm test
 pnpm build
 ```
 
-`pnpm build` also runs `pnpm update-data` before `next build`, so a production
-build generated from an empty snapshot will populate `src/data/mev-watch.json`
-before Next.js prerenders the app. Commit `src/data/mev-watch.json` if the
-generated diff is expected.
+Commit `src/data/mev-watch.json` if the generated diff is expected. The
+production build does not fetch upstream data.
 
 ## Vercel Environment
 

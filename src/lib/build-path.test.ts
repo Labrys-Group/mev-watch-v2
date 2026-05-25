@@ -1,12 +1,18 @@
 import packageJson from "../../package.json";
+import snapshot from "../data/mev-watch.json";
 import { describe, expect, it } from "vitest";
 
 describe("production build path", () => {
-  it("generates the checked-in data snapshot before building Next.js", () => {
-    expect(packageJson.scripts.build).toBe("pnpm update-data && next build");
+  it("does not fetch upstream data during the Next.js build", () => {
+    expect(packageJson.scripts.build).toBe("next build");
   });
 
-  it("uses the same data-generating build path on Vercel", () => {
-    expect(packageJson.scripts["vercel-build"]).toBe("pnpm build");
+  it("does not override Vercel's build command with data generation", () => {
+    expect(packageJson.scripts["vercel-build"]).toBeUndefined();
+  });
+
+  it("ships with an initial checked-in data snapshot", () => {
+    expect(snapshot.sourceEndDate).not.toBeNull();
+    expect(snapshot.days.length).toBeGreaterThan(0);
   });
 });

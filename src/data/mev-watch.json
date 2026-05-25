@@ -1,7 +1,124 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "1970-01-01T00:00:00.000Z",
-  "sourceStartDate": "2022-09-15",
-  "sourceEndDate": null,
-  "days": []
+  "generatedAt": "2026-05-25T06:11:12.145Z",
+  "sourceStartDate": "2026-05-24",
+  "sourceEndDate": "2026-05-24",
+  "days": [
+    {
+      "date": "2026-05-24",
+      "relays": [
+        {
+          "relayId": "relay.ultrasound.money",
+          "numPayloads": 4056
+        },
+        {
+          "relayId": "titanrelay.xyz",
+          "numPayloads": 3037
+        },
+        {
+          "relayId": "bloxroute.max-profit.blxrbdn.com",
+          "numPayloads": 2367
+        },
+        {
+          "relayId": "bloxroute.regulated.blxrbdn.com",
+          "numPayloads": 1808
+        },
+        {
+          "relayId": "aestus.live",
+          "numPayloads": 1045
+        },
+        {
+          "relayId": "boost-relay.flashbots.net",
+          "numPayloads": 489
+        },
+        {
+          "relayId": "agnostic-relay.net",
+          "numPayloads": 265
+        },
+        {
+          "relayId": "relay.ethgas.com",
+          "numPayloads": 101
+        }
+      ],
+      "builders": [
+        {
+          "builderId": "Titan (titanbuilder.xyz)",
+          "numBlocks": 3442
+        },
+        {
+          "builderId": "BuilderNet",
+          "numBlocks": 1431
+        },
+        {
+          "builderId": "    Quasar (quasar.win)    ",
+          "numBlocks": 1210
+        },
+        {
+          "builderId": "Eureka (eurekabuilder.xyz)",
+          "numBlocks": 259
+        },
+        {
+          "builderId": "bobTheBuilder.xyz",
+          "numBlocks": 105
+        },
+        {
+          "builderId": "Builder+ www.btcs.com/builder",
+          "numBlocks": 81
+        },
+        {
+          "builderId": "bombora.build     ",
+          "numBlocks": 73
+        },
+        {
+          "builderId": "beaverbuild.org",
+          "numBlocks": 44
+        },
+        {
+          "builderId": "bananabuild.org     ",
+          "numBlocks": 14
+        },
+        {
+          "builderId": "Ty For The Block",
+          "numBlocks": 7
+        },
+        {
+          "builderId": "Nethermind v1.36.0",
+          "numBlocks": 6
+        },
+        {
+          "builderId": "",
+          "numBlocks": 6
+        },
+        {
+          "builderId": "      geth go1.24.13 linux",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "      geth go1.25.4 linux",
+          "numBlocks": 3
+        },
+        {
+          "builderId": "ethgas-realtime-rpc",
+          "numBlocks": 2
+        },
+        {
+          "builderId": "I can haz block?",
+          "numBlocks": 1
+        },
+        {
+          "builderId": "0x75",
+          "numBlocks": 1
+        },
+        {
+          "builderId": "Powered by bloXroute",
+          "numBlocks": 1
+        },
+        {
+          "builderId": "Builder+ btcs.com | ethgas.com",
+          "numBlocks": 1
+        }
+      ],
+      "totalChainBlocks": 7178
+    }
+  ]
 }
