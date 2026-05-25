@@ -61,7 +61,9 @@ interface TooltipItem {
   payload: CompositionPoint;
 }
 
-/** Custom tooltip — the three band percentages plus the headline rate. */
+/** Custom tooltip — share-of-all-blocks bands and the share-of-MEV-boost
+ *  headline grouped under their own denominators so the two %s don't read
+ *  as a contradiction. */
 function ChartTooltip({
   active,
   payload,
@@ -75,7 +77,10 @@ function ChartTooltip({
   const point = payload[0].payload;
   return (
     <div className="border border-border-labrys bg-panel px-3 py-2 font-mono text-[11px] tracking-[0.06em] text-foreground">
-      <div className="text-fg-muted mb-1.5">{formatDateShort(String(label))}</div>
+      <div className="text-fg-muted mb-2">{formatDateShort(String(label))}</div>
+      <div className="text-fg-muted text-[10px] tracking-[0.12em] uppercase mb-1">
+        Share of all blocks
+      </div>
       <div className="flex items-center justify-between gap-5">
         <LegendSwatch className="bg-non-boost" label="Non-boosted" />
         <span>{formatPercent(point.nonBoost)}</span>
@@ -88,8 +93,14 @@ function ChartTooltip({
         <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
         <span>{formatPercent(point.nonCensored)}</span>
       </div>
-      <div className="mt-1.5 pt-1.5 border-t border-border-labrys text-fg-muted normal-case">
-        Censorship rate {formatPercent(point.censorshipPct)} of MEV-boost
+      <div className="mt-2 pt-2 border-t border-border-labrys">
+        <div className="text-fg-muted text-[10px] tracking-[0.12em] uppercase mb-1">
+          Share of MEV-boost
+        </div>
+        <div className="flex items-center justify-between gap-5">
+          <span>Censorship</span>
+          <span>{formatPercent(point.censorshipPct)}</span>
+        </div>
       </div>
     </div>
   );
@@ -180,7 +191,7 @@ export function TrendChart({ trend }: TrendChartProps) {
       accent="var(--warn)"
       aside={
         <>
-          <span>SHARE OF ALL BLOCKS</span>
+          <span>BANDS // SHARE OF ALL BLOCKS</span>
           <br />
           <span>SEP 2022 — NOW</span>
         </>
@@ -188,25 +199,32 @@ export function TrendChart({ trend }: TrendChartProps) {
     >
       {/* Recessed chart well */}
       <div className="border border-border-labrys bg-background">
-        {/* Stat header row — the headline censorship metric (share of MEV-boost) */}
-        <div className="grid grid-cols-3 border-b border-border-labrys font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-          <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
-            NOW
-            <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-foreground mt-1 normal-case">
-              <CountUp value={rangeStats.current} decimals={1} suffix="%" />
-            </strong>
+        {/* Stat header — headline censorship metric. The "OF MEV-BOOST"
+            banner names the denominator inline so it can't be confused
+            with the share-of-all-blocks bands below. */}
+        <div className="border-b border-border-labrys">
+          <div className="px-3 pt-2.5 pb-1 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
+            Of MEV-boost
           </div>
-          <div className="p-3 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
-            PEAK
-            <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-warn mt-1 normal-case">
-              <CountUp value={rangeStats.peak} decimals={1} suffix="%" />
-            </strong>
-          </div>
-          <div className="p-3 transition-colors duration-200 hover:bg-panel-alt">
-            TROUGH
-            <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-good mt-1 normal-case">
-              <CountUp value={rangeStats.trough} decimals={1} suffix="%" />
-            </strong>
+          <div className="grid grid-cols-3 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
+            <div className="px-3 pb-3 pt-1 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+              NOW
+              <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-foreground mt-1 normal-case">
+                <CountUp value={rangeStats.current} decimals={1} suffix="%" />
+              </strong>
+            </div>
+            <div className="px-3 pb-3 pt-1 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+              PEAK
+              <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-warn mt-1 normal-case">
+                <CountUp value={rangeStats.peak} decimals={1} suffix="%" />
+              </strong>
+            </div>
+            <div className="px-3 pb-3 pt-1 transition-colors duration-200 hover:bg-panel-alt">
+              TROUGH
+              <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-good mt-1 normal-case">
+                <CountUp value={rangeStats.trough} decimals={1} suffix="%" />
+              </strong>
+            </div>
           </div>
         </div>
 

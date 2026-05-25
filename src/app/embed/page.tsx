@@ -48,7 +48,7 @@ export default async function EmbedPage() {
             {formatPercent(summary.current)}
           </p>
           <p className="mt-2 font-mono text-xs uppercase tracking-wider text-fg-muted">
-            of blocks via OFAC-censoring relays
+            of MEV-boost blocks via OFAC-censoring relays
           </p>
         </div>
 
