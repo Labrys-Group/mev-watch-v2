@@ -8,9 +8,11 @@ import { formatRelativeTime } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Status | MEV Watch",
-  description:
-    "Status of the checked-in MEV Watch data snapshot and its freshness.",
+  description: "Status of the MEV Watch SQLite data artifact and its freshness.",
 };
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export default async function StatusPage() {
   const [snapshot, latestStats] = await Promise.all([
