@@ -20,6 +20,7 @@ BLOB_READ_WRITE_TOKEN=<created by Vercel Blob>
 CRON_SECRET=<long random secret>
 ETH_RPC_URL=<optional Ethereum JSON-RPC URL>
 MEV_WATCH_BLOB_PATH=data/mev-watch.sqlite # optional override
+MEV_WATCH_LIVE_BLOB_PREFIX=data/live-ledger/ # optional live-ledger Blob prefix
 UPDATE_DATA_MAX_DAYS=30 # optional, defaults to 30 days per cron run
 UPDATE_DATA_WRITE_EVERY=1 # optional, upload after each persisted batch
 ```
@@ -39,7 +40,10 @@ invocations when `CRON_SECRET` is configured.
 6. Uploads each persisted batch back to Vercel Blob.
 7. Releases the lock in a `finally` path.
 
-Normal pages and public API routes never write to SQLite.
+Normal pages and public API routes never write to SQLite. The narrow exception
+for user traffic is `/api/epochs`, which writes immutable timestamped JSON
+snapshots under the live-ledger prefix only; it never updates the daily SQLite
+artifact or a mutable `latest.json` pointer.
 
 Each cron invocation is date-budgeted so a large backlog advances over multiple
 runs instead of risking the platform function timeout. By default the route
