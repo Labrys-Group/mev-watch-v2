@@ -1,4 +1,4 @@
-import { get, put } from "@vercel/blob";
+import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
 
 import { isNewerSnapshot, parseLiveLedgerSnapshot } from "./snapshots";
 import type { SnapshotStore } from "./store";
@@ -74,5 +74,11 @@ function ensureTrailingSlash(value: string): string {
 }
 
 function isBlobPreconditionFailedError(error: unknown): boolean {
-  return error instanceof Error && error.name === "BlobPreconditionFailedError";
+  return (
+    error instanceof BlobPreconditionFailedError ||
+    (error instanceof Error &&
+      (error.name === "BlobPreconditionFailedError" ||
+        (error.message.includes("Precondition failed") &&
+          error.message.includes("ETag mismatch"))))
+  );
 }
