@@ -5,10 +5,9 @@ import { formatPercent } from "@/lib/format";
 export const metadata: Metadata = {
   title: "MEV Watch — Embed",
   description:
-    "Live OFAC censorship rate for Ethereum MEV-boost blocks — embeddable metric card.",
+    "OFAC censorship rate for Ethereum MEV-boost blocks — embeddable metric card.",
 };
 
-// Revalidate hourly, matching the main dashboard cadence.
 export const revalidate = 3600;
 
 export default async function EmbedPage() {

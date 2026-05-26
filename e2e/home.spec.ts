@@ -1,24 +1,24 @@
 import { test, expect } from "@playwright/test";
 
-test("homepage renders the dashboard with real data", async ({ page }) => {
+test("homepage renders the dashboard with checked-in data", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /CENSORSHIP/i }).first(),
+    page.getByRole("heading", { name: /CENSORSHIP IS/i }).first(),
   ).toBeVisible();
-  // A percentage appears somewhere on the page (hero / composition).
   await expect(page.getByText(/%/).first()).toBeVisible();
-  // Leaderboard section is present.
   await expect(page.getByText(/RELAY LEADERBOARD/i)).toBeVisible();
 });
 
-test("the trend chart renders three stacked bands", async ({ page }) => {
+test("the trend chart renders the checked-in snapshot series", async ({ page }) => {
   await page.goto("/");
-  // Scroll the chart section into view to trigger the IntersectionObserver.
   await page.getByText("02 / CENSORSHIP OVER TIME").scrollIntoViewIfNeeded();
-  await expect(page.locator(".recharts-area-area").first()).toBeVisible({
+  const section = page.locator("section").filter({
+    hasText: "02 / CENSORSHIP OVER TIME",
+  });
+  await expect(section).toContainText(/SEP 2022/i);
+  await expect(section.locator(".recharts-area-area").first()).toBeVisible({
     timeout: 15000,
   });
-  await expect(page.locator(".recharts-area-area")).toHaveCount(3);
 });
 
 test("theme toggle flips the document theme", async ({ page }) => {
@@ -29,12 +29,37 @@ test("theme toggle flips the document theme", async ({ page }) => {
   await expect(html).toHaveClass(/light/);
 });
 
-test("the composition section renders the live epoch ledger", async ({
-  page,
-}) => {
+test("the composition section renders and polls the live epoch API", async ({ page }) => {
+  const epochRequests: string[] = [];
+  await page.route("**/api/epochs", async (route) => {
+    epochRequests.push(route.request().url());
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        headSlot: 99,
+        fetchedAt: "2026-05-26T00:00:00.000Z",
+        degradedRelays: [],
+        epochs: [3, 2, 1, 0].map((epoch, rowIndex) => ({
+          epoch,
+          inProgress: rowIndex === 0,
+          slots: Array.from({ length: 32 }, (_, indexInEpoch) => ({
+            slot: epoch * 32 + indexInEpoch,
+            indexInEpoch,
+            category:
+              rowIndex === 0 && indexInEpoch > 3 ? "pending" : "nonboost",
+            relays: [],
+          })),
+        })),
+      }),
+    });
+  });
+
+  page.on("request", (request) => {
+    if (request.url().includes("/api/epochs")) epochRequests.push(request.url());
+  });
+
   await page.goto("/");
-  // The ledger footnote is present regardless of relay liveness.
-  await expect(page.getByText(/one real slot/i)).toBeVisible();
-  // The in-progress epoch row is labelled live.
-  await expect(page.getByText(/live ·/i)).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText(/DAILY MEV-BOOST DELIVERY DISTRIBUTION/i)).toBeVisible();
+  await expect(page.getByLabel("Live epoch ledger")).toBeVisible();
+  expect(epochRequests.length).toBeGreaterThan(0);
 });

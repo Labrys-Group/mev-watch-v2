@@ -2,6 +2,9 @@
   "name": "mev-watch",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,20 +13,14 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:check": "tsx scripts/check-db.ts",
-    "refresh": "tsx scripts/refresh.ts",
-    "seed-history": "tsx scripts/seed-history.ts",
-    "backfill-nonboost": "tsx scripts/backfill-nonboost.ts",
-    "db:summary": "tsx scripts/db-summary.ts"
+    "update-data": "tsx scripts/update-data.ts",
+    "backfill-and-upload": "tsx scripts/backfill-and-upload.ts"
   },
   "dependencies": {
-    "@libsql/client": "^0.17.3",
     "@tailwindcss/typography": "^0.5.19",
+    "@vercel/blob": "^2.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
     "next-themes": "^0.4.6",
@@ -41,12 +38,10 @@
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/node": "^20",
+    "@types/node": "^24.12.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.2",
-    "dotenv": "^17.4.2",
-    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "jsdom": "^29.1.1",

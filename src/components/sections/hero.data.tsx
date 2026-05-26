@@ -20,9 +20,8 @@ export async function HeroData() {
           Database is empty.
         </h1>
         <p className="mt-6 font-mono text-[13px] leading-snug text-fg-muted">
-          Run{" "}
-          <code className="font-mono text-foreground">pnpm seed-history</code>{" "}
-          to backfill daily snapshots, then reload.
+          Run <code className="font-mono text-foreground">pnpm update-data</code>{" "}
+          to generate the checked-in data snapshot, then reload.
         </p>
       </section>
     );

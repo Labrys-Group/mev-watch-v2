@@ -1,15 +1,24 @@
 // Relative import (not "@/config/relays"): this module is transitively
 // imported by tsx scripts, which do not resolve the @/* path alias.
 import { classifyRelay } from "../config/relays";
-import type { RelayPayloadCount, BuilderBlockCount } from "./data-source/types";
+
+export interface RelayPayloadCount {
+  relayId: string;
+  numPayloads: number;
+}
+
+export interface BuilderBlockCount {
+  builderId: string;
+  numBlocks: number;
+}
 
 export interface DailyStatsResult {
   /** Censoring relays' share of all MEV-boost relay payload deliveries (%). */
   censorshipPct: number;
   /** Neutral + unknown relays' share of deliveries (%). */
   neutralPct: number;
-  /** Non-MEV-boost (locally built) block share (%). */
-  nonBoostPct: number;
+  /** Non-MEV-boost (locally built) block share (%), or null when block counts are unavailable. */
+  nonBoostPct: number | null;
   /** Total relay payload deliveries counted (a block delivered via N relays
    *  counts N times — relayscan's `num_payloads` is per relay). */
   totalBlocks: number;
@@ -33,9 +42,10 @@ export interface RelayBreakdownEntry {
  * nudge the raw value slightly out of range.
  */
 export function nonBoostShare(
-  totalChainBlocks: number,
+  totalChainBlocks: number | null,
   mevBoostBlocks: number,
-): number {
+): number | null {
+  if (totalChainBlocks === null) return null;
   if (totalChainBlocks <= 0) return 0;
   const pct = ((totalChainBlocks - mevBoostBlocks) / totalChainBlocks) * 100;
   return Math.min(100, Math.max(0, pct));
@@ -54,12 +64,12 @@ export function nonBoostShare(
  * posture changed are classified with the posture in effect on that date.
  *
  * `totalChainBlocks` is the total execution-layer blocks proposed that UTC day;
- * pass 0 if unavailable (non-boost share will be 0).
+ * pass null if unavailable (non-boost share will be null).
  */
 export function computeDailyStats(
   relays: RelayPayloadCount[],
   builders: BuilderBlockCount[],
-  totalChainBlocks: number,
+  totalChainBlocks: number | null,
   date: string,
 ): DailyStatsResult {
   const totalDeliveries = relays.reduce((sum, r) => sum + r.numPayloads, 0);

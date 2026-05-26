@@ -1,138 +1,99 @@
-# Deploying MEV Watch v2
+# Deployment
 
-MEV Watch runs as a single Next.js app on **Vercel**, backed by a hosted
-**Turso** (libSQL) database, with a daily Vercel Cron job refreshing the data.
+MEV Watch deploys as a read-only Next.js app for normal user traffic. Pages and
+API routes read a SQLite data artifact. In production, Vercel Blob hosts the
+latest artifact and Vercel Cron is the only writer.
 
-Everything in the codebase is deployment-ready. The steps below are the
-human-operated checklist to take it live — they need Turso and Vercel accounts.
+## Required Services
 
----
+- Vercel project connected to this repository.
+- Vercel Blob store connected to the project. A private store is recommended.
+- Vercel Cron enabled through `vercel.json`.
+- Node 24 or newer for local development and Vercel builds/functions.
 
-## 1. Create the Turso database
+## Vercel Environment
 
-Install the Turso CLI and sign in:
-
-```bash
-# macOS / Linux
-curl -sSfL https://get.tur.so/install.sh | bash
-# Windows: see https://docs.turso.tech/cli/installation
-
-turso auth login
-```
-
-Create the database and read its credentials:
+Set these variables in the Vercel project:
 
 ```bash
-turso db create mev-watch
-
-# The libsql:// connection URL — copy it:
-turso db show mev-watch --url
-
-# An auth token — copy it:
-turso db tokens create mev-watch
+BLOB_READ_WRITE_TOKEN=<created by Vercel Blob>
+CRON_SECRET=<long random secret>
+ETH_RPC_URL=<optional Ethereum JSON-RPC URL>
+MEV_WATCH_BLOB_PATH=data/mev-watch.sqlite # optional override
+MEV_WATCH_LIVE_BLOB_PREFIX=data/live-ledger/ # optional live-ledger Blob prefix
+UPDATE_DATA_MAX_DAYS=30 # optional, defaults to 30 days per cron run
+UPDATE_DATA_WRITE_EVERY=1 # optional, upload after each persisted batch
 ```
 
-Keep the URL and token; they become `DATABASE_URL` and `DATABASE_AUTH_TOKEN`.
+Vercel automatically sends `Authorization: Bearer $CRON_SECRET` to cron
+invocations when `CRON_SECRET` is configured.
 
-## 2. Apply the schema to Turso
+## Data Refresh
 
-From the repo root, temporarily point your local `.env` at Turso:
+`vercel.json` invokes `/api/cron/update-data` daily at 03:30 UTC. The route:
 
-```
-DATABASE_URL=libsql://mev-watch-<your-org>.turso.io
-DATABASE_AUTH_TOKEN=<the token from step 1>
-```
+1. Validates the cron `Authorization` header.
+2. Acquires `data/mev-watch.sqlite.lock` in Vercel Blob.
+3. Downloads the current SQLite artifact from Vercel Blob to `/tmp`.
+4. Fetches missing complete UTC days.
+5. Writes successful days to SQLite as they complete.
+6. Uploads each persisted batch back to Vercel Blob.
+7. Releases the lock in a `finally` path.
 
-Then create the tables:
+Normal pages and public API routes never write to SQLite. The narrow exception
+for user traffic is `/api/epochs`, which maintains the live-ledger snapshot at
+`data/live-ledger/latest.json` by default, or under `MEV_WATCH_LIVE_BLOB_PREFIX`
+when configured. That endpoint never updates the daily SQLite artifact.
+
+Each cron invocation is date-budgeted so a large backlog advances over multiple
+runs instead of risking the platform function timeout. By default the route
+fetches up to 30 missing days and uploads every persisted day.
+
+The lock expires after 15 minutes. If another refresh already holds an
+unexpired lock, the cron route returns `200` with `skipped: true` so Vercel does
+not mark the scheduled invocation as failed.
+
+## Initial Blob Seed
+
+The repository includes `src/data/mev-watch.sqlite` as a local seed artifact.
+After creating the Blob store, upload that file to `data/mev-watch.sqlite`.
+The cron route can then continue from the stored `sourceEndDate`.
+
+To create a fresh backfilled artifact locally and upload it to Vercel Blob:
 
 ```bash
-pnpm db:migrate
+BLOB_READ_WRITE_TOKEN=<created by Vercel Blob> pnpm backfill-and-upload
 ```
 
-## 3. Seed production history
+By default this copies `src/data/mev-watch.sqlite` to `data/mev-watch.db`,
+backfills the copy, and uploads that file to the configured Blob pathname. The
+Blob pathname still defaults to `data/mev-watch.sqlite` so the deployed app can
+read it without additional configuration.
 
-With `.env` still pointing at Turso, backfill the history from relayscan.io:
+Useful overrides:
 
 ```bash
-pnpm seed-history
+pnpm backfill-and-upload --file data/mev-watch.db --blob-path data/mev-watch.sqlite
 ```
 
-This takes several minutes (~one request per day since the Merge). When it
-finishes, **restore `.env`** to the local file URL for day-to-day development:
+## Manual Refresh
 
-```
-DATABASE_URL=file:./data/mevwatch.db
-DATABASE_AUTH_TOKEN=
-```
-
-## 4. Deploy to Vercel
-
-1. Go to [vercel.com](https://vercel.com) and **Add New → Project**.
-2. Import the GitHub repo `Labrys-Group/mev-watch` (select the branch you want
-   to deploy).
-3. Framework preset: **Next.js**. Leave the build command and output directory
-   at their defaults.
-4. Do not deploy yet — set the environment variables first (next step).
-
-## 5. Set Vercel environment variables
-
-In **Project Settings → Environment Variables**, add (for Production):
-
-| Variable | Value |
-|---|---|
-| `DATABASE_URL` | the Turso `libsql://` URL from step 1 |
-| `DATABASE_AUTH_TOKEN` | the Turso token from step 1 |
-| `CRON_SECRET` | a long random string (e.g. `openssl rand -hex 32`) |
-| `SLACK_WEBHOOK_URL` | *(optional)* a Slack incoming-webhook URL for failure alerts |
-| `ETH_RPC_URL` | *(optional)* an Ethereum JSON-RPC URL for the non-MEV-boost block count; falls back to public RPCs when unset |
-
-Vercel automatically sends `Authorization: Bearer $CRON_SECRET` on cron
-invocations once `CRON_SECRET` is set — that is how `/api/refresh` is protected.
-
-Now trigger the deploy.
-
-## 6. Verify
-
-- The deployed homepage loads and shows live data.
-- **Project → Cron Jobs** lists the `/api/refresh` job (from `vercel.json`).
-- Manually confirm the refresh endpoint:
-
-  ```bash
-  curl -s https://<your-deployment>/api/refresh \
-    -H "Authorization: Bearer <your CRON_SECRET>"
-  # → {"status":"ok","date":"YYYY-MM-DD"}
-  ```
-
-  Without the header it must return `401`.
-
-## 7. Custom domain
-
-In **Project Settings → Domains**, add `mevwatch.info` and point its DNS at
-Vercel as instructed.
-
-## Upgrading an existing database
-
-When a release adds a Drizzle migration, an already-live Turso database must be
-migrated — and, for the non-MEV-boost data, backfilled. With `.env` temporarily
-pointing at Turso (as in steps 2–3):
+To refresh the local seed artifact:
 
 ```bash
-pnpm db:migrate          # apply new migrations (e.g. the total_chain_blocks column)
-pnpm backfill-nonboost   # populate nonBoostPct / totalChainBlocks across all history
+pnpm install
+ETH_RPC_URL=<optional-rpc-url> pnpm update-data
+pnpm test
+pnpm build
 ```
 
-`backfill-nonboost` is idempotent and doubles as a repair tool for any day a
-live refresh recorded without a block count. Restore `.env` to the local file
-URL afterwards.
+To test the production cron route locally, run the app with `CRON_SECRET` and
+`BLOB_READ_WRITE_TOKEN`, then request `/api/cron/update-data` with the matching
+`Authorization: Bearer <secret>` header.
 
----
+## Rollback
 
-## Notes
-
-- **Cron frequency:** `vercel.json` schedules the refresh daily at 02:00 UTC.
-  Vercel's Hobby plan allows once-daily cron; on Pro you can make it more
-  frequent by editing the `schedule` cron expression.
-- **The refresh is idempotent** — re-running for the same date overwrites that
-  day's rows, so a missed or repeated run is harmless.
-- **Local development is unaffected** — it keeps using the local `file:` libSQL
-  database; only production uses Turso.
+Application rollback is a normal Vercel deployment rollback. Data rollback is a
+Blob operation: replace `data/mev-watch.sqlite` with a known-good artifact. If a
+scheduled refresh fails before upload, the app continues serving the previous
+Blob artifact.

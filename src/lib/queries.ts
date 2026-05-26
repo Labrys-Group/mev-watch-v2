@@ -1,38 +1,31 @@
 import { cache } from "react";
-import { desc, eq } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { dailyStats, relayDailyStats, refreshLog, builderDailyStats } from "@/lib/db/schema";
-import { classifyRelay } from "@/config/relays";
+import {
+  deriveBuilderLeaderboard,
+  deriveLatestStats,
+  deriveRelayLeaderboard,
+  deriveTrend,
+  type BuilderRow,
+  type LatestStats,
+  type LeaderboardRow,
+  type TrendPoint,
+} from "@/lib/mev-watch-data";
+import {
+  resolveReadableArtifactPath,
+  shouldUseBlobArtifact,
+} from "@/lib/mev-watch-blob";
+import {
+  createReadOnlyMevWatchDatabase,
+  readMetadata,
+  readSnapshotFromDatabase,
+} from "@/lib/mev-watch-sqlite";
 
-export interface TrendPoint {
-  date: string;
-  censorshipPct: number;
-  /** Non-MEV-boost share of all chain blocks (%). Absent on points predating
-   *  the block-count backfill — treat as 0. */
-  nonBoostPct?: number;
-}
+export type { BuilderRow, LatestStats, LeaderboardRow, TrendPoint };
 
 export interface StatsSummary {
   current: number;
   peak: number;
   peakDate: string;
   trough: number;
-}
-
-export interface LatestStats {
-  date: string;
-  censorshipPct: number;
-  neutralPct: number;
-  nonBoostPct: number;
-  totalBlocks: number;
-}
-
-export interface LeaderboardRow {
-  relayId: string;
-  name: string;
-  posture: string;
-  blocks: number;
-  sharePct: number;
 }
 
 export interface RefreshInfo {
@@ -42,14 +35,13 @@ export interface RefreshInfo {
   message: string | null;
 }
 
-/** Pure derivation — peak/current/trough from a trend series. Exported for testing. */
 export function summarise(trend: TrendPoint[]): StatsSummary | null {
   if (trend.length === 0) return null;
   let peak = trend[0];
   let trough = trend[0];
-  for (const p of trend) {
-    if (p.censorshipPct > peak.censorshipPct) peak = p;
-    if (p.censorshipPct < trough.censorshipPct) trough = p;
+  for (const point of trend) {
+    if (point.censorshipPct > peak.censorshipPct) peak = point;
+    if (point.censorshipPct < trough.censorshipPct) trough = point;
   }
   return {
     current: trend[trend.length - 1].censorshipPct,
@@ -59,13 +51,6 @@ export function summarise(trend: TrendPoint[]): StatsSummary | null {
   };
 }
 
-/**
- * Runs a database query, returning `fallback` instead of throwing when the
- * database is unreachable or errors. Pages declare `revalidate` (ISR), so
- * Next.js prerenders them at build time — a transient Turso outage or an env
- * misconfiguration must not fail the whole build. Callers render their own
- * "data unavailable" state from the fallback instead. Exported for testing.
- */
 export async function safeQuery<T>(
   label: string,
   run: () => Promise<T>,
@@ -79,159 +64,54 @@ export async function safeQuery<T>(
   }
 }
 
-/** Full censorship trend, oldest first — drives the trend chart. */
+const getSnapshot = cache(async () => {
+  const db = createReadOnlyMevWatchDatabase(await resolveReadableArtifactPath());
+  try {
+    return readSnapshotFromDatabase(db);
+  } finally {
+    db.close();
+  }
+});
+
 export const getTrend = cache(async (): Promise<TrendPoint[]> => {
-  return safeQuery(
-    "getTrend",
-    async () =>
-      db
-        .select({
-          date: dailyStats.date,
-          censorshipPct: dailyStats.censorshipPct,
-          nonBoostPct: dailyStats.nonBoostPct,
-        })
-        .from(dailyStats)
-        .orderBy(dailyStats.date),
-    [],
-  );
+  return deriveTrend(await getSnapshot());
 });
 
-/** The most recent day's composition. */
 export const getLatestStats = cache(async (): Promise<LatestStats | null> => {
-  return safeQuery(
-    "getLatestStats",
-    async () => {
-      const [row] = await db
-        .select()
-        .from(dailyStats)
-        .orderBy(desc(dailyStats.date))
-        .limit(1);
-      if (!row) return null;
-      return {
-        date: row.date,
-        censorshipPct: row.censorshipPct,
-        neutralPct: row.neutralPct,
-        nonBoostPct: row.nonBoostPct,
-        totalBlocks: row.totalBlocks,
-      };
-    },
-    null,
-  );
+  return deriveLatestStats(await getSnapshot());
 });
 
-/**
- * Peak / current / trough summary across all history. Inherits `getTrend`'s
- * fail-soft behaviour — an empty trend summarises to `null`.
- */
 export async function getStatsSummary(): Promise<StatsSummary | null> {
   return summarise(await getTrend());
 }
 
-/** The most recent day's per-relay leaderboard, sorted by share descending. */
 export const getLeaderboard = cache(async (): Promise<LeaderboardRow[]> => {
-  return safeQuery(
-    "getLeaderboard",
-    async () => {
-      const [latest] = await db
-        .select({ date: dailyStats.date })
-        .from(dailyStats)
-        .orderBy(desc(dailyStats.date))
-        .limit(1);
-      if (!latest) return [];
-
-      const rows = await db
-        .select()
-        .from(relayDailyStats)
-        .where(eq(relayDailyStats.date, latest.date));
-
-      return rows
-        .map((r) => ({
-          relayId: r.relayKey,
-          name: classifyRelay(r.relayKey).name,
-          posture: classifyRelay(r.relayKey).posture,
-          blocks: r.blocks,
-          sharePct: r.sharePct,
-        }))
-        .sort((a, b) => b.sharePct - a.sharePct);
-    },
-    [],
-  );
+  return deriveRelayLeaderboard(await getSnapshot());
 });
 
-export interface BuilderRow {
-  builderId: string;
-  blocks: number;
-  sharePct: number;
-}
-
-/** The most recent day's per-builder leaderboard, sorted by share descending. */
 export const getBuilderLeaderboard = cache(async (): Promise<BuilderRow[]> => {
-  return safeQuery(
-    "getBuilderLeaderboard",
-    async () => {
-      const [latest] = await db
-        .select({ date: builderDailyStats.date })
-        .from(builderDailyStats)
-        .orderBy(desc(builderDailyStats.date))
-        .limit(1);
-      if (!latest) return [];
-
-      const rows = await db
-        .select()
-        .from(builderDailyStats)
-        .where(eq(builderDailyStats.date, latest.date));
-
-      return rows
-        .map((r) => ({
-          builderId: r.builderKey,
-          blocks: r.blocks,
-          sharePct: r.sharePct,
-        }))
-        .sort((a, b) => b.sharePct - a.sharePct);
-    },
-    [],
-  );
+  return deriveBuilderLeaderboard(await getSnapshot());
 });
 
-/** The latest refresh-log entry — powers the "last updated" indicator. */
 export const getLastRefresh = cache(async (): Promise<RefreshInfo | null> => {
-  return safeQuery(
-    "getLastRefresh",
-    async () => {
-      const [row] = await db
-        .select()
-        .from(refreshLog)
-        .orderBy(desc(refreshLog.ranAt))
-        .limit(1);
-      if (!row) return null;
-      return {
-        ranAt: row.ranAt,
-        status: row.status,
-        source: row.source,
-        message: row.message ?? null,
-      };
-    },
-    null,
-  );
+  const db = createReadOnlyMevWatchDatabase(await resolveReadableArtifactPath());
+  try {
+    const metadata = readMetadata(db);
+    const sourceEndDate = metadata.get("sourceEndDate");
+    if (!sourceEndDate) return null;
+    return {
+      ranAt: new Date(metadata.get("generatedAt") ?? 0),
+      status: "ok",
+      source: shouldUseBlobArtifact()
+        ? "Vercel Blob data/mev-watch.sqlite"
+        : "src/data/mev-watch.sqlite",
+      message: `Data through ${sourceEndDate}`,
+    };
+  } finally {
+    db.close();
+  }
 });
 
-/** The most recent N refresh-log entries, newest first — powers the status page. */
-export async function getRecentRefreshes(limit = 20): Promise<RefreshInfo[]> {
-  return safeQuery(
-    "getRecentRefreshes",
-    async () => {
-      const rows = await db
-        .select()
-        .from(refreshLog)
-        .orderBy(desc(refreshLog.ranAt))
-        .limit(limit);
-      return rows.map((r) => ({
-        ranAt: r.ranAt,
-        status: r.status,
-        source: r.source,
-        message: r.message ?? null,
-      }));
-    },
-    [],
-  );
+export async function getRecentRefreshes(): Promise<RefreshInfo[]> {
+  return [];
 }

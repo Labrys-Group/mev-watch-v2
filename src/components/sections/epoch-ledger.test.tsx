@@ -1,57 +1,79 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { EpochLedger } from "./epoch-ledger";
-import type { LedgerData } from "@/lib/epochs/get-live-epochs";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-function fakeLedger(): LedgerData {
-  const epochs = [0, 1, 2, 3].map((e) => {
-    const epoch = 449440 - e;
-    const inProgress = e === 0;
-    const slots = Array.from({ length: 32 }, (_, i) => ({
-      slot: epoch * 32 + i,
-      indexInEpoch: i,
-      category:
-        inProgress && i >= 20
-          ? ("pending" as const)
-          : i % 5 === 0
-            ? ("censoring" as const)
-            : ("neutral" as const),
-      relays:
-        i % 5 === 0
-          ? ["boost-relay.flashbots.net"]
-          : ["relay.ultrasound.money"],
-      builder: "0xbuilder",
-      valueWei: "52384984254521590",
-      blockNumber: 25147000 + i,
-      numTx: 120,
-    }));
-    return { epoch, inProgress, slots };
-  });
+import { EpochLedger } from "./epoch-ledger";
+import type { LedgerData } from "@/lib/live-ledger/types";
+
+function ledger(headSlot: number, category: "neutral" | "censoring"): LedgerData {
   return {
-    epochs,
-    headSlot: 449440 * 32 + 19,
-    fetchedAt: Date.now(),
-    relaysOk: 8,
-    relaysTotal: 8,
+    headSlot,
+    fetchedAt: "2026-05-26T00:00:00.000Z",
+    degradedRelays: [],
+    epochs: [
+      {
+        epoch: 3,
+        inProgress: true,
+        slots: Array.from({ length: 32 }, (_, index) => ({
+          slot: 96 + index,
+          indexInEpoch: index,
+          category: index === 0 ? category : index > 3 ? "pending" : "nonboost",
+          relays: index === 0 ? ["relay.ultrasound.money"] : [],
+        })),
+      },
+      ...[2, 1, 0].map((epoch) => ({
+        epoch,
+        inProgress: false,
+        slots: Array.from({ length: 32 }, (_, index) => ({
+          slot: epoch * 32 + index,
+          indexInEpoch: index,
+          category: "nonboost" as const,
+          relays: [],
+        })),
+      })),
+    ],
   };
 }
 
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
 afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 describe("EpochLedger", () => {
-  it("renders four epoch rows with their epoch numbers", () => {
-    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
-    render(<EpochLedger initial={fakeLedger()} />);
-    expect(screen.getByText("449,440")).toBeInTheDocument();
-    expect(screen.getByText("449,437")).toBeInTheDocument();
+  it("renders four epoch rows from the initial data", () => {
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    expect(screen.getByLabelText("Live epoch ledger")).toBeInTheDocument();
+    expect(screen.getByLabelText("Epoch 3 in progress")).toBeInTheDocument();
+    expect(screen.getByLabelText("Epoch 2")).toBeInTheDocument();
+    expect(screen.getAllByTitle(/Slot /)).toHaveLength(128);
   });
 
-  it("labels the in-progress epoch as live with its filled count", () => {
-    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
-    render(<EpochLedger initial={fakeLedger()} />);
-    expect(screen.getByText(/live · 20\/32/i)).toBeInTheDocument();
+  it("polls the API and keeps the last good state after a failed poll", async () => {
+    const updated = ledger(100, "censoring");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json(updated))
+      .mockRejectedValueOnce(new Error("network down"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(screen.getByText("CENSORING")).toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30_000);
+    });
+
+    expect(screen.getByText("LIVE CACHE STALE")).toBeInTheDocument();
+    expect(screen.getByText("CENSORING")).toBeInTheDocument();
   });
 });
