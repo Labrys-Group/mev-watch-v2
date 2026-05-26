@@ -29,15 +29,37 @@ test("theme toggle flips the document theme", async ({ page }) => {
   await expect(html).toHaveClass(/light/);
 });
 
-test("the composition section does not poll the removed live epoch API", async ({
-  page,
-}) => {
+test("the composition section renders and polls the live epoch API", async ({ page }) => {
   const epochRequests: string[] = [];
+  await page.route("**/api/epochs", async (route) => {
+    epochRequests.push(route.request().url());
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        headSlot: 99,
+        fetchedAt: "2026-05-26T00:00:00.000Z",
+        degradedRelays: [],
+        epochs: [3, 2, 1, 0].map((epoch, rowIndex) => ({
+          epoch,
+          inProgress: rowIndex === 0,
+          slots: Array.from({ length: 32 }, (_, indexInEpoch) => ({
+            slot: epoch * 32 + indexInEpoch,
+            indexInEpoch,
+            category:
+              rowIndex === 0 && indexInEpoch > 3 ? "pending" : "nonboost",
+            relays: [],
+          })),
+        })),
+      }),
+    });
+  });
+
   page.on("request", (request) => {
     if (request.url().includes("/api/epochs")) epochRequests.push(request.url());
   });
 
   await page.goto("/");
   await expect(page.getByText(/DAILY MEV-BOOST DELIVERY DISTRIBUTION/i)).toBeVisible();
-  expect(epochRequests).toEqual([]);
+  await expect(page.getByLabel("Live epoch ledger")).toBeVisible();
+  expect(epochRequests.length).toBeGreaterThan(0);
 });

@@ -1,13 +1,16 @@
 import type { LatestStats } from "@/lib/queries";
+import type { LedgerData } from "@/lib/live-ledger/types";
 import type { CSSVars } from "@/lib/css";
 import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
+import { EpochLedger } from "@/components/sections/epoch-ledger";
 
 interface CompositionProps {
   latest: LatestStats;
+  ledger: LedgerData;
 }
 
-export function Composition({ latest }: CompositionProps) {
+export function Composition({ latest, ledger }: CompositionProps) {
   const { censorshipPct, neutralPct, nonBoostPct, totalBlocks } = latest;
   const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
   const neutralBlocks = totalBlocks - censoringBlocks;
@@ -31,6 +34,8 @@ export function Composition({ latest }: CompositionProps) {
         </>
       }
     >
+      <EpochLedger initial={ledger} />
+
       <div className="grid grid-cols-1 border border-border-labrys bg-background sm:grid-cols-3">
         <CompositionBand
           label="OFAC Censoring"

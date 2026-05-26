@@ -1,9 +1,13 @@
 import { Composition } from "@/components/sections/composition";
 import { getLatestStats } from "@/lib/queries";
 import { Section } from "@/components/section";
+import { readInitialLedger } from "@/lib/live-ledger/service";
 
 export async function CompositionData() {
-  const latest = await getLatestStats();
+  const [latest, ledger] = await Promise.all([
+    getLatestStats(),
+    readInitialLedger(),
+  ]);
 
   if (!latest) {
     return (
@@ -20,5 +24,5 @@ export async function CompositionData() {
     );
   }
 
-  return <Composition latest={latest} />;
+  return <Composition latest={latest} ledger={ledger} />;
 }

@@ -1,0 +1,189 @@
+import { classifyRelay } from "@/config/relays";
+
+import { currentSlot, epochOf, epochSlotRange } from "./chain-time";
+import {
+  LiveLedgerSnapshotSchema,
+  type LedgerData,
+  type LiveLedgerSnapshot,
+  type RelayPayload,
+  type SlotCategory,
+  type StoredRecentBlock,
+} from "./types";
+
+export const LIVE_LEDGER_SCHEMA_VERSION = 1;
+export const LIVE_LEDGER_PRUNE_SLOTS = 256;
+export const LIVE_LEDGER_EPOCH_ROWS = 4;
+
+export function snapshotFilename(date = new Date()): string {
+  return `${date.toISOString().replace(/[:.]/g, "-")}.json`;
+}
+
+export function sortSnapshotNamesNewestFirst(names: string[]): string[] {
+  return [...names]
+    .filter((name) => name.endsWith(".json"))
+    .sort((a, b) => b.localeCompare(a));
+}
+
+export function parseLiveLedgerSnapshot(value: unknown): LiveLedgerSnapshot {
+  return LiveLedgerSnapshotSchema.parse(value);
+}
+
+export function emptySnapshot(now = Date.now()): LiveLedgerSnapshot {
+  const fetchedAt = new Date(now).toISOString();
+  return {
+    schemaVersion: LIVE_LEDGER_SCHEMA_VERSION,
+    headSlot: currentSlot(now),
+    fetchedAt,
+    degradedRelays: [],
+    blocks: [],
+  };
+}
+
+export function foldPayloadsBySlot(payloads: RelayPayload[]): StoredRecentBlock[] {
+  const bySlot = new Map<number, StoredRecentBlock>();
+
+  for (const payload of payloads) {
+    const existing = bySlot.get(payload.slot);
+    if (existing) {
+      existing.relays = sortedUnique([...existing.relays, payload.relayId]);
+      existing.builderPubkey ??= payload.builderPubkey;
+      existing.valueWei ??= payload.valueWei;
+      existing.numTx ??= payload.numTx;
+      continue;
+    }
+
+    bySlot.set(payload.slot, {
+      slot: payload.slot,
+      blockNumber: payload.blockNumber,
+      blockHash: payload.blockHash,
+      builderPubkey: payload.builderPubkey,
+      valueWei: payload.valueWei,
+      numTx: payload.numTx,
+      relays: [payload.relayId],
+    });
+  }
+
+  return [...bySlot.values()]
+    .map((block) => ({ ...block, relays: sortedUnique(block.relays) }))
+    .sort((a, b) => a.slot - b.slot);
+}
+
+export function mergeSnapshotBlocks(
+  existing: StoredRecentBlock[],
+  incoming: StoredRecentBlock[],
+): StoredRecentBlock[] {
+  const bySlot = new Map<number, StoredRecentBlock>();
+
+  for (const block of existing) {
+    bySlot.set(block.slot, { ...block, relays: sortedUnique(block.relays) });
+  }
+
+  for (const block of incoming) {
+    const current = bySlot.get(block.slot);
+    if (!current) {
+      bySlot.set(block.slot, { ...block, relays: sortedUnique(block.relays) });
+      continue;
+    }
+
+    bySlot.set(block.slot, {
+      ...current,
+      blockNumber: block.blockNumber || current.blockNumber,
+      blockHash: block.blockHash || current.blockHash,
+      builderPubkey: block.builderPubkey ?? current.builderPubkey,
+      valueWei: block.valueWei ?? current.valueWei,
+      numTx: block.numTx ?? current.numTx,
+      relays: sortedUnique([...current.relays, ...block.relays]),
+    });
+  }
+
+  return [...bySlot.values()].sort((a, b) => a.slot - b.slot);
+}
+
+export function pruneSnapshotBlocks(
+  blocks: StoredRecentBlock[],
+  headSlot: number,
+): StoredRecentBlock[] {
+  const minimumSlot = headSlot - LIVE_LEDGER_PRUNE_SLOTS;
+  return blocks.filter((block) => block.slot >= minimumSlot);
+}
+
+export function buildSnapshot({
+  previous,
+  incoming,
+  degradedRelays,
+  now = Date.now(),
+}: {
+  previous: LiveLedgerSnapshot | null;
+  incoming: StoredRecentBlock[];
+  degradedRelays: string[];
+  now?: number;
+}): LiveLedgerSnapshot {
+  const headSlot = Math.max(
+    currentSlot(now),
+    previous?.headSlot ?? 0,
+    incoming.at(-1)?.slot ?? 0,
+  );
+  const merged = mergeSnapshotBlocks(previous?.blocks ?? [], incoming);
+
+  return {
+    schemaVersion: LIVE_LEDGER_SCHEMA_VERSION,
+    headSlot,
+    fetchedAt: new Date(now).toISOString(),
+    degradedRelays: [...degradedRelays].sort(),
+    blocks: pruneSnapshotBlocks(merged, headSlot),
+  };
+}
+
+export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
+  const currentEpoch = epochOf(snapshot.headSlot);
+  const bySlot = new Map(snapshot.blocks.map((block) => [block.slot, block]));
+  const epochs = Array.from({ length: LIVE_LEDGER_EPOCH_ROWS }, (_, rowIndex) => {
+    const epoch = currentEpoch - rowIndex;
+    const range = epochSlotRange(epoch);
+
+    return {
+      epoch,
+      inProgress: rowIndex === 0,
+      slots: Array.from({ length: 32 }, (_, indexInEpoch) => {
+        const slot = range.first + indexInEpoch;
+        const block = bySlot.get(slot);
+        const category: SlotCategory =
+          slot > snapshot.headSlot
+            ? "pending"
+            : block
+              ? classifySlot(block.relays)
+              : "nonboost";
+
+        return {
+          slot,
+          indexInEpoch,
+          category,
+          relays: block?.relays ?? [],
+          builderPubkey: block?.builderPubkey,
+          valueWei: block?.valueWei,
+          blockNumber: block?.blockNumber,
+          blockHash: block?.blockHash,
+          numTx: block?.numTx,
+        };
+      }),
+    };
+  });
+
+  return {
+    headSlot: snapshot.headSlot,
+    fetchedAt: snapshot.fetchedAt,
+    degradedRelays: snapshot.degradedRelays,
+    epochs,
+  };
+}
+
+export function classifySlot(relays: string[]): Exclude<SlotCategory, "pending"> {
+  if (relays.length === 0) return "nonboost";
+  return relays.some((relayId) => classifyRelay(relayId).posture === "censoring")
+    ? "censoring"
+    : "neutral";
+}
+
+function sortedUnique(values: string[]): string[] {
+  return [...new Set(values)].sort();
+}
