@@ -334,16 +334,27 @@ export interface UpdateProgress {
   total: number;
 }
 
-export async function updateDataFile(opts: {
+export interface PersistProgress {
+  persistedDates: string[];
+  sourceEndDate: string;
+}
+
+export interface UpdateDataFileOptions {
   filePath?: string;
   dryRun?: boolean;
   now?: Date;
   fetchDay?: (date: string) => Promise<MevWatchDay>;
   onProgress?: (progress: UpdateProgress) => void;
+  onPersist?: (progress: PersistProgress) => Promise<void> | void;
   sleepMs?: number;
   concurrency?: number;
   writeEvery?: number;
-} = {}): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
+  maxDays?: number;
+}
+
+export async function updateDataFile(
+  opts: UpdateDataFileOptions = {},
+): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
   const filePath = opts.filePath ?? DATA_PATH;
   if (filePath.endsWith(".json")) {
     return updateJsonDataFile(opts);
@@ -357,7 +368,7 @@ export async function updateDataFile(opts: {
       ? addUtcDays(sourceEndDate, 1)
       : existingSnapshot.sourceStartDate;
     const end = yesterdayUtc(opts.now);
-    const dates = buildDateRange(start, end);
+    const dates = limitDateRange(buildDateRange(start, end), opts.maxDays);
     if (dates.length === 0) {
       return { changed: false, fetchedDates: [], snapshot: existingSnapshot };
     }
@@ -370,20 +381,26 @@ export async function updateDataFile(opts: {
     let nextIndex = 0;
     let completed = 0;
     let persistedThrough = 0;
+    let flushChain = Promise.resolve();
 
     const flush = async () => {
-      if (opts.dryRun) return;
-      const contiguousDays: MevWatchDay[] = [];
-      for (const day of days) {
-        if (!day) break;
-        contiguousDays.push(day);
-      }
-      if (contiguousDays.length <= persistedThrough) return;
-      const generatedAt = new Date().toISOString();
-      for (const day of contiguousDays.slice(persistedThrough)) {
-        upsertDay(db, day, generatedAt);
-      }
-      persistedThrough = contiguousDays.length;
+      flushChain = flushChain.then(async () => {
+        if (opts.dryRun) return;
+        const contiguousDays: MevWatchDay[] = [];
+        for (const day of days) {
+          if (!day) break;
+          contiguousDays.push(day);
+        }
+        if (contiguousDays.length <= persistedThrough) return;
+        const generatedAt = new Date().toISOString();
+        const persistedDays = contiguousDays.slice(persistedThrough);
+        for (const day of persistedDays) {
+          upsertDay(db, day, generatedAt);
+        }
+        persistedThrough = contiguousDays.length;
+        await notifyPersist(opts, persistedDays);
+      });
+      await flushChain;
     };
 
     async function worker() {
@@ -412,9 +429,12 @@ export async function updateDataFile(opts: {
     await flush();
     if (!opts.dryRun && persistedThrough < dates.length) {
       const generatedAt = new Date().toISOString();
-      for (const day of days.slice(persistedThrough)) {
+      const persistedDays = days.slice(persistedThrough);
+      for (const day of persistedDays) {
         upsertDay(db, day, generatedAt);
       }
+      persistedThrough = dates.length;
+      await notifyPersist(opts, persistedDays);
     }
     const next = opts.dryRun
       ? mergeSnapshotDays(existingSnapshot, days)
@@ -445,21 +465,14 @@ async function writeJsonSnapshot(
   await fs.writeFile(filePath, `${JSON.stringify(parsed, null, 2)}\n`);
 }
 
-async function updateJsonDataFile(opts: {
-  filePath?: string;
-  dryRun?: boolean;
-  now?: Date;
-  fetchDay?: (date: string) => Promise<MevWatchDay>;
-  onProgress?: (progress: UpdateProgress) => void;
-  sleepMs?: number;
-  concurrency?: number;
-  writeEvery?: number;
-} = {}): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
+async function updateJsonDataFile(
+  opts: UpdateDataFileOptions = {},
+): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
   const filePath = opts.filePath ?? DATA_PATH;
   const snapshot = await readJsonSnapshot(filePath);
   const start = nextMissingStartDate(snapshot);
   const end = yesterdayUtc(opts.now);
-  const dates = buildDateRange(start, end);
+  const dates = limitDateRange(buildDateRange(start, end), opts.maxDays);
   if (dates.length === 0) {
     return { changed: false, fetchedDates: [], snapshot };
   }
@@ -483,7 +496,11 @@ async function updateJsonDataFile(opts: {
     }
     if (contiguousDays.length <= persistedThrough) return;
     const next = mergeSnapshotDays(snapshot, contiguousDays);
-    writeChain = writeChain.then(() => writeJsonSnapshot(next, filePath));
+    const persistedDays = contiguousDays.slice(persistedThrough);
+    writeChain = writeChain.then(async () => {
+      await writeJsonSnapshot(next, filePath);
+      await notifyPersist(opts, persistedDays);
+    });
     await writeChain;
     persistedThrough = contiguousDays.length;
   };
@@ -516,6 +533,26 @@ async function updateJsonDataFile(opts: {
   const next = mergeSnapshotDays(snapshot, days);
   if (!opts.dryRun && persistedThrough < dates.length) {
     await writeJsonSnapshot(next, filePath);
+    await notifyPersist(opts, days.slice(persistedThrough));
   }
   return { changed: true, fetchedDates: dates, snapshot: next };
+}
+
+function limitDateRange(dates: string[], maxDays?: number): string[] {
+  if (maxDays === undefined) return dates;
+  const limit = Math.max(0, Math.floor(maxDays));
+  return dates.slice(0, limit);
+}
+
+async function notifyPersist(
+  opts: UpdateDataFileOptions,
+  persistedDays: MevWatchDay[],
+): Promise<void> {
+  if (persistedDays.length === 0) return;
+  const sourceEndDate = persistedDays.at(-1)?.date;
+  if (!sourceEndDate) return;
+  await opts.onPersist?.({
+    persistedDates: persistedDays.map((day) => day.date),
+    sourceEndDate,
+  });
 }

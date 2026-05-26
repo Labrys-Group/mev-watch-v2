@@ -1,4 +1,5 @@
 import { promises as fs } from "node:fs";
+import { randomUUID } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import {
@@ -30,6 +31,10 @@ interface DownloadOptions {
   pathname?: string;
   filePath?: string;
   getBlob?: typeof get;
+}
+
+interface ResolveReadableOptions extends DownloadOptions {
+  ttlMs?: number;
 }
 
 interface UploadOptions {
@@ -104,19 +109,25 @@ export function shouldUseBlobArtifact(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
-export async function resolveReadableArtifactPath(): Promise<string> {
+export async function resolveReadableArtifactPath(
+  opts: ResolveReadableOptions = {},
+): Promise<string> {
   if (!shouldUseBlobArtifact()) return SQLITE_DATA_PATH;
   const now = Date.now();
-  const ttlMs = Number(
-    process.env.MEV_WATCH_BLOB_CACHE_TTL_MS ?? DEFAULT_BLOB_CACHE_TTL_MS,
-  );
-  if (cachedPath && now - cachedAt < ttlMs) return cachedPath;
+  const ttlMs =
+    opts.ttlMs ??
+    Number(process.env.MEV_WATCH_BLOB_CACHE_TTL_MS ?? DEFAULT_BLOB_CACHE_TTL_MS);
+  const filePath = opts.filePath ?? BLOB_CACHE_PATH;
+  if (cachedPath === filePath && now - cachedAt < ttlMs) return cachedPath;
 
-  cachedDownload ??= downloadBlobArtifact().then((filePath) => {
-    cachedPath = filePath;
+  cachedDownload ??= downloadBlobArtifact(opts).then((downloadedPath) => {
+    cachedPath = downloadedPath;
     cachedAt = Date.now();
     cachedDownload = null;
-    return filePath;
+    return downloadedPath;
+  }).catch((error) => {
+    cachedDownload = null;
+    throw error;
   });
   return cachedDownload;
 }
@@ -158,7 +169,14 @@ export async function downloadBlobArtifact(
 
   const bytes = Buffer.from(await new Response(result.stream).arrayBuffer());
   await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, bytes);
+  const tempFilePath = `${filePath}.${randomUUID()}.tmp`;
+  try {
+    await fs.writeFile(tempFilePath, bytes);
+    await fs.rename(tempFilePath, filePath);
+  } catch (error) {
+    await fs.rm(tempFilePath, { force: true }).catch(() => undefined);
+    throw error;
+  }
   return filePath;
 }
 

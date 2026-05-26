@@ -110,6 +110,67 @@ describe("Vercel data cron route", () => {
     expect(releaseRefreshLockMock).toHaveBeenCalledWith(lock);
   });
 
+  it("passes a bounded date budget to the refresh job", async () => {
+    const lock = {
+      acquired: true,
+      lockPathname: "data/mev-watch.sqlite.lock",
+      etag: "lock-etag",
+      runId: "run-budget",
+    } as const;
+    acquireRefreshLockMock.mockResolvedValue(lock);
+    prepareWritableArtifactPathMock.mockResolvedValue("/tmp/mev-watch.sqlite");
+    updateDataFileMock.mockResolvedValue({
+      changed: false,
+      fetchedDates: [],
+      snapshot: {
+        schemaVersion: 1,
+        generatedAt: "2026-05-26T00:00:00.000Z",
+        sourceStartDate: "2022-09-15",
+        sourceEndDate: "2026-05-25",
+        days: [],
+      },
+    });
+
+    await GET(authorizedRequest());
+
+    expect(updateDataFileMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        maxDays: 30,
+      }),
+    );
+  });
+
+  it("uploads persisted partial progress before a later refresh failure aborts", async () => {
+    const lock = {
+      acquired: true,
+      lockPathname: "data/mev-watch.sqlite.lock",
+      etag: "lock-etag",
+      runId: "run-partial",
+    } as const;
+    acquireRefreshLockMock.mockResolvedValue(lock);
+    prepareWritableArtifactPathMock.mockResolvedValue("/tmp/mev-watch.sqlite");
+    updateDataFileMock.mockImplementation(async (opts) => {
+      await (
+        opts as unknown as {
+          onPersist: (progress: {
+            persistedDates: string[];
+            sourceEndDate: string;
+          }) => Promise<void>;
+        }
+      ).onPersist({
+        persistedDates: ["2023-10-25"],
+        sourceEndDate: "2023-10-25",
+      });
+      throw new Error("later day failed");
+    });
+
+    await expect(GET(authorizedRequest())).rejects.toThrow("later day failed");
+    expect(uploadBlobArtifactMock).toHaveBeenCalledWith({
+      filePath: "/tmp/mev-watch.sqlite",
+    });
+    expect(releaseRefreshLockMock).toHaveBeenCalledWith(lock);
+  });
+
   it("releases the acquired lock when refresh fails", async () => {
     const lock = {
       acquired: true,

@@ -20,6 +20,8 @@ BLOB_READ_WRITE_TOKEN=<created by Vercel Blob>
 CRON_SECRET=<long random secret>
 ETH_RPC_URL=<optional Ethereum JSON-RPC URL>
 MEV_WATCH_BLOB_PATH=data/mev-watch.sqlite # optional override
+UPDATE_DATA_MAX_DAYS=30 # optional, defaults to 30 days per cron run
+UPDATE_DATA_WRITE_EVERY=1 # optional, upload after each persisted batch
 ```
 
 Vercel automatically sends `Authorization: Bearer $CRON_SECRET` to cron
@@ -34,10 +36,14 @@ invocations when `CRON_SECRET` is configured.
 3. Downloads the current SQLite artifact from Vercel Blob to `/tmp`.
 4. Fetches missing complete UTC days.
 5. Writes successful days to SQLite as they complete.
-6. Uploads the refreshed artifact back to Vercel Blob.
+6. Uploads each persisted batch back to Vercel Blob.
 7. Releases the lock in a `finally` path.
 
 Normal pages and public API routes never write to SQLite.
+
+Each cron invocation is date-budgeted so a large backlog advances over multiple
+runs instead of risking the platform function timeout. By default the route
+fetches up to 30 missing days and uploads every persisted day.
 
 The lock expires after 15 minutes. If another refresh already holds an
 unexpired lock, the cron route returns `200` with `skipped: true` so Vercel does

@@ -1,8 +1,15 @@
-import { describe, expect, it, vi } from "vitest";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { promises as fs } from "node:fs";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   REFRESH_LOCK_TTL_MS,
   acquireRefreshLock,
+  clearArtifactPathCache,
+  downloadBlobArtifact,
   getMevWatchLockPathname,
+  resolveReadableArtifactPath,
   releaseRefreshLock,
 } from "./mev-watch-blob";
 
@@ -23,6 +30,68 @@ class BlobPreconditionFailedError extends Error {
 function jsonStream(value: unknown): ReadableStream<Uint8Array> {
   return new Response(JSON.stringify(value)).body as ReadableStream<Uint8Array>;
 }
+
+function byteStream(value: string): ReadableStream<Uint8Array> {
+  return new Response(value).body as ReadableStream<Uint8Array>;
+}
+
+afterEach(() => {
+  clearArtifactPathCache();
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+});
+
+describe("Vercel Blob data artifact cache", () => {
+  it("retries a Blob download after an earlier cache miss failed", async () => {
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "token");
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-blob-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    const getBlob = vi
+      .fn()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        statusCode: 200,
+        stream: byteStream("sqlite-bytes"),
+        blob: { contentType: "application/vnd.sqlite3" },
+      });
+
+    try {
+      await expect(
+        resolveReadableArtifactPath({ filePath, getBlob }),
+      ).rejects.toThrow("Blob data artifact not found");
+
+      await expect(resolveReadableArtifactPath({ filePath, getBlob })).resolves.toBe(
+        filePath,
+      );
+      await expect(readFile(filePath, "utf8")).resolves.toBe("sqlite-bytes");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("replaces the cached SQLite file with an atomic rename", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-blob-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    const renameSpy = vi.spyOn(fs, "rename");
+    const getBlob = vi.fn(async () => ({
+      statusCode: 200,
+      stream: byteStream("new-sqlite-bytes"),
+      blob: { contentType: "application/vnd.sqlite3" },
+    }));
+
+    try {
+      await downloadBlobArtifact({ filePath, getBlob });
+
+      expect(renameSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/mev-watch\.sqlite\./),
+        filePath,
+      );
+      await expect(readFile(filePath, "utf8")).resolves.toBe("new-sqlite-bytes");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+});
 
 describe("Vercel Blob refresh lock", () => {
   it("uses the SQLite artifact pathname as the lock namespace", () => {

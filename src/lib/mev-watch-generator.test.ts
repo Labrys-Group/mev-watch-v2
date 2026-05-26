@@ -269,6 +269,42 @@ describe("updateDataFile", () => {
     expect(maxActive).toBe(2);
   });
 
+  it("limits fetched dates and reports persisted SQLite batches", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
+
+    const persisted = vi.fn();
+    try {
+      const result = await updateDataFile({
+        filePath,
+        now: new Date("2022-09-20T00:00:00.000Z"),
+        sleepMs: 0,
+        maxDays: 2,
+        writeEvery: 1,
+        onPersist: persisted,
+        fetchDay: async (date) => ({
+          date,
+          relays: [],
+          builders: [],
+          totalChainBlocks: 1,
+        }),
+      });
+
+      expect(result.fetchedDates).toEqual(["2022-09-16", "2022-09-17"]);
+      expect(persisted).toHaveBeenCalledWith({
+        persistedDates: ["2022-09-16"],
+        sourceEndDate: "2022-09-16",
+      });
+      expect(persisted).toHaveBeenCalledWith({
+        persistedDates: ["2022-09-17"],
+        sourceEndDate: "2022-09-17",
+      });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("persists completed batches before a later fetch fails", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
     const filePath = path.join(dir, "mev-watch.sqlite");
