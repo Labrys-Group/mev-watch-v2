@@ -8,3 +8,6 @@ tasks:
   update-data:
     cmds:
       - pnpm update-data
+  backfill-and-upload:
+    cmds:
+      - pnpm backfill-and-upload

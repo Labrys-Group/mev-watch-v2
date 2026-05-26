@@ -59,6 +59,23 @@ The repository includes `src/data/mev-watch.sqlite` as a local seed artifact.
 After creating the Blob store, upload that file to `data/mev-watch.sqlite`.
 The cron route can then continue from the stored `sourceEndDate`.
 
+To create a fresh backfilled artifact locally and upload it to Vercel Blob:
+
+```bash
+BLOB_READ_WRITE_TOKEN=<created by Vercel Blob> pnpm backfill-and-upload
+```
+
+By default this copies `src/data/mev-watch.sqlite` to `data/mev-watch.db`,
+backfills the copy, and uploads that file to the configured Blob pathname. The
+Blob pathname still defaults to `data/mev-watch.sqlite` so the deployed app can
+read it without additional configuration.
+
+Useful overrides:
+
+```bash
+pnpm backfill-and-upload --file data/mev-watch.db --blob-path data/mev-watch.sqlite
+```
+
 ## Manual Refresh
 
 To refresh the local seed artifact:
