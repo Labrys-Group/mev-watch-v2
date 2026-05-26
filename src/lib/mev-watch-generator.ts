@@ -1,4 +1,3 @@
-import { promises as fs } from "node:fs";
 import { z } from "zod";
 import {
   MevWatchDaySchema,
@@ -11,8 +10,10 @@ import {
   createReadOnlyMevWatchDatabase,
   initializeMevWatchDatabase,
   readSnapshotFromDatabase,
+  readDatesMissingTotalChainBlocks,
   readSourceEndDate,
   SQLITE_DATA_PATH,
+  updateDayTotalChainBlocks,
   upsertDay,
 } from "./mev-watch-sqlite";
 
@@ -113,10 +114,6 @@ export function mergeSnapshotDays(
 export async function readSnapshot(
   filePath = DATA_PATH,
 ): Promise<MevWatchSnapshot> {
-  if (filePath.endsWith(".json")) {
-    return readJsonSnapshot(filePath);
-  }
-
   try {
     const db = createReadOnlyMevWatchDatabase(filePath);
     try {
@@ -137,16 +134,6 @@ export async function appendSnapshotDays(
   filePath = DATA_PATH,
 ): Promise<void> {
   const parsed = MevWatchSnapshotSchema.parse(snapshot);
-
-  if (filePath.endsWith(".json")) {
-    const existing = await readJsonSnapshot(filePath);
-    assertAppendOnlyDays(existing.sourceEndDate, parsed.days);
-    await writeJsonSnapshot(
-      mergeSnapshotDays(existing, parsed.days, parsed.generatedAt),
-      filePath,
-    );
-    return;
-  }
 
   const db = initializeMevWatchDatabase(filePath, {
     generatedAt: parsed.generatedAt,
@@ -316,7 +303,7 @@ export async function fetchMevWatchDay(
   const warn = deps.warn ?? console.warn;
 
   const day = await fetchRelayDay(date);
-  let totalChainBlocks = 0;
+  let totalChainBlocks: number | null = null;
   try {
     totalChainBlocks = await fetchBlockCount(date);
   } catch (error) {
@@ -344,24 +331,24 @@ export interface UpdateDataFileOptions {
   dryRun?: boolean;
   now?: Date;
   fetchDay?: (date: string) => Promise<MevWatchDay>;
+  fetchTotalChainBlocks?: (date: string) => Promise<number>;
   onProgress?: (progress: UpdateProgress) => void;
   onPersist?: (progress: PersistProgress) => Promise<void> | void;
   sleepMs?: number;
   concurrency?: number;
   writeEvery?: number;
   maxDays?: number;
+  maxRepairDays?: number;
 }
 
 export async function updateDataFile(
   opts: UpdateDataFileOptions = {},
 ): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
   const filePath = opts.filePath ?? DATA_PATH;
-  if (filePath.endsWith(".json")) {
-    return updateJsonDataFile(opts);
-  }
 
   const db = initializeMevWatchDatabase(filePath);
   try {
+    const repairedDates = opts.dryRun ? [] : await repairMissingBlockCounts(db, opts);
     const existingSnapshot = readSnapshotFromDatabase(db);
     const sourceEndDate = readSourceEndDate(db);
     const start = sourceEndDate
@@ -370,12 +357,16 @@ export async function updateDataFile(
     const end = yesterdayUtc(opts.now);
     const dates = limitDateRange(buildDateRange(start, end), opts.maxDays);
     if (dates.length === 0) {
-      return { changed: false, fetchedDates: [], snapshot: existingSnapshot };
+      return {
+        changed: repairedDates.length > 0,
+        fetchedDates: [],
+        snapshot: existingSnapshot,
+      };
     }
 
     const fetchDay = opts.fetchDay ?? fetchMevWatchDay;
     const sleepMs = opts.sleepMs ?? 300;
-    const concurrency = Math.max(1, Math.floor(opts.concurrency ?? 1));
+    const concurrency = positiveIntegerOrFallback(opts.concurrency, 1);
     const writeEvery = Math.max(0, Math.floor(opts.writeEvery ?? 0));
     const days = new Array<MevWatchDay>(dates.length);
     let nextIndex = 0;
@@ -445,103 +436,48 @@ export async function updateDataFile(
   }
 }
 
-async function readJsonSnapshot(filePath: string): Promise<MevWatchSnapshot> {
-  try {
-    const text = await fs.readFile(filePath, "utf8");
-    return MevWatchSnapshotSchema.parse(JSON.parse(text));
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return emptySnapshot();
-    }
-    throw error;
-  }
-}
-
-async function writeJsonSnapshot(
-  snapshot: MevWatchSnapshot,
-  filePath: string,
-): Promise<void> {
-  const parsed = MevWatchSnapshotSchema.parse(snapshot);
-  await fs.writeFile(filePath, `${JSON.stringify(parsed, null, 2)}\n`);
-}
-
-async function updateJsonDataFile(
-  opts: UpdateDataFileOptions = {},
-): Promise<{ changed: boolean; fetchedDates: string[]; snapshot: MevWatchSnapshot }> {
-  const filePath = opts.filePath ?? DATA_PATH;
-  const snapshot = await readJsonSnapshot(filePath);
-  const start = nextMissingStartDate(snapshot);
-  const end = yesterdayUtc(opts.now);
-  const dates = limitDateRange(buildDateRange(start, end), opts.maxDays);
-  if (dates.length === 0) {
-    return { changed: false, fetchedDates: [], snapshot };
-  }
-
-  const fetchDay = opts.fetchDay ?? fetchMevWatchDay;
-  const sleepMs = opts.sleepMs ?? 300;
-  const concurrency = Math.max(1, Math.floor(opts.concurrency ?? 1));
-  const writeEvery = Math.max(0, Math.floor(opts.writeEvery ?? 0));
-  const days = new Array<MevWatchDay>(dates.length);
-  let nextIndex = 0;
-  let completed = 0;
-  let persistedThrough = 0;
-  let writeChain = Promise.resolve();
-
-  const flush = async () => {
-    if (opts.dryRun) return;
-    const contiguousDays: MevWatchDay[] = [];
-    for (const day of days) {
-      if (!day) break;
-      contiguousDays.push(day);
-    }
-    if (contiguousDays.length <= persistedThrough) return;
-    const next = mergeSnapshotDays(snapshot, contiguousDays);
-    const persistedDays = contiguousDays.slice(persistedThrough);
-    writeChain = writeChain.then(async () => {
-      await writeJsonSnapshot(next, filePath);
-      await notifyPersist(opts, persistedDays);
-    });
-    await writeChain;
-    persistedThrough = contiguousDays.length;
-  };
-
-  async function worker() {
-    while (nextIndex < dates.length) {
-      const currentIndex = nextIndex;
-      nextIndex += 1;
-      const date = dates[currentIndex];
-      days[currentIndex] = await fetchDay(date);
-      completed += 1;
-      opts.onProgress?.({ date, index: completed, total: dates.length });
-      if (writeEvery > 0 && completed % writeEvery === 0) {
-        await flush();
-      }
-      if (sleepMs > 0) await sleep(sleepMs);
-    }
-  }
-
-  const workerResults = await Promise.allSettled(
-    Array.from({ length: Math.min(concurrency, dates.length) }, () => worker()),
-  );
-  const workerFailure = workerResults.find(
-    (result): result is PromiseRejectedResult => result.status === "rejected",
-  );
-  if (workerFailure) throw workerFailure.reason;
-
-  await flush();
-  await writeChain;
-  const next = mergeSnapshotDays(snapshot, days);
-  if (!opts.dryRun && persistedThrough < dates.length) {
-    await writeJsonSnapshot(next, filePath);
-    await notifyPersist(opts, days.slice(persistedThrough));
-  }
-  return { changed: true, fetchedDates: dates, snapshot: next };
-}
-
 function limitDateRange(dates: string[], maxDays?: number): string[] {
   if (maxDays === undefined) return dates;
   const limit = Math.max(0, Math.floor(maxDays));
   return dates.slice(0, limit);
+}
+
+function positiveIntegerOrFallback(value: number | undefined, fallback: number): number {
+  const parsed = Number(value ?? fallback);
+  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  return Math.floor(parsed);
+}
+
+async function repairMissingBlockCounts(
+  db: ReturnType<typeof initializeMevWatchDatabase>,
+  opts: UpdateDataFileOptions,
+): Promise<string[]> {
+  const dates = limitDateRange(
+    readDatesMissingTotalChainBlocks(db),
+    opts.maxRepairDays,
+  );
+  if (dates.length === 0) return [];
+  const fetchBlockCount = opts.fetchTotalChainBlocks ?? fetchTotalChainBlocks;
+  const repaired: string[] = [];
+
+  for (const date of dates) {
+    try {
+      const totalChainBlocks = await fetchBlockCount(date);
+      updateDayTotalChainBlocks(db, date, totalChainBlocks);
+      repaired.push(date);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(`block count repair unavailable for ${date}: ${message}`);
+    }
+  }
+
+  if (repaired.length > 0) {
+    await opts.onPersist?.({
+      persistedDates: repaired,
+      sourceEndDate: repaired.at(-1) as string,
+    });
+  }
+  return repaired;
 }
 
 async function notifyPersist(

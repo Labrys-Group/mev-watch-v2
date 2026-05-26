@@ -13,7 +13,8 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "update-data": "tsx scripts/update-data.ts"
+    "update-data": "tsx scripts/update-data.ts",
+    "backfill-and-upload": "tsx scripts/backfill-and-upload.ts"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",

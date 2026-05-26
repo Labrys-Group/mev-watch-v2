@@ -14,16 +14,6 @@ export const LIVE_LEDGER_SCHEMA_VERSION = 1;
 export const LIVE_LEDGER_PRUNE_SLOTS = 256;
 export const LIVE_LEDGER_EPOCH_ROWS = 4;
 
-export function snapshotFilename(date = new Date()): string {
-  return `${date.toISOString().replace(/[:.]/g, "-")}.json`;
-}
-
-export function sortSnapshotNamesNewestFirst(names: string[]): string[] {
-  return [...names]
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => b.localeCompare(a));
-}
-
 export function parseLiveLedgerSnapshot(value: unknown): LiveLedgerSnapshot {
   return LiveLedgerSnapshotSchema.parse(value);
 }
@@ -132,6 +122,19 @@ export function buildSnapshot({
     degradedRelays: [...degradedRelays].sort(),
     blocks: pruneSnapshotBlocks(merged, headSlot),
   };
+}
+
+export function isNewerSnapshot(
+  incoming: LiveLedgerSnapshot,
+  latest: LiveLedgerSnapshot,
+): boolean {
+  const incomingTime = Date.parse(incoming.fetchedAt);
+  const latestTime = Date.parse(latest.fetchedAt);
+  if (!Number.isFinite(incomingTime) || !Number.isFinite(latestTime)) {
+    return incoming.headSlot > latest.headSlot;
+  }
+  if (incomingTime !== latestTime) return incomingTime > latestTime;
+  return incoming.headSlot > latest.headSlot;
 }
 
 export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {

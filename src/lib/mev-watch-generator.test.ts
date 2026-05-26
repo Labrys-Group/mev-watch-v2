@@ -1,3 +1,4 @@
+import { DatabaseSync } from "node:sqlite";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -136,7 +137,7 @@ describe("appendSnapshotDays", () => {
 });
 
 describe("fetchMevWatchDay", () => {
-  it("keeps relayscan data when the optional block count fails", async () => {
+  it("keeps relayscan data with a nullable block count when block counting fails", async () => {
     const warn = vi.fn();
     const globalFetch = vi.fn(async () => {
       throw new Error("unexpected global fetch");
@@ -159,7 +160,7 @@ describe("fetchMevWatchDay", () => {
       date: "2026-05-20",
       relays: [{ relayId: "relay.ultrasound.money", numPayloads: 10 }],
       builders: [{ builderId: "builder-a", numBlocks: 9 }],
-      totalChainBlocks: 0,
+      totalChainBlocks: null,
     });
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining("block count unavailable for 2026-05-20"),
@@ -267,6 +268,156 @@ describe("updateDataFile", () => {
     }
 
     expect(maxActive).toBe(2);
+  });
+
+  it("falls back to one worker when callers pass invalid concurrency", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
+
+    const fetched: string[] = [];
+    try {
+      await updateDataFile({
+        filePath,
+        now: new Date("2022-09-18T12:00:00Z"),
+        sleepMs: 0,
+        concurrency: Number.NaN,
+        fetchDay: async (date) => {
+          fetched.push(date);
+          return {
+            date,
+            relays: [],
+            builders: [],
+            totalChainBlocks: 0,
+          };
+        },
+      });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+
+    expect(fetched).toEqual(["2022-09-16", "2022-09-17"]);
+  });
+
+  it("repairs existing days with missing block counts before returning current data", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    const db = new DatabaseSync(filePath);
+    db.exec(`
+      CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
+      CREATE TABLE days (date TEXT PRIMARY KEY, total_chain_blocks INTEGER) STRICT;
+      CREATE TABLE relay_counts (
+        date TEXT NOT NULL,
+        relay_id TEXT NOT NULL,
+        num_payloads INTEGER NOT NULL,
+        PRIMARY KEY (date, relay_id)
+      ) STRICT;
+      CREATE TABLE builder_counts (
+        date TEXT NOT NULL,
+        builder_id TEXT NOT NULL,
+        num_blocks INTEGER NOT NULL,
+        PRIMARY KEY (date, builder_id)
+      ) STRICT;
+      INSERT INTO metadata (key, value) VALUES
+        ('schemaVersion', '1'),
+        ('generatedAt', '2026-05-25T00:00:00.000Z'),
+        ('sourceStartDate', '2022-09-15'),
+        ('sourceEndDate', '2022-09-16');
+      INSERT INTO days (date, total_chain_blocks) VALUES
+        ('2022-09-15', 7200),
+        ('2022-09-16', NULL);
+    `);
+    db.close();
+
+    const persisted = vi.fn();
+    try {
+      const result = await updateDataFile({
+        filePath,
+        now: new Date("2022-09-17T12:00:00Z"),
+        sleepMs: 0,
+        onPersist: persisted,
+        fetchTotalChainBlocks: async (date) => {
+          expect(date).toBe("2022-09-16");
+          return 7201;
+        },
+      });
+
+      expect(result.changed).toBe(true);
+      expect(result.fetchedDates).toEqual([]);
+      expect(result.snapshot.days.at(-1)).toMatchObject({
+        date: "2022-09-16",
+        totalChainBlocks: 7201,
+      });
+      expect(persisted).toHaveBeenCalledWith({
+        persistedDates: ["2022-09-16"],
+        sourceEndDate: "2022-09-16",
+      });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("limits block count repairs before fetching new days", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    const db = new DatabaseSync(filePath);
+    db.exec(`
+      CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
+      CREATE TABLE days (date TEXT PRIMARY KEY, total_chain_blocks INTEGER) STRICT;
+      CREATE TABLE relay_counts (
+        date TEXT NOT NULL,
+        relay_id TEXT NOT NULL,
+        num_payloads INTEGER NOT NULL,
+        PRIMARY KEY (date, relay_id)
+      ) STRICT;
+      CREATE TABLE builder_counts (
+        date TEXT NOT NULL,
+        builder_id TEXT NOT NULL,
+        num_blocks INTEGER NOT NULL,
+        PRIMARY KEY (date, builder_id)
+      ) STRICT;
+      INSERT INTO metadata (key, value) VALUES
+        ('schemaVersion', '1'),
+        ('generatedAt', '2026-05-25T00:00:00.000Z'),
+        ('sourceStartDate', '2022-09-15'),
+        ('sourceEndDate', '2022-09-17');
+      INSERT INTO days (date, total_chain_blocks) VALUES
+        ('2022-09-15', NULL),
+        ('2022-09-16', NULL),
+        ('2022-09-17', NULL);
+    `);
+    db.close();
+
+    const repaired: string[] = [];
+    const fetched: string[] = [];
+    try {
+      const result = await updateDataFile({
+        filePath,
+        now: new Date("2022-09-19T12:00:00Z"),
+        sleepMs: 0,
+        maxDays: 1,
+        maxRepairDays: 1,
+        fetchTotalChainBlocks: async (date) => {
+          repaired.push(date);
+          return 7200;
+        },
+        fetchDay: async (date) => {
+          fetched.push(date);
+          return {
+            date,
+            relays: [],
+            builders: [],
+            totalChainBlocks: 7201,
+          };
+        },
+      });
+
+      expect(repaired).toEqual(["2022-09-15"]);
+      expect(fetched).toEqual(["2022-09-18"]);
+      expect(result.fetchedDates).toEqual(["2022-09-18"]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 
   it("limits fetched dates and reports persisted SQLite batches", async () => {

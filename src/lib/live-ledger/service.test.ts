@@ -21,12 +21,6 @@ function memoryStore(initial: LiveLedgerSnapshot | null = null): SnapshotStore &
       written.push(snapshot);
       return `${snapshot.fetchedAt}.json`;
     },
-    async listSnapshotNames() {
-      return [];
-    },
-    async cleanup() {
-      return undefined;
-    },
   };
 }
 

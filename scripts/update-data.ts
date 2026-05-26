@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import {
   buildDateRange,
   nextMissingStartDate,
@@ -6,9 +7,15 @@ import {
   yesterdayUtc,
 } from "../src/lib/mev-watch-generator";
 
-async function main() {
+export function readUpdateDataConcurrency(): number {
+  const value = Number(process.env.UPDATE_DATA_CONCURRENCY ?? 8);
+  if (!Number.isFinite(value) || value < 1) return 8;
+  return Math.floor(value);
+}
+
+export async function main() {
   const dryRun = process.argv.includes("--dry-run");
-  const concurrency = Number(process.env.UPDATE_DATA_CONCURRENCY ?? 8);
+  const concurrency = readUpdateDataConcurrency();
   if (dryRun) {
     const snapshot = await readSnapshot();
     const start = nextMissingStartDate(snapshot);
@@ -41,7 +48,9 @@ async function main() {
   console.log(`updated ${result.fetchedDates.length} day(s): ${first}..${last}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

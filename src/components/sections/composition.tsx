@@ -105,7 +105,7 @@ export function Composition({ latest, ledger }: CompositionProps) {
 
 interface CompositionBandProps {
   label: string;
-  value: number;
+  value: number | null;
   swatch: string;
   delay: string;
 }
@@ -121,7 +121,13 @@ function CompositionBand({ label, value, swatch, delay }: CompositionBandProps) 
         {label}
       </div>
       <div className="mt-2 font-sans text-[30px] font-bold leading-none tracking-[-0.025em] text-foreground">
-        <CountUp value={value} decimals={1} suffix="%" />
+        {value === null ? (
+          <span className="font-mono text-[18px] uppercase tracking-[0.08em] text-fg-muted">
+            N/A
+          </span>
+        ) : (
+          <CountUp value={value} decimals={1} suffix="%" />
+        )}
       </div>
     </div>
   );

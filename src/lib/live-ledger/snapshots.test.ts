@@ -6,8 +6,6 @@ import {
   ledgerFromSnapshot,
   mergeSnapshotBlocks,
   pruneSnapshotBlocks,
-  snapshotFilename,
-  sortSnapshotNamesNewestFirst,
 } from "./snapshots";
 import type { LiveLedgerSnapshot, RelayPayload } from "./types";
 
@@ -86,20 +84,6 @@ describe("live ledger snapshots", () => {
     ]);
     expect(pruneSnapshotBlocks(merged, 300)).toEqual([
       expect.objectContaining({ slot: 100 }),
-    ]);
-  });
-
-  it("generates sortable timestamp filenames", () => {
-    const name = snapshotFilename(new Date("2026-05-26T00:12:30.123Z"));
-    expect(name).toBe("2026-05-26T00-12-30-123Z.json");
-    expect(
-      sortSnapshotNamesNewestFirst([
-        "2026-05-26T00-12-30-123Z.json",
-        "2026-05-26T00-12-31-123Z.json",
-      ]),
-    ).toEqual([
-      "2026-05-26T00-12-31-123Z.json",
-      "2026-05-26T00-12-30-123Z.json",
     ]);
   });
 

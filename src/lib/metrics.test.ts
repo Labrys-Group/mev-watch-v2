@@ -65,6 +65,11 @@ describe("computeDailyStats", () => {
     const r = computeDailyStats(RELAYS, builders, 10000, ANY_DATE);
     expect(r.nonBoostPct).toBeCloseTo(10, 5); // (10000 - 9000) / 10000
   });
+
+  it("reports non-boost as unavailable when chain block counts are missing", () => {
+    const r = computeDailyStats(RELAYS, [], null, ANY_DATE);
+    expect(r.nonBoostPct).toBeNull();
+  });
 });
 
 describe("computeRelayBreakdown", () => {
@@ -117,7 +122,11 @@ describe("nonBoostShare", () => {
     expect(nonBoostShare(100, 120)).toBe(0);
   });
 
-  it("returns 0 when the chain total is zero or unknown", () => {
+  it("returns 0 when the chain total is zero", () => {
     expect(nonBoostShare(0, 0)).toBe(0);
+  });
+
+  it("returns null when the chain total is unavailable", () => {
+    expect(nonBoostShare(null, 0)).toBeNull();
   });
 });

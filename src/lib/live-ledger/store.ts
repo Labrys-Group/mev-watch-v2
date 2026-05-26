@@ -3,8 +3,6 @@ import type { LiveLedgerSnapshot } from "./types";
 export interface SnapshotStore {
   readLatestSnapshot(): Promise<LiveLedgerSnapshot | null>;
   writeSnapshot(snapshot: LiveLedgerSnapshot): Promise<string>;
-  listSnapshotNames(): Promise<string[]>;
-  cleanup(): Promise<void>;
 }
 
 export async function createSnapshotStore(): Promise<SnapshotStore> {

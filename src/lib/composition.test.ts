@@ -22,8 +22,12 @@ describe("toCompositionPoint", () => {
     expect(p.nonBoost).toBe(10);
   });
 
-  it("collapses to the two-way split when non-boost data is absent", () => {
-    const p = toCompositionPoint({ date: "2026-05-20", censorshipPct: 30 });
+  it("collapses to the two-way split when non-boost data is unavailable", () => {
+    const p = toCompositionPoint({
+      date: "2026-05-20",
+      censorshipPct: 30,
+      nonBoostPct: null,
+    });
     expect(p.nonBoost).toBe(0);
     expect(p.censored).toBeCloseTo(30, 5);
     expect(p.nonCensored).toBeCloseTo(70, 5);

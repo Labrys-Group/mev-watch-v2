@@ -66,7 +66,6 @@ export async function refreshLiveLedger({
   });
 
   await snapshotStore.writeSnapshot(snapshot);
-  await snapshotStore.cleanup();
 
   return {
     data: ledgerFromSnapshot(snapshot),
