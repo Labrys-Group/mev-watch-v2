@@ -1,5 +1,6 @@
 import type { LatestStats } from "@/lib/queries";
 import type { LedgerData } from "@/lib/live-ledger/types";
+import type { DataFreshness } from "@/lib/data-freshness";
 import type { CSSVars } from "@/lib/css";
 import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
@@ -8,9 +9,10 @@ import { EpochLedger } from "@/components/sections/epoch-ledger";
 interface CompositionProps {
   latest: LatestStats;
   ledger: LedgerData;
+  freshness: DataFreshness;
 }
 
-export function Composition({ latest, ledger }: CompositionProps) {
+export function Composition({ latest, ledger, freshness }: CompositionProps) {
   const { censorshipPct, neutralPct, nonBoostPct, totalBlocks } = latest;
   const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
   const neutralBlocks = totalBlocks - censoringBlocks;
@@ -23,17 +25,25 @@ export function Composition({ latest, ledger }: CompositionProps) {
       accent="var(--accent-alt-color)"
       aside={
         <>
+          <span>{freshness.sourceLabel}</span>
+          <br />
           <span>DAILY MEV-BOOST DELIVERY DISTRIBUTION</span>
           <br />
           <span>
             N&nbsp;={" "}
             <strong className="text-foreground font-semibold tracking-normal normal-case">
-              {totalBlocks.toLocaleString()} BLOCKS
+              {totalBlocks.toLocaleString()} DELIVERIES
             </strong>
           </span>
         </>
       }
     >
+      <p className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-muted">
+        {freshness.sourceLabel}
+      </p>
+      <p className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-muted">
+        Recent slots, independent of the daily snapshot
+      </p>
       <EpochLedger initial={ledger} />
 
       <div className="grid grid-cols-1 border border-border-labrys bg-background sm:grid-cols-3">

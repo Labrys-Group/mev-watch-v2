@@ -17,16 +17,16 @@ export function Leaderboard({ rows }: LeaderboardProps) {
 
   return (
     <Section
-      label="04 / RELAY LEADERBOARD"
-      title="Ranked by block share."
+      label="03 / RELAY LEADERBOARD"
+      title="Ranked by delivery share."
       pattern="ticks"
       accent="var(--accent-color)"
       aside={<>SOURCE: RELAYSCAN.IO + BEACON</>}
     >
       <p className="mb-3 border-b border-border-labrys pb-3 font-sans text-[13px] leading-snug text-fg-muted">
-        Top relays by share — last 24 hours ·{" "}
+        Top relays by delivery share — last 24 hours ·{" "}
         <strong className="font-semibold text-foreground">
-          {totalBlocks.toLocaleString()} blocks
+          {totalBlocks.toLocaleString()} deliveries
         </strong>
         .
       </p>
@@ -39,7 +39,7 @@ export function Leaderboard({ rows }: LeaderboardProps) {
               <th className={TH}>RELAY</th>
               <th className={TH}>POSTURE</th>
               <th className={TH}>SHARE</th>
-              <th className={`${TH} text-right`}>BLOCKS</th>
+              <th className={`${TH} text-right`}>DELIVERIES</th>
             </tr>
           </thead>
           <tbody>
