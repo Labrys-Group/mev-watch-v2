@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-26
 **Status:** Draft, for a separate PR
-**Topic:** Fix the current dashboard UX issues found on the `codex/review` branch: stale data disclosure, live-vs-snapshot context, relay delivery terminology, section order, and duplicated page titles.
+**Topic:** Fix the current dashboard UX issues found on the `codex/review` branch: stale data disclosure, live-vs-snapshot context, relay delivery terminology, section order, FAQ card behavior, and duplicated page titles.
 
 ## 1. Context
 
@@ -20,6 +20,7 @@ The UI also still contains issues that predate the SQLite branch:
 
 - relay payload deliveries are labelled as `blocks` in several places, even though the metric layer documents that relay `num_payloads` counts deliveries and can count the same block once per relay
 - homepage section labels render out of sequence: `01`, `02`, `04`, `05`, `03`, `06`
+- FAQ cards open in paired rows, so clicking one FAQ also expands the neighboring card in that row
 - route metadata duplicates the product name in page titles, for example `Status | MEV Watch | MEV Watch`
 
 ## 2. Goals & non-goals
@@ -30,6 +31,7 @@ The UI also still contains issues that predate the SQLite branch:
 - Rename relay payload totals from "blocks" to "deliveries" wherever the value comes from `relay_counts.num_payloads`.
 - Keep true builder block totals labelled as blocks.
 - Put homepage section numbering back in visible reading order.
+- Make FAQ cards expand independently so only the clicked question opens.
 - Remove duplicated `MEV Watch` from route titles.
 - Add focused tests so these regressions are caught without needing full browser E2E coverage.
 
@@ -140,6 +142,18 @@ Make visible numbering match reading order. Either:
 
 Prefer option 1 if product flow should move from metric to action before detailed tables. Prefer option 2 if the current layout order is intentional.
 
+### FAQ card behavior
+
+FAQ expansion should be per card, not per visual row. Clicking one question should expand only that answer and leave its neighboring card collapsed.
+
+Current behavior comes from row-pair state in `FaqPair`: each two-item pair shares one `open` boolean. Replace this with independent item state. Acceptable options:
+
+1. Move `open` state into each individual FAQ card component.
+2. Track open item IDs in the parent `Faq` component.
+3. Use native `<details>` per FAQ item if the visual styling and animation remain consistent.
+
+Keep the existing full-card click target and keyboard-accessible button semantics. The layout may still use CSS grid rows, but the closed neighboring card must not reveal answer content or show an expanded indicator.
+
 ### Metadata titles
 
 Route-level metadata titles should not include the product suffix if the root layout template appends it.
@@ -225,6 +239,11 @@ Where a component needs both stats and freshness, fetch them together and pass a
 - `src/app/page.tsx` and section label constants
   - fix section order or numbering
 
+- `src/components/sections/faq.tsx`
+  - remove shared row-pair open state
+  - keep each FAQ item independently controlled
+  - preserve accessible `aria-expanded` / `aria-controls` behavior
+
 - `src/app/status/page.tsx`
   - title becomes `Status`
   - add stale-specific language when source day is old
@@ -251,6 +270,8 @@ Component tests:
 - composition aside renders `DELIVERIES`
 - embed renders source date and delivery-share wording
 - homepage section labels are in increasing visible order
+- clicking one FAQ card opens only that FAQ answer
+- FAQ sibling cards in the same row remain collapsed after one card is opened
 
 Metadata tests:
 
@@ -281,6 +302,7 @@ pnpm build
 - Relay payload count UI says deliveries, not blocks.
 - Builder count UI still says blocks.
 - Section labels increase in visual order.
+- FAQ cards open independently.
 - `/status` and `/embed` titles do not duplicate `MEV Watch`.
 - Existing public API response shapes remain unchanged.
 
