@@ -3,7 +3,7 @@ import { del, get, list, put } from "@vercel/blob";
 import {
   isTimestampedSnapshotName,
   LATEST_SNAPSHOT_NAME,
-  newestSnapshotFile,
+  parseTimestampedSnapshotName,
   SNAPSHOT_RETENTION_COUNT,
   sortNewestFirst,
   timestampedSnapshotName,
@@ -43,6 +43,23 @@ export function createBlobSnapshotStore(
   }
 
   async function readTimestampedSnapshots(): Promise<SnapshotFile[]> {
+    const blobs = await listSnapshotBlobs();
+
+    const snapshots = await Promise.all(
+      blobs
+        .filter((blob) => isTimestampedSnapshotName(blob.name))
+        .map(async (blob) => {
+          const snapshot = await readSnapshot(blob.pathname).catch(() => null);
+          return snapshot ? { name: blob.name, snapshot } : null;
+        }),
+    );
+
+    return snapshots.filter((file): file is SnapshotFile => file !== null);
+  }
+
+  async function listSnapshotBlobs(): Promise<
+    { name: string; pathname: string }[]
+  > {
     const blobs = [];
     let cursor: string | undefined;
 
@@ -56,20 +73,28 @@ export function createBlobSnapshotStore(
       cursor = result.hasMore ? result.cursor : undefined;
     } while (cursor);
 
-    const snapshots = await Promise.all(
-      blobs
-        .map((blob) => ({
-          name: blob.pathname.slice(prefix.length),
-          pathname: blob.pathname,
-        }))
-        .filter((blob) => isTimestampedSnapshotName(blob.name))
-        .map(async (blob) => {
-          const snapshot = await readSnapshot(blob.pathname).catch(() => null);
-          return snapshot ? { name: blob.name, snapshot } : null;
-        }),
-    );
+    return blobs.map((blob) => ({
+      name: blob.pathname.slice(prefix.length),
+      pathname: blob.pathname,
+    }));
+  }
 
-    return snapshots.filter((file): file is SnapshotFile => file !== null);
+  async function readNewestTimestampedSnapshot(): Promise<LiveLedgerSnapshot | null> {
+    const latestBlob = (await listSnapshotBlobs())
+      .map((blob) => {
+        const parsed = parseTimestampedSnapshotName(blob.name);
+        return parsed ? { ...blob, ...parsed } : null;
+      })
+      .filter((blob): blob is NonNullable<typeof blob> => blob !== null)
+      .sort((a, b) => {
+        if (a.fetchedAtMs !== b.fetchedAtMs) {
+          return b.fetchedAtMs - a.fetchedAtMs;
+        }
+        if (a.headSlot !== b.headSlot) return b.headSlot - a.headSlot;
+        return a.name.localeCompare(b.name);
+      })[0];
+
+    return latestBlob ? readSnapshot(latestBlob.pathname) : null;
   }
 
   async function pruneOldSnapshots(): Promise<{ deletedSnapshots: number }> {
@@ -83,8 +108,8 @@ export function createBlobSnapshotStore(
 
   return {
     async readLatestSnapshot() {
-      const latest = newestSnapshotFile(await readTimestampedSnapshots());
-      if (latest) return latest.snapshot;
+      const latest = await readNewestTimestampedSnapshot();
+      if (latest) return latest;
       return readSnapshot(legacyLatestPathname);
     },
     async writeSnapshot(snapshot) {

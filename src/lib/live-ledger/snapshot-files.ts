@@ -11,6 +11,15 @@ export interface SnapshotFile {
   snapshot: LiveLedgerSnapshot;
 }
 
+export interface TimestampedSnapshotName {
+  name: string;
+  fetchedAtMs: number;
+  headSlot: number;
+}
+
+const TIMESTAMPED_SNAPSHOT_NAME_PATTERN =
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z-head-(\d+)-[0-9a-f-]{36}\.json$/i;
+
 export function timestampedSnapshotName(snapshot: LiveLedgerSnapshot): string {
   return `${safeTimestamp(snapshot.fetchedAt)}-head-${snapshot.headSlot}-${randomUUID()}.json`;
 }
@@ -21,6 +30,26 @@ export function isTimestampedSnapshotName(name: string): boolean {
     name !== LATEST_SNAPSHOT_NAME &&
     !name.endsWith(".tmp")
   );
+}
+
+export function parseTimestampedSnapshotName(
+  name: string,
+): TimestampedSnapshotName | null {
+  const match = TIMESTAMPED_SNAPSHOT_NAME_PATTERN.exec(name);
+  if (!match) return null;
+
+  const [, year, month, day, hour, minute, second, millisecond, headSlotRaw] =
+    match;
+  const fetchedAtMs = Date.parse(
+    `${year}-${month}-${day}T${hour}:${minute}:${second}.${millisecond}Z`,
+  );
+  const headSlot = Number(headSlotRaw);
+
+  if (!Number.isFinite(fetchedAtMs) || !Number.isSafeInteger(headSlot)) {
+    return null;
+  }
+
+  return { name, fetchedAtMs, headSlot };
 }
 
 export function newestSnapshotFile(

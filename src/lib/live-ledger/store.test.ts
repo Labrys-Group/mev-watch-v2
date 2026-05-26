@@ -209,12 +209,17 @@ describe("blob live ledger snapshot store", () => {
     }
   });
 
-  it("reads the newest timestamped blob via list and get", async () => {
-    const olderPath = "data/live-ledger/older.json";
-    const newerPath = "data/live-ledger/newer.json";
+  it("reads only the newest timestamped blob selected by timestamp and numeric head slot", async () => {
+    const olderPath =
+      "data/live-ledger/2026-05-26T00-00-09-000Z-head-999-aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.json";
+    const lexicalHeadSlotTrapPath =
+      "data/live-ledger/2026-05-26T00-00-10-000Z-head-99-bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb.json";
+    const newerPath =
+      "data/live-ledger/2026-05-26T00-00-10-000Z-head-100-cccccccc-cccc-4ccc-cccc-cccccccccccc.json";
     const listBlob = vi.fn(async () => ({
       blobs: [
         { pathname: olderPath, uploadedAt: new Date(), size: 1 },
+        { pathname: lexicalHeadSlotTrapPath, uploadedAt: new Date(), size: 1 },
         { pathname: newerPath, uploadedAt: new Date(), size: 1 },
       ],
       hasMore: false,
@@ -223,8 +228,11 @@ describe("blob live ledger snapshot store", () => {
       if (pathname === olderPath) {
         return blobResult(snapshot(10, "2026-05-26T00:00:10.000Z"));
       }
+      if (pathname === lexicalHeadSlotTrapPath) {
+        return blobResult(snapshot(99, "2026-05-26T00:00:10.000Z"));
+      }
       if (pathname === newerPath) {
-        return blobResult(snapshot(30, "2026-05-26T00:00:30.000Z"));
+        return blobResult(snapshot(100, "2026-05-26T00:00:10.000Z"));
       }
       return null;
     });
@@ -236,14 +244,18 @@ describe("blob live ledger snapshot store", () => {
     } as never);
 
     await expect(store.readLatestSnapshot()).resolves.toMatchObject({
-      headSlot: 30,
+      headSlot: 100,
     });
 
     expect(listBlob).toHaveBeenCalledWith({
       prefix: "data/live-ledger/",
       limit: 1000,
     });
-    expect(getBlob).toHaveBeenCalledTimes(2);
+    expect(getBlob).toHaveBeenCalledTimes(1);
+    expect(getBlob).toHaveBeenCalledWith(newerPath, {
+      access: "private",
+      useCache: false,
+    });
     expect(getBlob).not.toHaveBeenCalledWith(
       "data/live-ledger/latest.json",
       expect.anything(),
