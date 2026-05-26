@@ -1,7 +1,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { updateDataFile } from "../src/lib/mev-watch-generator";
+import {
+  updateDataFile,
+  type UpdateDataFileOptions,
+} from "../src/lib/mev-watch-generator";
 import {
   getMevWatchBlobPathname,
   uploadBlobArtifact,
@@ -14,11 +17,12 @@ export const DEFAULT_BACKFILL_DB_PATH = path.join(
 );
 
 const DEFAULT_CONCURRENCY = 8;
-const DEFAULT_WRITE_EVERY = 25;
+const DEFAULT_WRITE_EVERY = 1;
 
 type Env = Record<string, string | undefined>;
 type Mkdir = (dirPath: string, opts: { recursive: true }) => Promise<unknown>;
 type CopyFile = (source: string, destination: string) => Promise<unknown>;
+type Access = (filePath: string) => Promise<unknown>;
 type UpdateDataFile = typeof updateDataFile;
 type UploadBlobArtifact = typeof uploadBlobArtifact;
 
@@ -30,9 +34,11 @@ interface BackfillAndUploadOptions {
   writeEvery?: number;
   mkdir?: Mkdir;
   copyFile?: CopyFile;
+  access?: Access;
   updateDataFile?: UpdateDataFile;
   uploadBlobArtifact?: UploadBlobArtifact;
   onProgress?: (progress: { date: string; index: number; total: number }) => void;
+  onPersist?: UpdateDataFileOptions["onPersist"];
 }
 
 interface BackfillAndUploadResult {
@@ -85,17 +91,21 @@ export async function backfillAndUploadArtifact(
   const blobPathname = opts.blobPathname ?? getMevWatchBlobPathname();
   const mkdir = opts.mkdir ?? fs.mkdir;
   const copyFile = opts.copyFile ?? fs.copyFile;
+  const access = opts.access ?? fs.access;
   const runUpdateDataFile = opts.updateDataFile ?? updateDataFile;
   const runUploadBlobArtifact = opts.uploadBlobArtifact ?? uploadBlobArtifact;
 
   await mkdir(path.dirname(filePath), { recursive: true });
-  await copyFile(seedFilePath, filePath);
+  if (!(await fileExists(filePath, access))) {
+    await copyFile(seedFilePath, filePath);
+  }
 
   const result = await runUpdateDataFile({
     filePath,
     concurrency: opts.concurrency ?? DEFAULT_CONCURRENCY,
     writeEvery: opts.writeEvery ?? DEFAULT_WRITE_EVERY,
     onProgress: opts.onProgress,
+    onPersist: opts.onPersist,
   });
   const uploadResult = await runUploadBlobArtifact({
     filePath,
@@ -120,6 +130,11 @@ export async function main() {
     ...config,
     onProgress: ({ date, index, total }) => {
       console.log(`[${index}/${total}] fetched ${date}`);
+    },
+    onPersist: ({ persistedDates, sourceEndDate }) => {
+      console.log(
+        `saved ${persistedDates.length} day(s), resumable through ${sourceEndDate}`,
+      );
     },
   });
 
@@ -152,6 +167,16 @@ function readOption(args: string[], flag: string): string | undefined {
     throw new Error(`${flag} requires a value`);
   }
   return value;
+}
+
+async function fileExists(filePath: string, access: Access): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return false;
+    throw error;
+  }
 }
 
 function readUploadedUrl(value: unknown): string | null {
