@@ -14,16 +14,6 @@ export const LIVE_LEDGER_SCHEMA_VERSION = 1;
 export const LIVE_LEDGER_PRUNE_SLOTS = 256;
 export const LIVE_LEDGER_EPOCH_ROWS = 4;
 
-export function snapshotFilename(date = new Date()): string {
-  return `${date.toISOString().replace(/[:.]/g, "-")}.json`;
-}
-
-export function sortSnapshotNamesNewestFirst(names: string[]): string[] {
-  return [...names]
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => b.localeCompare(a));
-}
-
 export function parseLiveLedgerSnapshot(value: unknown): LiveLedgerSnapshot {
   return LiveLedgerSnapshotSchema.parse(value);
 }

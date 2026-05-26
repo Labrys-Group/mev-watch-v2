@@ -19,7 +19,7 @@ export const MevWatchDaySchema = z.object({
   date: z.string(),
   relays: z.array(RelayPayloadCountSchema),
   builders: z.array(BuilderBlockCountSchema),
-  totalChainBlocks: z.number().int().nonnegative(),
+  totalChainBlocks: z.number().int().nonnegative().nullable(),
 });
 
 export const MevWatchSnapshotSchema = z.object({
@@ -36,14 +36,14 @@ export type MevWatchSnapshot = z.infer<typeof MevWatchSnapshotSchema>;
 export interface TrendPoint {
   date: string;
   censorshipPct: number;
-  nonBoostPct?: number;
+  nonBoostPct: number | null;
 }
 
 export interface LatestStats {
   date: string;
   censorshipPct: number;
   neutralPct: number;
-  nonBoostPct: number;
+  nonBoostPct: number | null;
   totalBlocks: number;
 }
 

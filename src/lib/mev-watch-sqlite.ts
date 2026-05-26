@@ -26,7 +26,7 @@ interface MetadataRow {
 
 interface DayRow {
   date: string;
-  total_chain_blocks: number;
+  total_chain_blocks: number | null;
 }
 
 interface RelayCountRow {
@@ -74,7 +74,7 @@ export function initializeSchema(
 
     CREATE TABLE IF NOT EXISTS days (
       date TEXT PRIMARY KEY,
-      total_chain_blocks INTEGER NOT NULL
+      total_chain_blocks INTEGER
     ) STRICT;
 
     CREATE TABLE IF NOT EXISTS relay_counts (
@@ -96,6 +96,7 @@ export function initializeSchema(
     CREATE INDEX IF NOT EXISTS relay_counts_date_idx ON relay_counts(date);
     CREATE INDEX IF NOT EXISTS builder_counts_date_idx ON builder_counts(date);
   `);
+  migrateDaysTotalChainBlocksNullable(db);
 
   setMetadataIfMissing(db, "schemaVersion", "1");
   setMetadataIfMissing(db, "generatedAt", generatedAt);
@@ -138,6 +139,37 @@ export function readSourceEndDate(db: MevWatchDatabase): string | null {
     .prepare("SELECT value FROM metadata WHERE key = 'sourceEndDate'")
     .get() as unknown as { value: string } | undefined;
   return row?.value ?? null;
+}
+
+export function readDatesMissingTotalChainBlocks(db: MevWatchDatabase): string[] {
+  const rows = db
+    .prepare(
+      "SELECT date FROM days WHERE total_chain_blocks IS NULL ORDER BY date ASC",
+    )
+    .all() as unknown as { date: string }[];
+  return rows.map((row) => row.date);
+}
+
+export function updateDayTotalChainBlocks(
+  db: MevWatchDatabase,
+  date: string,
+  totalChainBlocks: number,
+  generatedAt = new Date().toISOString(),
+): void {
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare("UPDATE days SET total_chain_blocks = ? WHERE date = ?").run(
+      totalChainBlocks,
+      date,
+    );
+    setMetadata(db, "schemaVersion", "1");
+    setMetadata(db, "generatedAt", generatedAt);
+    refreshSourceBounds(db);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
 }
 
 export function upsertDay(
@@ -229,6 +261,29 @@ function readDayDetails(db: MevWatchDatabase, row: DayRow): MevWatchDay {
       numBlocks: builder.num_blocks,
     })),
   });
+}
+
+function migrateDaysTotalChainBlocksNullable(db: MevWatchDatabase): void {
+  const column = db
+    .prepare("PRAGMA table_info(days)")
+    .all()
+    .find((row) => (row as { name?: string }).name === "total_chain_blocks") as
+    | { notnull: number }
+    | undefined;
+  if (!column?.notnull) return;
+
+  db.exec(`
+    PRAGMA foreign_keys = OFF;
+    CREATE TABLE days_nullable (
+      date TEXT PRIMARY KEY,
+      total_chain_blocks INTEGER
+    ) STRICT;
+    INSERT INTO days_nullable (date, total_chain_blocks)
+      SELECT date, total_chain_blocks FROM days;
+    DROP TABLE days;
+    ALTER TABLE days_nullable RENAME TO days;
+    PRAGMA foreign_keys = ON;
+  `);
 }
 
 function setMetadataIfMissing(

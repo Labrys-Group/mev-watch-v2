@@ -1,5 +1,8 @@
 import { cache } from "react";
 import {
+  deriveBuilderLeaderboard,
+  deriveLatestStats,
+  deriveRelayLeaderboard,
   deriveTrend,
   type BuilderRow,
   type LatestStats,
@@ -12,15 +15,9 @@ import {
 } from "@/lib/mev-watch-blob";
 import {
   createReadOnlyMevWatchDatabase,
-  readLatestDayFromDatabase,
   readMetadata,
   readSnapshotFromDatabase,
 } from "@/lib/mev-watch-sqlite";
-import {
-  computeBuilderBreakdown,
-  computeDailyStats,
-  computeRelayBreakdown,
-} from "@/lib/metrics";
 
 export type { BuilderRow, LatestStats, LeaderboardRow, TrendPoint };
 
@@ -67,30 +64,21 @@ export async function safeQuery<T>(
   }
 }
 
-export const getTrend = cache(async (): Promise<TrendPoint[]> => {
+const getSnapshot = cache(async () => {
   const db = createReadOnlyMevWatchDatabase(await resolveReadableArtifactPath());
   try {
-    return deriveTrend(readSnapshotFromDatabase(db));
+    return readSnapshotFromDatabase(db);
   } finally {
     db.close();
   }
 });
 
+export const getTrend = cache(async (): Promise<TrendPoint[]> => {
+  return deriveTrend(await getSnapshot());
+});
+
 export const getLatestStats = cache(async (): Promise<LatestStats | null> => {
-  const db = createReadOnlyMevWatchDatabase(await resolveReadableArtifactPath());
-  try {
-    const day = readLatestDayFromDatabase(db);
-    if (!day) return null;
-    const stats = computeDailyStats(
-      day.relays,
-      day.builders,
-      day.totalChainBlocks,
-      day.date,
-    );
-    return { date: day.date, ...stats };
-  } finally {
-    db.close();
-  }
+  return deriveLatestStats(await getSnapshot());
 });
 
 export async function getStatsSummary(): Promise<StatsSummary | null> {
@@ -98,39 +86,11 @@ export async function getStatsSummary(): Promise<StatsSummary | null> {
 }
 
 export const getLeaderboard = cache(async (): Promise<LeaderboardRow[]> => {
-  const db = createReadOnlyMevWatchDatabase(await resolveReadableArtifactPath());
-  try {
-    const day = readLatestDayFromDatabase(db);
-    if (!day) return [];
-    return computeRelayBreakdown(day.relays, day.date)
-      .map(({ relayId, name, posture, blocks, sharePct }) => ({
-        relayId,
-        name,
-        posture,
-        blocks,
-        sharePct,
-      }))
-      .sort((a, b) => b.sharePct - a.sharePct);
-  } finally {
-    db.close();
-  }
+  return deriveRelayLeaderboard(await getSnapshot());
 });
 
 export const getBuilderLeaderboard = cache(async (): Promise<BuilderRow[]> => {
-  const db = createReadOnlyMevWatchDatabase(await resolveReadableArtifactPath());
-  try {
-    const day = readLatestDayFromDatabase(db);
-    if (!day) return [];
-    return computeBuilderBreakdown(day.builders)
-      .map(({ builderId, blocks, sharePct }) => ({
-        builderId,
-        blocks,
-        sharePct,
-      }))
-      .sort((a, b) => b.sharePct - a.sharePct);
-  } finally {
-    db.close();
-  }
+  return deriveBuilderLeaderboard(await getSnapshot());
 });
 
 export const getLastRefresh = cache(async (): Promise<RefreshInfo | null> => {

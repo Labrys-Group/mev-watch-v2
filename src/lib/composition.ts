@@ -20,9 +20,8 @@ function clamp(n: number): number {
 /**
  * Re-base one daily point onto an all-chain-blocks denominator so the three
  * bands stack to 100. `censorshipPct` is the censoring share of MEV-boost;
- * `nonBoostPct` is the non-MEV-boost share of all chain blocks. A point with no
- * `nonBoostPct` (pre-backfill) collapses to the plain censored/non-censored
- * split.
+ * `nonBoostPct` is the non-MEV-boost share of all chain blocks. A point with
+ * unavailable non-boost data collapses to the plain censored/non-censored split.
  */
 export function toCompositionPoint(point: TrendPoint): CompositionPoint {
   const nonBoost = clamp(point.nonBoostPct ?? 0);

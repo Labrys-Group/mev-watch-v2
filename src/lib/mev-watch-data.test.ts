@@ -80,4 +80,30 @@ describe("MEV Watch data derivation", () => {
       { builderId: "builder-b", blocks: 3000, sharePct: 33.33333333333333 },
     ]);
   });
+
+  it("surfaces unavailable non-boost metrics when block counts are degraded", () => {
+    const degraded = {
+      ...SNAPSHOT,
+      sourceEndDate: "2023-12-19",
+      days: [
+        ...SNAPSHOT.days,
+        {
+          date: "2023-12-19",
+          totalChainBlocks: null,
+          relays: [{ relayId: "relay.ultrasound.money", numPayloads: 100 }],
+          builders: [{ builderId: "builder-a", numBlocks: 90 }],
+        },
+      ],
+    } as unknown as MevWatchSnapshot;
+
+    expect(deriveTrend(degraded).at(-1)).toEqual({
+      date: "2023-12-19",
+      censorshipPct: 0,
+      nonBoostPct: null,
+    });
+    expect(deriveLatestStats(degraded)).toMatchObject({
+      date: "2023-12-19",
+      nonBoostPct: null,
+    });
+  });
 });

@@ -135,7 +135,44 @@ describe("Vercel data cron route", () => {
 
     expect(updateDataFileMock).toHaveBeenCalledWith(
       expect.objectContaining({
+        concurrency: 4,
         maxDays: 30,
+        writeEvery: 1,
+      }),
+    );
+  });
+
+  it("falls back when numeric cron tuning env vars are invalid", async () => {
+    const lock = {
+      acquired: true,
+      lockPathname: "data/mev-watch.sqlite.lock",
+      etag: "lock-etag",
+      runId: "run-invalid-env",
+    } as const;
+    vi.stubEnv("UPDATE_DATA_CONCURRENCY", "not-a-number");
+    vi.stubEnv("UPDATE_DATA_MAX_DAYS", "0");
+    vi.stubEnv("UPDATE_DATA_WRITE_EVERY", "-1");
+    acquireRefreshLockMock.mockResolvedValue(lock);
+    prepareWritableArtifactPathMock.mockResolvedValue("/tmp/mev-watch.sqlite");
+    updateDataFileMock.mockResolvedValue({
+      changed: false,
+      fetchedDates: [],
+      snapshot: {
+        schemaVersion: 1,
+        generatedAt: "2026-05-26T00:00:00.000Z",
+        sourceStartDate: "2022-09-15",
+        sourceEndDate: "2026-05-25",
+        days: [],
+      },
+    });
+
+    await GET(authorizedRequest());
+
+    expect(updateDataFileMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        concurrency: 4,
+        maxDays: 30,
+        writeEvery: 1,
       }),
     );
   });

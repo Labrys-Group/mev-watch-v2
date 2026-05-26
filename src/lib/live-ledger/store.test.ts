@@ -26,19 +26,23 @@ function snapshot(slot: number, fetchedAt: string): LiveLedgerSnapshot {
 }
 
 describe("local live ledger snapshot store", () => {
-  it("reads the newest timestamped snapshot and cleans up old files", async () => {
+  it("overwrites and reads a single latest snapshot", async () => {
     await withTempDir(async (dir) => {
-      const store = createLocalSnapshotStore({ dir, retention: 2 });
+      const store = createLocalSnapshotStore({ dir });
 
       await store.writeSnapshot(snapshot(1, "2026-05-26T00:00:00.000Z"));
       await store.writeSnapshot(snapshot(2, "2026-05-26T00:00:01.000Z"));
       await store.writeSnapshot(snapshot(3, "2026-05-26T00:00:02.000Z"));
-      await store.cleanup();
 
       await expect(store.readLatestSnapshot()).resolves.toMatchObject({
         headSlot: 3,
       });
-      await expect(store.listSnapshotNames()).resolves.toHaveLength(2);
+      await expect(store.writeSnapshot(snapshot(4, "2026-05-26T00:00:03.000Z"))).resolves.toBe(
+        "latest.json",
+      );
+      await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+        headSlot: 4,
+      });
     });
   });
 });

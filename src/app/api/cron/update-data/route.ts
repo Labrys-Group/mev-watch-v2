@@ -38,7 +38,7 @@ export async function GET(request: Request) {
     let uploadedPersistedProgress = false;
     const result = await updateDataFile({
       filePath,
-      concurrency: Number(process.env.UPDATE_DATA_CONCURRENCY ?? 4),
+      concurrency: readPositiveIntegerEnv("UPDATE_DATA_CONCURRENCY", 4),
       maxDays: readPositiveIntegerEnv(
         "UPDATE_DATA_MAX_DAYS",
         DEFAULT_CRON_MAX_DAYS,
