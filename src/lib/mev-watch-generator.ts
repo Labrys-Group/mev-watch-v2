@@ -415,7 +415,10 @@ export async function updateDataFile(
     const workerFailure = workerResults.find(
       (result): result is PromiseRejectedResult => result.status === "rejected",
     );
-    if (workerFailure) throw workerFailure.reason;
+    if (workerFailure) {
+      await flush();
+      throw workerFailure.reason;
+    }
 
     await flush();
     if (!opts.dryRun && persistedThrough < dates.length) {

@@ -493,6 +493,44 @@ describe("updateDataFile", () => {
     }
   });
 
+  it("flushes pending contiguous days before rethrowing a fetch failure", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
+
+    try {
+      await expect(
+        updateDataFile({
+          filePath,
+          now: new Date("2022-09-21T12:00:00Z"),
+          sleepMs: 0,
+          concurrency: 1,
+          writeEvery: 25,
+          fetchDay: async (date) => {
+            if (date === "2022-09-19") throw new Error("upstream failed");
+            return {
+              date,
+              relays: [],
+              builders: [],
+              totalChainBlocks: 0,
+            };
+          },
+        }),
+      ).rejects.toThrow("upstream failed");
+
+      const snapshot = await readSnapshot(filePath);
+      expect(snapshot.sourceEndDate).toBe("2022-09-18");
+      expect(snapshot.days.map((day) => day.date)).toEqual([
+        "2022-09-15",
+        "2022-09-16",
+        "2022-09-17",
+        "2022-09-18",
+      ]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("does not persist non-contiguous completed days", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
     const filePath = path.join(dir, "mev-watch.sqlite");
@@ -509,8 +547,8 @@ describe("updateDataFile", () => {
           fetchDay: async (date) => {
             if (date === "2022-09-16") {
               await new Promise((resolve) => setTimeout(resolve, 50));
+              throw new Error("upstream failed");
             }
-            if (date === "2022-09-19") throw new Error("upstream failed");
             return {
               date,
               relays: [],
