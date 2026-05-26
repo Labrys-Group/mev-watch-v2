@@ -53,8 +53,13 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     <div className="reveal-item mb-5 border border-border-labrys bg-background p-3">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted">
-          Live epoch ledger · head slot{" "}
-          <span className="text-foreground">{data.headSlot.toLocaleString()}</span>
+          <div>
+            Live epoch ledger · head slot{" "}
+            <span className="text-foreground">{data.headSlot.toLocaleString()}</span>
+          </div>
+          <div className="mt-1 text-[9px] tracking-[0.12em]">
+            Recent slots, independent of the daily snapshot
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 font-mono text-[9px] uppercase tracking-[0.12em]">
           {stale ? <span className="text-warn">LIVE CACHE STALE</span> : null}

@@ -1,9 +1,14 @@
 import { Hero } from "@/components/sections/hero";
-import { getTrend } from "@/lib/queries";
+import { getLastRefresh, getLatestStats, getTrend } from "@/lib/queries";
 import { computeHeroVerdict } from "@/lib/hero-verdict";
+import { getDataFreshness } from "@/lib/data-freshness";
 
 export async function HeroData() {
-  const trend = await getTrend();
+  const [trend, latest, lastRefresh] = await Promise.all([
+    getTrend(),
+    getLatestStats(),
+    getLastRefresh(),
+  ]);
 
   // Pre-seed local dev: the verdict math would render "CONTAINED 0%" which is
   // misleading. Show an honest empty-state hero card instead.
@@ -28,5 +33,9 @@ export async function HeroData() {
   }
 
   const verdict = computeHeroVerdict(trend);
-  return <Hero verdict={verdict} />;
+  const freshness = getDataFreshness({
+    latestDate: latest?.date ?? null,
+    generatedAt: lastRefresh?.ranAt ?? null,
+  });
+  return <Hero verdict={verdict} freshness={freshness} />;
 }

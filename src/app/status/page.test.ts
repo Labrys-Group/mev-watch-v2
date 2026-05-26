@@ -6,4 +6,8 @@ describe("status page route config", () => {
     expect(statusPage.runtime).toBe("nodejs");
     expect(statusPage.dynamic).toBe("force-dynamic");
   });
+
+  it("uses a short route metadata title", () => {
+    expect(statusPage.metadata.title).toBe("Status");
+  });
 });

@@ -1,5 +1,6 @@
 import { StatusBar } from "@/components/sections/status-bar";
 import { getLatestStats, getLastRefresh } from "@/lib/queries";
+import { getDataFreshness } from "@/lib/data-freshness";
 
 export async function StatusBarData() {
   const [latest, lastRefresh] = await Promise.all([
@@ -25,11 +26,17 @@ export async function StatusBarData() {
     );
   }
 
+  const freshness = getDataFreshness({
+    latestDate: latest.date,
+    generatedAt: lastRefresh?.ranAt ?? null,
+  });
+
   return (
     <StatusBar
       latestDate={latest.date}
       censorshipPct={latest.censorshipPct}
       lastRefresh={lastRefresh?.ranAt ?? null}
+      freshness={freshness}
     />
   );
 }

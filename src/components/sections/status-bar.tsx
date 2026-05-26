@@ -1,14 +1,28 @@
 import type { ReactNode } from "react";
 import { formatPercent, formatRelativeTime } from "@/lib/format";
+import type { DataFreshness } from "@/lib/data-freshness";
 
 interface StatusBarProps {
   latestDate: string;
   censorshipPct: number;
-  lastRefresh: Date | null;
+  lastRefresh?: Date | null;
+  freshness: DataFreshness;
 }
 
-export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarProps) {
-  const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
+export function StatusBar({
+  latestDate,
+  censorshipPct,
+  lastRefresh,
+  freshness,
+}: StatusBarProps) {
+  const updatedText =
+    freshness.generatedAgeLabel ?? (lastRefresh ? formatRelativeTime(lastRefresh) : "—");
+  const isStale = freshness.status === "stale";
+  const statusText = isStale ? "DAILY STALE" : "DAILY FRESH";
+  const ageText =
+    typeof freshness.sourceAgeDays === "number"
+      ? `${freshness.sourceAgeDays}d old`
+      : null;
 
   return (
     <div className="relative overflow-hidden bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
@@ -19,7 +33,7 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
       />
 
       {/* Inner row: grid of cells */}
-      <div className="relative z-10 grid grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_repeat(5,1fr)]">
+      <div className="relative z-10 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] md:grid-cols-[auto_repeat(5,1fr)]">
         {/* Labrys logo — grayscale, links to labrys.io; on hover the
             wordmark unfurls and shifts the rest of the row across */}
         <a
@@ -71,19 +85,35 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
 
         <StatusCell
           label="STATUS"
-          valueClassName="text-good flex items-center gap-1.5"
+          mobileLabel="DAILY"
+          valueClassName={`${isStale ? "text-warn" : "text-good"} flex items-center gap-1.5`}
           value={
             <>
               <span
-                className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
-                style={{ boxShadow: "0 0 6px var(--good)" }}
+                className={`mr-1 inline-block h-1.5 w-1.5 rounded-full ${isStale ? "bg-warn" : "bg-good"}`}
+                style={{
+                  boxShadow: `0 0 6px var(${isStale ? "--warn" : "--good"})`,
+                }}
               />
-              LIVE
+              {statusText}
             </>
           }
         />
 
-        <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
+        <StatusCell
+          label="DATA THROUGH"
+          mobileLabel="THROUGH"
+          value={
+            <span className="inline-flex flex-col items-end leading-tight md:flex-row md:items-center md:gap-1.5">
+              <span>{latestDate}</span>
+              {ageText ? (
+                <span className={isStale ? "text-warn" : "text-fg-muted"}>
+                  {ageText}
+                </span>
+              ) : null}
+            </span>
+          }
+        />
 
         <StatusCell
           label="CENSORSHIP"
@@ -99,6 +129,7 @@ export function StatusBar({ latestDate, censorshipPct, lastRefresh }: StatusBarP
 
 interface StatusCellProps {
   label: string;
+  mobileLabel?: string;
   value: ReactNode;
   /** Extra classes layered onto the `<strong>` value. Overrides `text-foreground`
    *  if a colour is provided. */
@@ -110,14 +141,24 @@ interface StatusCellProps {
   mdOnly?: boolean;
 }
 
-function StatusCell({ label, value, valueClassName, isLast, mdOnly }: StatusCellProps) {
+function StatusCell({
+  label,
+  mobileLabel,
+  value,
+  valueClassName,
+  isLast,
+  mdOnly,
+}: StatusCellProps) {
   const visibility = mdOnly ? "hidden md:flex" : "flex";
   const divider = isLast ? "" : " border-r border-border-labrys";
   return (
     <div
       className={`${visibility} justify-between items-center gap-3 px-3 py-2 text-[12px] tracking-[0.1em] uppercase${divider}`}
     >
-      <span>{label}</span>
+      <span>
+        {mobileLabel ? <span className="md:hidden">{mobileLabel}</span> : null}
+        <span className={mobileLabel ? "hidden md:inline" : undefined}>{label}</span>
+      </span>
       <strong
         className={`text-foreground font-semibold tracking-normal normal-case${valueClassName ? ` ${valueClassName}` : ""}`}
       >

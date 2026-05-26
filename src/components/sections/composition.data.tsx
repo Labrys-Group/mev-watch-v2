@@ -1,12 +1,14 @@
 import { Composition } from "@/components/sections/composition";
-import { getLatestStats } from "@/lib/queries";
+import { getLastRefresh, getLatestStats } from "@/lib/queries";
 import { Section } from "@/components/section";
 import { readInitialLedger } from "@/lib/live-ledger/service";
+import { getDataFreshness } from "@/lib/data-freshness";
 
 export async function CompositionData() {
-  const [latest, ledger] = await Promise.all([
+  const [latest, ledger, lastRefresh] = await Promise.all([
     getLatestStats(),
     readInitialLedger(),
+    getLastRefresh(),
   ]);
 
   if (!latest) {
@@ -24,5 +26,10 @@ export async function CompositionData() {
     );
   }
 
-  return <Composition latest={latest} ledger={ledger} />;
+  const freshness = getDataFreshness({
+    latestDate: latest.date,
+    generatedAt: lastRefresh?.ranAt ?? null,
+  });
+
+  return <Composition latest={latest} ledger={ledger} freshness={freshness} />;
 }

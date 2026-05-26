@@ -27,7 +27,7 @@ const STEPS = [
 export function WhatToDo() {
   return (
     <Section
-      label="03 / WHAT TO DO"
+      label="05 / WHAT TO DO"
       title="Keep Ethereum credibly neutral."
       aside="FOR: VALIDATORS, STAKERS, BUILDERS"
       pattern="arcs"

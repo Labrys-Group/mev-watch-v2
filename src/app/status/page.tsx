@@ -5,9 +5,10 @@ import { SiteFooter } from "@/components/sections/site-footer";
 import { Reveal } from "@/components/reveal";
 import { getLastRefresh, getLatestStats } from "@/lib/queries";
 import { formatRelativeTime } from "@/lib/format";
+import { getDataFreshness } from "@/lib/data-freshness";
 
 export const metadata: Metadata = {
-  title: "Status | MEV Watch",
+  title: "Status",
   description: "Status of the MEV Watch SQLite data artifact and its freshness.",
 };
 
@@ -19,6 +20,11 @@ export default async function StatusPage() {
     getLastRefresh(),
     getLatestStats(),
   ]);
+  const freshness = getDataFreshness({
+    latestDate: latestStats?.date ?? null,
+    generatedAt: snapshot?.ranAt ?? null,
+  });
+  const isStale = freshness.status === "stale";
 
   return (
     <div className="min-h-screen">
@@ -34,7 +40,8 @@ export default async function StatusPage() {
           <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-fg-muted">
             MEV Watch serves a SQLite data artifact. A scheduled Vercel Cron
             job refreshes the artifact and publishes the latest copy to Vercel
-            Blob.
+            Blob. Daily aggregate freshness is based on the latest source day,
+            not the time this artifact was generated.
           </p>
         </Reveal>
 
@@ -52,6 +59,15 @@ export default async function StatusPage() {
                   </span>
                   <span className="font-mono text-xs text-fg-muted">
                     {formatRelativeTime(new Date(`${latestStats.date}T00:00:00Z`))}
+                  </span>
+                  <span
+                    className={`font-mono text-xs uppercase tracking-[0.12em] ${
+                      isStale ? "text-warn" : "text-good"
+                    }`}
+                  >
+                    {isStale
+                      ? `Daily data stale (${freshness.sourceAgeDays}d old)`
+                      : "Daily data fresh"}
                   </span>
                 </div>
               ) : (
