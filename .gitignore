@@ -62,3 +62,6 @@ next-env.d.ts
 /data/*
 !/data/.gitkeep
 .gstack/
+
+# generated data artifacts
+/src/data/mev-watch.sqlite
