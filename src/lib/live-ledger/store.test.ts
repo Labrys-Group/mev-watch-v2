@@ -141,4 +141,38 @@ describe("blob live ledger snapshot store", () => {
     expect(getBlob).toHaveBeenCalledTimes(2);
     expect(putBlob).toHaveBeenCalledTimes(1);
   });
+
+  it("treats repeated lost blob write races as success when latest is already newer", async () => {
+    const preconditionFailed = new Error("etag changed");
+    preconditionFailed.name = "BlobPreconditionFailedError";
+
+    const getBlob = vi
+      .fn()
+      .mockResolvedValueOnce(
+        blobResult(snapshot(10, "2026-05-26T00:00:10.000Z"), "etag-10"),
+      )
+      .mockResolvedValueOnce(
+        blobResult(snapshot(11, "2026-05-26T00:00:11.000Z"), "etag-11"),
+      )
+      .mockResolvedValueOnce(
+        blobResult(snapshot(12, "2026-05-26T00:00:12.000Z"), "etag-12"),
+      )
+      .mockResolvedValueOnce(
+        blobResult(snapshot(30, "2026-05-26T00:00:30.000Z"), "etag-30"),
+      );
+    const putBlob = vi.fn(async () => {
+      throw preconditionFailed;
+    });
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob,
+    });
+
+    await expect(
+      store.writeSnapshot(snapshot(20, "2026-05-26T00:00:20.000Z")),
+    ).resolves.toBe("latest.json");
+
+    expect(getBlob).toHaveBeenCalledTimes(4);
+    expect(putBlob).toHaveBeenCalledTimes(3);
+  });
 });

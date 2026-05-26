@@ -64,6 +64,10 @@ export function createBlobSnapshotStore(
           throw error;
         }
       }
+      const latest = await readLatestSnapshotWithEtag();
+      if (latest && !isNewerSnapshot(snapshot, latest.snapshot)) {
+        return pathname.slice(prefix.length);
+      }
       throw new Error(`unable to write ${pathname}: latest snapshot changed repeatedly`);
     },
   };
