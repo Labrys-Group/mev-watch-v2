@@ -357,6 +357,69 @@ describe("updateDataFile", () => {
     }
   });
 
+  it("limits block count repairs before fetching new days", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    const db = new DatabaseSync(filePath);
+    db.exec(`
+      CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
+      CREATE TABLE days (date TEXT PRIMARY KEY, total_chain_blocks INTEGER) STRICT;
+      CREATE TABLE relay_counts (
+        date TEXT NOT NULL,
+        relay_id TEXT NOT NULL,
+        num_payloads INTEGER NOT NULL,
+        PRIMARY KEY (date, relay_id)
+      ) STRICT;
+      CREATE TABLE builder_counts (
+        date TEXT NOT NULL,
+        builder_id TEXT NOT NULL,
+        num_blocks INTEGER NOT NULL,
+        PRIMARY KEY (date, builder_id)
+      ) STRICT;
+      INSERT INTO metadata (key, value) VALUES
+        ('schemaVersion', '1'),
+        ('generatedAt', '2026-05-25T00:00:00.000Z'),
+        ('sourceStartDate', '2022-09-15'),
+        ('sourceEndDate', '2022-09-17');
+      INSERT INTO days (date, total_chain_blocks) VALUES
+        ('2022-09-15', NULL),
+        ('2022-09-16', NULL),
+        ('2022-09-17', NULL);
+    `);
+    db.close();
+
+    const repaired: string[] = [];
+    const fetched: string[] = [];
+    try {
+      const result = await updateDataFile({
+        filePath,
+        now: new Date("2022-09-19T12:00:00Z"),
+        sleepMs: 0,
+        maxDays: 1,
+        maxRepairDays: 1,
+        fetchTotalChainBlocks: async (date) => {
+          repaired.push(date);
+          return 7200;
+        },
+        fetchDay: async (date) => {
+          fetched.push(date);
+          return {
+            date,
+            relays: [],
+            builders: [],
+            totalChainBlocks: 7201,
+          };
+        },
+      });
+
+      expect(repaired).toEqual(["2022-09-15"]);
+      expect(fetched).toEqual(["2022-09-18"]);
+      expect(result.fetchedDates).toEqual(["2022-09-18"]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("limits fetched dates and reports persisted SQLite batches", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
     const filePath = path.join(dir, "mev-watch.sqlite");

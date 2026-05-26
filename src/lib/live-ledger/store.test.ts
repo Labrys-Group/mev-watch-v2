@@ -1,8 +1,9 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import { createBlobSnapshotStore } from "./store-blob";
 import { createLocalSnapshotStore } from "./store-local";
 import type { LiveLedgerSnapshot } from "./types";
 
@@ -25,6 +26,14 @@ function snapshot(slot: number, fetchedAt: string): LiveLedgerSnapshot {
   };
 }
 
+function blobResult(snapshot: LiveLedgerSnapshot, etag: string) {
+  return {
+    statusCode: 200,
+    stream: new Response(JSON.stringify(snapshot)).body,
+    blob: { etag },
+  };
+}
+
 describe("local live ledger snapshot store", () => {
   it("overwrites and reads a single latest snapshot", async () => {
     await withTempDir(async (dir) => {
@@ -44,5 +53,49 @@ describe("local live ledger snapshot store", () => {
         headSlot: 4,
       });
     });
+  });
+});
+
+describe("blob live ledger snapshot store", () => {
+  it("does not overwrite a newer latest snapshot with an older refresh", async () => {
+    const getBlob = vi.fn(async () =>
+      blobResult(snapshot(20, "2026-05-26T00:00:20.000Z"), "etag-newer"),
+    );
+    const putBlob = vi.fn();
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob,
+    });
+
+    await expect(
+      store.writeSnapshot(snapshot(10, "2026-05-26T00:00:10.000Z")),
+    ).resolves.toBe("latest.json");
+
+    expect(putBlob).not.toHaveBeenCalled();
+  });
+
+  it("rechecks latest when a conditional blob write loses a race", async () => {
+    const staleSnapshot = snapshot(10, "2026-05-26T00:00:10.000Z");
+    const newerSnapshot = snapshot(30, "2026-05-26T00:00:30.000Z");
+    const preconditionFailed = new Error("etag changed");
+    preconditionFailed.name = "BlobPreconditionFailedError";
+
+    const getBlob = vi
+      .fn()
+      .mockResolvedValueOnce(blobResult(staleSnapshot, "etag-stale"))
+      .mockResolvedValueOnce(blobResult(newerSnapshot, "etag-newer"));
+    const putBlob = vi.fn(async () => {
+      throw preconditionFailed;
+    });
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob,
+    });
+
+    await expect(
+      store.writeSnapshot(snapshot(20, "2026-05-26T00:00:20.000Z")),
+    ).resolves.toBe("latest.json");
+
+    expect(putBlob).toHaveBeenCalledTimes(1);
   });
 });

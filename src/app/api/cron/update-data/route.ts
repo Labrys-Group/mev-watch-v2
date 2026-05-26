@@ -36,13 +36,15 @@ export async function GET(request: Request) {
   try {
     const filePath = await prepareWritableArtifactPath();
     let uploadedPersistedProgress = false;
+    const maxDays = readPositiveIntegerEnv(
+      "UPDATE_DATA_MAX_DAYS",
+      DEFAULT_CRON_MAX_DAYS,
+    );
     const result = await updateDataFile({
       filePath,
       concurrency: readPositiveIntegerEnv("UPDATE_DATA_CONCURRENCY", 4),
-      maxDays: readPositiveIntegerEnv(
-        "UPDATE_DATA_MAX_DAYS",
-        DEFAULT_CRON_MAX_DAYS,
-      ),
+      maxDays,
+      maxRepairDays: readPositiveIntegerEnv("UPDATE_DATA_REPAIR_MAX_DAYS", maxDays),
       writeEvery: readPositiveIntegerEnv(
         "UPDATE_DATA_WRITE_EVERY",
         DEFAULT_CRON_WRITE_EVERY,

@@ -338,6 +338,7 @@ export interface UpdateDataFileOptions {
   concurrency?: number;
   writeEvery?: number;
   maxDays?: number;
+  maxRepairDays?: number;
 }
 
 export async function updateDataFile(
@@ -451,7 +452,10 @@ async function repairMissingBlockCounts(
   db: ReturnType<typeof initializeMevWatchDatabase>,
   opts: UpdateDataFileOptions,
 ): Promise<string[]> {
-  const dates = readDatesMissingTotalChainBlocks(db);
+  const dates = limitDateRange(
+    readDatesMissingTotalChainBlocks(db),
+    opts.maxRepairDays,
+  );
   if (dates.length === 0) return [];
   const fetchBlockCount = opts.fetchTotalChainBlocks ?? fetchTotalChainBlocks;
   const repaired: string[] = [];
