@@ -6,9 +6,10 @@ import {
   ledgerFromSnapshot,
 } from "./snapshots";
 import { createSnapshotStore, type SnapshotStore } from "./store";
+import { LIVE_LEDGER_REFRESH_INTERVAL_MS } from "./timing";
 import type { LedgerData, LiveLedgerSnapshot } from "./types";
 
-export const MIN_SNAPSHOT_REFRESH_INTERVAL_MS = 15_000;
+export const MIN_SNAPSHOT_REFRESH_INTERVAL_MS = LIVE_LEDGER_REFRESH_INTERVAL_MS;
 
 export async function readInitialLedger(
   store?: SnapshotStore,

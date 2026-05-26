@@ -56,7 +56,7 @@ describe("refreshLiveLedger", () => {
 
     const result = await refreshLiveLedger({
       store,
-      now: Date.parse(previousSnapshot.fetchedAt) + 14_999,
+      now: Date.parse(previousSnapshot.fetchedAt) + 29_999,
       fetchPayloads,
     });
 
@@ -72,7 +72,7 @@ describe("refreshLiveLedger", () => {
 
     const result = await refreshLiveLedger({
       store,
-      now: Date.parse(previousSnapshot.fetchedAt) + 16_000,
+      now: Date.parse(previousSnapshot.fetchedAt) + 30_000,
       fetchPayloads: vi.fn(async () => ({
         successfulRelays: ["boost-relay.flashbots.net"],
         degradedRelays: ["relay.ultrasound.money"],

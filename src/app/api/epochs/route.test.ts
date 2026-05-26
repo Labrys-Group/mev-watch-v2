@@ -14,7 +14,7 @@ describe("GET /api/epochs", () => {
     vi.resetAllMocks();
   });
 
-  it("returns live ledger data with a short shared cache header", async () => {
+  it("returns live ledger data with a shared cache header matching the poll interval", async () => {
     refreshLiveLedgerMock.mockResolvedValue({
       wroteSnapshot: true,
       snapshot: {
@@ -35,7 +35,7 @@ describe("GET /api/epochs", () => {
     const response = await GET();
 
     expect(response.headers.get("cache-control")).toBe(
-      "public, s-maxage=15, stale-while-revalidate=30",
+      "public, s-maxage=30, stale-while-revalidate=30",
     );
     await expect(response.json()).resolves.toEqual({
       headSlot: 96,

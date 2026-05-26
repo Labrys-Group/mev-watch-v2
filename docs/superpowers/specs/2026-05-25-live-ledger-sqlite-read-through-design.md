@@ -144,7 +144,7 @@ Behavior:
 Suggested response headers:
 
 ```
-Cache-Control: public, s-maxage=10, stale-while-revalidate=30
+Cache-Control: public, s-maxage=30, stale-while-revalidate=30
 ```
 
 The exact cache window can be tuned, but it should be short enough to feel live and long enough that many viewers do not multiply relay load. The client can still poll every 30s.
@@ -258,6 +258,6 @@ E2E tests:
 ## 12. Open questions
 
 - Is 100 recent blocks enough for the UI, or should the route keep fetching 200 delivered payloads per relay to cover gaps and relay skew?
-- Should the route cache be closer to one slot (`s-maxage=10-12`) or aligned with the client poll interval (`s-maxage=30`)?
+- Route cache, snapshot freshness, and client polling are aligned at 30 seconds.
 - Should stale ledger state be visibly labeled after a threshold, for example `fetchedAt` older than 2 minutes?
 - How many timestamped live snapshots should production retain: newest 5, newest 10, or a time-based cutoff?

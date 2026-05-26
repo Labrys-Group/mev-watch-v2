@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
+import { LIVE_LEDGER_REFRESH_INTERVAL_MS } from "@/lib/live-ledger/timing";
 import type { LedgerData, SlotCell, SlotCategory } from "@/lib/live-ledger/types";
 
-export const EPOCH_LEDGER_POLL_MS = 30_000;
+export const EPOCH_LEDGER_POLL_MS = LIVE_LEDGER_REFRESH_INTERVAL_MS;
 
 interface EpochLedgerProps {
   initial: LedgerData;
