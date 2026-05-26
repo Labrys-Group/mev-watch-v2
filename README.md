@@ -7,16 +7,16 @@ Live at **[mevwatch.info](https://mevwatch.info)**.
 The site reports, daily, the share of MEV-boost relay payload deliveries that go
 through OFAC-censoring relays. Relay posture metadata lives in
 `src/data/relays.json`; measured daily snapshots live in
-`src/data/mev-watch.json`.
+`src/data/mev-watch.sqlite`.
 
 ## Stack
 
-Next.js 16 App Router · Tailwind v4 + shadcn/ui · checked-in JSON data ·
-GitHub Actions data refresh · Vitest + Playwright · deployed on Vercel.
+Next.js 16 App Router · Tailwind v4 + shadcn/ui · SQLite data artifact ·
+Vercel Blob + Cron data refresh · Vitest + Playwright · deployed on Vercel.
 
 ## Quick start
 
-Requires Node 20+ and pnpm.
+Requires Node 24+ and pnpm.
 
 ```bash
 pnpm install
@@ -32,22 +32,22 @@ pnpm dev                     # http://localhost:3000
 | `pnpm build` | production build |
 | `pnpm lint` / `pnpm test` | ESLint / Vitest |
 | `pnpm test:e2e` | Playwright (auto-starts the dev server) |
-| `pnpm update-data` | fetch missing complete UTC days and rewrite `src/data/mev-watch.json` |
+| `pnpm update-data` | fetch missing complete UTC days and rewrite `src/data/mev-watch.sqlite` |
 | `pnpm update-data --dry-run` | validate the snapshot and print the missing date range without network fetches |
 
 ## Architecture pointers
 
-- **Data snapshot** — `src/data/mev-watch.json` stores canonical raw daily relay,
+- **Data artifact** — `src/data/mev-watch.sqlite` stores canonical raw daily relay,
   builder, and total-chain-block counts.
 - **Relay metadata** — `src/data/relays.json` stores editorial relay posture and
   display metadata.
 - **Derivations** — `src/lib/mev-watch-data.ts` computes chart, composition, and
-  leaderboard view models from the checked-in snapshot.
-- **Generator** — `scripts/update-data.ts` is run by
-  `.github/workflows/update-data.yml` on a daily cron and commits data changes
-  directly.
+  leaderboard view models from raw SQLite rows.
+- **Generator** — `scripts/update-data.ts` writes the local SQLite artifact. In
+  production, `src/app/api/cron/update-data/route.ts` runs from Vercel Cron and
+  publishes the refreshed artifact to Vercel Blob.
 - **Public API** — `src/app/api/v1/{summary,trend,relays}` serves read-only JSON
-  backed by the same checked-in data.
+  backed by the same SQLite artifact.
 
 ## Docs
 

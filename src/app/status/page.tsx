@@ -8,9 +8,11 @@ import { formatRelativeTime } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Status | MEV Watch",
-  description:
-    "Status of the checked-in MEV Watch data snapshot and its freshness.",
+  description: "Status of the MEV Watch SQLite data artifact and its freshness.",
 };
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export default async function StatusPage() {
   const [snapshot, latestStats] = await Promise.all([
@@ -30,9 +32,9 @@ export default async function StatusPage() {
             Data snapshot status
           </h1>
           <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-fg-muted">
-            MEV Watch now serves a checked-in JSON snapshot. A scheduled GitHub
-            Actions workflow refreshes that file and commits it back to the
-            repository.
+            MEV Watch serves a SQLite data artifact. A scheduled Vercel Cron
+            job refreshes the artifact and publishes the latest copy to Vercel
+            Blob.
           </p>
         </Reveal>
 

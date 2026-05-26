@@ -1,8 +1,9 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import {
+  appendSnapshotDays,
   buildDateRange,
   fetchMevWatchDay,
   fetchRelayscanDay,
@@ -20,6 +21,24 @@ const EMPTY: MevWatchSnapshot = {
   sourceEndDate: null,
   days: [],
 };
+
+async function seedSqliteSnapshot(filePath: string): Promise<void> {
+  await appendSnapshotDays(
+    {
+      ...EMPTY,
+      sourceEndDate: "2022-09-15",
+      days: [
+        {
+          date: "2022-09-15",
+          relays: [],
+          builders: [],
+          totalChainBlocks: 0,
+        },
+      ],
+    },
+    filePath,
+  );
+}
 
 describe("MEV Watch data generator planning helpers", () => {
   it("starts from the merge date when no snapshot days exist", () => {
@@ -71,6 +90,48 @@ describe("MEV Watch data generator planning helpers", () => {
         { date: "2026-05-21", relays: [], builders: [], totalChainBlocks: 3 },
       ],
     });
+  });
+});
+
+describe("appendSnapshotDays", () => {
+  it("rejects days at or before the existing source end date", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
+
+    try {
+      await expect(
+        appendSnapshotDays(
+          {
+            ...EMPTY,
+            sourceEndDate: "2022-09-15",
+            days: [
+              {
+                date: "2022-09-15",
+                relays: [],
+                builders: [],
+                totalChainBlocks: 1,
+              },
+            ],
+          },
+          filePath,
+        ),
+      ).rejects.toThrow(
+        "appendSnapshotDays only accepts days after existing sourceEndDate",
+      );
+
+      const snapshot = await readSnapshot(filePath);
+      expect(snapshot.days).toEqual([
+        {
+          date: "2022-09-15",
+          relays: [],
+          builders: [],
+          totalChainBlocks: 0,
+        },
+      ]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 
@@ -141,22 +202,8 @@ describe("fetchRelayscanDay", () => {
 describe("updateDataFile", () => {
   it("reports progress as each missing day is fetched", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
-    const filePath = path.join(dir, "mev-watch.json");
-    await writeFile(
-      filePath,
-      `${JSON.stringify({
-        ...EMPTY,
-        sourceEndDate: "2022-09-15",
-        days: [
-          {
-            date: "2022-09-15",
-            relays: [],
-            builders: [],
-            totalChainBlocks: 0,
-          },
-        ],
-      })}\n`,
-    );
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
 
     const progress = vi.fn();
     try {
@@ -191,22 +238,8 @@ describe("updateDataFile", () => {
 
   it("fetches missing days with bounded concurrency", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
-    const filePath = path.join(dir, "mev-watch.json");
-    await writeFile(
-      filePath,
-      `${JSON.stringify({
-        ...EMPTY,
-        sourceEndDate: "2022-09-15",
-        days: [
-          {
-            date: "2022-09-15",
-            relays: [],
-            builders: [],
-            totalChainBlocks: 0,
-          },
-        ],
-      })}\n`,
-    );
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
 
     let active = 0;
     let maxActive = 0;
@@ -236,24 +269,46 @@ describe("updateDataFile", () => {
     expect(maxActive).toBe(2);
   });
 
+  it("limits fetched dates and reports persisted SQLite batches", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
+
+    const persisted = vi.fn();
+    try {
+      const result = await updateDataFile({
+        filePath,
+        now: new Date("2022-09-20T00:00:00.000Z"),
+        sleepMs: 0,
+        maxDays: 2,
+        writeEvery: 1,
+        onPersist: persisted,
+        fetchDay: async (date) => ({
+          date,
+          relays: [],
+          builders: [],
+          totalChainBlocks: 1,
+        }),
+      });
+
+      expect(result.fetchedDates).toEqual(["2022-09-16", "2022-09-17"]);
+      expect(persisted).toHaveBeenCalledWith({
+        persistedDates: ["2022-09-16"],
+        sourceEndDate: "2022-09-16",
+      });
+      expect(persisted).toHaveBeenCalledWith({
+        persistedDates: ["2022-09-17"],
+        sourceEndDate: "2022-09-17",
+      });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("persists completed batches before a later fetch fails", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
-    const filePath = path.join(dir, "mev-watch.json");
-    await writeFile(
-      filePath,
-      `${JSON.stringify({
-        ...EMPTY,
-        sourceEndDate: "2022-09-15",
-        days: [
-          {
-            date: "2022-09-15",
-            relays: [],
-            builders: [],
-            totalChainBlocks: 0,
-          },
-        ],
-      })}\n`,
-    );
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
 
     try {
       await expect(
@@ -289,22 +344,8 @@ describe("updateDataFile", () => {
 
   it("does not persist non-contiguous completed days", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-generator-"));
-    const filePath = path.join(dir, "mev-watch.json");
-    await writeFile(
-      filePath,
-      `${JSON.stringify({
-        ...EMPTY,
-        sourceEndDate: "2022-09-15",
-        days: [
-          {
-            date: "2022-09-15",
-            relays: [],
-            builders: [],
-            totalChainBlocks: 0,
-          },
-        ],
-      })}\n`,
-    );
+    const filePath = path.join(dir, "mev-watch.sqlite");
+    await seedSqliteSnapshot(filePath);
 
     try {
       await expect(

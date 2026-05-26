@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/*": ["src/data/mev-watch.sqlite"],
+  },
   // Serve the bundled understand-anything dashboard at /understanding-anything.
   // The static assets live under public/understanding-anything/ and are served
   // directly by Next.js; this rewrite only handles the bare entry path so a user
