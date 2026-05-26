@@ -3,6 +3,7 @@ import type { LiveLedgerSnapshot } from "./types";
 export interface SnapshotStore {
   readLatestSnapshot(): Promise<LiveLedgerSnapshot | null>;
   writeSnapshot(snapshot: LiveLedgerSnapshot): Promise<string>;
+  cleanupOldSnapshots(): Promise<{ deletedSnapshots: number }>;
 }
 
 export async function createSnapshotStore(): Promise<SnapshotStore> {
