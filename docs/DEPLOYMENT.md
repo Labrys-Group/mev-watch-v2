@@ -41,9 +41,9 @@ invocations when `CRON_SECRET` is configured.
 7. Releases the lock in a `finally` path.
 
 Normal pages and public API routes never write to SQLite. The narrow exception
-for user traffic is `/api/epochs`, which writes immutable timestamped JSON
-snapshots under the live-ledger prefix only; it never updates the daily SQLite
-artifact or a mutable `latest.json` pointer.
+for user traffic is `/api/epochs`, which maintains the live-ledger snapshot at
+`data/live-ledger/latest.json` by default, or under `MEV_WATCH_LIVE_BLOB_PREFIX`
+when configured. That endpoint never updates the daily SQLite artifact.
 
 Each cron invocation is date-budgeted so a large backlog advances over multiple
 runs instead of risking the platform function timeout. By default the route
