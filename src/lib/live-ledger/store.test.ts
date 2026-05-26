@@ -54,6 +54,22 @@ describe("local live ledger snapshot store", () => {
       });
     });
   });
+
+  it("does not overwrite a newer latest snapshot with an older refresh", async () => {
+    await withTempDir(async (dir) => {
+      const store = createLocalSnapshotStore({ dir });
+
+      await store.writeSnapshot(snapshot(20, "2026-05-26T00:00:20.000Z"));
+      await expect(
+        store.writeSnapshot(snapshot(10, "2026-05-26T00:00:10.000Z")),
+      ).resolves.toBe("latest.json");
+
+      await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+        headSlot: 20,
+        fetchedAt: "2026-05-26T00:00:20.000Z",
+      });
+    });
+  });
 });
 
 describe("blob live ledger snapshot store", () => {

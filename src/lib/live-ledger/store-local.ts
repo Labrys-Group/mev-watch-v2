@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 
-import { parseLiveLedgerSnapshot } from "./snapshots";
+import { isNewerSnapshot, parseLiveLedgerSnapshot } from "./snapshots";
 import type { SnapshotStore } from "./store";
 
 const DEFAULT_LOCAL_DIR = "data/live-ledger";
@@ -27,6 +27,10 @@ export function createLocalSnapshotStore(
     },
     async writeSnapshot(snapshot) {
       await fs.mkdir(dir, { recursive: true });
+      const latest = await this.readLatestSnapshot();
+      if (latest && !isNewerSnapshot(snapshot, latest)) {
+        return LATEST_SNAPSHOT_NAME;
+      }
       await fs.writeFile(
         filePath(dir, LATEST_SNAPSHOT_NAME),
         `${JSON.stringify(snapshot, null, 2)}\n`,

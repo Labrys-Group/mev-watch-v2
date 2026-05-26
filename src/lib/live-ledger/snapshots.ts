@@ -124,6 +124,19 @@ export function buildSnapshot({
   };
 }
 
+export function isNewerSnapshot(
+  incoming: LiveLedgerSnapshot,
+  latest: LiveLedgerSnapshot,
+): boolean {
+  const incomingTime = Date.parse(incoming.fetchedAt);
+  const latestTime = Date.parse(latest.fetchedAt);
+  if (!Number.isFinite(incomingTime) || !Number.isFinite(latestTime)) {
+    return incoming.headSlot > latest.headSlot;
+  }
+  if (incomingTime !== latestTime) return incomingTime > latestTime;
+  return incoming.headSlot > latest.headSlot;
+}
+
 export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
   const currentEpoch = epochOf(snapshot.headSlot);
   const bySlot = new Map(snapshot.blocks.map((block) => [block.slot, block]));
