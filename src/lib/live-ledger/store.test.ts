@@ -114,4 +114,31 @@ describe("blob live ledger snapshot store", () => {
 
     expect(putBlob).toHaveBeenCalledTimes(1);
   });
+
+  it("rechecks latest when Vercel Blob reports a plain ETag mismatch error", async () => {
+    const staleSnapshot = snapshot(10, "2026-05-26T00:00:10.000Z");
+    const newerSnapshot = snapshot(30, "2026-05-26T00:00:30.000Z");
+    const etagMismatch = new Error(
+      "Vercel Blob: Precondition failed: ETag mismatch.",
+    );
+
+    const getBlob = vi
+      .fn()
+      .mockResolvedValueOnce(blobResult(staleSnapshot, "etag-stale"))
+      .mockResolvedValueOnce(blobResult(newerSnapshot, "etag-newer"));
+    const putBlob = vi.fn(async () => {
+      throw etagMismatch;
+    });
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob,
+    });
+
+    await expect(
+      store.writeSnapshot(snapshot(20, "2026-05-26T00:00:20.000Z")),
+    ).resolves.toBe("latest.json");
+
+    expect(getBlob).toHaveBeenCalledTimes(2);
+    expect(putBlob).toHaveBeenCalledTimes(1);
+  });
 });
