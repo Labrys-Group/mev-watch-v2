@@ -1,20 +1,23 @@
 # MEV Watch
 
-A public transparency tool tracking OFAC censorship of Ethereum MEV-boost blocks.
+A public transparency tool tracking OFAC censorship of Ethereum MEV-boost
+blocks.
 
 Live at **[mevwatch.info](https://mevwatch.info)**.
 
-The site reports, daily, the share of MEV-boost relay payload deliveries that go
+The site reports the daily share of MEV-boost relay payload deliveries that go
 through OFAC-censoring relays. Relay posture metadata lives in
-`src/data/relays.json`; measured daily snapshots live in
-`src/data/mev-watch.sqlite`.
+`src/data/relays.json`; the checked-in daily seed artifact lives in
+`src/data/mev-watch.sqlite`. Production reads the latest copy from Vercel Blob
+when Blob credentials are configured.
 
 ## Stack
 
-Next.js 16 App Router · Tailwind v4 + shadcn/ui · SQLite data artifact ·
-Vercel Blob + Cron data refresh · Vitest + Playwright · deployed on Vercel.
+Next.js 16 App Router · React 19 · Tailwind v4 + shadcn/ui · Node SQLite data
+artifact · Vercel Blob + Vercel Cron data refresh · Vitest + Playwright ·
+deployed on Vercel.
 
-## Quick start
+## Quick Start
 
 Requires Node 24+ and pnpm.
 
@@ -24,39 +27,64 @@ pnpm update-data --dry-run   # validate the snapshot and print the missing range
 pnpm dev                     # http://localhost:3000
 ```
 
-## Common commands
+## Common Commands
 
 | Command | What it does |
 |---|---|
 | `pnpm dev` | start the dev server |
 | `pnpm build` | production build |
-| `pnpm lint` / `pnpm test` | ESLint / Vitest |
-| `pnpm test:e2e` | Playwright (auto-starts the dev server) |
+| `pnpm lint` | ESLint |
+| `pnpm test` | Vitest unit tests |
+| `pnpm test:watch` | Vitest in watch mode |
+| `pnpm test:e2e` | Playwright e2e tests; auto-starts the dev server |
 | `pnpm update-data` | fetch missing complete UTC days and rewrite `src/data/mev-watch.sqlite` |
 | `pnpm update-data --dry-run` | validate the snapshot and print the missing date range without network fetches |
+| `pnpm backfill-and-upload` | create a resumable backfill copy under `data/` and upload it to Vercel Blob |
 
-## Architecture pointers
+## App Surfaces
 
-- **Data artifact** — `src/data/mev-watch.sqlite` stores canonical raw daily relay,
-  builder, and total-chain-block counts.
-- **Relay metadata** — `src/data/relays.json` stores editorial relay posture and
-  display metadata.
-- **Derivations** — `src/lib/mev-watch-data.ts` computes chart, composition, and
-  leaderboard view models from raw SQLite rows.
-- **Generator** — `scripts/update-data.ts` writes the local SQLite artifact. In
+- `/` — main dashboard with the freshness/status bar, hero metric,
+  composition, trend, relay leaderboard, builder leaderboard, action section,
+  and FAQ.
+- `/methodology` — user-facing explanation of the metric, data source,
+  classification, and limitations.
+- `/status` — data artifact status and freshness.
+- `/embed` — standalone iframe-friendly metric card.
+- `/api/v1/summary`, `/api/v1/trend`, `/api/v1/relays` — public read-only JSON
+  API backed by the same SQLite artifact.
+- `/api/epochs` — live epoch ledger JSON backed by the live-ledger snapshot
+  store, not the daily SQLite artifact.
+
+## Architecture Pointers
+
+- **Daily SQLite artifact** — `src/data/mev-watch.sqlite` is the local seed and
+  fallback artifact. Its schema is managed in `src/lib/mev-watch-sqlite.ts`:
+  `metadata`, `days`, `relay_counts`, and `builder_counts`.
+- **Production artifact** — when `BLOB_READ_WRITE_TOKEN` is present, reads are
+  resolved through Vercel Blob via `src/lib/mev-watch-blob.ts`; the checked-in
+  SQLite file remains a seed/fallback.
+- **Relay metadata** — `src/data/relays.json` stores active and historical relay
+  posture plus display metadata. `src/config/relays.ts` validates and exposes
+  it.
+- **Derivations** — `src/lib/mev-watch-data.ts`, `src/lib/metrics.ts`, and
+  `src/lib/queries.ts` compute chart, composition, status, and leaderboard view
+  models from raw SQLite rows.
+- **Generator** — `scripts/update-data.ts` refreshes the local artifact. In
   production, `src/app/api/cron/update-data/route.ts` runs from Vercel Cron and
-  publishes the refreshed artifact to Vercel Blob.
-- **Public API** — `src/app/api/v1/{summary,trend,relays}` serves read-only JSON
-  backed by the same SQLite artifact.
+  uploads persisted progress to Blob.
+- **Live ledger** — `src/lib/live-ledger/*` polls relay
+  `/proposer_payload_delivered` endpoints and stores rolling snapshots locally
+  under `data/live-ledger/` or in Blob under `MEV_WATCH_LIVE_BLOB_PREFIX`.
+- **Cron routes** — `vercel.json` schedules `/api/cron/update-data` daily at
+  `03:30 UTC` and `/api/cron/live-ledger-cleanup` hourly.
 
 ## Docs
 
-- Design and decisions: `docs/superpowers/specs/`
-- Phased implementation plans: `docs/superpowers/plans/`
-- Methodology (user-facing): `/methodology` on the live site, source at
-  `src/app/methodology/page.tsx`
 - Production deploy + ops: `docs/DEPLOYMENT.md`
 - Working-with-the-codebase guide for AI tools: `CLAUDE.md`
+- Methodology source: `src/app/methodology/page.tsx`
+- Historical design records: `docs/superpowers/specs/`
+- Historical implementation plans: `docs/superpowers/plans/`
 
 ## License
 
