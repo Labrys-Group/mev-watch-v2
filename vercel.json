@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/update-data",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/live-ledger-cleanup",
+      "schedule": "0 * * * *"
     }
   ]
 }
