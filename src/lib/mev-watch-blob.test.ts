@@ -199,6 +199,31 @@ describe("Vercel Blob refresh lock", () => {
     });
   });
 
+  it("tries to acquire when the existing lock disappears before its body is read", async () => {
+    const now = new Date("2026-05-26T00:00:00.000Z");
+    const headBlob = vi.fn(async () => ({ etag: "vanished-etag" }));
+    const getBlob = vi.fn(async () => {
+      throw new BlobNotFoundError();
+    });
+    const putBlob = vi.fn(async () => ({ etag: "new-lock-etag" }));
+
+    const lock = await acquireRefreshLock({
+      artifactPathname: "data/mev-watch.sqlite",
+      now,
+      runId: "run-vanished",
+      headBlob,
+      getBlob,
+      putBlob,
+    });
+
+    expect(lock).toMatchObject({
+      acquired: true,
+      lockPathname: "data/mev-watch.sqlite.lock",
+      etag: "new-lock-etag",
+      runId: "run-vanished",
+    });
+  });
+
   it("treats stale-lock delete races as not acquired", async () => {
     const now = new Date("2026-05-26T00:15:01.000Z");
     const headBlob = vi.fn(async () => ({ etag: "stale-etag" }));

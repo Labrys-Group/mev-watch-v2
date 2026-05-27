@@ -15,7 +15,7 @@ export async function TrendChartData() {
         <p className="font-mono text-[13px] leading-snug text-fg-muted">
           No daily snapshots yet — run{" "}
           <code className="font-mono text-foreground">pnpm update-data</code>{" "}
-          to generate the checked-in data snapshot, then reload.
+          to generate the local data snapshot, then reload.
         </p>
       </Section>
     );

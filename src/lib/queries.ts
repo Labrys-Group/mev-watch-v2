@@ -104,7 +104,7 @@ export const getLastRefresh = cache(async (): Promise<RefreshInfo | null> => {
       status: "ok",
       source: shouldUseBlobArtifact()
         ? "Vercel Blob data/mev-watch.sqlite"
-        : "src/data/mev-watch.sqlite",
+        : process.env.MEV_WATCH_SQLITE_PATH ?? "src/data/mev-watch.sqlite",
       message: `Data through ${sourceEndDate}`,
     };
   } finally {

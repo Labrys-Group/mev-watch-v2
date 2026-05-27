@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
+const e2eSqlitePath = "data/e2e-mev-watch.sqlite";
+
 export default defineConfig({
   testDir: "e2e",
   use: {
@@ -14,8 +16,11 @@ export default defineConfig({
   retries: 0,
   webServer: {
     command: "pnpm dev",
+    env: {
+      MEV_WATCH_SQLITE_PATH: e2eSqlitePath,
+    },
     port: 3000,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

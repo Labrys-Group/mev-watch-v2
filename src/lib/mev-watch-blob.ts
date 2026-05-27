@@ -222,17 +222,21 @@ export async function acquireRefreshLock(
 
   if (existing) {
     const lockBody = await readRefreshLockBody(getBlob, lockPathname);
-    if (!isExpiredLock(lockBody, existing, now, ttlMs)) {
-      return locked(lockPathname);
-    }
-
-    try {
-      await delBlob(lockPathname, { ifMatch: existing.etag });
-    } catch (error) {
-      if (isBlobNotFoundError(error) || isBlobPreconditionFailedError(error)) {
+    if (lockBody === "missing") {
+      existing = null;
+    } else {
+      if (!isExpiredLock(lockBody, existing, now, ttlMs)) {
         return locked(lockPathname);
       }
-      throw error;
+
+      try {
+        await delBlob(lockPathname, { ifMatch: existing.etag });
+      } catch (error) {
+        if (isBlobNotFoundError(error) || isBlobPreconditionFailedError(error)) {
+          return locked(lockPathname);
+        }
+        throw error;
+      }
     }
   }
 
@@ -284,11 +288,17 @@ export async function releaseRefreshLock(
 async function readRefreshLockBody(
   getBlob: GetBlobFn,
   lockPathname: string,
-): Promise<LockBody | null> {
-  const result = await getBlob(lockPathname, {
-    access: "private",
-    useCache: false,
-  });
+): Promise<LockBody | null | "missing"> {
+  let result: Awaited<ReturnType<GetBlobFn>>;
+  try {
+    result = await getBlob(lockPathname, {
+      access: "private",
+      useCache: false,
+    });
+  } catch (error) {
+    if (isBlobNotFoundError(error)) return "missing";
+    throw error;
+  }
   if (!result || result.statusCode !== 200 || !result.stream) return null;
 
   try {
