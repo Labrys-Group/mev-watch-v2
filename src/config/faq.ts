@@ -15,7 +15,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'What does "censoring" mean?',
-    a: "A censoring relay refuses to propagate blocks containing transactions that touch targeted addresses or contracts — most famously Tornado Cash. Blocks built and delivered through such a relay will never include those transactions, regardless of fees offered.",
+    a: "A censoring relay refuses to propagate blocks containing transactions that touch targeted addresses or contracts. OFAC sanctions are one regime that can drive this filtering, with Tornado Cash the best-known example. Blocks built and delivered through such a relay will never include those transactions, regardless of fees offered.",
   },
   {
     q: "Why does censorship matter?",

@@ -5,6 +5,18 @@ import { FAQ_ITEMS } from "@/config/faq";
 import { Faq } from "./faq";
 
 describe("Faq", () => {
+  it("mentions OFAC as one source of censoring in the censoring explanation", () => {
+    render(<Faq />);
+
+    const censoringButton = screen.getByRole("button", {
+      name: /What does "censoring" mean/i,
+    });
+
+    fireEvent.click(censoringButton);
+
+    expect(screen.getByText(/OFAC sanctions are one regime/i)).toBeVisible();
+  });
+
   it("opens only the clicked card and leaves its row neighbor collapsed", () => {
     render(<Faq />);
 
