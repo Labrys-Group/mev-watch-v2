@@ -22,6 +22,7 @@
     "backfill-and-upload": "tsx scripts/backfill-and-upload.ts"
   },
   "dependencies": {
+    "@next/env": "16.2.6",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/blob": "^2.4.0",
     "class-variance-authority": "^0.7.1",

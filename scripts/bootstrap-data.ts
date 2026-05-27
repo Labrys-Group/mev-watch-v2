@@ -1,13 +1,18 @@
 import { pathToFileURL } from "node:url";
-import {
-  bootstrapMevWatchDatabase,
-  SQLITE_DATA_PATH,
-} from "../src/lib/mev-watch-sqlite";
+import { loadEnvConfig } from "@next/env";
 
-export function main(): void {
-  bootstrapMevWatchDatabase(SQLITE_DATA_PATH);
+export async function main(): Promise<void> {
+  loadEnvConfig(process.cwd(), process.env.npm_lifecycle_event === "predev");
+  const { bootstrapMevWatchDatabase, resolveMevWatchSqlitePath } = await import(
+    "../src/lib/mev-watch-sqlite"
+  );
+
+  bootstrapMevWatchDatabase(resolveMevWatchSqlitePath());
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main();
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 }
