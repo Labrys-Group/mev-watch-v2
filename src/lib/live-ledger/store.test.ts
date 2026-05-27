@@ -203,7 +203,10 @@ describe("blob live ledger snapshot store", () => {
     expect(new Set(names).size).toBe(2);
     expect(names).not.toContain("latest.json");
     expect(putBlob).toHaveBeenCalledTimes(2);
-    for (const call of putBlob.mock.calls) {
+    const putBlobCalls = putBlob.mock.calls as unknown as Array<
+      [string, unknown, Record<string, unknown>]
+    >;
+    for (const call of putBlobCalls) {
       expect(call[0]).not.toContain("latest.json");
       expect(call[2]).not.toHaveProperty("ifMatch");
     }
