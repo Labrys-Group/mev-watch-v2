@@ -9,7 +9,7 @@ The site reports the daily share of MEV-boost relay payload deliveries that go
 through OFAC-censoring relays. Relay posture metadata lives in
 `src/data/relays.json`; the local daily SQLite artifact is generated at
 `src/data/mev-watch.sqlite` and ignored by Git. Production reads the latest copy
-from Vercel Blob when Blob credentials are configured.
+from Vercel Blob.
 
 ## Stack
 
@@ -63,8 +63,8 @@ pnpm dev                     # http://localhost:3000
   `src/lib/mev-watch-sqlite.ts`: `metadata`, `days`, `relay_counts`, and
   `builder_counts`.
 - **Production artifact** — when `BLOB_READ_WRITE_TOKEN` is present, reads are
-  resolved through Vercel Blob via `src/lib/mev-watch-blob.ts`; the generated
-  local SQLite file remains a seed/fallback when Blob is not configured.
+  resolved through Vercel Blob via `src/lib/mev-watch-blob.ts`. Deployments
+  should use Blob rather than relying on a bundled local SQLite file.
 - **Relay metadata** — `src/data/relays.json` stores active and historical relay
   posture plus display metadata. `src/config/relays.ts` validates and exposes
   it.

@@ -1,4 +1,5 @@
 import packageJson from "../../package.json";
+import nextConfig from "../../next.config";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -21,6 +22,14 @@ describe("production build path", () => {
   it("bootstraps the local SQLite artifact before build and test commands", () => {
     expect(packageJson.scripts.prebuild).toBe("tsx scripts/bootstrap-data.ts");
     expect(packageJson.scripts.pretest).toBe("tsx scripts/bootstrap-data.ts");
+  });
+
+  it("does not bundle the local SQLite artifact into the production server", () => {
+    expect(nextConfig).not.toHaveProperty("outputFileTracingIncludes");
+    expect(nextConfig).toHaveProperty("outputFileTracingExcludes");
+    expect(nextConfig.outputFileTracingExcludes).toEqual({
+      "/*": ["src/data/mev-watch.sqlite", "data/*.sqlite"],
+    });
   });
 
   it("can create an empty local SQLite artifact for clean clones", async () => {

@@ -21,7 +21,6 @@ CRON_SECRET=<long random secret>
 ETH_RPC_URL=<optional Ethereum JSON-RPC URL>
 MEV_WATCH_BLOB_PATH=data/mev-watch.sqlite # optional daily artifact Blob pathname
 MEV_WATCH_BLOB_CACHE_TTL_MS=300000 # optional read cache TTL, defaults to 5 minutes
-MEV_WATCH_SQLITE_PATH=src/data/mev-watch.sqlite # optional local artifact path
 MEV_WATCH_LIVE_BLOB_PREFIX=data/live-ledger/ # optional live-ledger Blob prefix
 UPDATE_DATA_MAX_DAYS=30 # optional, defaults to 30 days per cron run
 UPDATE_DATA_REPAIR_MAX_DAYS=30 # optional, defaults to UPDATE_DATA_MAX_DAYS
@@ -53,8 +52,8 @@ Local-only overrides are documented in `.env.example`, including
 2. Acquires `data/mev-watch.sqlite.lock` in Vercel Blob, or the configured
    `MEV_WATCH_BLOB_PATH` plus `.lock`.
 3. Downloads the current SQLite artifact from Vercel Blob to `/tmp`.
-4. Falls back to the generated local SQLite artifact if no writable Blob
-   artifact exists yet.
+4. Uses the generated local SQLite artifact only as an initial seed if no
+   writable Blob artifact exists yet.
 5. Fetches missing complete UTC days, limited by `UPDATE_DATA_MAX_DAYS`.
 6. Repairs missing total-chain-block counts, limited by
    `UPDATE_DATA_REPAIR_MAX_DAYS`.
@@ -88,13 +87,14 @@ artifact.
 
 ## Initial Blob Seed
 
-The repository does not commit the SQLite binary. Local dev/build/test commands
-bootstrap an empty ignored artifact at `src/data/mev-watch.sqlite`, or at
-`MEV_WATCH_SQLITE_PATH` when configured. After creating the Blob store, create a
-real data artifact with `pnpm update-data` or `pnpm backfill-and-upload`, then
-upload it to `data/mev-watch.sqlite`, or to the path configured by
-`MEV_WATCH_BLOB_PATH`. The cron route can then continue from the stored
-`sourceEndDate`.
+The repository does not commit or bundle the SQLite binary for production.
+Local dev/build/test commands bootstrap an empty ignored artifact at
+`src/data/mev-watch.sqlite`, or at `MEV_WATCH_SQLITE_PATH` when configured.
+After creating the Blob store, create a real data artifact with
+`pnpm update-data` or `pnpm backfill-and-upload`, then upload it to
+`data/mev-watch.sqlite`, or to the path configured by `MEV_WATCH_BLOB_PATH`.
+The deployed app should read from Blob and the cron route can then continue from
+the stored `sourceEndDate`.
 
 To create a fresh backfilled artifact locally and upload it to Vercel Blob:
 
