@@ -14,8 +14,8 @@ export const FAQ_ITEMS: FaqItem[] = [
     a: "MEV-Boost is middleware that lets Ethereum validators outsource block construction to a competitive market of specialised builders, connected via relays. Builders compete to produce the most valuable block; the winning bid is relayed to the validator, who earns a larger share of MEV revenue than solo-building would yield.",
   },
   {
-    q: 'What does "OFAC-censoring" mean?',
-    a: "An OFAC-censoring relay refuses to propagate blocks containing transactions that touch US-sanctioned addresses — most famously Tornado Cash. Blocks built and delivered through such a relay will never include those transactions, regardless of fees offered.",
+    q: 'What does "censoring" mean?',
+    a: "A censoring relay refuses to propagate blocks containing transactions that touch targeted addresses or contracts — most famously Tornado Cash. Blocks built and delivered through such a relay will never include those transactions, regardless of fees offered.",
   },
   {
     q: "Why does censorship matter?",
@@ -27,7 +27,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "What should validators do?",
-    a: "Configure mev-boost to connect only to neutral relays: Ultra Sound, Aestus, Agnostic Gnosis, and Titan all have strong track records of non-censorship. Remove OFAC-filtering relays such as Flashbots, bloXroute Max Profit, and bloXroute Regulated. The cost to you is zero; the benefit to Ethereum is a credibly neutral base layer.",
+    a: "Configure mev-boost to connect only to non-censoring relays: Ultra Sound, Aestus, Agnostic Gnosis, and Titan all have strong track records of non-censorship. Remove censoring relays such as Flashbots, bloXroute Max Profit, and bloXroute Regulated. The cost to you is zero; the benefit to Ethereum is a credibly neutral base layer.",
   },
   {
     q: "Is the data verifiable?",

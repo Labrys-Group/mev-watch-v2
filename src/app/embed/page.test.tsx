@@ -36,8 +36,9 @@ describe("embed page", () => {
     expect(screen.getByText("33.4%")).toBeInTheDocument();
     expect(screen.getByText("Daily snapshot through 2023-10-24")).toBeInTheDocument();
     expect(
-      screen.getByText("OFAC-censoring relay delivery share"),
+      screen.getByText("Censoring relay delivery share"),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/blocks via OFAC-censoring relays/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/OFAC/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/blocks via censoring relays/i)).not.toBeInTheDocument();
   });
 });

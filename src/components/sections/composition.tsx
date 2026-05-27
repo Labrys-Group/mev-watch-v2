@@ -20,7 +20,7 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
   return (
     <Section
       label="01 / POST-MERGE COMPOSITION"
-      title="Censoring vs. neutral relays."
+      title="Censoring vs. non-censoring relays."
       pattern="line-grid"
       accent="var(--accent-alt-color)"
       aside={
@@ -48,13 +48,13 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
 
       <div className="grid grid-cols-1 border border-border-labrys bg-background sm:grid-cols-3">
         <CompositionBand
-          label="OFAC Censoring"
+          label="Censoring relays"
           value={censorshipPct}
           swatch="bg-ofac"
           delay="80ms"
         />
         <CompositionBand
-          label="Neutral + unknown"
+          label="Non-censoring + unknown"
           value={neutralPct}
           swatch="bg-neutral-relay"
           delay="140ms"
@@ -89,7 +89,7 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
           </div>
         </div>
 
-        {/* Neutral cell */}
+        {/* Non-censoring cell */}
         <div
           className="reveal-item border border-border-labrys p-3.5 bg-background transition-colors duration-200 hover:border-neutral-relay"
           style={{ "--delay": "210ms" } as CSSVars}
@@ -99,7 +99,7 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
               className="inline-block w-2.5 h-2.5 shrink-0 bg-neutral-relay"
               aria-hidden="true"
             />
-            Neutral relays
+            Non-censoring relays
           </div>
           <div className="font-sans font-bold text-[28px] sm:text-[30px] leading-none tracking-[-0.025em] text-foreground mt-2.5">
             <CountUp value={neutralBlocks} />

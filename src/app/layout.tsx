@@ -18,13 +18,13 @@ const splineSansMono = Spline_Sans_Mono({
 const SITE_URL = "https://www.mevwatch.info";
 const SITE_NAME = "MEV Watch";
 const SITE_DESCRIPTION =
-  "A public transparency tool tracking OFAC censorship of Ethereum MEV-boost blocks. Daily metrics and relay leaderboards.";
+  "A public transparency tool tracking censoring and non-censoring Ethereum MEV-boost relay flow. Daily metrics and relay leaderboards.";
 const GA_MEASUREMENT_ID = "G-542FSGYLE8";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — OFAC censorship on Ethereum MEV-boost`,
+    default: `${SITE_NAME} — censoring relay share on Ethereum MEV-boost`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -32,7 +32,8 @@ export const metadata: Metadata = {
   keywords: [
     "MEV",
     "MEV-boost",
-    "OFAC",
+    "censoring",
+    "non-censoring",
     "Ethereum",
     "censorship",
     "relays",
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — OFAC censorship on Ethereum MEV-boost`,
+    title: `${SITE_NAME} — censoring relay share on Ethereum MEV-boost`,
     description: SITE_DESCRIPTION,
     locale: "en_US",
     images: [
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
         url: "/preview.png",
         width: 1200,
         height: 630,
-        alt: "MEV Watch — OFAC censorship on Ethereum MEV-boost",
+        alt: "MEV Watch — censoring relay share on Ethereum MEV-boost",
       },
     ],
   },
@@ -69,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@labrys_io",
     creator: "@labrys_io",
-    title: `${SITE_NAME} — OFAC censorship on Ethereum MEV-boost`,
+    title: `${SITE_NAME} — censoring relay share on Ethereum MEV-boost`,
     description: SITE_DESCRIPTION,
     images: ["/preview.png"],
   },

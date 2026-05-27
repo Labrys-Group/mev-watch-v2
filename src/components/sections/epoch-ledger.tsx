@@ -209,5 +209,9 @@ function slotTitle(slot: SlotCell): string {
   const blockNumber = slot.blockNumber ? ` · block ${slot.blockNumber}` : "";
   const value = slot.valueWei ? ` · value ${slot.valueWei} wei` : "";
   const txs = typeof slot.numTx === "number" ? ` · tx ${slot.numTx}` : "";
-  return `Slot ${slot.slot} · ${slot.category} · relays ${relays}${blockNumber}${value}${txs}`;
+  return `Slot ${slot.slot} · ${slotCategoryLabel(slot.category)} · relays ${relays}${blockNumber}${value}${txs}`;
+}
+
+function slotCategoryLabel(category: SlotCategory): string {
+  return category === "neutral" ? "non-censoring" : category;
 }

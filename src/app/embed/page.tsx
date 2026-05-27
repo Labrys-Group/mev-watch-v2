@@ -6,7 +6,7 @@ import { getDataFreshness } from "@/lib/data-freshness";
 export const metadata: Metadata = {
   title: "Embed",
   description:
-    "OFAC censorship rate for Ethereum MEV-boost blocks — embeddable metric card.",
+    "Censoring relay share for Ethereum MEV-boost blocks — embeddable metric card.",
 };
 
 export const revalidate = 3600;
@@ -53,7 +53,7 @@ export default async function EmbedPage() {
             {formatPercent(summary.current)}
           </p>
           <p className="mt-2 font-mono text-xs uppercase tracking-wider text-fg-muted">
-            OFAC-censoring relay delivery share
+            Censoring relay delivery share
           </p>
           <p className="mt-2 font-mono text-xs uppercase tracking-wider text-warn">
             {freshness.sourceLabel}

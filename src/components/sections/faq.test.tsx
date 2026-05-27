@@ -10,7 +10,7 @@ describe("Faq", () => {
 
     const firstButton = screen.getByRole("button", { name: /What is MEV-Boost/i });
     const secondButton = screen.getByRole("button", {
-      name: /What does "OFAC-censoring" mean/i,
+      name: /What does "censoring" mean/i,
     });
 
     fireEvent.click(firstButton);
