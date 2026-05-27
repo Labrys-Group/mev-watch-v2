@@ -5,6 +5,27 @@ version: "3"
 dotenv: [".env"]
 
 tasks:
+  dev:
+    cmds:
+      - pnpm dev
+  build:
+    cmds:
+      - pnpm build
+  start:
+    cmds:
+      - pnpm start
+  lint:
+    cmds:
+      - pnpm lint
+  test:
+    cmds:
+      - pnpm test
+  test:watch:
+    cmds:
+      - pnpm test:watch
+  test:e2e:
+    cmds:
+      - pnpm test:e2e
   update-data:
     cmds:
       - pnpm update-data

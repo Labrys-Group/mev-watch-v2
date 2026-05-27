@@ -10,7 +10,7 @@ import type { CSSVars } from "@/lib/css";
 export const metadata: Metadata = {
   title: "Methodology | MEV Watch",
   description:
-    "How MEV Watch measures OFAC censorship on Ethereum: data source, metric definition, relay classification, and known limitations.",
+    "How MEV Watch measures censoring relay flow on Ethereum: data source, metric definition, relay classification, and known limitations.",
 };
 
 interface Limitation {
@@ -43,7 +43,7 @@ const LIMITATIONS: Limitation[] = [
         the MEV-Boost flow and therefore not counted in either the numerator or
         the denominator. The non-boost composition band on the dashboard shows
         their share of the overall chain separately. Because local blocks tend
-        to be censorship-neutral, the censorship percentage may overstate the
+        to be non-censoring, the censorship percentage may overstate the
         true proportion of all Ethereum blocks that are censored.
       </>
     ),
@@ -136,7 +136,7 @@ export default function MethodologyPage() {
                 style={{ "--delay": "440ms" } as CSSVars}
               >
                 MEV Watch tracks the share of Ethereum block flow that passes
-                through OFAC-censoring relays in the MEV-boost ecosystem. This
+                through censoring relays in the MEV-boost ecosystem. This
                 page explains what that means, where the data comes from, how
                 the metric is calculated, and where the approach falls short.
               </p>
@@ -156,12 +156,12 @@ export default function MethodologyPage() {
                 <p className="m-0">
                   MEV Watch answers one question: what fraction of Ethereum
                   MEV-boost block flow is currently delivered through relays
-                  that apply OFAC sanctions filtering?
+                  that apply transaction filtering?
                 </p>
                 <p className="m-0">
                   When that number is high, the majority of validators are
                   building on blocks curated by censoring infrastructure —
-                  meaning OFAC-sanctioned transactions (such as interactions
+                  meaning censoring-targeted transactions (such as interactions
                   with Tornado Cash contracts) are systematically excluded from
                   a large proportion of Ethereum blocks. When it is low, most
                   block flow passes through relays that include all valid
@@ -202,10 +202,10 @@ export default function MethodologyPage() {
                   Each relay operates its own inclusion policy. Some relays
                   (classified here as{" "}
                   <span className="text-warn">censoring</span>) instruct their
-                  builders to exclude transactions involving OFAC-sanctioned
+                  builders to exclude transactions involving targeted
                   addresses before submitting a bid. Other relays (classified
-                  as <span className="text-good">neutral</span>) apply no such
-                  filter and include all valid transactions.
+                  as <span className="text-good">non-censoring</span>) apply
+                  no such filter and include all valid transactions.
                 </p>
                 <p className="m-0">
                   Because most validators connect to multiple relays
@@ -335,10 +335,10 @@ export default function MethodologyPage() {
             </Section>
           </Reveal>
 
-          {/* 05 / OFAC RELAY CLASSIFICATION */}
+          {/* 05 / RELAY CLASSIFICATION */}
           <Reveal>
             <Section
-              label="05 / OFAC RELAY CLASSIFICATION"
+              label="05 / RELAY CLASSIFICATION"
               title="Posture by relay."
               aside={
                 <>
@@ -351,7 +351,7 @@ export default function MethodologyPage() {
               accent="var(--good)"
             >
               <p className="font-mono text-sm leading-relaxed text-fg-muted max-w-2xl mb-5 m-0">
-                Whether a relay applies OFAC sanctions filtering is an
+                Whether a relay applies transaction filtering is an
                 editorial judgement — it cannot be inferred from on-chain data
                 alone. MEV Watch maintains this classification by hand in{" "}
                 <code className="font-mono text-xs text-foreground border border-border-labrys px-1.5 py-0.5">
@@ -410,13 +410,15 @@ export default function MethodologyPage() {
                       </div>
                       {/* Posture cell — flex so the badge centres in the fixed
                           140px column; min-w on the badge keeps the three
-                          posture words (CENSORING / NEUTRAL / UNKNOWN) the
-                          same visual width so the column never looks ragged. */}
+                          posture labels the same visual width so the column
+                          never looks ragged. */}
                       <div className="flex items-center px-3 py-2.5 sm:px-4 sm:py-3 sm:border-r sm:border-border-labrys">
                         <span
                           className={`inline-flex w-full justify-center font-mono text-[9.5px] tracking-[0.12em] uppercase border px-2 py-[3px] ${postureCls}`}
                         >
-                          {relay.posture}
+                          {relay.posture === "neutral"
+                            ? "non-censoring"
+                            : relay.posture}
                         </span>
                       </div>
                       <div className="col-span-2 border-t border-border-labrys font-mono text-[10.5px] text-fg-muted px-3 py-2.5 break-all leading-tight sm:col-span-1 sm:border-t-0 sm:px-4 sm:py-3 min-w-0">

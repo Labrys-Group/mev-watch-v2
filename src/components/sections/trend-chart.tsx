@@ -90,7 +90,7 @@ function ChartTooltip({
         <span>{formatPercent(point.censored)}</span>
       </div>
       <div className="flex items-center justify-between gap-5">
-        <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
+        <LegendSwatch className="bg-neutral-relay" label="Non-censoring" />
         <span>{formatPercent(point.nonCensored)}</span>
       </div>
       <div className="mt-2 pt-2 border-t border-border-labrys">
@@ -256,7 +256,7 @@ export function TrendChart({ trend }: TrendChartProps) {
             <div className="flex items-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
               <LegendSwatch className="bg-non-boost" label="Non-boosted" />
               <LegendSwatch className="bg-ofac" label="Censored" />
-              <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
+              <LegendSwatch className="bg-neutral-relay" label="Non-censoring" />
             </div>
           </div>
 
@@ -322,7 +322,7 @@ export function TrendChart({ trend }: TrendChartProps) {
                     content={<ChartTooltip />}
                     cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
                   />
-                  {/* Declared bottom-to-top: non-censored, censored, non-boosted */}
+                  {/* Declared bottom-to-top: non-censoring, censoring, non-boosted */}
                   <Area
                     type="monotone"
                     dataKey="nonCensored"

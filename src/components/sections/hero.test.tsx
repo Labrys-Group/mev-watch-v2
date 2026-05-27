@@ -31,6 +31,8 @@ describe("Hero", () => {
     expect(screen.getByText("FALLING")).toBeInTheDocument();
     expect(screen.getByText("Daily data through 2023-10-24")).toBeInTheDocument();
     expect(screen.getByText(/This historical daily snapshot tracks/)).toBeInTheDocument();
+    expect(screen.getByText(/filter censoring-targeted transactions/i)).toBeInTheDocument();
+    expect(screen.queryByText(/OFAC/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/shows that share falling over time/)).not.toBeInTheDocument();
   });
 });

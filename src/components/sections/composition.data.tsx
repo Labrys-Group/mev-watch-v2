@@ -15,7 +15,7 @@ export async function CompositionData() {
     return (
       <Section
         label="01 / POST-MERGE COMPOSITION"
-        title="Censoring vs. neutral relays."
+        title="Censoring vs. non-censoring relays."
       >
         <p className="font-mono text-[13px] leading-snug text-fg-muted">
           No daily snapshots yet — run{" "}

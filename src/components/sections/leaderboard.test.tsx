@@ -24,7 +24,29 @@ describe("relay leaderboard terminology", () => {
     expect(relaySection).toHaveTextContent("Top relays by delivery share");
     expect(relaySection).toHaveTextContent("123 deliveries");
     expect(relaySection).toHaveTextContent("DELIVERIES");
+    expect(relaySection).toHaveTextContent("NON-CENSORING");
+    expect(relaySection).not.toHaveTextContent("OFAC");
     expect(relaySection).not.toHaveTextContent("BLOCKS");
+  });
+
+  it("labels censoring relays by posture instead of OFAC", () => {
+    render(
+      <Leaderboard
+        rows={[
+          {
+            relayId: "relay-a",
+            name: "Relay A",
+            posture: "censoring",
+            blocks: 123,
+            sharePct: 100,
+          },
+        ]}
+      />,
+    );
+
+    const relaySection = screen.getByText("03 / RELAY LEADERBOARD").closest("section");
+    expect(relaySection).toHaveTextContent("CENSORING");
+    expect(relaySection).not.toHaveTextContent("OFAC");
   });
 });
 

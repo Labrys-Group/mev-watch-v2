@@ -43,9 +43,14 @@ describe("Composition", () => {
     expect(screen.getAllByText("Daily snapshot through 2023-10-24").length).toBeGreaterThan(0);
     expect(screen.getByText(/11,869 DELIVERIES/)).toBeInTheDocument();
     expect(screen.getAllByText("MEV-boost deliveries")).toHaveLength(2);
+    expect(screen.getByText("Censoring vs. non-censoring relays.")).toBeInTheDocument();
     expect(screen.getByLabelText("Live epoch ledger")).toBeInTheDocument();
     expect(
       screen.getByText("Recent slots, independent of the daily snapshot"),
     ).toBeInTheDocument();
+    expect(screen.getAllByText("Censoring relays").length).toBeGreaterThan(0);
+    expect(screen.getByText("Non-censoring + unknown")).toBeInTheDocument();
+    expect(screen.getByText("Non-censoring relays")).toBeInTheDocument();
+    expect(screen.queryByText(/OFAC/i)).not.toBeInTheDocument();
   });
 });

@@ -83,11 +83,11 @@ export function Leaderboard({ rows }: LeaderboardProps) {
                     <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle">
                       {isCensoring ? (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-warn border-warn">
-                          OFAC
+                          CENSORING
                         </span>
                       ) : isNeutral ? (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-good border-good">
-                          NEUTRAL
+                          NON-CENSORING
                         </span>
                       ) : (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-fg-muted border-border-labrys">

@@ -4,11 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EpochLedger } from "./epoch-ledger";
 import type { LedgerData } from "@/lib/live-ledger/types";
 
-function ledger(headSlot: number, category: "neutral" | "censoring"): LedgerData {
+function ledger(
+  headSlot: number,
+  category: "neutral" | "censoring",
+  degradedRelays: string[] = [],
+): LedgerData {
   return {
     headSlot,
     fetchedAt: "2026-05-26T00:00:00.000Z",
-    degradedRelays: [],
+    degradedRelays,
     epochs: [
       {
         epoch: 3,
@@ -75,5 +79,34 @@ describe("EpochLedger", () => {
 
     expect(screen.getByText("LIVE CACHE STALE")).toBeInTheDocument();
     expect(screen.getByText("CENSORING")).toBeInTheDocument();
+  });
+
+  it("renders degraded coverage and censoring as separate explained statuses", () => {
+    render(
+      <EpochLedger
+        initial={ledger(99, "censoring", ["bloxroute.max-profit.blxrbdn.com"])}
+      />,
+    );
+
+    const statuses = screen.getByLabelText("Live ledger statuses");
+    expect(statuses).toBeInTheDocument();
+
+    expect(
+      screen.getByLabelText(
+        "Data status: Degraded relay coverage. One or more relay APIs did not respond, so the live ledger may be missing relay observations.",
+      ),
+    ).toHaveAttribute(
+      "title",
+      "One or more relay APIs did not respond, so the live ledger may be missing relay observations.",
+    );
+    expect(
+      screen.getByLabelText(
+        "Slot status: Censoring relay observed. At least one visible recent slot was delivered through a relay classified as censoring.",
+      ),
+    ).toHaveAttribute(
+      "title",
+      "At least one visible recent slot was delivered through a relay classified as censoring.",
+    );
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 });

@@ -9,12 +9,12 @@ const STEPS = [
   },
   {
     n: "02.",
-    title: "Remove OFAC-compliant relays",
+    title: "Remove censoring relays",
     body: "Drop Flashbots, bloXroute Max Profit, and bloXroute Regulated from the list.",
   },
   {
     n: "03.",
-    title: "Add neutral relays",
+    title: "Add non-censoring relays",
     body: "Ultra Sound, Aestus, Agnostic, and Titan relay — all censorship-free.",
   },
   {

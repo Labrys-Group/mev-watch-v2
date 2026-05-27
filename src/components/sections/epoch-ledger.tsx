@@ -61,12 +61,36 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
             Recent slots, independent of the daily snapshot
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 font-mono text-[9px] uppercase tracking-[0.12em]">
-          {stale ? <span className="text-warn">LIVE CACHE STALE</span> : null}
-          {data.degradedRelays.length > 0 ? (
-            <span className="text-warn">DEGRADED RELAY COVERAGE</span>
+        <div
+          aria-label="Live ledger statuses"
+          className="flex flex-wrap items-center gap-2 font-mono text-[9px] uppercase tracking-[0.12em]"
+          role="list"
+        >
+          {stale ? (
+            <StatusBadge
+              tone="warn"
+              label="Cache"
+              value="Live cache stale"
+              description="The most recent poll failed, so the ledger is showing the last successful response."
+            />
           ) : null}
-          {hasCensoring ? <span className="text-ofac">CENSORING</span> : null}
+          {data.degradedRelays.length > 0 ? (
+            <StatusBadge
+              tone="warn"
+              label="Data"
+              value="Degraded relay coverage"
+              description="One or more relay APIs did not respond, so the live ledger may be missing relay observations."
+            />
+          ) : null}
+          {hasCensoring ? (
+            <StatusBadge
+              tone="ofac"
+              label="Slot"
+              value="CENSORING"
+              accessibleStatus="Censoring relay observed"
+              description="At least one visible recent slot was delivered through a relay classified as censoring."
+            />
+          ) : null}
         </div>
       </div>
 
@@ -100,6 +124,42 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
         ))}
       </div>
     </div>
+  );
+}
+
+function StatusBadge({
+  tone,
+  label,
+  value,
+  accessibleStatus = value,
+  description,
+}: {
+  tone: "ofac" | "warn";
+  label: string;
+  value: string;
+  accessibleStatus?: string;
+  description: string;
+}) {
+  return (
+    <span
+      aria-label={`${label} status: ${accessibleStatus}. ${description}`}
+      className={[
+        "inline-flex items-center gap-1.5 border bg-background px-1.5 py-1 outline-none transition-colors",
+        "focus-visible:ring-2 focus-visible:ring-accent-brand/50",
+        tone === "ofac"
+          ? "border-ofac/35 text-ofac"
+          : "border-warn/35 text-warn",
+      ].join(" ")}
+      role="listitem"
+      tabIndex={0}
+      title={description}
+    >
+      <span className="text-fg-muted">{label}</span>
+      <span aria-hidden="true" className="text-fg-muted">
+        /
+      </span>
+      <span>{value.toUpperCase()}</span>
+    </span>
   );
 }
 
@@ -149,5 +209,9 @@ function slotTitle(slot: SlotCell): string {
   const blockNumber = slot.blockNumber ? ` · block ${slot.blockNumber}` : "";
   const value = slot.valueWei ? ` · value ${slot.valueWei} wei` : "";
   const txs = typeof slot.numTx === "number" ? ` · tx ${slot.numTx}` : "";
-  return `Slot ${slot.slot} · ${slot.category} · relays ${relays}${blockNumber}${value}${txs}`;
+  return `Slot ${slot.slot} · ${slotCategoryLabel(slot.category)} · relays ${relays}${blockNumber}${value}${txs}`;
+}
+
+function slotCategoryLabel(category: SlotCategory): string {
+  return category === "neutral" ? "non-censoring" : category;
 }

@@ -122,7 +122,7 @@ export function Hero({ verdict, freshness }: HeroProps) {
             </span>
 
             <p className="m-0">
-              Some MEV-Boost relays filter OFAC-sanctioned transactions.{" "}
+              Some MEV-Boost relays filter censoring-targeted transactions.{" "}
               <strong className="text-foreground font-semibold">
                 {isStale
                   ? "This historical daily snapshot tracks how much of Ethereum's MEV-Boost relay delivery flow passed through them"
