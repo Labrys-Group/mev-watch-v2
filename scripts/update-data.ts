@@ -13,18 +13,9 @@ export function readUpdateDataConcurrency(): number {
   return Math.floor(value);
 }
 
-export function readUpdateDataRepairMaxDays(): number | undefined {
-  const raw = process.env.UPDATE_DATA_REPAIR_MAX_DAYS;
-  if (raw === undefined || raw === "") return undefined;
-  const value = Number(raw);
-  if (!Number.isFinite(value) || value < 0) return undefined;
-  return Math.floor(value);
-}
-
 export async function main() {
   const dryRun = process.argv.includes("--dry-run");
   const concurrency = readUpdateDataConcurrency();
-  const maxRepairDays = readUpdateDataRepairMaxDays();
   if (dryRun) {
     const snapshot = await readSnapshot();
     const start = nextMissingStartDate(snapshot);
@@ -41,7 +32,6 @@ export async function main() {
   const result = await updateDataFile({
     dryRun,
     concurrency,
-    maxRepairDays,
     writeEvery: 25,
     onProgress: ({ date, index, total }) => {
       console.log(`[${index}/${total}] fetched ${date}`);
