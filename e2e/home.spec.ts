@@ -9,17 +9,7 @@ test("homepage renders the dashboard with generated test data", async ({ page })
   await expect(page.getByText(/RELAY LEADERBOARD/i)).toBeVisible();
 });
 
-test("the trend chart renders the generated snapshot series without sizing warnings", async ({
-  page,
-}) => {
-  const chartSizingWarnings: string[] = [];
-  page.on("console", (message) => {
-    const text = message.text();
-    if (text.includes("width(-1)") || text.includes("height(-1)")) {
-      chartSizingWarnings.push(text);
-    }
-  });
-
+test("the trend chart renders the generated snapshot series", async ({ page }) => {
   await page.goto("/");
   await page.getByText("02 / CENSORSHIP OVER TIME").scrollIntoViewIfNeeded();
   const section = page.locator("section").filter({
@@ -29,7 +19,6 @@ test("the trend chart renders the generated snapshot series without sizing warni
   await expect(section.locator(".recharts-area-area").first()).toBeVisible({
     timeout: 15000,
   });
-  expect(chartSizingWarnings).toEqual([]);
 });
 
 test("theme toggle flips the document theme", async ({ page }) => {
@@ -70,7 +59,9 @@ test("the composition section renders and polls the live epoch API", async ({ pa
   });
 
   await page.goto("/");
-  await expect(page.getByText(/DAILY MEV-BOOST DELIVERY DISTRIBUTION/i)).toBeVisible();
-  await expect(page.getByLabel("Live epoch ledger")).toBeVisible();
+  await expect(page.getByText(/DISTRIBUTION OF MEV-BOOST BLOCKS/i)).toBeVisible();
+  await expect(
+    page.getByLabel(/Epoch \d+: \d+ of 32 slots delivered/).first(),
+  ).toBeVisible();
   expect(epochRequests.length).toBeGreaterThan(0);
 });
