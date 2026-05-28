@@ -5,7 +5,6 @@ import type { DataFreshness } from "@/lib/data-freshness";
 
 interface HeroProps {
   verdict: HeroVerdict;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   freshness: DataFreshness;
 }
 
