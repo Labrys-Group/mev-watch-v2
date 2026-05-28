@@ -81,7 +81,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
   // Poll the API immediately on mount, then every POLL_MS.
   useEffect(() => {
     let alive = true;
-    const timeouts = new Set<ReturnType<typeof window.setTimeout>>();
+    const timeouts = new Set<number>();
 
     async function poll() {
       try {
