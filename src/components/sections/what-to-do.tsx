@@ -9,12 +9,12 @@ const STEPS = [
   },
   {
     n: "02.",
-    title: "Remove censoring relays",
+    title: "Remove OFAC-compliant relays",
     body: "Drop Flashbots, bloXroute Max Profit, and bloXroute Regulated from the list.",
   },
   {
     n: "03.",
-    title: "Add non-censoring relays",
+    title: "Add neutral relays",
     body: "Ultra Sound, Aestus, Agnostic, and Titan relay — all censorship-free.",
   },
   {
@@ -27,7 +27,7 @@ const STEPS = [
 export function WhatToDo() {
   return (
     <Section
-      label="05 / WHAT TO DO"
+      label="03 / WHAT TO DO"
       title="Keep Ethereum credibly neutral."
       aside="FOR: VALIDATORS, STAKERS, BUILDERS"
       pattern="arcs"
