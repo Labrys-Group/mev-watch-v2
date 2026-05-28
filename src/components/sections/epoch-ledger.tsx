@@ -6,19 +6,9 @@ import { createPortal } from "react-dom";
 import type { CSSVars } from "@/lib/css";
 import type { EpochRow, LedgerData, SlotCell } from "@/lib/live-ledger/types";
 import { classifyRelay } from "@/config/relays";
-import { SECONDS_PER_SLOT } from "@/lib/live-ledger/chain-time";
 
 /** Client poll interval. A slot is 12s; 10s keeps the pulse close to real-time. */
 export const POLL_MS = 10_000;
-/** Bar cadence — the chain's actual block tempo, not the poll tempo. */
-const SLOT_MS = SECONDS_PER_SLOT * 1000;
-
-/** Count slots already delivered for a row (non-pending). */
-function filledSlots(row: EpochRow): number {
-  let n = 0;
-  for (const s of row.slots) if (s.category !== "pending") n++;
-  return n;
-}
 
 type FilledCategory = "censoring" | "neutral" | "nonboost";
 
@@ -99,6 +89,10 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     const timeouts = new Set<number>();
 
     async function poll() {
+      // Restart the progress bar the moment a fetch fires so the bar's
+      // animation tracks poll cadence — when the bar finishes, the next
+      // request is going out.
+      setPollTick((t) => t + 1);
       try {
         const res = await fetch("/api/epochs", { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -126,18 +120,8 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
           staggerNext.current = true;
         }
 
-        // Only restart the poll-progress bar when the chain actually
-        // advanced — polling cadence (10s) is faster than slot cadence
-        // (12s), so most polls return the same data and shouldn't make
-        // the bar flicker.
-        const dataAdvanced =
-          changes.epochShift !== 0 ||
-          filledSlots(next.epochs[0]) !==
-            filledSlots(prevRef.current.epochs[0]);
-
         prevRef.current = next;
         setData(next);
-        if (dataAdvanced) setPollTick((t) => t + 1);
       } catch {
         if (alive) setReconnecting(true);
       }
@@ -181,10 +165,9 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       className="relative border border-border-labrys bg-background p-3 sm:p-4"
       onMouseLeave={() => setHover(null)}
     >
-      {/* Browser-style poll progress bar — fills over one slot (12s),
-          snaps back and restarts only when the ledger actually advances
-          (a new slot fills or the epoch ticks). If a slot is late, the
-          bar holds at full instead of pretending to start a new cycle. */}
+      {/* Browser-style poll progress bar — fills over one poll cycle
+          (POLL_MS). Restarts at the start of every fetch so that the
+          moment the bar finishes, the next request is going out. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-[2px] overflow-hidden"
@@ -192,7 +175,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
         <div
           key={pollTick}
           className="epoch-poll-bar h-full w-full"
-          style={{ animationDuration: `${SLOT_MS}ms` } as CSSVars}
+          style={{ animationDuration: `${POLL_MS}ms` } as CSSVars}
         />
       </div>
 
