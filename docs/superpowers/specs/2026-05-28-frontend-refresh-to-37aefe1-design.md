@@ -88,15 +88,14 @@ Ship a `front-end-refresh` branch whose user-visible surface matches `37aefe1` f
 
 ## Cross-cutting cleanups
 
-- **Operational debt:** `mockup-b-terminal.html` at the repo root was committed in a wip checkpoint and should be deleted (matches the existing `sandbox-files-are-debt` user-memory rule).
 - **Seed-command copy:** every empty-state that says `pnpm update-data` reverts to `pnpm seed-history`. Caught in `hero.data.tsx`, `status-bar.data.tsx`, `composition.data.tsx`, `trend-chart.data.tsx`, and the `hero.tsx` JSX itself.
-- **Section numbering:** the dashboard section labels shifted (Composition stayed 01, Trend was 02, Leaderboard 03→04, Builder 04→05, What-to-do 03→05). Re-sequence to `37aefe1`'s numbering (Composition 01, Trend 02, Relay 03, Builder 04, What-to-do 05 — but verify against the actual `37aefe1` file rather than this summary).
+- **Section numbering:** the `<Section label="NN / …" />` prop inside each component shifted (Composition stayed `01 / POST-MERGE COMPOSITION`, Trend stayed `02`, Leaderboard `03→04`, Builder `04→05`, What-to-do `03→05`). Re-sequence to `37aefe1`'s numbering: Composition 01, Trend 02, Relay 03, Builder 04, What-to-do 05. Methodology section labels (inside `src/app/methodology/page.tsx`) shifted similarly (`05 / OFAC RELAY CLASSIFICATION` → `05 / RELAY CLASSIFICATION`) — revert those too. Verify each label against the `37aefe1` source file before committing.
 
 ## Commit strategy
 
 One commit per coherent grouping so the PR diff is reviewable surface-by-surface:
 
-1. `chore: branch off origin/main + delete sandbox HTML`
+1. `chore: branch off origin/main` (already done — `d76d0f6`)
 2. `refactor(hero): revert to 37aefe1 stat card + readme copy; keep freshness wiring`
 3. `refactor(status-bar): revert mobile grid + LIVE cell; keep freshness wiring`
 4. `refactor(composition): restore 2-tile + epoch-grid layout; keep ledger/freshness props`
