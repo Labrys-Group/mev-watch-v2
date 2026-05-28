@@ -1,12 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Manrope, Spline_Sans_Mono } from "next/font/google";
-import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { StatusBarSkeleton } from "@/components/skeletons/status-bar.skeleton";
-import { SiteHeader } from "@/components/sections/site-header";
-import { StatusBarData } from "@/components/sections/status-bar.data";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -160,13 +156,6 @@ export default function RootLayout({
           {/* Fixed page-wide blueprint grid, behind all content */}
           <div className="bg-grid" aria-hidden="true" />
           <ScrollProgress />
-          {/* Status bar + nav stay pinned together across route transitions. */}
-          <div className="sticky top-0 z-50">
-            <Suspense fallback={<StatusBarSkeleton />}>
-              <StatusBarData />
-            </Suspense>
-            <SiteHeader />
-          </div>
           {children}
         </ThemeProvider>
         <Script
