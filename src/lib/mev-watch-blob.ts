@@ -10,7 +10,7 @@ import {
   head,
   put,
 } from "@vercel/blob";
-import { SQLITE_DATA_PATH } from "./mev-watch-sqlite";
+import { initializeMevWatchDatabase, SQLITE_DATA_PATH } from "./mev-watch-sqlite";
 
 export const DEFAULT_BLOB_PATHNAME = "data/mev-watch.sqlite";
 export const BLOB_CACHE_PATH = path.join(tmpdir(), "mev-watch.sqlite");
@@ -59,6 +59,13 @@ type HeadBlobFn = (pathname: string) => Promise<BlobHeadResult>;
 type GetBlobFn = typeof get;
 type PutBlobFn = typeof put;
 type DelBlobFn = typeof del;
+
+class BlobArtifactNotFoundError extends Error {
+  constructor(pathname: string) {
+    super(`Blob data artifact not found at ${pathname}`);
+    this.name = "BlobArtifactNotFoundError";
+  }
+}
 
 interface AcquireRefreshLockOptions {
   artifactPathname?: string;
@@ -138,12 +145,13 @@ export async function prepareWritableArtifactPath(): Promise<string> {
   try {
     return await downloadBlobArtifact({ filePath: BLOB_WRITE_PATH });
   } catch (error) {
-    try {
-      await fs.copyFile(SQLITE_DATA_PATH, BLOB_WRITE_PATH);
-      return BLOB_WRITE_PATH;
-    } catch {
+    if (!(error instanceof BlobArtifactNotFoundError)) {
       throw error;
     }
+    await fs.rm(BLOB_WRITE_PATH, { force: true });
+    const db = initializeMevWatchDatabase(BLOB_WRITE_PATH);
+    db.close();
+    return BLOB_WRITE_PATH;
   }
 }
 
@@ -163,8 +171,8 @@ export async function downloadBlobArtifact(
     access: "private",
   })) as BlobGetResult | null;
 
-  if (!result || result.statusCode !== 200) {
-    throw new Error(`Blob data artifact not found at ${pathname}`);
+  if (!result || result.statusCode !== 200 || !result.stream) {
+    throw new BlobArtifactNotFoundError(pathname);
   }
 
   const bytes = Buffer.from(await new Response(result.stream).arrayBuffer());
@@ -299,7 +307,8 @@ async function readRefreshLockBody(
     if (isBlobNotFoundError(error)) return "missing";
     throw error;
   }
-  if (!result || result.statusCode !== 200 || !result.stream) return null;
+  if (!result) return "missing";
+  if (result.statusCode !== 200 || !result.stream) return null;
 
   try {
     const body = await new Response(result.stream).json();

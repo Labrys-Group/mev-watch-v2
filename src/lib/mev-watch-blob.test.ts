@@ -4,14 +4,22 @@ import path from "node:path";
 import { promises as fs } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  BLOB_WRITE_PATH,
   REFRESH_LOCK_TTL_MS,
   acquireRefreshLock,
   clearArtifactPathCache,
   downloadBlobArtifact,
   getMevWatchLockPathname,
+  prepareWritableArtifactPath,
   resolveReadableArtifactPath,
   releaseRefreshLock,
 } from "./mev-watch-blob";
+import {
+  createReadOnlyMevWatchDatabase,
+  readSnapshotFromDatabase,
+} from "./mev-watch-sqlite";
+
+const blobGetMock = vi.hoisted(() => vi.fn());
 
 class BlobNotFoundError extends Error {
   constructor() {
@@ -27,6 +35,31 @@ class BlobPreconditionFailedError extends Error {
   }
 }
 
+vi.mock("@vercel/blob", () => {
+  class MockBlobNotFoundError extends Error {
+    constructor() {
+      super("not found");
+      this.name = "BlobNotFoundError";
+    }
+  }
+
+  class MockBlobPreconditionFailedError extends Error {
+    constructor() {
+      super("precondition failed");
+      this.name = "BlobPreconditionFailedError";
+    }
+  }
+
+  return {
+    BlobNotFoundError: MockBlobNotFoundError,
+    BlobPreconditionFailedError: MockBlobPreconditionFailedError,
+    del: vi.fn(),
+    get: blobGetMock,
+    head: vi.fn(),
+    put: vi.fn(),
+  };
+});
+
 function jsonStream(value: unknown): ReadableStream<Uint8Array> {
   return new Response(JSON.stringify(value)).body as ReadableStream<Uint8Array>;
 }
@@ -37,11 +70,46 @@ function byteStream(value: string): ReadableStream<Uint8Array> {
 
 afterEach(() => {
   clearArtifactPathCache();
+  blobGetMock.mockReset();
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
 });
 
 describe("Vercel Blob data artifact cache", () => {
+  it("bootstraps an empty writable artifact when the Blob artifact is missing", async () => {
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "token");
+    blobGetMock.mockResolvedValue(null);
+    await rm(BLOB_WRITE_PATH, { force: true });
+
+    try {
+      await expect(prepareWritableArtifactPath()).resolves.toBe(BLOB_WRITE_PATH);
+
+      const db = createReadOnlyMevWatchDatabase(BLOB_WRITE_PATH);
+      try {
+        const snapshot = readSnapshotFromDatabase(db);
+        expect(snapshot.sourceStartDate).toBe("2022-09-15");
+        expect(snapshot.sourceEndDate).toBeNull();
+        expect(snapshot.days).toEqual([]);
+      } finally {
+        db.close();
+      }
+    } finally {
+      await rm(BLOB_WRITE_PATH, { force: true });
+    }
+  });
+
+  it("does not bootstrap over non-missing Blob download failures", async () => {
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "token");
+    blobGetMock.mockRejectedValue(new Error("auth failed"));
+    await rm(BLOB_WRITE_PATH, { force: true });
+
+    try {
+      await expect(prepareWritableArtifactPath()).rejects.toThrow("auth failed");
+    } finally {
+      await rm(BLOB_WRITE_PATH, { force: true });
+    }
+  });
+
   it("retries a Blob download after an earlier cache miss failed", async () => {
     vi.stubEnv("BLOB_READ_WRITE_TOKEN", "token");
     const dir = await mkdtemp(path.join(tmpdir(), "mev-watch-blob-"));
@@ -199,12 +267,35 @@ describe("Vercel Blob refresh lock", () => {
     });
   });
 
-  it("tries to acquire when the existing lock disappears before its body is read", async () => {
+  it("tries to acquire when the existing lock throws not found before its body is read", async () => {
     const now = new Date("2026-05-26T00:00:00.000Z");
     const headBlob = vi.fn(async () => ({ etag: "vanished-etag" }));
     const getBlob = vi.fn(async () => {
       throw new BlobNotFoundError();
     });
+    const putBlob = vi.fn(async () => ({ etag: "new-lock-etag" }));
+
+    const lock = await acquireRefreshLock({
+      artifactPathname: "data/mev-watch.sqlite",
+      now,
+      runId: "run-vanished",
+      headBlob,
+      getBlob,
+      putBlob,
+    });
+
+    expect(lock).toMatchObject({
+      acquired: true,
+      lockPathname: "data/mev-watch.sqlite.lock",
+      etag: "new-lock-etag",
+      runId: "run-vanished",
+    });
+  });
+
+  it("tries to acquire when the existing lock returns null before its body is read", async () => {
+    const now = new Date("2026-05-26T00:00:00.000Z");
+    const headBlob = vi.fn(async () => ({ etag: "vanished-etag" }));
+    const getBlob = vi.fn(async () => null);
     const putBlob = vi.fn(async () => ({ etag: "new-lock-etag" }));
 
     const lock = await acquireRefreshLock({
