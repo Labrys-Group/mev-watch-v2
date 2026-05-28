@@ -17,12 +17,6 @@ vi.mock("@/lib/queries", () => ({
     peakDate: "2022-11-01",
     trough: 20,
   })),
-  getLastRefresh: vi.fn(async () => ({
-    ranAt: new Date("2026-05-25T07:07:43.521Z"),
-    status: "ok",
-    source: "src/data/mev-watch.sqlite",
-    message: "Data through 2023-10-24",
-  })),
 }));
 
 describe("embed page", () => {
@@ -30,15 +24,12 @@ describe("embed page", () => {
     expect(embedPage.metadata.title).toBe("Embed");
   });
 
-  it("renders snapshot freshness and delivery-share wording", async () => {
+  it("renders the metric with OFAC-censoring relay wording", async () => {
     render(await embedPage.default());
 
     expect(screen.getByText("33.4%")).toBeInTheDocument();
-    expect(screen.getByText("Daily snapshot through 2023-10-24")).toBeInTheDocument();
     expect(
-      screen.getByText("Censoring relay delivery share"),
+      screen.getByText("of MEV-boost blocks via OFAC-censoring relays"),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/OFAC/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/blocks via censoring relays/i)).not.toBeInTheDocument();
   });
 });

@@ -1,21 +1,19 @@
 import type { Metadata } from "next";
-import { getLastRefresh, getLatestStats, getStatsSummary } from "@/lib/queries";
+import { getLatestStats, getStatsSummary } from "@/lib/queries";
 import { formatPercent } from "@/lib/format";
-import { getDataFreshness } from "@/lib/data-freshness";
 
 export const metadata: Metadata = {
   title: "Embed",
   description:
-    "Censoring relay share for Ethereum MEV-boost blocks — embeddable metric card.",
+    "Live OFAC censorship rate for Ethereum MEV-boost blocks — embeddable metric card.",
 };
 
 export const revalidate = 3600;
 
 export default async function EmbedPage() {
-  const [latest, summary, lastRefresh] = await Promise.all([
+  const [latest, summary] = await Promise.all([
     getLatestStats(),
     getStatsSummary(),
-    getLastRefresh(),
   ]);
 
   if (!latest || !summary) {
@@ -34,10 +32,6 @@ export default async function EmbedPage() {
   }
 
   const drop = (summary.peak - summary.current).toFixed(1);
-  const freshness = getDataFreshness({
-    latestDate: latest.date,
-    generatedAt: lastRefresh?.ranAt ?? null,
-  });
 
   return (
     <main className="bg-background flex min-h-screen items-center justify-center p-4">
@@ -53,10 +47,7 @@ export default async function EmbedPage() {
             {formatPercent(summary.current)}
           </p>
           <p className="mt-2 font-mono text-xs uppercase tracking-wider text-fg-muted">
-            Censoring relay delivery share
-          </p>
-          <p className="mt-2 font-mono text-xs uppercase tracking-wider text-warn">
-            {freshness.sourceLabel}
+            of MEV-boost blocks via OFAC-censoring relays
           </p>
         </div>
 
