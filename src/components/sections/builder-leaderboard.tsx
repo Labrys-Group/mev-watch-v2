@@ -13,7 +13,12 @@ const TH =
 export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
   // Caption surfaces the timeframe + the block-total so readers don't have to
   // infer "WINDOW: 1D" from the cryptic aside (also invisible on mobile).
+  // Total uses the unfiltered set so it still reflects every MEV-boost block,
+  // even when the long tail of <0.1% builders is hidden below.
   const totalBlocks = rows.reduce((sum, r) => sum + r.blocks, 0);
+  // Drop the long-tail noise — builders sitting on a handful of blocks add
+  // visual length without signal.
+  const displayRows = rows.filter((r) => r.sharePct >= 0.1);
 
   return (
     <Section
@@ -42,7 +47,7 @@ export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 ? (
+            {displayRows.length === 0 ? (
               <tr>
                 <td
                   colSpan={4}
@@ -52,7 +57,7 @@ export function BuilderLeaderboard({ rows }: BuilderLeaderboardProps) {
                 </td>
               </tr>
             ) : (
-              rows.map((row, index) => {
+              displayRows.map((row, index) => {
                 const rank = String(index + 1).padStart(2, "0");
 
                 return (

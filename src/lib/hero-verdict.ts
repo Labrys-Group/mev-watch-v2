@@ -11,7 +11,12 @@ const SMOOTH_DAYS = 7;
 /** Month-over-month lookback. */
 const LOOKBACK_DAYS = 30;
 
-export type HeroState = "falling" | "rising" | "contained" | "winning";
+export type HeroState =
+  | "falling"
+  | "rising"
+  | "contained"
+  | "winning"
+  | "offline";
 
 export interface HeroVerdict {
   /** Classified trend state. */
@@ -19,7 +24,7 @@ export interface HeroVerdict {
   /** Word completing "CENSORSHIP IS ___". */
   headlineWord: string;
   /** Drives the Hero's colour, glow, and verdict wash. */
-  tone: "good" | "bad";
+  tone: "good" | "bad" | "neutral";
   /** Directional glyph for the stat line. */
   arrow: string;
   /** Latest day's censorship % — the big number the Hero shows. */
@@ -35,6 +40,7 @@ const COPY: Record<HeroState, Pick<HeroVerdict, "headlineWord" | "tone" | "arrow
   rising: { headlineWord: "RISING", tone: "bad", arrow: "▲" },
   contained: { headlineWord: "CONTAINED", tone: "good", arrow: "-" },
   winning: { headlineWord: "WINNING", tone: "bad", arrow: "-" },
+  offline: { headlineWord: "OFFLINE", tone: "neutral", arrow: "—" },
 };
 
 /** Add `days` (may be negative) to an ISO `YYYY-MM-DD` date. */
@@ -59,6 +65,7 @@ function messageFor(state: HeroState, changePct: number): string {
     rising: `Up ${abs}% over the last 30 days — censorship is regaining its grip.`,
     contained: "Barely moved in a month — censorship resistance remains strong.",
     winning: "Barely moved in a month — censorship is taking over.",
+    offline: "Awaiting the next daily snapshot — figures will populate once data is available.",
   };
   return messages[state];
 }
@@ -82,7 +89,7 @@ function build(state: HeroState, current: number, changePct: number): HeroVerdic
  * visually contradict each other.
  */
 export function computeHeroVerdict(trend: TrendPoint[]): HeroVerdict {
-  if (trend.length === 0) return build("contained", 0, 0);
+  if (trend.length === 0) return build("offline", 0, 0);
 
   const latest = trend[trend.length - 1];
   const current = latest.censorshipPct;

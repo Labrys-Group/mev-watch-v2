@@ -51,7 +51,7 @@ describe("fetchRelayPayloads", () => {
       },
     ]);
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://relay.ultrasound.money/relay/v1/data/bidtraces/proposer_payload_delivered?limit=200",
+      "https://relay.ultrasound.money/relay/v1/data/bidtraces/proposer_payload_delivered?limit=100",
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });

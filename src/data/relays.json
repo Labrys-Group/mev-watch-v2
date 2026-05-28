@@ -72,8 +72,7 @@
     "id": "relay.btcs.com",
     "name": "BTCS",
     "posture": "censoring",
-    "active": true,
-    "dataApiHost": "relay.btcs.com"
+    "active": false
   },
   {
     "id": "bloxroute.ethical.blxrbdn.com",

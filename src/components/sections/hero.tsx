@@ -9,24 +9,47 @@ interface HeroProps {
 }
 
 export function Hero({ verdict }: HeroProps) {
-  const isGood = verdict.tone === "good";
   const trendWord = verdict.headlineWord;
-  const trendColor = isGood ? "text-good" : "text-warn";
-  const trendGlow = isGood ? "glow-good" : "glow-warn";
-  const trendBorder = isGood ? "border-good" : "border-warn";
+  const trendColor =
+    verdict.tone === "good"
+      ? "text-good"
+      : verdict.tone === "bad"
+        ? "text-warn"
+        : "text-fg-muted";
+  const trendGlow =
+    verdict.tone === "good"
+      ? "glow-good"
+      : verdict.tone === "bad"
+        ? "glow-warn"
+        : "";
+  const trendBorder =
+    verdict.tone === "good"
+      ? "border-good"
+      : verdict.tone === "bad"
+        ? "border-warn"
+        : "border-border-labrys";
+  // Verdict-tinted wash colour — null for the neutral/offline tone so the
+  // hero card stays cool instead of leaning green or amber on no data.
+  const washColor =
+    verdict.tone === "good"
+      ? "var(--good)"
+      : verdict.tone === "bad"
+        ? "var(--warn)"
+        : null;
 
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
-      {/* Verdict-tinted wash — a faint colour cue for the current trend */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: `radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, ${
-            isGood ? "var(--good)" : "var(--warn)"
-          } 14%, transparent) 0%, transparent 58%)`,
-        }}
-      />
+      {/* Verdict-tinted wash — a faint colour cue for the current trend. Skipped
+          when the verdict is neutral (e.g. no data) so the panel stays cool. */}
+      {washColor && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, ${washColor} 14%, transparent) 0%, transparent 58%)`,
+          }}
+        />
+      )}
       {/* Faded grid background texture */}
       <div aria-hidden="true" className="faded-grid pointer-events-none absolute inset-0" />
 

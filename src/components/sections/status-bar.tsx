@@ -7,6 +7,8 @@ interface StatusBarProps {
   censorshipPct: number;
   lastRefresh?: Date | null;
   freshness: DataFreshness;
+  /** When false, swaps LIVE → DISCONNECTED and dims downstream values. */
+  connected?: boolean;
 }
 
 export function StatusBar({
@@ -15,6 +17,7 @@ export function StatusBar({
   lastRefresh,
   // Preserved in props for the data wrapper to pass; not rendered after the 37aefe1 revert.
   freshness: _freshness,
+  connected = true,
 }: StatusBarProps) {
   const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
 
@@ -77,26 +80,42 @@ export function StatusBar({
 
         <StatusCell label="NETWORK" value="ETH MAINNET" mdOnly />
 
-        <StatusCell
-          label="STATUS"
-          valueClassName="text-good flex items-center gap-1.5"
-          value={
-            <>
-              <span
-                className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
-                style={{ boxShadow: "0 0 6px var(--good)" }}
-              />
-              LIVE
-            </>
-          }
-        />
+        {connected ? (
+          <StatusCell
+            label="STATUS"
+            valueClassName="text-good flex items-center gap-1.5"
+            value={
+              <>
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
+                  style={{ boxShadow: "0 0 6px var(--good)" }}
+                />
+                LIVE
+              </>
+            }
+          />
+        ) : (
+          <StatusCell
+            label="STATUS"
+            valueClassName="text-warn flex items-center gap-1.5"
+            value={
+              <>
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-warn mr-1 animate-pulse"
+                  style={{ boxShadow: "0 0 6px var(--warn)" }}
+                />
+                DISCONNECTED
+              </>
+            }
+          />
+        )}
 
         <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
 
         <StatusCell
           label="CENSORSHIP"
           value={formatPercent(censorshipPct)}
-          valueClassName="text-warn"
+          valueClassName={connected ? "text-warn" : "text-fg-muted"}
         />
 
         <StatusCell label="UPDATED" value={updatedText} mdOnly isLast />

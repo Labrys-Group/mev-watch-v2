@@ -35,6 +35,8 @@ export function CountUp({
     const el = ref.current;
     if (!el) return;
 
+    let rafId: number | null = null;
+
     // After the intro count-up has played once, subsequent value changes
     // (e.g. the trend-chart range toggle) snap to the new value instead
     // of re-triggering the scroll-into-view animation.
@@ -58,15 +60,17 @@ export function CountUp({
         const t = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - t, 3);
         setDisplay(value * eased);
-        if (t < 1) requestAnimationFrame(frame);
+        if (t < 1) rafId = requestAnimationFrame(frame);
         else setDisplay(value);
       };
-      requestAnimationFrame(frame);
+      rafId = requestAnimationFrame(frame);
     };
 
     if (typeof IntersectionObserver === "undefined") {
       run();
-      return;
+      return () => {
+        if (rafId !== null) cancelAnimationFrame(rafId);
+      };
     }
 
     const observer = new IntersectionObserver(
@@ -82,7 +86,14 @@ export function CountUp({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      // Cancel any in-flight intro animation so a value change mid-frame
+      // (e.g. clicking a trend-chart range tab while the count-up is still
+      // running) doesn't get overwritten by the next frame using the stale
+      // target captured in the RAF closure.
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [value, duration]);
 
   const text =

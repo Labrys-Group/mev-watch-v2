@@ -20,9 +20,22 @@ export function formatRelativeTime(then: Date, now: Date = new Date()): string {
 }
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /** Formats an ISO date string ("2022-11-14") as "Nov '22". */
 export function formatDateShort(isoDate: string): string {
   const [year, month] = isoDate.split("-");
   return `${MONTHS[Number(month) - 1]} '${year.slice(2)}`;
+}
+
+/** Formats an ISO date string ("2022-11-14") as "Mon · 14 Nov 2022".
+ *  Parses in UTC because daily snapshots are stored as UTC days — local
+ *  parsing would shift the weekday for users west of UTC. */
+export function formatDateLong(isoDate: string): string {
+  const [yearStr, monthStr, dayStr] = isoDate.split("-");
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  const d = new Date(Date.UTC(year, month - 1, day));
+  return `${DAYS[d.getUTCDay()]} · ${day} ${MONTHS[month - 1]} ${year}`;
 }

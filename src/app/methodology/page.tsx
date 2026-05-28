@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
+import { StatusBarData } from "@/components/sections/status-bar.data";
+import { StatusBarSkeleton } from "@/components/skeletons/status-bar.skeleton";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
 import { RELAYS } from "@/config/relays";
@@ -84,7 +87,12 @@ const LIMITATIONS: Limitation[] = [
 export default function MethodologyPage() {
   return (
     <div className="min-h-screen">
-      <SiteHeader />
+      <div className="sticky top-0 z-50">
+        <Suspense fallback={<StatusBarSkeleton />}>
+          <StatusBarData />
+        </Suspense>
+        <SiteHeader />
+      </div>
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="space-y-4 py-5">
           {/* Page hero — same vocabulary as the home Hero: panel card, faded

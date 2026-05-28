@@ -16,6 +16,9 @@ describe("RELAYS config", () => {
   });
 
   it("matches the verified current relay table (relayscan mainnet poll set)", () => {
+    // BTCS removed from the active poll set on 2026-05-28: its
+    // proposer_payload_delivered endpoint has been ~5 months stale, producing
+    // only false-negative "non-MEV-boost" tiles in the live ledger.
     expect(RELAYS.map(({ id, name, posture }) => ({ id, name, posture }))).toEqual([
       { id: "relay.ultrasound.money", name: "Ultra Sound", posture: "neutral" },
       { id: "titanrelay.xyz", name: "Titan Relay", posture: "neutral" },
@@ -38,7 +41,6 @@ describe("RELAYS config", () => {
       { id: "agnostic-relay.net", name: "Agnostic Gnosis", posture: "neutral" },
       { id: "relay.edennetwork.io", name: "Eden Network", posture: "censoring" },
       { id: "relay.ethgas.com", name: "EthGas", posture: "unknown" },
-      { id: "relay.btcs.com", name: "BTCS", posture: "censoring" },
     ]);
   });
 });

@@ -6,9 +6,19 @@ import { createPortal } from "react-dom";
 import type { CSSVars } from "@/lib/css";
 import type { EpochRow, LedgerData, SlotCell } from "@/lib/live-ledger/types";
 import { classifyRelay } from "@/config/relays";
+import { SECONDS_PER_SLOT } from "@/lib/live-ledger/chain-time";
 
 /** Client poll interval. A slot is 12s; 10s keeps the pulse close to real-time. */
 export const POLL_MS = 10_000;
+/** Bar cadence — the chain's actual block tempo, not the poll tempo. */
+const SLOT_MS = SECONDS_PER_SLOT * 1000;
+
+/** Count slots already delivered for a row (non-pending). */
+function filledSlots(row: EpochRow): number {
+  let n = 0;
+  for (const s of row.slots) if (s.category !== "pending") n++;
+  return n;
+}
 
 type FilledCategory = "censoring" | "neutral" | "nonboost";
 
@@ -18,8 +28,10 @@ const CAT_META: Record<
 > = {
   censoring: { label: "OFAC Censoring", bg: "bg-ofac", text: "text-warn" },
   neutral: { label: "Neutral", bg: "bg-neutral-relay", text: "text-good" },
+  // Covers both genuinely locally-built blocks and slots no relay we polled
+  // reported on — we stay vague rather than over-claiming "non-MEV-boost".
   nonboost: {
-    label: "Non-MEV-Boost",
+    label: "Relay Unknown / Non-MEV-Boost",
     bg: "bg-non-boost",
     text: "text-fg-muted",
   },
@@ -61,6 +73,9 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
   const [exiting, setExiting] = useState<EpochRow | null>(null);
   const [entering, setEntering] = useState<number | null>(null);
   const [exitCollapsed, setExitCollapsed] = useState(false);
+  // Bumped on every successful poll; used as a React key to restart the
+  // top-of-panel progress bar so it scrubs the gap between fetches.
+  const [pollTick, setPollTick] = useState(0);
   // Tap-to-detail on phones produced a tiny floating tooltip on tile-sized
   // tap targets — readers couldn't dismiss it. Gate the interaction behind
   // real hover + pointer support so only true mouse devices wire it up.
@@ -111,8 +126,18 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
           staggerNext.current = true;
         }
 
+        // Only restart the poll-progress bar when the chain actually
+        // advanced — polling cadence (10s) is faster than slot cadence
+        // (12s), so most polls return the same data and shouldn't make
+        // the bar flicker.
+        const dataAdvanced =
+          changes.epochShift !== 0 ||
+          filledSlots(next.epochs[0]) !==
+            filledSlots(prevRef.current.epochs[0]);
+
         prevRef.current = next;
         setData(next);
+        if (dataAdvanced) setPollTick((t) => t + 1);
       } catch {
         if (alive) setReconnecting(true);
       }
@@ -156,6 +181,21 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       className="relative border border-border-labrys bg-background p-3 sm:p-4"
       onMouseLeave={() => setHover(null)}
     >
+      {/* Browser-style poll progress bar — fills over one slot (12s),
+          snaps back and restarts only when the ledger actually advances
+          (a new slot fills or the epoch ticks). If a slot is late, the
+          bar holds at full instead of pretending to start a new cycle. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[2px] overflow-hidden"
+      >
+        <div
+          key={pollTick}
+          className="epoch-poll-bar h-full w-full"
+          style={{ animationDuration: `${SLOT_MS}ms` } as CSSVars}
+        />
+      </div>
+
       <div className="space-y-1">
         {/* eslint-disable-next-line react-hooks/refs -- stagger flows from the intentional render-time ref read above */}
         {rows.map((row, rowIdx) => {

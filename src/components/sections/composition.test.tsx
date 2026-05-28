@@ -52,7 +52,9 @@ describe("Composition", () => {
     // Legend strip
     expect(screen.getByText("OFAC Censoring")).toBeInTheDocument();
     expect(screen.getByText("Neutral")).toBeInTheDocument();
-    expect(screen.getByText("Non-MEV-Boost")).toBeInTheDocument();
+    expect(
+      screen.getByText("Relay Unknown / Non-MEV-Boost"),
+    ).toBeInTheDocument();
 
     // 2-tile labels
     expect(screen.getAllByText("Censoring relays").length).toBeGreaterThan(0);

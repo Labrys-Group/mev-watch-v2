@@ -67,7 +67,7 @@ export function Composition({
             className="inline-block w-2.5 h-2.5 shrink-0 bg-non-boost"
             aria-hidden="true"
           />
-          Non-MEV-Boost
+          Relay Unknown / Non-MEV-Boost
         </span>
         <span className="normal-case tracking-normal text-[10px] font-mono text-fg-muted sm:ml-auto">
           Each tile is one real slot · latest 4 epochs, live.
