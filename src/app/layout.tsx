@@ -29,8 +29,19 @@ const OG_IMAGE_ALT =
   "MEV Watch — censoring relay share on Ethereum MEV-boost";
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
+// `metadataBase` resolves every relative metadata URL (og:image, twitter:image,
+// favicons). On Vercel preview deployments we point it at the deployment
+// itself so sharing the preview URL pulls THAT build's preview.png rather
+// than production's stale one. Production and local dev keep the canonical
+// host. `alternates.canonical` is set to an absolute SITE_URL below so
+// previews never claim canonical authority over the real site.
+const METADATA_BASE_URL =
+  process.env.VERCEL_ENV !== "production" && process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : SITE_URL;
+
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(METADATA_BASE_URL),
   title: {
     default: SITE_TITLE,
     template: `%s | ${SITE_NAME}`,
@@ -61,7 +72,10 @@ export const metadata: Metadata = {
     telephone: false,
   },
   alternates: {
-    canonical: "/",
+    // Absolute, always production — even on Vercel preview deployments the
+    // canonical points at the real site so previews don't compete with
+    // production in search results.
+    canonical: `${SITE_URL}/`,
   },
   manifest: "/manifest.webmanifest",
   openGraph: {
