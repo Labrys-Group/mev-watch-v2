@@ -15,28 +15,10 @@ describe("RELAYS config", () => {
     }
   });
 
-  it("matches the verified current relay table", () => {
+  it("matches the verified current relay table (relayscan mainnet poll set)", () => {
     expect(RELAYS.map(({ id, name, posture }) => ({ id, name, posture }))).toEqual([
-      {
-        id: "relay.ultrasound.money",
-        name: "Ultra Sound",
-        posture: "neutral",
-      },
-      {
-        id: "relay-filtered.ultrasound.money",
-        name: "Ultra Sound Filtered",
-        posture: "censoring",
-      },
-      {
-        id: "titanrelay.xyz",
-        name: "Titan Relay",
-        posture: "neutral",
-      },
-      {
-        id: "regional.titanrelay.xyz",
-        name: "Titan Relay Regional",
-        posture: "censoring",
-      },
+      { id: "relay.ultrasound.money", name: "Ultra Sound", posture: "neutral" },
+      { id: "titanrelay.xyz", name: "Titan Relay", posture: "neutral" },
       {
         id: "bloxroute.max-profit.blxrbdn.com",
         name: "bloXroute Max Profit",
@@ -47,26 +29,16 @@ describe("RELAYS config", () => {
         name: "bloXroute Regulated",
         posture: "censoring",
       },
-      {
-        id: "aestus.live",
-        name: "Aestus",
-        posture: "neutral",
-      },
+      { id: "aestus.live", name: "Aestus", posture: "neutral" },
       {
         id: "boost-relay.flashbots.net",
         name: "Flashbots",
         posture: "censoring",
       },
-      {
-        id: "agnostic-relay.net",
-        name: "Agnostic Gnosis",
-        posture: "neutral",
-      },
-      {
-        id: "relay.ethgas.com",
-        name: "EthGas",
-        posture: "unknown",
-      },
+      { id: "agnostic-relay.net", name: "Agnostic Gnosis", posture: "neutral" },
+      { id: "relay.edennetwork.io", name: "Eden Network", posture: "censoring" },
+      { id: "relay.ethgas.com", name: "EthGas", posture: "unknown" },
+      { id: "relay.btcs.com", name: "BTCS", posture: "censoring" },
     ]);
   });
 });

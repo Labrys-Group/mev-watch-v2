@@ -37,9 +37,9 @@ Ship a `front-end-refresh` branch whose user-visible surface matches `37aefe1` f
 - `src/lib/live-ledger/**`, `src/lib/data-freshness.ts`, `src/lib/queries.ts`, `src/lib/mev-watch-*.ts`, `src/lib/composition.ts`, `src/lib/metrics.ts`
 - `scripts/**`
 
-**Deferred to a separate branch (see Backend investigation section below):**
+**Added to scope mid-execution (was deferred, then pulled forward):**
 
-- `src/data/relays.json` and/or `src/lib/live-ledger/snapshots.ts:classifySlot()` — the root cause of the ~90% live-ledger censorship reading. Per-user decision on 2026-05-28, this fix ships in a separate branch so this branch stays pure FE refresh.
+- `src/data/relays.json` — make the active set match relayscan's mainnet poll list exactly. Removes two phantoms (`relay-filtered.ultrasound.money`, `regional.titanrelay.xyz`) that relayscan doesn't poll. Activates two relays relayscan does poll (`relay.edennetwork.io`, `relay.btcs.com`). Resolves the ~90% live-ledger censorship reading at its root cause.
 - `next.config.ts`, `vercel.json`, `vitest.config.ts`, `playwright.config.ts`, `eslint.config.mjs`, `Taskfile.yml`
 - `src/app/status/page.tsx` — user opted to leave Justin's minimal snapshot view as-is
 - `package.json`, `pnpm-lock.yaml`
@@ -168,17 +168,22 @@ The original brief was "no logic or backend changes." During spec review the use
 
    `37aefe1` excluded these variants — presumably as a deliberate methodology choice, since their inclusion under "censoring path wins" double-counts neutral blocks as censoring without any way to attribute the delivery to the validator's actual selected relay.
 
-### Fix path (deferred to a separate branch)
+### Fix path (shipped on this branch after audit)
 
-Per user decision on 2026-05-28, the methodology fix ships separately so this branch remains a pure FE refresh. The user's framing: **the relay list should track what relayscan publishes** (the source of truth that stays current as the ecosystem evolves), so simply pruning the new entries from `relays.json` is the wrong long-term answer — relayscan adds new sibling/regional relays over time and we'd be back here next quarter.
+After confirming against relayscan's own `config-mainnet.yaml`, ethstaker's MEV relay list, and Ultra Sound's own website that `relay-filtered.ultrasound.money` does not appear anywhere as a real Ultra Sound endpoint (Ultra Sound describes a single "credibly-neutral and permissionless" relay) and `regional.titanrelay.xyz` is not in relayscan's poll list, the fix is data-only: make our active set mirror relayscan's exact 10-relay poll list.
 
-For the followup branch, the candidate fixes (no decision locked):
+Changes applied to `src/data/relays.json`:
 
-1. **Operator-sibling de-dup in `classifySlot()`** — slot is censoring only if the censoring relay's neutral sibling from the same operator is *not* also in the delivery set. Requires a small operator-pair map (Ultra Sound ↔ Ultra Sound Filtered, Titan ↔ Titan Regional). Scales as relayscan adds more sibling pairs.
-2. **Majority-wins classification** — slot is censoring only if most relays in the delivery set are censoring. No pair config needed; broader methodology shift.
-3. **Winning-relay attribution** — classify by the actual winning relay (highest valueWei). Requires `valueWei` on all stored blocks; partial coverage today.
+- **Removed (not polled by relayscan):**
+  - `relay-filtered.ultrasound.money` (no evidence this endpoint exists)
+  - `regional.titanrelay.xyz` (real per ethstaker but not in relayscan's config)
+- **Activated (relayscan polls them, we had them inactive):**
+  - `relay.edennetwork.io` — Eden Network, posture `censoring` (carried from prior historical entry)
+  - `relay.btcs.com` — BTCS, posture `censoring` (carried from prior historical entry; "BTCS markets this explicitly as an OFAC-compliant relay" per project history)
 
-Once the methodology fix lands, the live ledger should drop closer to the daily headline's ~50–55% range. The daily snapshot pipeline will pick up the change on its next run. Persisted historical days may need a one-time recompute (out of scope for both branches).
+`src/config/relays.test.ts`'s "verified current relay table" assertion is updated to the new 10-relay list. All other postures (8 of 8 that overlap with ethstaker) match canonical sources and are unchanged.
+
+Effect on the live ledger: removes the phantom-sibling double-count, dropping the live-ledger censorship reading from ~90% toward the daily headline's ~50–55% range. Effect on the daily snapshot pipeline: minor — relayscan never reported the two phantoms (so removing them changes nothing in historical days), and Eden + BTCS counts now flow through (negligible market share but they no longer get classified `unknown`).
 
 ## Open questions
 
@@ -186,8 +191,7 @@ None at spec-write time. All six decision points were answered in the brainstorm
 
 ## Out of scope (followups)
 
-- **Methodology fix for the ~90% live-ledger reading** (next branch). See the Backend Investigation section for diagnosis and candidate approaches. User wants the relay list to keep matching relayscan's tracked set; the fix needs to live in classification logic, not data pruning.
-- Backfill recompute for any persisted SQLite days that included the two new operator-sibling relays.
+- Backfill recompute for any persisted SQLite days that included the two now-removed phantom relays. Only the live ledger is affected day-to-day; the daily snapshot pipeline never ingested them.
 - Methodology page edit acknowledging the "censoring path wins" rule and its limitation when relay-operator pools overlap.
 - Status page redesign (user kept Justin's minimal version; revisit later if desired).
 - The composition daily-bars concept Justin introduced (skipped per user decision; could revisit as a future feature).
