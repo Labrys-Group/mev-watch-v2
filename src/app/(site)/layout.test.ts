@@ -1,6 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
 import { createElement, Fragment } from "react";
-import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/components/skeletons/status-bar.skeleton", () => ({
