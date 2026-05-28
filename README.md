@@ -7,9 +7,9 @@ Live at **[mevwatch.info](https://mevwatch.info)**.
 
 The site reports the daily share of MEV-boost relay payload deliveries that go
 through OFAC-censoring relays. Relay posture metadata lives in
-`src/data/relays.json`; the checked-in daily seed artifact lives in
-`src/data/mev-watch.sqlite`. Production reads the latest copy from Vercel Blob
-when Blob credentials are configured.
+`src/data/relays.json`; the local daily SQLite artifact is generated at
+`src/data/mev-watch.sqlite` and ignored by Git. Production reads the latest copy
+from Vercel Blob.
 
 ## Stack
 
@@ -23,7 +23,7 @@ Requires Node 24+ and pnpm.
 
 ```bash
 pnpm install
-pnpm update-data --dry-run   # validate the snapshot and print the missing range
+pnpm update-data --dry-run   # validate/generate the local artifact and print the missing range
 pnpm dev                     # http://localhost:3000
 ```
 
@@ -37,7 +37,7 @@ pnpm dev                     # http://localhost:3000
 | `pnpm test` | Vitest unit tests |
 | `pnpm test:watch` | Vitest in watch mode |
 | `pnpm test:e2e` | Playwright e2e tests; auto-starts the dev server |
-| `pnpm update-data` | fetch missing complete UTC days and rewrite `src/data/mev-watch.sqlite` |
+| `pnpm update-data` | fetch missing complete UTC days and rewrite the local SQLite artifact |
 | `pnpm update-data --dry-run` | validate the snapshot and print the missing date range without network fetches |
 | `pnpm backfill-and-upload` | create a resumable backfill copy under `data/` and upload it to Vercel Blob |
 
@@ -57,12 +57,14 @@ pnpm dev                     # http://localhost:3000
 
 ## Architecture Pointers
 
-- **Daily SQLite artifact** — `src/data/mev-watch.sqlite` is the local seed and
-  fallback artifact. Its schema is managed in `src/lib/mev-watch-sqlite.ts`:
-  `metadata`, `days`, `relay_counts`, and `builder_counts`.
+- **Daily SQLite artifact** — `src/data/mev-watch.sqlite` is generated locally
+  before dev/build/test commands and remains ignored by Git. Override the path
+  with `MEV_WATCH_SQLITE_PATH`. Its schema is managed in
+  `src/lib/mev-watch-sqlite.ts`: `metadata`, `days`, `relay_counts`, and
+  `builder_counts`.
 - **Production artifact** — when `BLOB_READ_WRITE_TOKEN` is present, reads are
-  resolved through Vercel Blob via `src/lib/mev-watch-blob.ts`; the checked-in
-  SQLite file remains a seed/fallback.
+  resolved through Vercel Blob via `src/lib/mev-watch-blob.ts`. Deployments
+  should use Blob rather than relying on a bundled local SQLite file.
 - **Relay metadata** — `src/data/relays.json` stores active and historical relay
   posture plus display metadata. `src/config/relays.ts` validates and exposes
   it.

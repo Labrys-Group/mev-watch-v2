@@ -25,6 +25,11 @@ const eslintConfig = defineConfig([
     // Pre-built static dashboard served via next.config rewrite — minified
     // vendor JS, not project source.
     "public/understanding-anything/**",
+    // Playwright artifacts may be absent between runs; keep ESLint from
+    // walking ignored artifact directories directly.
+    "test-results/**",
+    "playwright-report/**",
+    "blob-report/**",
   ]),
 ]);
 

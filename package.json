@@ -6,17 +6,23 @@
     "node": ">=24"
   },
   "scripts": {
+    "predev": "tsx scripts/bootstrap-data.ts",
     "dev": "next dev",
+    "prebuild": "tsx scripts/bootstrap-data.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "pretest": "tsx scripts/bootstrap-data.ts",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
+    "pretest:e2e": "tsx scripts/seed-e2e-data.ts",
     "test:e2e": "playwright test",
     "update-data": "tsx scripts/update-data.ts",
+    "prebackfill-and-upload": "tsx scripts/bootstrap-data.ts",
     "backfill-and-upload": "tsx scripts/backfill-and-upload.ts"
   },
   "dependencies": {
+    "@next/env": "16.2.6",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/blob": "^2.4.0",
     "class-variance-authority": "^0.7.1",

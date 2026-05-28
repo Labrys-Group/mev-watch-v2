@@ -1,4 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
+import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import {
   MevWatchDaySchema,
@@ -8,10 +9,22 @@ import {
 } from "./mev-watch-data";
 import { DEFAULT_START_DATE } from "./mev-watch-generator-constants";
 
-export const SQLITE_DATA_PATH = path.join(
+const DEFAULT_SQLITE_DATA_PATH = path.join(
   process.cwd(),
   "src/data/mev-watch.sqlite",
 );
+
+export function resolveMevWatchSqlitePath(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  const configured = env.MEV_WATCH_SQLITE_PATH;
+  if (!configured) return DEFAULT_SQLITE_DATA_PATH;
+  return path.isAbsolute(configured)
+    ? configured
+    : path.join(/* turbopackIgnore: true */ process.cwd(), configured);
+}
+
+export const SQLITE_DATA_PATH = resolveMevWatchSqlitePath();
 
 export type MevWatchDatabase = InstanceType<typeof DatabaseSync>;
 
@@ -58,6 +71,17 @@ export function initializeMevWatchDatabase(
   const db = createWritableMevWatchDatabase(filePath);
   initializeSchema(db, opts.generatedAt);
   return db;
+}
+
+export function bootstrapMevWatchDatabase(
+  filePath = SQLITE_DATA_PATH,
+  generatedAt = new Date().toISOString(),
+): boolean {
+  if (existsSync(filePath)) return false;
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  const db = initializeMevWatchDatabase(filePath, { generatedAt });
+  db.close();
+  return true;
 }
 
 export function initializeSchema(

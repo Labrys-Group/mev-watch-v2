@@ -8,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 import type { TrendPoint } from "@/lib/queries";
 import { toCompositionPoint, type CompositionPoint } from "@/lib/composition";
@@ -129,6 +128,7 @@ export function TrendChart({ trend }: TrendChartProps) {
   // sweep animation plays exactly when the reader reaches it.
   const chartRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const el = chartRef.current;
@@ -151,6 +151,31 @@ export function TrendChart({ trend }: TrendChartProps) {
       { threshold: 0.25 },
     );
 
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = chartRef.current;
+    if (!el) return;
+
+    const updateSize = () => {
+      const rect = el.getBoundingClientRect();
+      const width = Math.floor(rect.width);
+      const height = Math.floor(rect.height);
+      setChartSize((current) => {
+        if (current.width === width && current.height === height) return current;
+        return { width, height };
+      });
+    };
+
+    updateSize();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateSize);
+      return () => window.removeEventListener("resize", updateSize);
+    }
+
+    const observer = new ResizeObserver(updateSize);
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -182,6 +207,7 @@ export function TrendChart({ trend }: TrendChartProps) {
     () => sparseTickIndices(data, isNarrow ? 3 : 8),
     [data, isNarrow],
   );
+  const chartReady = inView && chartSize.width > 0 && chartSize.height > 0;
 
   return (
     <Section
@@ -261,10 +287,12 @@ export function TrendChart({ trend }: TrendChartProps) {
           </div>
 
           {/* Chart */}
-          <div ref={chartRef} className="w-full h-[260px] sm:h-[300px] px-2 pt-4 pb-2">
-            {inView ? (
-              <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[260px] min-w-0 w-full px-2 pb-2 pt-4 sm:h-[300px]">
+            <div ref={chartRef} className="h-full min-w-0 w-full">
+              {chartReady ? (
                 <AreaChart
+                  width={chartSize.width}
+                  height={chartSize.height}
                   data={data}
                   margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
                 >
@@ -381,13 +409,13 @@ export function TrendChart({ trend }: TrendChartProps) {
                     animationEasing="ease-out"
                   />
                 </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div
-                className="h-full w-full animate-pulse bg-foreground/5"
-                aria-hidden="true"
-              />
-            )}
+              ) : (
+                <div
+                  className="h-full w-full animate-pulse bg-foreground/5"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

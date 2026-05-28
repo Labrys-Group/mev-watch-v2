@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  outputFileTracingIncludes: {
-    "/*": ["src/data/mev-watch.sqlite"],
+  outputFileTracingExcludes: {
+    "/*": ["src/data/mev-watch.sqlite", "data/*.sqlite"],
   },
   // Serve the bundled understand-anything dashboard at /understanding-anything.
   // The static assets live under public/understanding-anything/ and are served

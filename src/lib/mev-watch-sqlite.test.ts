@@ -4,9 +4,11 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  bootstrapMevWatchDatabase,
   createReadOnlyMevWatchDatabase,
   initializeMevWatchDatabase,
   readSnapshotFromDatabase,
+  resolveMevWatchSqlitePath,
   upsertDay,
 } from "./mev-watch-sqlite";
 
@@ -20,6 +22,33 @@ async function withTempDb<T>(run: (dbPath: string) => Promise<T>): Promise<T> {
 }
 
 describe("SQLite MEV Watch artifact", () => {
+  it("allows the SQLite artifact path to be overridden by environment", () => {
+    expect(
+      resolveMevWatchSqlitePath({
+        MEV_WATCH_SQLITE_PATH: "data/test-mev-watch.sqlite",
+      }),
+    ).toBe(path.join(process.cwd(), "data/test-mev-watch.sqlite"));
+  });
+
+  it("bootstraps a missing local artifact with the empty schema", async () => {
+    await withTempDb(async (dbPath) => {
+      bootstrapMevWatchDatabase(dbPath, "2026-05-26T01:00:00.000Z");
+
+      const db = createReadOnlyMevWatchDatabase(dbPath);
+      try {
+        expect(readSnapshotFromDatabase(db)).toEqual({
+          schemaVersion: 1,
+          generatedAt: "2026-05-26T01:00:00.000Z",
+          sourceStartDate: "2022-09-15",
+          sourceEndDate: null,
+          days: [],
+        });
+      } finally {
+        db.close();
+      }
+    });
+  });
+
   it("stores raw daily rows and reads the snapshot back in date order", async () => {
     await withTempDb(async (dbPath) => {
       const db = initializeMevWatchDatabase(dbPath, {

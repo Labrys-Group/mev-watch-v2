@@ -52,8 +52,8 @@ Local-only overrides are documented in `.env.example`, including
 2. Acquires `data/mev-watch.sqlite.lock` in Vercel Blob, or the configured
    `MEV_WATCH_BLOB_PATH` plus `.lock`.
 3. Downloads the current SQLite artifact from Vercel Blob to `/tmp`.
-4. Falls back to the checked-in `src/data/mev-watch.sqlite` seed if no writable
-   Blob artifact exists yet.
+4. Uses the generated local SQLite artifact only as an initial seed if no
+   writable Blob artifact exists yet.
 5. Fetches missing complete UTC days, limited by `UPDATE_DATA_MAX_DAYS`.
 6. Repairs missing total-chain-block counts, limited by
    `UPDATE_DATA_REPAIR_MAX_DAYS`.
@@ -87,10 +87,14 @@ artifact.
 
 ## Initial Blob Seed
 
-The repository includes `src/data/mev-watch.sqlite` as a local seed artifact.
-After creating the Blob store, upload that file to `data/mev-watch.sqlite`, or
-to the path configured by `MEV_WATCH_BLOB_PATH`. The cron route can then
-continue from the stored `sourceEndDate`.
+The repository does not commit or bundle the SQLite binary for production.
+Local dev/build/test commands bootstrap an empty ignored artifact at
+`src/data/mev-watch.sqlite`, or at `MEV_WATCH_SQLITE_PATH` when configured.
+After creating the Blob store, create a real data artifact with
+`pnpm update-data` or `pnpm backfill-and-upload`, then upload it to
+`data/mev-watch.sqlite`, or to the path configured by `MEV_WATCH_BLOB_PATH`.
+The deployed app should read from Blob and the cron route can then continue from
+the stored `sourceEndDate`.
 
 To create a fresh backfilled artifact locally and upload it to Vercel Blob:
 
@@ -98,10 +102,10 @@ To create a fresh backfilled artifact locally and upload it to Vercel Blob:
 BLOB_READ_WRITE_TOKEN=<created by Vercel Blob> pnpm backfill-and-upload
 ```
 
-By default this copies `src/data/mev-watch.sqlite` to `data/mev-watch.db`,
+By default this copies the local SQLite artifact to `data/mev-watch.db`,
 backfills the copy, and uploads that file to the configured Blob pathname. The
-Blob pathname defaults to `data/mev-watch.sqlite` so the deployed app can read
-it without additional configuration.
+Blob pathname defaults to `data/mev-watch.sqlite` so the deployed app can read it
+without additional configuration.
 
 Useful overrides:
 

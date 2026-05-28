@@ -71,7 +71,7 @@ const LIMITATIONS: Limitation[] = [
       <>
         The headline censorship percentage is a daily snapshot. Intra-day
         changes in relay composition do not move it until the next UTC
-        day&apos;s checked-in data snapshot is generated. The dashboard does not
+        day&apos;s local or Blob-backed data snapshot is refreshed. The dashboard does not
         poll relay APIs on page load.
       </>
     ),

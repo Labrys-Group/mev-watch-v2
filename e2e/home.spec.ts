@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("homepage renders the dashboard with checked-in data", async ({ page }) => {
+test("homepage renders the dashboard with generated test data", async ({ page }) => {
   await page.goto("/");
   await expect(
     page.getByRole("heading", { name: /CENSORSHIP IS/i }).first(),
@@ -9,7 +9,17 @@ test("homepage renders the dashboard with checked-in data", async ({ page }) => 
   await expect(page.getByText(/RELAY LEADERBOARD/i)).toBeVisible();
 });
 
-test("the trend chart renders the checked-in snapshot series", async ({ page }) => {
+test("the trend chart renders the generated snapshot series without sizing warnings", async ({
+  page,
+}) => {
+  const chartSizingWarnings: string[] = [];
+  page.on("console", (message) => {
+    const text = message.text();
+    if (text.includes("width(-1)") || text.includes("height(-1)")) {
+      chartSizingWarnings.push(text);
+    }
+  });
+
   await page.goto("/");
   await page.getByText("02 / CENSORSHIP OVER TIME").scrollIntoViewIfNeeded();
   const section = page.locator("section").filter({
@@ -19,6 +29,7 @@ test("the trend chart renders the checked-in snapshot series", async ({ page }) 
   await expect(section.locator(".recharts-area-area").first()).toBeVisible({
     timeout: 15000,
   });
+  expect(chartSizingWarnings).toEqual([]);
 });
 
 test("theme toggle flips the document theme", async ({ page }) => {

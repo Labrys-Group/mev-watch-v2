@@ -26,7 +26,7 @@ export async function HeroData() {
         </h1>
         <p className="mt-6 font-mono text-[13px] leading-snug text-fg-muted">
           Run <code className="font-mono text-foreground">pnpm update-data</code>{" "}
-          to generate the checked-in data snapshot, then reload.
+          to generate the local data snapshot, then reload.
         </p>
       </section>
     );
