@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { Reveal } from "@/components/reveal";
 import { getLastRefresh, getLatestStats } from "@/lib/queries";
@@ -28,7 +27,6 @@ export default async function StatusPage() {
 
   return (
     <div className="min-h-screen">
-      <SiteHeader />
       <main className="mx-auto max-w-[900px] px-4 py-12 md:px-6">
         <Reveal className="mb-10 border-b border-border-labrys pb-8">
           <p className="mb-4 font-mono text-[10.5px] tracking-[0.18em] uppercase text-accent-brand">

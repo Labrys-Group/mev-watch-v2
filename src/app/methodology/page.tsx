@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { SiteHeader } from "@/components/sections/site-header";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
@@ -81,7 +80,6 @@ const LIMITATIONS: Limitation[] = [
 export default function MethodologyPage() {
   return (
     <div className="min-h-screen">
-      <SiteHeader />
       <main className="mx-auto max-w-[1200px] px-4 md:px-6">
         <div className="space-y-4 py-5">
           {/* Page hero — same vocabulary as the home Hero: panel card, faded

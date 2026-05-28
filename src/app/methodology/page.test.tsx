@@ -1,9 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/components/sections/site-header", () => ({
-  SiteHeader: () => <header>Header</header>,
-}));
 vi.mock("@/components/sections/site-footer", () => ({
   SiteFooter: () => <footer>Footer</footer>,
 }));

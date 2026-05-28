@@ -4,9 +4,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import StatusPage from "./page";
 
-vi.mock("@/components/sections/site-header", () => ({
-  SiteHeader: () => <header>Header</header>,
-}));
 vi.mock("@/components/sections/site-footer", () => ({
   SiteFooter: () => <footer>Footer</footer>,
 }));

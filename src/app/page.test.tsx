@@ -3,9 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import Home from "./page";
 
-vi.mock("@/components/sections/status-bar.data", () => ({
-  StatusBarData: () => <div>Status bar</div>,
-}));
 vi.mock("@/components/sections/hero.data", () => ({
   HeroData: () => <section>Hero</section>,
 }));
@@ -26,9 +23,6 @@ vi.mock("@/components/sections/what-to-do", () => ({
 }));
 vi.mock("@/components/sections/faq", () => ({
   Faq: () => <section>06 / FAQ</section>,
-}));
-vi.mock("@/components/sections/site-header", () => ({
-  SiteHeader: () => <header>Header</header>,
 }));
 vi.mock("@/components/sections/site-footer", () => ({
   SiteFooter: () => <footer>Footer</footer>,
