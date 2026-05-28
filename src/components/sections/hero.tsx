@@ -5,19 +5,16 @@ import type { DataFreshness } from "@/lib/data-freshness";
 
 interface HeroProps {
   verdict: HeroVerdict;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   freshness: DataFreshness;
 }
 
-export function Hero({ verdict, freshness }: HeroProps) {
+export function Hero({ verdict }: HeroProps) {
   const isGood = verdict.tone === "good";
   const trendWord = verdict.headlineWord;
   const trendColor = isGood ? "text-good" : "text-warn";
   const trendGlow = isGood ? "glow-good" : "glow-warn";
   const trendBorder = isGood ? "border-good" : "border-warn";
-  const isStale = freshness.status === "stale";
-  const sourceBadge = freshness.sourceDate
-    ? `Daily data through ${freshness.sourceDate}`
-    : freshness.sourceLabel;
 
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
@@ -92,18 +89,7 @@ export function Hero({ verdict, freshness }: HeroProps) {
                 {verdict.arrow}
               </span>
             </div>
-            <div className="m-0 min-w-0 flex-1">
-              <p className="m-0">{verdict.message}</p>
-              <p
-                className={`mt-2 inline-flex border px-2 py-1 text-[10px] uppercase tracking-[0.12em] ${
-                  isStale
-                    ? "border-warn text-warn"
-                    : "border-border-labrys text-fg-muted"
-                }`}
-              >
-                {sourceBadge}
-              </p>
-            </div>
+            <p className="m-0 min-w-0 flex-1">{verdict.message}</p>
           </div>
 
           {/* Readme terminal lede box — mt-auto pushes it to the bottom of
@@ -122,15 +108,12 @@ export function Hero({ verdict, freshness }: HeroProps) {
             </span>
 
             <p className="m-0">
-              Some MEV-Boost relays filter censoring-targeted transactions.{" "}
+              Some MEV-Boost relays filter OFAC-sanctioned transactions.{" "}
               <strong className="text-foreground font-semibold">
-                {isStale
-                  ? "This historical daily snapshot tracks how much of Ethereum's MEV-Boost relay delivery flow passed through them"
-                  : "MEV Watch tracks how much of Ethereum's block flow still passes through them"}
+                MEV Watch tracks how much of Ethereum&apos;s block flow still passes
+                through them
               </strong>{" "}
-              {isStale
-                ? `through ${freshness.sourceDate}.`
-                : "— and shows that share falling over time."}
+              — and shows that share falling over time.
               <span
                 aria-hidden="true"
                 className="cursor-blink ml-1 inline-block h-[1.05em] w-[7px] translate-y-[0.2em] bg-accent-brand align-baseline"
