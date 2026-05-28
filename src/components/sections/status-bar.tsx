@@ -13,6 +13,7 @@ export function StatusBar({
   latestDate,
   censorshipPct,
   lastRefresh,
+  // Preserved in props for the data wrapper to pass; not rendered after the 37aefe1 revert.
   freshness: _freshness,
 }: StatusBarProps) {
   const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
