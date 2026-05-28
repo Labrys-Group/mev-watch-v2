@@ -15,9 +15,11 @@ interface CountUpProps {
 }
 
 /**
- * Animates a number from 0 up to `value` the first time it scrolls
- * into view. Server-renders the final value so the figure is correct
- * without JavaScript and free of hydration mismatches.
+ * Animates a number on first scroll-into-view (0 → value), then tweens
+ * between subsequent target values from whatever is currently on screen
+ * (e.g. the trend-chart NOW / PEAK / TROUGH stats counting up or down
+ * when the range tab changes). Server-renders the final value so the
+ * figure is correct without JavaScript and free of hydration mismatches.
  */
 export function CountUp({
   value,
@@ -29,7 +31,15 @@ export function CountUp({
 }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const [display, setDisplay] = useState(value);
+  // Mirror `display` in a ref so a mid-flight tween can read the latest
+  // on-screen number when a new target comes in, without re-subscribing
+  // the effect on every animation frame.
+  const displayRef = useRef(value);
   const started = useRef(false);
+
+  useEffect(() => {
+    displayRef.current = display;
+  }, [display]);
 
   useEffect(() => {
     const el = ref.current;
@@ -37,33 +47,40 @@ export function CountUp({
 
     let rafId: number | null = null;
 
-    // After the intro count-up has played once, subsequent value changes
-    // (e.g. the trend-chart range toggle) snap to the new value instead
-    // of re-triggering the scroll-into-view animation.
+    const tween = (from: number, to: number) => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setDisplay(to);
+        return;
+      }
+      const start = performance.now();
+      const delta = to - from;
+      const frame = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        setDisplay(from + delta * eased);
+        if (t < 1) rafId = requestAnimationFrame(frame);
+        else setDisplay(to);
+      };
+      rafId = requestAnimationFrame(frame);
+    };
+
+    // After the scroll-into-view intro has played once, value changes
+    // (e.g. clicking through trend-chart range tabs) tween from the
+    // currently displayed number to the new target rather than snapping
+    // or replaying the 0→value reveal.
     if (started.current) {
-      setDisplay(value);
-      return;
+      tween(displayRef.current, value);
+      return () => {
+        if (rafId !== null) cancelAnimationFrame(rafId);
+      };
     }
 
     const run = () => {
       if (started.current) return;
       started.current = true;
-
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setDisplay(value);
-        return;
-      }
-
-      const start = performance.now();
       setDisplay(0);
-      const frame = (now: number) => {
-        const t = Math.min(1, (now - start) / duration);
-        const eased = 1 - Math.pow(1 - t, 3);
-        setDisplay(value * eased);
-        if (t < 1) rafId = requestAnimationFrame(frame);
-        else setDisplay(value);
-      };
-      rafId = requestAnimationFrame(frame);
+      displayRef.current = 0;
+      tween(0, value);
     };
 
     if (typeof IntersectionObserver === "undefined") {
@@ -88,10 +105,6 @@ export function CountUp({
     observer.observe(el);
     return () => {
       observer.disconnect();
-      // Cancel any in-flight intro animation so a value change mid-frame
-      // (e.g. clicking a trend-chart range tab while the count-up is still
-      // running) doesn't get overwritten by the next frame using the stale
-      // target captured in the RAF closure.
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [value, duration]);

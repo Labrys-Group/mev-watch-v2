@@ -292,7 +292,8 @@ details[open]::details-content {
    vertical scroll (new row drops in from above; old row slides up + out).
    ────────────────────────────────────────────────────────────── */
 .epoch-tile {
-  animation: mw-tile-pop 0.52s cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+  animation: mw-tile-pop var(--pop-duration, 0.52s)
+    cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
   animation-delay: var(--delay, 0ms);
 }
 .epoch-row-wrap {

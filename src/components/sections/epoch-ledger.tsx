@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 import type { CSSVars } from "@/lib/css";
@@ -263,9 +263,13 @@ function EpochRowView({
           {row.inProgress ? `● live · ${filled}/32` : "epoch"}
         </div>
       </div>
-      {/* 32 slots: 2 rows of 16 on mobile, a single row of 32 from sm up. */}
+      {/* 32 slots: 2 rows of 16 on mobile, a single row of 32 from sm up.
+          Track widths use explicit calc() instead of 1fr so every column
+          resolves to the same fractional pixel value — `1fr` distribution
+          rounds inconsistently per track and made tiles look uneven on
+          phones, where the rounding is a larger share of each tile. */}
       <div
-        className="grid gap-[2px] grid-cols-[repeat(16,minmax(0,1fr))] sm:flex-1 sm:grid-cols-[repeat(32,minmax(0,1fr))]"
+        className="grid gap-[2px] grid-cols-[repeat(16,calc((100%-30px)/16))] sm:flex-1 sm:grid-cols-[repeat(32,calc((100%-62px)/32))]"
         aria-label={`Epoch ${row.epoch}: ${filled} of 32 slots delivered`}
       >
         {row.slots.map((cell, col) => (
@@ -274,7 +278,8 @@ function EpochRowView({
             cell={cell}
             epoch={row.epoch}
             isNext={col === nextIdx}
-            delay={stagger ? (rowIdx + col) * 15 : 0}
+            delay={stagger ? (rowIdx + col) * 26 : 0}
+            popDurationMs={stagger ? 900 : undefined}
             onHover={onHover}
             hoverEnabled={hoverEnabled}
           />
@@ -289,6 +294,7 @@ interface SlotTileProps {
   epoch: number;
   isNext: boolean;
   delay: number;
+  popDurationMs?: number;
   onHover: (h: HoverState | null) => void;
   hoverEnabled: boolean;
 }
@@ -298,6 +304,7 @@ function SlotTile({
   epoch,
   isNext,
   delay,
+  popDurationMs,
   onHover,
   hoverEnabled,
 }: SlotTileProps) {
@@ -322,10 +329,27 @@ function SlotTile({
           onHover({ cell, epoch, x: e.clientX, y: e.clientY });
         };
 
+  // Snapshot `--delay` and `--pop-duration` at mount. The first /api/epochs
+  // poll fires within ~100–300ms of mount, which re-renders the parent and
+  // flips `stagger` to false — that would change these inline vars on every
+  // already-mounted tile. Chrome restarts a running CSS animation when its
+  // duration or delay var changes, which made the staggered reveal snap to
+  // its end state mid-flight. Freezing the style after mount keeps the
+  // initial animation intact; new tiles arriving from later polls get a
+  // fresh mount with their own (snappy) values.
+  const initialStyle = useMemo<CSSVars>(() => {
+    const vars: CSSVars = { "--delay": `${delay}ms` };
+    if (popDurationMs !== undefined) {
+      vars["--pop-duration"] = `${popDurationMs}ms`;
+    }
+    return vars;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-time snapshot
+  }, []);
+
   return (
     <div
       className={className}
-      style={{ "--delay": `${delay}ms` } as CSSVars}
+      style={initialStyle}
       onMouseEnter={showDetail}
       onMouseMove={showDetail}
     >

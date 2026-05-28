@@ -57,6 +57,21 @@ function LegendSwatch({ className, label }: { className: string; label: string }
   );
 }
 
+/** Date row for the NOW/PEAK/TROUGH cells. Drops the weekday prefix on
+ *  mobile so the date stays on one line inside a third-of-width cell. */
+function StatDate({ iso }: { iso: string }) {
+  const long = formatDateLong(iso);
+  const sep = long.indexOf(" · ");
+  const weekday = sep > -1 ? long.slice(0, sep) : "";
+  const rest = sep > -1 ? long.slice(sep + 3) : long;
+  return (
+    <div className="mt-1 text-[9px] tracking-[0.08em] text-fg-muted normal-case">
+      <span className="hidden sm:inline">{weekday} · </span>
+      {rest}
+    </div>
+  );
+}
+
 interface TooltipItem {
   payload: CompositionPoint;
 }
@@ -252,51 +267,39 @@ export function TrendChart({ trend }: TrendChartProps) {
             <span className="text-fg-muted">Of MEV-boost payloads</span>
           </div>
           <div className="grid grid-cols-3 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-            <div className="px-3 pt-1 pb-2 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
-              <div className="flex items-baseline gap-2">
+            <div className="px-2 sm:px-3 pt-1 pb-2 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
                 <span>NOW</span>
-                <strong className="font-sans font-bold text-[18px] leading-none tracking-[-0.015em] text-foreground normal-case">
+                <strong className="font-sans font-bold text-[15px] sm:text-[18px] leading-none tracking-[-0.015em] text-foreground normal-case">
                   <CountUp value={rangeStats.current} decimals={1} suffix="%" />
                 </strong>
               </div>
-              {rangeStats.currentDate && (
-                <div className="mt-1 text-[9px] tracking-[0.08em] text-fg-muted normal-case">
-                  {formatDateLong(rangeStats.currentDate)}
-                </div>
-              )}
+              {rangeStats.currentDate && <StatDate iso={rangeStats.currentDate} />}
             </div>
-            <div className="px-3 pt-1 pb-2 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
-              <div className="flex items-baseline gap-2">
+            <div className="px-2 sm:px-3 pt-1 pb-2 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
                 <span>PEAK</span>
-                <strong className="font-sans font-bold text-[18px] leading-none tracking-[-0.015em] text-warn normal-case">
+                <strong className="font-sans font-bold text-[15px] sm:text-[18px] leading-none tracking-[-0.015em] text-warn normal-case">
                   <CountUp value={rangeStats.peak} decimals={1} suffix="%" />
                 </strong>
               </div>
-              {rangeStats.peakDate && (
-                <div className="mt-1 text-[9px] tracking-[0.08em] text-fg-muted normal-case">
-                  {formatDateLong(rangeStats.peakDate)}
-                </div>
-              )}
+              {rangeStats.peakDate && <StatDate iso={rangeStats.peakDate} />}
             </div>
-            <div className="px-3 pt-1 pb-2 transition-colors duration-200 hover:bg-panel-alt">
-              <div className="flex items-baseline gap-2">
+            <div className="px-2 sm:px-3 pt-1 pb-2 transition-colors duration-200 hover:bg-panel-alt">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
                 <span>TROUGH</span>
-                <strong className="font-sans font-bold text-[18px] leading-none tracking-[-0.015em] text-good normal-case">
+                <strong className="font-sans font-bold text-[15px] sm:text-[18px] leading-none tracking-[-0.015em] text-good normal-case">
                   <CountUp value={rangeStats.trough} decimals={1} suffix="%" />
                 </strong>
               </div>
-              {rangeStats.troughDate && (
-                <div className="mt-1 text-[9px] tracking-[0.08em] text-fg-muted normal-case">
-                  {formatDateLong(rangeStats.troughDate)}
-                </div>
-              )}
+              {rangeStats.troughDate && <StatDate iso={rangeStats.troughDate} />}
             </div>
           </div>
         </div>
 
         {/* Range toggle + legend + chart */}
         <div className="p-0">
-          <div className="flex items-center justify-between gap-3 flex-wrap px-4 pt-4 pb-0">
+          <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-0 sm:flex-row sm:flex-wrap sm:justify-between">
             {/* Range tabs — sliding brand-accent underline tracks the
                 active button. Hairline rail below keeps the inactive labels
                 anchored visually without boxing the whole control. */}
@@ -332,11 +335,32 @@ export function TrendChart({ trend }: TrendChartProps) {
                 />
               )}
             </div>
-            {/* Legend */}
-            <div className="flex items-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-              <LegendSwatch className="bg-non-boost" label="Non-boosted" />
-              <LegendSwatch className="bg-ofac" label="Censored" />
-              <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
+            {/* Legend — labels & order mirror the composition/epoch ledger
+                key so a reader sees the same names across both sections. */}
+            <div className="flex items-center justify-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted sm:justify-end">
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="inline-block w-2.5 h-2.5 shrink-0 bg-ofac"
+                  aria-hidden="true"
+                />
+                <span className="sm:hidden">Censoring</span>
+                <span className="hidden sm:inline">OFAC Censoring</span>
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="inline-block w-2.5 h-2.5 shrink-0 bg-neutral-relay"
+                  aria-hidden="true"
+                />
+                Neutral
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="inline-block w-2.5 h-2.5 shrink-0 bg-non-boost"
+                  aria-hidden="true"
+                />
+                <span className="sm:hidden">Unknown</span>
+                <span className="hidden sm:inline">Relay Unknown / Non-MEV-Boost</span>
+              </span>
             </div>
           </div>
 
