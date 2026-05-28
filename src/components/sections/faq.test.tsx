@@ -9,7 +9,7 @@ describe("Faq", () => {
     render(<Faq />);
 
     const censoringButton = screen.getByRole("button", {
-      name: /What does "censoring" mean/i,
+      name: /What does "OFAC-censoring" mean/i,
     });
 
     fireEvent.click(censoringButton);
@@ -17,22 +17,23 @@ describe("Faq", () => {
     expect(screen.getByText(/OFAC sanctions are one regime/i)).toBeVisible();
   });
 
-  it("opens only the clicked card and leaves its row neighbor collapsed", () => {
+  it("opens both cards in a pair when either button is clicked", () => {
     render(<Faq />);
 
     const firstButton = screen.getByRole("button", { name: /What is MEV-Boost/i });
     const secondButton = screen.getByRole("button", {
-      name: /What does "censoring" mean/i,
+      name: /What does "OFAC-censoring" mean/i,
     });
 
+    // Q1 and Q2 are in the same pair — clicking Q1 opens both
     fireEvent.click(firstButton);
 
     expect(firstButton).toHaveAttribute("aria-expanded", "true");
-    expect(secondButton).toHaveAttribute("aria-expanded", "false");
+    expect(secondButton).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText(FAQ_ITEMS[0].a)).toBeVisible();
 
     const secondCard = secondButton.closest("div");
     expect(secondCard).not.toBeNull();
-    expect(within(secondCard as HTMLElement).queryByText(FAQ_ITEMS[1].a)).toBeNull();
+    expect(within(secondCard as HTMLElement).getByText(FAQ_ITEMS[1].a)).toBeVisible();
   });
 });
