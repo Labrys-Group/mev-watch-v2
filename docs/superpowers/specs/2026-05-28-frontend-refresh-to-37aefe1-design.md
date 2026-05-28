@@ -36,6 +36,10 @@ Ship a `front-end-refresh` branch whose user-visible surface matches `37aefe1` f
 - `src/app/api/**` (no route changes)
 - `src/lib/live-ledger/**`, `src/lib/data-freshness.ts`, `src/lib/queries.ts`, `src/lib/mev-watch-*.ts`, `src/lib/composition.ts`, `src/lib/metrics.ts`
 - `scripts/**`
+
+**Added to scope after backend investigation (see section below):**
+
+- `src/data/relays.json` — remove two new active censoring entries (`relay-filtered.ultrasound.money`, `regional.titanrelay.xyz`) to revert to `37aefe1`'s 8-relay active set. This is the root cause of the ~90% live-ledger censorship reading.
 - `next.config.ts`, `vercel.json`, `vitest.config.ts`, `playwright.config.ts`, `eslint.config.mjs`, `Taskfile.yml`
 - `src/app/status/page.tsx` — user opted to leave Justin's minimal snapshot view as-is
 - `package.json`, `pnpm-lock.yaml`
@@ -143,9 +147,57 @@ Run in this order on the branch before opening the PR:
 | Globals.css restoration collides with current selectors | Diff carefully — the deleted rules used `.epoch-tile`, `.epoch-row-wrap`, etc. If origin/main re-uses any of those class names for a different purpose, namespace the restored rules. (Quick `git grep` before commit.) |
 | Limitation #4 merged wording reads awkwardly | Render the methodology page in dev and read it back. Adjust prose until it reads naturally. |
 
+## Backend / data investigation (added 2026-05-28)
+
+The original brief was "no logic or backend changes." During spec review the user flagged a live-data symptom: **the epoch ledger is showing ~90% of slots as censoring** — a value that doesn't match the trend chart's daily headline (which sits in the ~50–55% range historically). This triggered a focused investigation of every backend change Justin made on top of `37aefe1`.
+
+### Findings
+
+**1. The classification logic itself is unchanged.** `src/lib/live-ledger/snapshots.ts:classifySlot()` uses the same "censoring path wins" rule that `37aefe1`'s `src/lib/epochs/classify.ts:classifySlot()` used, byte-for-byte. Both say: if any relay in the delivery set is censoring, the slot is censoring; otherwise neutral; empty set → nonboost. Not the regression.
+
+**2. The daily metric (`src/lib/metrics.ts:computeDailyStats`) is unchanged in formula.** Justin inlined the `RelayPayloadCount` / `BuilderBlockCount` type definitions (previously imported from a `data-source/types` module he deleted), and improved `nonBoostShare` to return `number | null` when block counts are missing. Both are safe refactors. Censorship percentage formula is identical: `(censoring_payloads / total_payloads) * 100`.
+
+**3. Chain-time constants identical** (`GENESIS_TIME`, `SECONDS_PER_SLOT`, `SLOTS_PER_EPOCH`). Not the regression.
+
+**4. The regression IS in `src/data/relays.json`.** Justin added two new ACTIVE censoring entries that did not exist in `37aefe1`'s `src/config/relays.ts`:
+
+   - `relay-filtered.ultrasound.money` (Ultra Sound Filtered) — `posture: "censoring"`, `active: true`
+   - `regional.titanrelay.xyz` (Titan Relay Regional) — `posture: "censoring"`, `active: true`
+
+   These are real relay endpoints — operator-run sibling variants of the major neutral relays (Ultra Sound main, Titan main). Because builders typically submit the same bid simultaneously to *all* of an operator's relay endpoints, blocks delivered by the neutral Ultra Sound main are also visible in Ultra Sound Filtered's `/proposer_payload_delivered` records — and the existing "any censoring relay in the delivery set wins" rule then flips those slots to censoring. The same effect compounds through Titan main + Titan Regional. With Flashbots (~40–60% share, censoring) already pulling the baseline up, the addition of two more high-volume censoring contributors that share their candidate pool with the largest neutral relays plausibly drives the per-slot censorship rate to the ~90% the user is observing.
+
+   `37aefe1` excluded these variants — presumably as a deliberate methodology choice, since their inclusion under "censoring path wins" double-counts neutral blocks as censoring without any way to attribute the delivery to the validator's actual selected relay.
+
+### Recommended fix
+
+This is a data revert, not a logic change — consistent with the "back to 37aefe1's view" goal. **Remove the two new active entries from `src/data/relays.json`** (`relay-filtered.ultrasound.money` and `regional.titanrelay.xyz`). The remaining 8 active relays match `37aefe1`'s set exactly:
+
+```
+relay.ultrasound.money            neutral
+titanrelay.xyz                    neutral
+bloxroute.max-profit.blxrbdn.com  censoring (since 2023-12-18; neutral prior)
+bloxroute.regulated.blxrbdn.com   censoring
+aestus.live                       neutral
+boost-relay.flashbots.net         censoring
+agnostic-relay.net                neutral
+relay.ethgas.com                  unknown
+```
+
+The historical (`active: false`) relays — bloXroute Ethical, Blocknative, Eden, Manifold, relayooor, BTCS — match `37aefe1` and stay.
+
+**Add this as commit 14 in the strategy:** `fix(data): remove Ultra Sound Filtered + Titan Regional from active relays (revert to 37aefe1's set)`. Place it before the leaderboard commit so the leaderboard renders against the reverted relay set.
+
+After the fix, the live ledger should drop closer to the daily headline's ~50–55% range; the daily snapshot pipeline will pick up the change on its next run. Existing days already persisted to SQLite may need a one-time backfill recompute if the historical days included these two relays' counts — out of scope for this branch (call out as a followup).
+
+### Followups out of scope
+
+- Backfill recompute for any persisted days whose `relay_counts` table included the two removed relays (would require running `pnpm update-data --reseed` or equivalent).
+- Methodology page edit acknowledging the "censoring path wins" rule and its limitation (the rule overstates when censoring relays' candidate pool overlaps with neutral relays' pool).
+- Possible future methodology change to weight slots by the winning relay only, requiring a richer relay-payload schema.
+
 ## Open questions
 
-None at spec-write time. All six decision points were answered in the brainstorming round on 2026-05-28.
+None at spec-write time. All six decision points were answered in the brainstorming round on 2026-05-28; the backend investigation was added on user request during spec review.
 
 ## Out of scope (followups)
 
