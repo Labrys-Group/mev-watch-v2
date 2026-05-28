@@ -81,6 +81,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
   // Poll the API immediately on mount, then every POLL_MS.
   useEffect(() => {
     let alive = true;
+    const timeouts = new Set<ReturnType<typeof window.setTimeout>>();
 
     async function poll() {
       try {
@@ -97,11 +98,13 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
           setExiting(dropped);
           setExitCollapsed(false);
           setEntering(next.epochs[0].epoch);
-          window.setTimeout(() => {
+          const t = window.setTimeout(() => {
+            timeouts.delete(t);
             if (!alive) return;
             setExiting(null);
             setEntering(null);
           }, 650);
+          timeouts.add(t);
         } else if (changes.epochShift !== 0) {
           // A multi-epoch jump (e.g. a stale tab): re-enter with the stagger
           // rather than animate a single shift.
@@ -120,6 +123,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     return () => {
       alive = false;
       window.clearInterval(id);
+      for (const t of timeouts) window.clearTimeout(t);
     };
   }, []);
 
@@ -140,6 +144,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     };
   }, [entering, exiting]);
 
+  // eslint-disable-next-line react-hooks/refs -- stagger is derived from a write-once ref that resets after each render; this read-during-render is intentional.
   const stagger = staggerNext.current;
   useEffect(() => {
     staggerNext.current = false;
@@ -153,7 +158,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       onMouseLeave={() => setHover(null)}
     >
       <div className="space-y-1">
-        {/* eslint-disable react-hooks/refs -- stagger is derived from a write-once ref that resets after each render; this read-during-render is intentional. */}
+        {/* eslint-disable-next-line react-hooks/refs -- stagger flows from the intentional render-time ref read above */}
         {rows.map((row, rowIdx) => {
           const isExiting = exiting !== null && row === exiting;
           const collapsed = isExiting ? exitCollapsed : entering === row.epoch;
@@ -172,7 +177,6 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
             </div>
           );
         })}
-        {/* eslint-enable react-hooks/refs */}
       </div>
 
       {reconnecting && (
