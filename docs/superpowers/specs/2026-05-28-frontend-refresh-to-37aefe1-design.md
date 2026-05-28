@@ -37,9 +37,9 @@ Ship a `front-end-refresh` branch whose user-visible surface matches `37aefe1` f
 - `src/lib/live-ledger/**`, `src/lib/data-freshness.ts`, `src/lib/queries.ts`, `src/lib/mev-watch-*.ts`, `src/lib/composition.ts`, `src/lib/metrics.ts`
 - `scripts/**`
 
-**Added to scope after backend investigation (see section below):**
+**Deferred to a separate branch (see Backend investigation section below):**
 
-- `src/data/relays.json` — remove two new active censoring entries (`relay-filtered.ultrasound.money`, `regional.titanrelay.xyz`) to revert to `37aefe1`'s 8-relay active set. This is the root cause of the ~90% live-ledger censorship reading.
+- `src/data/relays.json` and/or `src/lib/live-ledger/snapshots.ts:classifySlot()` — the root cause of the ~90% live-ledger censorship reading. Per-user decision on 2026-05-28, this fix ships in a separate branch so this branch stays pure FE refresh.
 - `next.config.ts`, `vercel.json`, `vitest.config.ts`, `playwright.config.ts`, `eslint.config.mjs`, `Taskfile.yml`
 - `src/app/status/page.tsx` — user opted to leave Justin's minimal snapshot view as-is
 - `package.json`, `pnpm-lock.yaml`
@@ -168,32 +168,17 @@ The original brief was "no logic or backend changes." During spec review the use
 
    `37aefe1` excluded these variants — presumably as a deliberate methodology choice, since their inclusion under "censoring path wins" double-counts neutral blocks as censoring without any way to attribute the delivery to the validator's actual selected relay.
 
-### Recommended fix
+### Fix path (deferred to a separate branch)
 
-This is a data revert, not a logic change — consistent with the "back to 37aefe1's view" goal. **Remove the two new active entries from `src/data/relays.json`** (`relay-filtered.ultrasound.money` and `regional.titanrelay.xyz`). The remaining 8 active relays match `37aefe1`'s set exactly:
+Per user decision on 2026-05-28, the methodology fix ships separately so this branch remains a pure FE refresh. The user's framing: **the relay list should track what relayscan publishes** (the source of truth that stays current as the ecosystem evolves), so simply pruning the new entries from `relays.json` is the wrong long-term answer — relayscan adds new sibling/regional relays over time and we'd be back here next quarter.
 
-```
-relay.ultrasound.money            neutral
-titanrelay.xyz                    neutral
-bloxroute.max-profit.blxrbdn.com  censoring (since 2023-12-18; neutral prior)
-bloxroute.regulated.blxrbdn.com   censoring
-aestus.live                       neutral
-boost-relay.flashbots.net         censoring
-agnostic-relay.net                neutral
-relay.ethgas.com                  unknown
-```
+For the followup branch, the candidate fixes (no decision locked):
 
-The historical (`active: false`) relays — bloXroute Ethical, Blocknative, Eden, Manifold, relayooor, BTCS — match `37aefe1` and stay.
+1. **Operator-sibling de-dup in `classifySlot()`** — slot is censoring only if the censoring relay's neutral sibling from the same operator is *not* also in the delivery set. Requires a small operator-pair map (Ultra Sound ↔ Ultra Sound Filtered, Titan ↔ Titan Regional). Scales as relayscan adds more sibling pairs.
+2. **Majority-wins classification** — slot is censoring only if most relays in the delivery set are censoring. No pair config needed; broader methodology shift.
+3. **Winning-relay attribution** — classify by the actual winning relay (highest valueWei). Requires `valueWei` on all stored blocks; partial coverage today.
 
-**Add this as commit 14 in the strategy:** `fix(data): remove Ultra Sound Filtered + Titan Regional from active relays (revert to 37aefe1's set)`. Place it before the leaderboard commit so the leaderboard renders against the reverted relay set.
-
-After the fix, the live ledger should drop closer to the daily headline's ~50–55% range; the daily snapshot pipeline will pick up the change on its next run. Existing days already persisted to SQLite may need a one-time backfill recompute if the historical days included these two relays' counts — out of scope for this branch (call out as a followup).
-
-### Followups out of scope
-
-- Backfill recompute for any persisted days whose `relay_counts` table included the two removed relays (would require running `pnpm update-data --reseed` or equivalent).
-- Methodology page edit acknowledging the "censoring path wins" rule and its limitation (the rule overstates when censoring relays' candidate pool overlaps with neutral relays' pool).
-- Possible future methodology change to weight slots by the winning relay only, requiring a richer relay-payload schema.
+Once the methodology fix lands, the live ledger should drop closer to the daily headline's ~50–55% range. The daily snapshot pipeline will pick up the change on its next run. Persisted historical days may need a one-time recompute (out of scope for both branches).
 
 ## Open questions
 
@@ -201,6 +186,9 @@ None at spec-write time. All six decision points were answered in the brainstorm
 
 ## Out of scope (followups)
 
+- **Methodology fix for the ~90% live-ledger reading** (next branch). See the Backend Investigation section for diagnosis and candidate approaches. User wants the relay list to keep matching relayscan's tracked set; the fix needs to live in classification logic, not data pruning.
+- Backfill recompute for any persisted SQLite days that included the two new operator-sibling relays.
+- Methodology page edit acknowledging the "censoring path wins" rule and its limitation when relay-operator pools overlap.
 - Status page redesign (user kept Justin's minimal version; revisit later if desired).
 - The composition daily-bars concept Justin introduced (skipped per user decision; could revisit as a future feature).
 - The freshness-badge UX in hero/status-bar/embed (removed per user; could revisit as a softer indicator later).
