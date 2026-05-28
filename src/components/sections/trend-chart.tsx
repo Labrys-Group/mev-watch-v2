@@ -8,6 +8,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import type { TrendPoint } from "@/lib/queries";
 import { toCompositionPoint, type CompositionPoint } from "@/lib/composition";
@@ -89,7 +90,7 @@ function ChartTooltip({
         <span>{formatPercent(point.censored)}</span>
       </div>
       <div className="flex items-center justify-between gap-5">
-        <LegendSwatch className="bg-neutral-relay" label="Non-censoring" />
+        <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
         <span>{formatPercent(point.nonCensored)}</span>
       </div>
       <div className="mt-2 pt-2 border-t border-border-labrys">
@@ -128,7 +129,6 @@ export function TrendChart({ trend }: TrendChartProps) {
   // sweep animation plays exactly when the reader reaches it.
   const chartRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
-  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const el = chartRef.current;
@@ -151,31 +151,6 @@ export function TrendChart({ trend }: TrendChartProps) {
       { threshold: 0.25 },
     );
 
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const el = chartRef.current;
-    if (!el) return;
-
-    const updateSize = () => {
-      const rect = el.getBoundingClientRect();
-      const width = Math.floor(rect.width);
-      const height = Math.floor(rect.height);
-      setChartSize((current) => {
-        if (current.width === width && current.height === height) return current;
-        return { width, height };
-      });
-    };
-
-    updateSize();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", updateSize);
-      return () => window.removeEventListener("resize", updateSize);
-    }
-
-    const observer = new ResizeObserver(updateSize);
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -207,7 +182,6 @@ export function TrendChart({ trend }: TrendChartProps) {
     () => sparseTickIndices(data, isNarrow ? 3 : 8),
     [data, isNarrow],
   );
-  const chartReady = inView && chartSize.width > 0 && chartSize.height > 0;
 
   return (
     <Section
@@ -282,17 +256,15 @@ export function TrendChart({ trend }: TrendChartProps) {
             <div className="flex items-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
               <LegendSwatch className="bg-non-boost" label="Non-boosted" />
               <LegendSwatch className="bg-ofac" label="Censored" />
-              <LegendSwatch className="bg-neutral-relay" label="Non-censoring" />
+              <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
             </div>
           </div>
 
           {/* Chart */}
-          <div className="h-[260px] min-w-0 w-full px-2 pb-2 pt-4 sm:h-[300px]">
-            <div ref={chartRef} className="h-full min-w-0 w-full">
-              {chartReady ? (
+          <div ref={chartRef} className="w-full h-[260px] sm:h-[300px] px-2 pt-4 pb-2">
+            {inView ? (
+              <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
-                  width={chartSize.width}
-                  height={chartSize.height}
                   data={data}
                   margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
                 >
@@ -350,7 +322,7 @@ export function TrendChart({ trend }: TrendChartProps) {
                     content={<ChartTooltip />}
                     cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
                   />
-                  {/* Declared bottom-to-top: non-censoring, censoring, non-boosted */}
+                  {/* Declared bottom-to-top: non-censored, censored, non-boosted */}
                   <Area
                     type="monotone"
                     dataKey="nonCensored"
@@ -409,13 +381,13 @@ export function TrendChart({ trend }: TrendChartProps) {
                     animationEasing="ease-out"
                   />
                 </AreaChart>
-              ) : (
-                <div
-                  className="h-full w-full animate-pulse bg-foreground/5"
-                  aria-hidden="true"
-                />
-              )}
-            </div>
+              </ResponsiveContainer>
+            ) : (
+              <div
+                className="h-full w-full animate-pulse bg-foreground/5"
+                aria-hidden="true"
+              />
+            )}
           </div>
         </div>
       </div>
