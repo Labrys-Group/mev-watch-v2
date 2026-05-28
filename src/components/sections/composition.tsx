@@ -17,7 +17,6 @@ interface CompositionProps {
 export function Composition({
   latest,
   ledger,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   freshness: _freshness,
 }: CompositionProps) {
   const { censorshipPct, totalBlocks } = latest;

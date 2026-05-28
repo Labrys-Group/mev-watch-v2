@@ -144,7 +144,6 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     };
   }, [entering, exiting]);
 
-  // eslint-disable-next-line react-hooks/refs -- stagger is derived from a write-once ref that resets after each render; this read-during-render is intentional.
   const stagger = staggerNext.current;
   useEffect(() => {
     staggerNext.current = false;
