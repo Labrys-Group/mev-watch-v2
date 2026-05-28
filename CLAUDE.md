@@ -10,8 +10,7 @@ tool tracking OFAC censorship of Ethereum MEV-boost blocks. This repository is
 a single Next.js application; the v1 Turborepo monorepo was fully replaced.
 
 The active implementation uses a SQLite data artifact, not a remote application
-database. The dated files under `docs/superpowers/` are useful design history,
-but some describe superseded approaches.
+database.
 
 ## Commands
 
@@ -34,10 +33,11 @@ Next.js 16 App Router app. Styling is Tailwind CSS v4 + shadcn/ui, with Labrys
 design tokens in `src/app/globals.css`, light/dark theme support through
 `next-themes`, and focused UI primitives under `src/components/`.
 
-The app reads a SQLite artifact through Node's `node:sqlite` APIs. The checked-in
-artifact at `src/data/mev-watch.sqlite` is the local seed and fallback. In
-production, `BLOB_READ_WRITE_TOKEN` enables Vercel Blob-backed reads and writes
-through `src/lib/mev-watch-blob.ts`.
+The app reads a SQLite artifact through Node's `node:sqlite` APIs. The local
+artifact at `src/data/mev-watch.sqlite` is gitignored and serves as the dev
+seed and fallback; populate it with `pnpm update-data`. In production,
+`BLOB_READ_WRITE_TOKEN` enables Vercel Blob-backed reads and writes through
+`src/lib/mev-watch-blob.ts`.
 
 ### Key Conventions
 
@@ -50,8 +50,6 @@ through `src/lib/mev-watch-blob.ts`.
   accessors live in `src/config/relays.ts`.
 - Unit tests sit beside their source as `*.test.ts(x)`; e2e tests live in
   `e2e/`.
-- Do not treat `docs/superpowers/**` as current implementation truth without
-  checking the code first.
 
 ## Data Pipeline
 

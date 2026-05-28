@@ -10,14 +10,20 @@
 !.yarn/releases
 !.yarn/versions
 
+# editor
 .vscode/
 
 # testing
 /coverage
+/test-results
+/playwright-report
+/blob-report
 
-# next.js
+# next.js / typescript build
 /.next/
 /out/
+next-env.d.ts
+*.tsbuildinfo
 
 # production
 /build
@@ -32,36 +38,23 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (commit .env.example only)
 .env*
 !.env.example
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# superpowers brainstorm scratch
+# scratch / tool caches
 .superpowers
-
-# understand-anything skill cache (knowledge graph, fingerprints)
 .understand-anything/
+.gstack/
+tmp_*
 
-# env & local infra
-.env
-.env*.local
-
-# drizzle / playwright artifacts
-/test-results
-/playwright-report
-/blob-report
-
-# local libSQL database
+# local data artifacts (seed SQLite, live-ledger snapshots, e2e DBs)
 /data/*
 !/data/.gitkeep
-.gstack/
-
-# generated data artifacts
 /src/data/mev-watch.sqlite
+
+# local design history (not committed)
+docs/superpowers/
