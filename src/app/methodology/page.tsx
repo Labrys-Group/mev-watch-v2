@@ -10,10 +10,27 @@ import { Section } from "@/components/section";
 import { RELAYS } from "@/config/relays";
 import type { CSSVars } from "@/lib/css";
 
+const METHODOLOGY_TITLE = "Methodology";
+const METHODOLOGY_DESCRIPTION =
+  "How MEV Watch measures OFAC censorship on Ethereum: data source, metric definition, relay classification, and known limitations.";
+
 export const metadata: Metadata = {
-  title: "Methodology | MEV Watch",
-  description:
-    "How MEV Watch measures OFAC censorship on Ethereum: data source, metric definition, relay classification, and known limitations.",
+  title: METHODOLOGY_TITLE,
+  description: METHODOLOGY_DESCRIPTION,
+  alternates: {
+    canonical: "/methodology",
+  },
+  openGraph: {
+    type: "article",
+    url: "/methodology",
+    title: `${METHODOLOGY_TITLE} — MEV Watch`,
+    description: METHODOLOGY_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${METHODOLOGY_TITLE} — MEV Watch`,
+    description: METHODOLOGY_DESCRIPTION,
+  },
 };
 
 interface Limitation {

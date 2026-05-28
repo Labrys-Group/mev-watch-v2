@@ -26,7 +26,13 @@ UPDATE_DATA_MAX_DAYS=30 # optional, defaults to 30 days per cron run
 UPDATE_DATA_REPAIR_MAX_DAYS=30 # optional, defaults to UPDATE_DATA_MAX_DAYS
 UPDATE_DATA_CONCURRENCY=4 # optional cron fetch concurrency
 UPDATE_DATA_WRITE_EVERY=1 # optional, upload after each persisted batch
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX # optional Google Tag Manager container; GA4 lives inside GTM
 ```
+
+Vercel Analytics and Speed Insights are wired through `@vercel/analytics` and
+`@vercel/speed-insights`. Both auto-detect the Vercel environment and need no
+project variables; enable the products in the Vercel dashboard to start
+receiving data.
 
 Vercel automatically sends `Authorization: Bearer $CRON_SECRET` to cron
 invocations when `CRON_SECRET` is configured.

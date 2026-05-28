@@ -7,9 +7,27 @@ import { getLastRefresh, getLatestStats } from "@/lib/queries";
 import { formatRelativeTime } from "@/lib/format";
 import { getDataFreshness } from "@/lib/data-freshness";
 
+const STATUS_TITLE = "Status";
+const STATUS_DESCRIPTION =
+  "Status of the MEV Watch SQLite data artifact and its freshness.";
+
 export const metadata: Metadata = {
-  title: "Status",
-  description: "Status of the MEV Watch SQLite data artifact and its freshness.",
+  title: STATUS_TITLE,
+  description: STATUS_DESCRIPTION,
+  alternates: {
+    canonical: "/status",
+  },
+  openGraph: {
+    type: "website",
+    url: "/status",
+    title: `${STATUS_TITLE} — MEV Watch`,
+    description: STATUS_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${STATUS_TITLE} — MEV Watch`,
+    description: STATUS_DESCRIPTION,
+  },
 };
 
 export const runtime = "nodejs";

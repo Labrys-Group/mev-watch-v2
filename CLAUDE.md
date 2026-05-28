@@ -88,7 +88,11 @@ Start from `.env.example`. The main production variables are
 `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET`, optional `ETH_RPC_URL`, optional Blob
 path overrides, and update tuning variables such as `UPDATE_DATA_MAX_DAYS`,
 `UPDATE_DATA_CONCURRENCY`, `UPDATE_DATA_REPAIR_MAX_DAYS`, and
-`UPDATE_DATA_WRITE_EVERY`.
+`UPDATE_DATA_WRITE_EVERY`. Analytics: `NEXT_PUBLIC_GTM_ID` loads the Google
+Tag Manager container (GA4 and any other tags are configured inside GTM, not
+in code). Vercel Analytics and Speed Insights are wired via
+`@vercel/analytics` and `@vercel/speed-insights` in `src/app/layout.tsx` and
+need no env vars.
 
 ## Status
 
