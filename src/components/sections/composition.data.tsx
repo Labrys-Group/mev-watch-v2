@@ -15,12 +15,12 @@ export async function CompositionData() {
     return (
       <Section
         label="01 / POST-MERGE COMPOSITION"
-        title="Censoring vs. non-censoring relays."
+        title="Censoring vs. neutral relays."
       >
         <p className="font-mono text-[13px] leading-snug text-fg-muted">
           No daily snapshots yet — run{" "}
-          <code className="font-mono text-foreground">pnpm update-data</code>{" "}
-          to generate the local data snapshot, then reload.
+          <code className="font-mono text-foreground">pnpm seed-history</code>{" "}
+          to backfill, then reload.
         </p>
       </Section>
     );

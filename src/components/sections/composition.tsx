@@ -9,62 +9,76 @@ import { EpochLedger } from "@/components/sections/epoch-ledger";
 interface CompositionProps {
   latest: LatestStats;
   ledger: LedgerData;
+  // freshness is passed by the data wrapper and kept here for API stability,
+  // but the restored 37aefe1 layout does not surface it in the JSX.
   freshness: DataFreshness;
 }
 
-export function Composition({ latest, ledger, freshness }: CompositionProps) {
-  const { censorshipPct, neutralPct, nonBoostPct, totalBlocks } = latest;
+export function Composition({
+  latest,
+  ledger,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  freshness: _freshness,
+}: CompositionProps) {
+  const { censorshipPct, totalBlocks } = latest;
+
   const censoringBlocks = Math.round((censorshipPct / 100) * totalBlocks);
   const neutralBlocks = totalBlocks - censoringBlocks;
 
   return (
     <Section
       label="01 / POST-MERGE COMPOSITION"
-      title="Censoring vs. non-censoring relays."
+      title="Censoring vs. neutral relays."
       pattern="line-grid"
       accent="var(--accent-alt-color)"
       aside={
         <>
-          <span>{freshness.sourceLabel}</span>
-          <br />
-          <span>DAILY MEV-BOOST DELIVERY DISTRIBUTION</span>
+          <span>DISTRIBUTION OF MEV-BOOST BLOCKS</span>
           <br />
           <span>
             N&nbsp;={" "}
             <strong className="text-foreground font-semibold tracking-normal normal-case">
-              {totalBlocks.toLocaleString()} DELIVERIES
+              {totalBlocks.toLocaleString()} BLOCKS
             </strong>
           </span>
         </>
       }
     >
-      <p className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-muted">
-        {freshness.sourceLabel}
-      </p>
-      <p className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-muted">
-        Recent slots, independent of the daily snapshot
-      </p>
+      {/* Live epoch ledger — the latest 4 epochs of real per-slot data */}
       <EpochLedger initial={ledger} />
 
-      <div className="grid grid-cols-1 border border-border-labrys bg-background sm:grid-cols-3">
-        <CompositionBand
-          label="Censoring relays"
-          value={censorshipPct}
-          swatch="bg-ofac"
-          delay="80ms"
-        />
-        <CompositionBand
-          label="Non-censoring + unknown"
-          value={neutralPct}
-          swatch="bg-neutral-relay"
-          delay="140ms"
-        />
-        <CompositionBand
-          label="Non-MEV-Boost"
-          value={nonBoostPct}
-          swatch="bg-non-boost"
-          delay="200ms"
-        />
+      {/* Legend + footnote */}
+      <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap border border-border-labrys border-t-0 px-4 py-2.5 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
+        <span className="inline-flex items-center gap-2">
+          <span
+            className="inline-block w-2.5 h-2.5 shrink-0 bg-ofac"
+            aria-hidden="true"
+          />
+          OFAC Censoring
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span
+            className="inline-block w-2.5 h-2.5 shrink-0 bg-neutral-relay"
+            aria-hidden="true"
+          />
+          Neutral
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span
+            className="inline-block w-2.5 h-2.5 shrink-0 bg-non-boost"
+            aria-hidden="true"
+          />
+          Non-MEV-Boost
+        </span>
+        <span className="normal-case tracking-normal text-[10px] font-mono text-fg-muted sm:ml-auto">
+          Each tile is one real slot · latest 4 epochs, live.
+          {/* Hover hint only on devices that can actually hover; touch
+              devices no longer wire up tap-to-detail. */}
+          <span className="hidden [@media(hover:hover)]:inline">
+            {" "}
+            Hover a tile for detail.
+          </span>
+        </span>
       </div>
 
       {/* Block-count cards */}
@@ -89,7 +103,7 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
           </div>
         </div>
 
-        {/* Non-censoring cell */}
+        {/* Neutral cell */}
         <div
           className="reveal-item border border-border-labrys p-3.5 bg-background transition-colors duration-200 hover:border-neutral-relay"
           style={{ "--delay": "210ms" } as CSSVars}
@@ -99,7 +113,7 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
               className="inline-block w-2.5 h-2.5 shrink-0 bg-neutral-relay"
               aria-hidden="true"
             />
-            Non-censoring relays
+            Neutral relays
           </div>
           <div className="font-sans font-bold text-[28px] sm:text-[30px] leading-none tracking-[-0.025em] text-foreground mt-2.5">
             <CountUp value={neutralBlocks} />
@@ -110,35 +124,5 @@ export function Composition({ latest, ledger, freshness }: CompositionProps) {
         </div>
       </div>
     </Section>
-  );
-}
-
-interface CompositionBandProps {
-  label: string;
-  value: number | null;
-  swatch: string;
-  delay: string;
-}
-
-function CompositionBand({ label, value, swatch, delay }: CompositionBandProps) {
-  return (
-    <div
-      className="reveal-item border-b border-border-labrys p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
-      style={{ "--delay": delay } as CSSVars}
-    >
-      <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] uppercase text-fg-muted">
-        <span className={`inline-block h-2.5 w-2.5 shrink-0 ${swatch}`} />
-        {label}
-      </div>
-      <div className="mt-2 font-sans text-[30px] font-bold leading-none tracking-[-0.025em] text-foreground">
-        {value === null ? (
-          <span className="font-mono text-[18px] uppercase tracking-[0.08em] text-fg-muted">
-            N/A
-          </span>
-        ) : (
-          <CountUp value={value} decimals={1} suffix="%" />
-        )}
-      </div>
-    </div>
   );
 }
