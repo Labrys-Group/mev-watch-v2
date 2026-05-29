@@ -14,7 +14,13 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState({
+    open: false,
+    pathname,
+  });
+
+  const menuOpen = mobileMenu.open && mobileMenu.pathname === pathname;
+  const closeMenu = () => setMobileMenu({ open: false, pathname });
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-labrys bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
@@ -82,7 +88,12 @@ export function SiteHeader() {
             type="button"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={() =>
+              setMobileMenu((current) => ({
+                open: current.pathname === pathname ? !current.open : true,
+                pathname,
+              }))
+            }
             className="grid h-8 w-8 place-items-center rounded-sm text-fg-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand"
           >
             {menuOpen ? (
@@ -106,7 +117,7 @@ export function SiteHeader() {
               <Link
                 key={href}
                 href={href}
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
                 aria-current={isActive ? "page" : undefined}
                 className={`block border-b border-border-labrys px-4 py-3 font-mono text-[12px] tracking-[0.12em] uppercase transition-colors last:border-b-0 ${
                   isActive
