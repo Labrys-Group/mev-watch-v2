@@ -311,6 +311,7 @@ function SlotTile({
       : (e: MouseEvent<HTMLDivElement>) => {
           onHover({ cell, epoch, x: e.clientX, y: e.clientY });
         };
+  const clearDetail = pending || !hoverEnabled ? () => onHover(null) : undefined;
 
   // Snapshot `--delay` and `--pop-duration` at mount. The first /api/epochs
   // poll fires within ~100–300ms of mount, which re-renders the parent and
@@ -333,7 +334,7 @@ function SlotTile({
     <div
       className={className}
       style={initialStyle}
-      onMouseEnter={showDetail}
+      onMouseEnter={showDetail ?? clearDetail}
       onMouseMove={showDetail}
     >
       <span

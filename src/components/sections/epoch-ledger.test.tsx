@@ -218,6 +218,41 @@ describe("EpochLedger", () => {
     ).toBe(0);
   });
 
+  it("clears the slot tooltip when hovering a pending slot", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    const pendingTiles = document.querySelectorAll(".epoch-cell");
+    expect(filledTiles.length).toBeGreaterThan(0);
+    expect(pendingTiles.length).toBeGreaterThan(0);
+
+    fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
+    expect(document.querySelectorAll(".pointer-events-none.fixed")).toHaveLength(
+      1,
+    );
+
+    fireEvent.mouseEnter(pendingTiles[0], { clientX: 120, clientY: 100 });
+
+    expect(document.querySelectorAll(".pointer-events-none.fixed")).toHaveLength(
+      0,
+    );
+  });
+
   it("does not wire hover handlers when matchMedia reports no fine pointer", async () => {
     vi.stubGlobal(
       "matchMedia",
