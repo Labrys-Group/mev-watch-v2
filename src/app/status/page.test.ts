@@ -10,4 +10,19 @@ describe("status page route config", () => {
   it("uses a short route metadata title", () => {
     expect(statusPage.metadata.title).toBe("Status");
   });
+
+  it("preserves shared social preview metadata", () => {
+    expect(JSON.stringify(statusPage.metadata.openGraph)).toContain(
+      "/preview.png",
+    );
+    expect(JSON.stringify(statusPage.metadata.twitter)).toContain(
+      "/preview.png",
+    );
+    expect(JSON.stringify(statusPage.metadata.openGraph)).toContain(
+      "MEV Watch",
+    );
+    expect(JSON.stringify(statusPage.metadata.twitter)).toContain(
+      "@labrys_io",
+    );
+  });
 });

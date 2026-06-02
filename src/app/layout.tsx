@@ -5,7 +5,16 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Manrope, Spline_Sans_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { FAQ_ITEMS } from "@/config/faq";
+import {
+  OPEN_GRAPH_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+  TWITTER_HANDLE,
+  TWITTER_IMAGE,
+  baseJsonLd,
+} from "@/config/seo";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -20,13 +29,6 @@ const splineSansMono = Spline_Sans_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://www.mevwatch.info";
-const SITE_NAME = "MEV Watch";
-const SITE_TITLE = `${SITE_NAME} — censoring relay share on Ethereum MEV-boost`;
-const SITE_DESCRIPTION =
-  "A public transparency tool tracking censoring and non-censoring Ethereum MEV-boost relay flow. Daily metrics and relay leaderboards.";
-const OG_IMAGE_ALT =
-  "MEV Watch — censoring relay share on Ethereum MEV-boost";
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
 // `metadataBase` resolves every relative metadata URL (og:image, twitter:image,
@@ -85,28 +87,15 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     locale: "en_US",
-    images: [
-      {
-        url: "/preview.png",
-        width: 1200,
-        height: 630,
-        alt: OG_IMAGE_ALT,
-        type: "image/png",
-      },
-    ],
+    images: [OPEN_GRAPH_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@labrys_io",
-    creator: "@labrys_io",
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: "/preview.png",
-        alt: OG_IMAGE_ALT,
-      },
-    ],
+    images: [TWITTER_IMAGE],
   },
   icons: {
     icon: "/favicon.ico",
@@ -133,92 +122,6 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#org`,
-      name: "Labrys",
-      url: "https://labrys.io",
-      logo: `${SITE_URL}/mev-watch-logo-light.png`,
-      sameAs: ["https://twitter.com/labrys_io", "https://labrys.io"],
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_URL}/#site`,
-      url: SITE_URL,
-      name: SITE_NAME,
-      description: SITE_DESCRIPTION,
-      publisher: { "@id": `${SITE_URL}/#org` },
-      inLanguage: "en-US",
-    },
-    {
-      "@type": "WebApplication",
-      "@id": `${SITE_URL}/#app`,
-      name: SITE_NAME,
-      url: SITE_URL,
-      applicationCategory: "AnalyticsApplication",
-      operatingSystem: "Any",
-      browserRequirements: "Requires JavaScript",
-      description: SITE_DESCRIPTION,
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      publisher: { "@id": `${SITE_URL}/#org` },
-    },
-    {
-      "@type": "Dataset",
-      "@id": `${SITE_URL}/#dataset`,
-      name: "Ethereum MEV-boost relay censorship — daily delivery share",
-      description:
-        "Daily share of Ethereum MEV-boost relay payload deliveries attributable to OFAC-censoring relays, derived from relayscan.io. Maintained by Labrys.",
-      url: SITE_URL,
-      keywords: [
-        "Ethereum",
-        "MEV-boost",
-        "OFAC",
-        "censorship",
-        "relays",
-        "transparency",
-      ],
-      creator: { "@id": `${SITE_URL}/#org` },
-      publisher: { "@id": `${SITE_URL}/#org` },
-      isAccessibleForFree: true,
-      license: "https://opensource.org/licenses/MIT",
-      temporalCoverage: "2022-09-15/..",
-      spatialCoverage: "Ethereum mainnet",
-      distribution: [
-        {
-          "@type": "DataDownload",
-          encodingFormat: "application/json",
-          contentUrl: `${SITE_URL}/api/v1/summary`,
-        },
-        {
-          "@type": "DataDownload",
-          encodingFormat: "application/json",
-          contentUrl: `${SITE_URL}/api/v1/trend`,
-        },
-        {
-          "@type": "DataDownload",
-          encodingFormat: "application/json",
-          contentUrl: `${SITE_URL}/api/v1/relays`,
-        },
-      ],
-    },
-    {
-      "@type": "FAQPage",
-      "@id": `${SITE_URL}/#faq`,
-      mainEntity: FAQ_ITEMS.map((item) => ({
-        "@type": "Question",
-        name: item.q,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.a,
-        },
-      })),
-    },
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -235,7 +138,7 @@ export default function RootLayout({
         ) : null}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(baseJsonLd) }}
         />
         {GTM_ID ? (
           <Script id="gtm-init" strategy="afterInteractive">

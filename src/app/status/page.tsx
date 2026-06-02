@@ -6,6 +6,12 @@ import { Reveal } from "@/components/reveal";
 import { getLastRefresh, getLatestStats } from "@/lib/queries";
 import { formatRelativeTime } from "@/lib/format";
 import { getDataFreshness } from "@/lib/data-freshness";
+import {
+  OPEN_GRAPH_IMAGE,
+  SITE_NAME,
+  TWITTER_HANDLE,
+  TWITTER_IMAGE,
+} from "@/config/seo";
 
 const STATUS_TITLE = "Status";
 const STATUS_DESCRIPTION =
@@ -20,13 +26,19 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/status",
+    siteName: SITE_NAME,
     title: `${STATUS_TITLE} — MEV Watch`,
     description: STATUS_DESCRIPTION,
+    locale: "en_US",
+    images: [OPEN_GRAPH_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
     title: `${STATUS_TITLE} — MEV Watch`,
     description: STATUS_DESCRIPTION,
+    images: [TWITTER_IMAGE],
   },
 };
 

@@ -8,6 +8,12 @@ import { StatusBarSkeleton } from "@/components/skeletons/status-bar.skeleton";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
 import { RELAYS } from "@/config/relays";
+import {
+  OPEN_GRAPH_IMAGE,
+  SITE_NAME,
+  TWITTER_HANDLE,
+  TWITTER_IMAGE,
+} from "@/config/seo";
 import type { CSSVars } from "@/lib/css";
 
 const METHODOLOGY_TITLE = "Methodology";
@@ -23,13 +29,19 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: "/methodology",
+    siteName: SITE_NAME,
     title: `${METHODOLOGY_TITLE} — MEV Watch`,
     description: METHODOLOGY_DESCRIPTION,
+    locale: "en_US",
+    images: [OPEN_GRAPH_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
     title: `${METHODOLOGY_TITLE} — MEV Watch`,
     description: METHODOLOGY_DESCRIPTION,
+    images: [TWITTER_IMAGE],
   },
 };
 

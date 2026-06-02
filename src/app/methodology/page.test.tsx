@@ -12,6 +12,15 @@ vi.mock("@/components/reveal", () => ({
 }));
 
 describe("MethodologyPage", () => {
+  it("preserves shared social preview metadata", async () => {
+    const { metadata } = await import("./page");
+
+    expect(JSON.stringify(metadata.openGraph)).toContain("/preview.png");
+    expect(JSON.stringify(metadata.twitter)).toContain("/preview.png");
+    expect(JSON.stringify(metadata.openGraph)).toContain("MEV Watch");
+    expect(JSON.stringify(metadata.twitter)).toContain("@labrys_io");
+  });
+
   it("uses OFAC terminology, neutral classification, and correct section labels", async () => {
     const { default: MethodologyPage, metadata } = await import("./page");
     render(<MethodologyPage />);
