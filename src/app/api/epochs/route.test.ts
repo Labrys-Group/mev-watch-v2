@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GET } from "./route";
 import { refreshLiveLedger } from "@/lib/live-ledger/service";
+import { LIVE_LEDGER_CACHE_SECONDS } from "@/lib/live-ledger/timing";
 
 vi.mock("@/lib/live-ledger/service", () => ({
   refreshLiveLedger: vi.fn(),
@@ -14,7 +15,7 @@ describe("GET /api/epochs", () => {
     vi.resetAllMocks();
   });
 
-  it("returns live ledger data with a shared cache header matching the poll interval", async () => {
+  it("returns live ledger data with a shared cache header matching the configured cache ttl", async () => {
     refreshLiveLedgerMock.mockResolvedValue({
       wroteSnapshot: true,
       snapshot: {
@@ -35,7 +36,7 @@ describe("GET /api/epochs", () => {
     const response = await GET();
 
     expect(response.headers.get("cache-control")).toBe(
-      "public, s-maxage=30, stale-while-revalidate=30",
+      `public, s-maxage=${LIVE_LEDGER_CACHE_SECONDS}, stale-while-revalidate=${LIVE_LEDGER_CACHE_SECONDS}`,
     );
     await expect(response.json()).resolves.toEqual({
       headSlot: 96,
