@@ -279,6 +279,72 @@ details[open]::details-content {
   animation-delay: var(--delay, 0ms);
 }
 
+/* Epoch ledger animations.
+   `.epoch-tile` runs `mw-tile-pop` on mount. On initial render the row
+   staggers `--delay` across tiles so the grid pops in slot-by-slot
+   (slicing across). After mount React keys each tile by
+   `${slot}:${pending|filled}`, so a tile remounts only when its slot
+   newly fills — that single tile then pops in with `--delay: 0`,
+   bouncing into place as it arrives.
+   Rows shift via two layers: the wrapper transitions `grid-template-rows`
+   from `1fr ↔ 0fr` so the layout reflows without measuring pixels, and
+   the inner child slides + fades so the visible motion reads as a
+   vertical scroll (new row drops in from above; old row slides up + out).
+   ────────────────────────────────────────────────────────────── */
+.epoch-tile {
+  animation: mw-tile-pop var(--pop-duration, 0.52s)
+    cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+.epoch-row-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.epoch-row-wrap--collapsed {
+  grid-template-rows: 0fr;
+}
+.epoch-row-wrap > * {
+  min-height: 0;
+  transform: translateY(0);
+  opacity: 1;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease-out;
+}
+.epoch-row-wrap--collapsed > * {
+  /* Clip only while the wrapper is collapsing so the slide-out doesn't
+     spill past the shrinking grid row. Steady-state rows stay overflow-
+     visible so a hovered tile's scale-up isn't chopped off vertically. */
+  overflow: hidden;
+  /* Translate up so the row slides out the top of the stack as it
+     collapses, matching the "scroll up" feel for the exiting bottom row.
+     The entering top row starts here too — opacity:0 + translated up — and
+     drops down into place when the wrapper expands. */
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+/* Poll progress bar — fills left→right over POLL_MS. Restarted by
+   remounting via a React key on each successful fetch;
+   animation-duration is set inline from POLL_MS. */
+.epoch-poll-bar {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--accent-color) 35%, transparent),
+    var(--accent-color)
+  );
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation-name: epoch-poll-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes epoch-poll-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 /* Page-wide blueprint grid — fixed behind all content, radially
    feathered so it dissolves inward into the background colour. */
 .bg-grid {
@@ -354,8 +420,21 @@ details[open]::details-content {
   .grow-bar,
   .reveal-item,
   .reveal-row,
-  .tile {
+  .tile,
+  .epoch-tile,
+  .epoch-poll-bar {
     animation: none !important;
+  }
+  .epoch-poll-bar {
+    transform: scaleX(1) !important;
+    opacity: 0.4 !important;
+  }
+  .epoch-tile,
+  .epoch-row-wrap,
+  .epoch-row-wrap > * {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
   .nav-underline::after {
     transition: none !important;

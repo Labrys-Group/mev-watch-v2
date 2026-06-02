@@ -17,16 +17,16 @@ export function Leaderboard({ rows }: LeaderboardProps) {
 
   return (
     <Section
-      label="03 / RELAY LEADERBOARD"
-      title="Ranked by delivery share."
+      label="04 / RELAY LEADERBOARD"
+      title="Ranked by block share."
       pattern="ticks"
       accent="var(--accent-color)"
       aside={<>SOURCE: RELAYSCAN.IO + BEACON</>}
     >
       <p className="mb-3 border-b border-border-labrys pb-3 font-sans text-[13px] leading-snug text-fg-muted">
-        Top relays by delivery share — last 24 hours ·{" "}
+        Top relays by share — last 24 hours ·{" "}
         <strong className="font-semibold text-foreground">
-          {totalBlocks.toLocaleString()} deliveries
+          {totalBlocks.toLocaleString()} blocks
         </strong>
         .
       </p>
@@ -39,7 +39,7 @@ export function Leaderboard({ rows }: LeaderboardProps) {
               <th className={TH}>RELAY</th>
               <th className={TH}>POSTURE</th>
               <th className={TH}>SHARE</th>
-              <th className={`${TH} text-right`}>DELIVERIES</th>
+              <th className={`${TH} text-right`}>BLOCKS</th>
             </tr>
           </thead>
           <tbody>
@@ -83,11 +83,11 @@ export function Leaderboard({ rows }: LeaderboardProps) {
                     <td className="px-2 py-2.5 max-[360px]:px-1 sm:px-2.5 align-middle">
                       {isCensoring ? (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-warn border-warn">
-                          CENSORING
+                          OFAC
                         </span>
                       ) : isNeutral ? (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-good border-good">
-                          NON-CENSORING
+                          NEUTRAL
                         </span>
                       ) : (
                         <span className="inline-block font-mono text-[9.5px] tracking-[0.12em] uppercase px-2 py-[3px] border text-fg-muted border-border-labrys">

@@ -93,9 +93,12 @@ describe("computeHeroVerdict", () => {
     expect(v.changePct).toBe(0);
   });
 
-  it("returns a safe default for an empty trend", () => {
+  it("returns an offline verdict for an empty trend", () => {
     const v = computeHeroVerdict([]);
-    expect(v.state).toBe("contained");
+    expect(v.state).toBe("offline");
+    expect(v.headlineWord).toBe("OFFLINE");
+    expect(v.tone).toBe("neutral");
+    expect(v.arrow).toBe("—");
     expect(v.current).toBe(0);
     expect(v.changePct).toBe(0);
   });

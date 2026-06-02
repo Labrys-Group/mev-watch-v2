@@ -25,14 +25,14 @@ const staleFreshness: DataFreshness = {
 };
 
 describe("Hero", () => {
-  it("keeps the verdict but discloses stale daily snapshot context", () => {
+  it("renders the verdict headline and hardcoded readme copy", () => {
     render(<Hero verdict={verdict} freshness={staleFreshness} />);
 
     expect(screen.getByText("FALLING")).toBeInTheDocument();
-    expect(screen.getByText("Daily data through 2023-10-24")).toBeInTheDocument();
-    expect(screen.getByText(/This historical daily snapshot tracks/)).toBeInTheDocument();
-    expect(screen.getByText(/filter censoring-targeted transactions/i)).toBeInTheDocument();
-    expect(screen.queryByText(/OFAC/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/shows that share falling over time/)).not.toBeInTheDocument();
+    expect(screen.getByText(verdict.message)).toBeInTheDocument();
+    expect(screen.getByText(/OFAC-sanctioned transactions/i)).toBeInTheDocument();
+    expect(screen.getByText(/shows that share falling over time/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Daily data through/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/This historical daily snapshot tracks/)).not.toBeInTheDocument();
   });
 });

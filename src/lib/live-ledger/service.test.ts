@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { GENESIS_TIME } from "./chain-time";
 import { refreshLiveLedger } from "./service";
 import type { SnapshotStore } from "./store";
+import { LIVE_LEDGER_REFRESH_INTERVAL_MS } from "./timing";
 import type { LiveLedgerSnapshot } from "./types";
 
 function memoryStore(initial: LiveLedgerSnapshot | null = null): SnapshotStore & {
@@ -53,7 +54,7 @@ describe("refreshLiveLedger", () => {
 
     const result = await refreshLiveLedger({
       store,
-      now: Date.parse(previousSnapshot.fetchedAt) + 29_999,
+      now: Date.parse(previousSnapshot.fetchedAt) + LIVE_LEDGER_REFRESH_INTERVAL_MS - 1,
       fetchPayloads,
     });
 
@@ -69,7 +70,7 @@ describe("refreshLiveLedger", () => {
 
     const result = await refreshLiveLedger({
       store,
-      now: Date.parse(previousSnapshot.fetchedAt) + 30_000,
+      now: Date.parse(previousSnapshot.fetchedAt) + LIVE_LEDGER_REFRESH_INTERVAL_MS,
       fetchPayloads: vi.fn(async () => ({
         successfulRelays: ["boost-relay.flashbots.net"],
         degradedRelays: ["relay.ultrasound.money"],

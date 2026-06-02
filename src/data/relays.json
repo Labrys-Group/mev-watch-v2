@@ -7,25 +7,11 @@
     "dataApiHost": "relay.ultrasound.money"
   },
   {
-    "id": "relay-filtered.ultrasound.money",
-    "name": "Ultra Sound Filtered",
-    "posture": "censoring",
-    "active": true,
-    "dataApiHost": "relay-filtered.ultrasound.money"
-  },
-  {
     "id": "titanrelay.xyz",
     "name": "Titan Relay",
     "posture": "neutral",
     "active": true,
     "dataApiHost": "titanrelay.xyz"
-  },
-  {
-    "id": "regional.titanrelay.xyz",
-    "name": "Titan Relay Regional",
-    "posture": "censoring",
-    "active": true,
-    "dataApiHost": "regional.titanrelay.xyz"
   },
   {
     "id": "bloxroute.max-profit.blxrbdn.com",
@@ -69,11 +55,24 @@
     "dataApiHost": "agnostic-relay.net"
   },
   {
+    "id": "relay.edennetwork.io",
+    "name": "Eden Network",
+    "posture": "censoring",
+    "active": true,
+    "dataApiHost": "relay.edennetwork.io"
+  },
+  {
     "id": "relay.ethgas.com",
     "name": "EthGas",
     "posture": "unknown",
     "active": true,
     "dataApiHost": "relay.ethgas.com"
+  },
+  {
+    "id": "relay.btcs.com",
+    "name": "BTCS",
+    "posture": "censoring",
+    "active": false
   },
   {
     "id": "bloxroute.ethical.blxrbdn.com",
@@ -88,12 +87,6 @@
     "active": false
   },
   {
-    "id": "relay.edennetwork.io",
-    "name": "Eden Network",
-    "posture": "censoring",
-    "active": false
-  },
-  {
     "id": "mainnet-relay.securerpc.com",
     "name": "Manifold",
     "posture": "neutral",
@@ -103,12 +96,6 @@
     "id": "relayooor.wtf",
     "name": "relayooor",
     "posture": "neutral",
-    "active": false
-  },
-  {
-    "id": "relay.btcs.com",
-    "name": "BTCS",
-    "posture": "censoring",
     "active": false
   }
 ]

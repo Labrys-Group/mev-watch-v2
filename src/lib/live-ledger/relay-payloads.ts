@@ -4,7 +4,12 @@ import { RELAYS, type RelayInfo } from "@/config/relays";
 
 import type { RelayPayload } from "./types";
 
-const DEFAULT_LIMIT = 200;
+// 100 is the strictest cap among active relays — bloXroute (Max Profit and
+// Regulated) reject anything higher with HTTP 400 "maximum limit is 100",
+// which would otherwise degrade ~30% of mainnet share. At our 10s poll
+// interval, 100 payloads covers >30 min for the busiest relay — well past
+// the 25.6 min window we render.
+const DEFAULT_LIMIT = 100;
 const DEFAULT_TIMEOUT_MS = 4_000;
 
 const RelayPayloadResponseSchema = z.array(

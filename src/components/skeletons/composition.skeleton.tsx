@@ -1,6 +1,8 @@
 /**
- * Loading placeholder for <Composition>. Mirrors the Section frame, daily
- * composition bands, and two stat tiles.
+ * Loading placeholder for <Composition>. Mirrors the Section frame +
+ * epoch-ledger row + legend strip + two stat tiles. The ledger row uses
+ * a fixed pixel height matching the real EpochLedger so the page body
+ * doesn't jump when data swaps in.
  */
 export function CompositionSkeleton() {
   return (
@@ -10,41 +12,22 @@ export function CompositionSkeleton() {
     >
       <SectionHeaderSkeleton />
       <div className="p-4 md:p-5">
-        <div className="mb-5 border border-border-labrys bg-background p-3">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className="h-[10px] w-48 animate-pulse bg-foreground/10" />
-            <div className="h-[10px] w-28 animate-pulse bg-foreground/10" />
-          </div>
-          <div className="space-y-1.5">
-            {Array.from({ length: 4 }).map((_, row) => (
+        {/* Epoch ledger placeholder — fixed-height row */}
+        <div className="border border-border-labrys bg-background p-3">
+          <div className="grid grid-cols-4 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
               <div
-                key={row}
-                className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-2"
-              >
-                <div className="ml-auto h-4 w-10 animate-pulse bg-foreground/10" />
-                <div className="grid grid-cols-[repeat(32,minmax(7px,1fr))] gap-1">
-                  {Array.from({ length: 32 }).map((__, slot) => (
-                    <div
-                      key={slot}
-                      className="h-4 animate-pulse border border-border-labrys bg-foreground/10"
-                    />
-                  ))}
-                </div>
-              </div>
+                key={i}
+                className="h-[120px] animate-pulse bg-foreground/5"
+              />
             ))}
           </div>
         </div>
-        {/* Composition bands */}
-        <div className="grid grid-cols-1 border border-border-labrys bg-background sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-b border-border-labrys p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
-            >
-              <div className="h-[10px] w-32 animate-pulse bg-foreground/10" />
-              <div className="mt-2 h-[30px] w-24 animate-pulse bg-foreground/10" />
-            </div>
-          ))}
+        {/* Legend strip placeholder */}
+        <div className="flex items-center gap-4 border border-t-0 border-border-labrys px-4 py-2.5">
+          <span className="h-[10px] w-24 animate-pulse bg-foreground/10" />
+          <span className="h-[10px] w-20 animate-pulse bg-foreground/10" />
+          <span className="h-[10px] w-28 animate-pulse bg-foreground/10" />
         </div>
         {/* Two stat tiles */}
         <div className="mt-5 grid grid-cols-2 gap-3">

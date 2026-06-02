@@ -7,22 +7,19 @@ interface StatusBarProps {
   censorshipPct: number;
   lastRefresh?: Date | null;
   freshness: DataFreshness;
+  /** When false, swaps LIVE → DISCONNECTED and dims downstream values. */
+  connected?: boolean;
 }
 
 export function StatusBar({
   latestDate,
   censorshipPct,
   lastRefresh,
-  freshness,
+  // Preserved in props for the data wrapper to pass; not rendered after the 37aefe1 revert.
+  freshness: _freshness,
+  connected = true,
 }: StatusBarProps) {
-  const updatedText =
-    freshness.generatedAgeLabel ?? (lastRefresh ? formatRelativeTime(lastRefresh) : "—");
-  const isStale = freshness.status === "stale";
-  const statusText = isStale ? "DAILY STALE" : "DAILY FRESH";
-  const ageText =
-    typeof freshness.sourceAgeDays === "number"
-      ? `${freshness.sourceAgeDays}d old`
-      : null;
+  const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
 
   return (
     <div className="relative overflow-hidden bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
@@ -33,7 +30,7 @@ export function StatusBar({
       />
 
       {/* Inner row: grid of cells */}
-      <div className="relative z-10 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] md:grid-cols-[auto_repeat(5,1fr)]">
+      <div className="relative z-10 grid grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_repeat(5,1fr)]">
         {/* Labrys logo — grayscale, links to labrys.io; on hover the
             wordmark unfurls and shifts the rest of the row across */}
         <a
@@ -83,42 +80,42 @@ export function StatusBar({
 
         <StatusCell label="NETWORK" value="ETH MAINNET" mdOnly />
 
-        <StatusCell
-          label="STATUS"
-          mobileLabel="DAILY"
-          valueClassName={`${isStale ? "text-warn" : "text-good"} flex items-center gap-1.5`}
-          value={
-            <>
-              <span
-                className={`mr-1 inline-block h-1.5 w-1.5 rounded-full ${isStale ? "bg-warn" : "bg-good"}`}
-                style={{
-                  boxShadow: `0 0 6px var(${isStale ? "--warn" : "--good"})`,
-                }}
-              />
-              {statusText}
-            </>
-          }
-        />
+        {connected ? (
+          <StatusCell
+            label="STATUS"
+            valueClassName="text-good flex items-center gap-1.5"
+            value={
+              <>
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
+                  style={{ boxShadow: "0 0 6px var(--good)" }}
+                />
+                LIVE
+              </>
+            }
+          />
+        ) : (
+          <StatusCell
+            label="STATUS"
+            valueClassName="text-warn flex items-center gap-1.5"
+            value={
+              <>
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full bg-warn mr-1 animate-pulse"
+                  style={{ boxShadow: "0 0 6px var(--warn)" }}
+                />
+                DISCONNECTED
+              </>
+            }
+          />
+        )}
 
-        <StatusCell
-          label="DATA THROUGH"
-          mobileLabel="THROUGH"
-          value={
-            <span className="inline-flex flex-col items-end leading-tight md:flex-row md:items-center md:gap-1.5">
-              <span>{latestDate}</span>
-              {ageText ? (
-                <span className={isStale ? "text-warn" : "text-fg-muted"}>
-                  {ageText}
-                </span>
-              ) : null}
-            </span>
-          }
-        />
+        <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
 
         <StatusCell
           label="CENSORSHIP"
           value={formatPercent(censorshipPct)}
-          valueClassName="text-warn"
+          valueClassName={connected ? "text-warn" : "text-fg-muted"}
         />
 
         <StatusCell label="UPDATED" value={updatedText} mdOnly isLast />
@@ -129,7 +126,6 @@ export function StatusBar({
 
 interface StatusCellProps {
   label: string;
-  mobileLabel?: string;
   value: ReactNode;
   /** Extra classes layered onto the `<strong>` value. Overrides `text-foreground`
    *  if a colour is provided. */
@@ -141,24 +137,14 @@ interface StatusCellProps {
   mdOnly?: boolean;
 }
 
-function StatusCell({
-  label,
-  mobileLabel,
-  value,
-  valueClassName,
-  isLast,
-  mdOnly,
-}: StatusCellProps) {
+function StatusCell({ label, value, valueClassName, isLast, mdOnly }: StatusCellProps) {
   const visibility = mdOnly ? "hidden md:flex" : "flex";
   const divider = isLast ? "" : " border-r border-border-labrys";
   return (
     <div
       className={`${visibility} justify-between items-center gap-3 px-3 py-2 text-[12px] tracking-[0.1em] uppercase${divider}`}
     >
-      <span>
-        {mobileLabel ? <span className="md:hidden">{mobileLabel}</span> : null}
-        <span className={mobileLabel ? "hidden md:inline" : undefined}>{label}</span>
-      </span>
+      <span>{label}</span>
       <strong
         className={`text-foreground font-semibold tracking-normal normal-case${valueClassName ? ` ${valueClassName}` : ""}`}
       >

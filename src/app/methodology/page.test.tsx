@@ -12,16 +12,36 @@ vi.mock("@/components/reveal", () => ({
 }));
 
 describe("MethodologyPage", () => {
-  it("uses censoring and non-censoring terminology without mentioning OFAC", async () => {
+  it("uses OFAC terminology, neutral classification, and correct section labels", async () => {
     const { default: MethodologyPage, metadata } = await import("./page");
     render(<MethodologyPage />);
 
     const pageText = document.body.textContent ?? "";
     const serializedMetadata = JSON.stringify(metadata);
 
-    expect(screen.getByText("05 / RELAY CLASSIFICATION")).toBeInTheDocument();
-    expect(pageText).toContain("non-censoring");
-    expect(pageText).toContain("censoring relays");
-    expect(`${serializedMetadata} ${pageText}`).not.toMatch(/OFAC/i);
+    // Section label reverted to OFAC variant
+    expect(
+      screen.getByText("05 / OFAC RELAY CLASSIFICATION"),
+    ).toBeInTheDocument();
+
+    // OFAC terminology restored
+    expect(`${serializedMetadata} ${pageText}`).toMatch(/OFAC/i);
+    expect(pageText).toContain("OFAC-censoring relays");
+    expect(pageText).toContain("OFAC sanctions filtering");
+
+    // neutral restored (not non-censoring in prose)
+    expect(pageText).toContain("neutral");
+
+    // Limitation #4 has updated title and live ledger mention
+    expect(pageText).toContain(
+      "Headline is daily; the live ledger is a separate view",
+    );
+    expect(pageText).toContain("epoch ledger");
+
+    // Exception B: relays.json reference preserved
+    expect(pageText).toContain("relays.json");
+
+    // Exception A: Vercel Blob reference preserved
+    expect(pageText).toContain("Vercel Blob");
   });
 });

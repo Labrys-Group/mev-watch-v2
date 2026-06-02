@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { formatPercent } from "./format";
-import { formatRelativeTime, formatDateShort } from "./format";
+import { formatRelativeTime, formatDateShort, formatDateLong } from "./format";
 
 describe("formatPercent", () => {
   it("formats a whole number with one decimal place", () => {
@@ -33,5 +33,18 @@ describe("formatRelativeTime", () => {
 describe("formatDateShort", () => {
   it("formats an ISO date as MMM 'YY", () => {
     expect(formatDateShort("2022-11-14")).toBe("Nov '22");
+  });
+});
+
+describe("formatDateLong", () => {
+  it("formats an ISO date as 'DDD · D MMM YYYY' in UTC", () => {
+    // 2022-11-14 was a Monday in UTC.
+    expect(formatDateLong("2022-11-14")).toBe("Mon · 14 Nov 2022");
+  });
+
+  it("uses UTC weekday regardless of local timezone", () => {
+    // 2022-01-01 was a Saturday in UTC; local parsing would yield Friday
+    // for users west of UTC.
+    expect(formatDateLong("2022-01-01")).toBe("Sat · 1 Jan 2022");
   });
 });

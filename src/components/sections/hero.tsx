@@ -8,29 +8,48 @@ interface HeroProps {
   freshness: DataFreshness;
 }
 
-export function Hero({ verdict, freshness }: HeroProps) {
-  const isGood = verdict.tone === "good";
+export function Hero({ verdict }: HeroProps) {
   const trendWord = verdict.headlineWord;
-  const trendColor = isGood ? "text-good" : "text-warn";
-  const trendGlow = isGood ? "glow-good" : "glow-warn";
-  const trendBorder = isGood ? "border-good" : "border-warn";
-  const isStale = freshness.status === "stale";
-  const sourceBadge = freshness.sourceDate
-    ? `Daily data through ${freshness.sourceDate}`
-    : freshness.sourceLabel;
+  const trendColor =
+    verdict.tone === "good"
+      ? "text-good"
+      : verdict.tone === "bad"
+        ? "text-warn"
+        : "text-fg-muted";
+  const trendGlow =
+    verdict.tone === "good"
+      ? "glow-good"
+      : verdict.tone === "bad"
+        ? "glow-warn"
+        : "";
+  const trendBorder =
+    verdict.tone === "good"
+      ? "border-good"
+      : verdict.tone === "bad"
+        ? "border-warn"
+        : "border-border-labrys";
+  // Verdict-tinted wash colour — null for the neutral/offline tone so the
+  // hero card stays cool instead of leaning green or amber on no data.
+  const washColor =
+    verdict.tone === "good"
+      ? "var(--good)"
+      : verdict.tone === "bad"
+        ? "var(--warn)"
+        : null;
 
   return (
     <section className="relative overflow-hidden rounded-[var(--radius)] border border-border-labrys bg-panel p-5 md:p-8">
-      {/* Verdict-tinted wash — a faint colour cue for the current trend */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: `radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, ${
-            isGood ? "var(--good)" : "var(--warn)"
-          } 14%, transparent) 0%, transparent 58%)`,
-        }}
-      />
+      {/* Verdict-tinted wash — a faint colour cue for the current trend. Skipped
+          when the verdict is neutral (e.g. no data) so the panel stays cool. */}
+      {washColor && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(115% 125% at 0% 0%, color-mix(in oklch, ${washColor} 14%, transparent) 0%, transparent 58%)`,
+          }}
+        />
+      )}
       {/* Faded grid background texture */}
       <div aria-hidden="true" className="faded-grid pointer-events-none absolute inset-0" />
 
@@ -92,18 +111,7 @@ export function Hero({ verdict, freshness }: HeroProps) {
                 {verdict.arrow}
               </span>
             </div>
-            <div className="m-0 min-w-0 flex-1">
-              <p className="m-0">{verdict.message}</p>
-              <p
-                className={`mt-2 inline-flex border px-2 py-1 text-[10px] uppercase tracking-[0.12em] ${
-                  isStale
-                    ? "border-warn text-warn"
-                    : "border-border-labrys text-fg-muted"
-                }`}
-              >
-                {sourceBadge}
-              </p>
-            </div>
+            <p className="m-0 min-w-0 flex-1">{verdict.message}</p>
           </div>
 
           {/* Readme terminal lede box — mt-auto pushes it to the bottom of
@@ -122,15 +130,12 @@ export function Hero({ verdict, freshness }: HeroProps) {
             </span>
 
             <p className="m-0">
-              Some MEV-Boost relays filter censoring-targeted transactions.{" "}
+              Some MEV-Boost relays filter OFAC-sanctioned transactions.{" "}
               <strong className="text-foreground font-semibold">
-                {isStale
-                  ? "This historical daily snapshot tracks how much of Ethereum's MEV-Boost relay delivery flow passed through them"
-                  : "MEV Watch tracks how much of Ethereum's block flow still passes through them"}
+                MEV Watch tracks how much of Ethereum&apos;s block flow still passes
+                through them
               </strong>{" "}
-              {isStale
-                ? `through ${freshness.sourceDate}.`
-                : "— and shows that share falling over time."}
+              — and shows that share falling over time.
               <span
                 aria-hidden="true"
                 className="cursor-blink ml-1 inline-block h-[1.05em] w-[7px] translate-y-[0.2em] bg-accent-brand align-baseline"

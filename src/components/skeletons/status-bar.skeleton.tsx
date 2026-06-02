@@ -9,7 +9,7 @@ export function StatusBarSkeleton() {
       className="relative overflow-hidden bg-panel-alt border-b border-border-labrys font-mono text-fg-muted"
       aria-hidden="true"
     >
-      <div className="relative z-10 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] md:grid-cols-[auto_repeat(5,1fr)]">
+      <div className="relative z-10 grid grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_repeat(5,1fr)]">
         {/* Logo cell — fixed-width to match the real anchor */}
         <div className="flex items-center border-r border-border-labrys px-3 py-2">
           <span className="block h-[19px] w-[18px] animate-pulse bg-foreground/10" />

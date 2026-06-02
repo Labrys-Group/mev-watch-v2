@@ -8,10 +8,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import type { TrendPoint } from "@/lib/queries";
 import { toCompositionPoint, type CompositionPoint } from "@/lib/composition";
-import { formatPercent, formatDateShort } from "@/lib/format";
+import { formatPercent, formatDateShort, formatDateLong } from "@/lib/format";
 import { Section } from "@/components/section";
 import { CountUp } from "@/components/count-up";
 
@@ -56,6 +57,21 @@ function LegendSwatch({ className, label }: { className: string; label: string }
   );
 }
 
+/** Date row for the NOW/PEAK/TROUGH cells. Drops the weekday prefix on
+ *  mobile so the date stays on one line inside a third-of-width cell. */
+function StatDate({ iso }: { iso: string }) {
+  const long = formatDateLong(iso);
+  const sep = long.indexOf(" · ");
+  const weekday = sep > -1 ? long.slice(0, sep) : "";
+  const rest = sep > -1 ? long.slice(sep + 3) : long;
+  return (
+    <div className="mt-1 text-[9px] tracking-[0.08em] text-fg-muted normal-case">
+      <span className="hidden sm:inline">{weekday} · </span>
+      {rest}
+    </div>
+  );
+}
+
 interface TooltipItem {
   payload: CompositionPoint;
 }
@@ -76,7 +92,7 @@ function ChartTooltip({
   const point = payload[0].payload;
   return (
     <div className="border border-border-labrys bg-panel px-3 py-2 font-mono text-[11px] tracking-[0.06em] text-foreground">
-      <div className="text-fg-muted mb-2">{formatDateShort(String(label))}</div>
+      <div className="text-fg-muted mb-2">{formatDateLong(String(label))}</div>
       <div className="text-fg-muted text-[10px] tracking-[0.12em] uppercase mb-1">
         Share of all blocks
       </div>
@@ -89,7 +105,7 @@ function ChartTooltip({
         <span>{formatPercent(point.censored)}</span>
       </div>
       <div className="flex items-center justify-between gap-5">
-        <LegendSwatch className="bg-neutral-relay" label="Non-censoring" />
+        <LegendSwatch className="bg-neutral-relay" label="Non-censored" />
         <span>{formatPercent(point.nonCensored)}</span>
       </div>
       <div className="mt-2 pt-2 border-t border-border-labrys">
@@ -112,6 +128,32 @@ export function TrendChart({ trend }: TrendChartProps) {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+  // Recharts replays the left-to-right wipe whenever `data` changes. The
+  // long 1100ms wipe reads as a glitch on a click-driven range swap (the
+  // chart appears to snap to width 0 and grow), so we shorten the duration
+  // after the first interaction. Initial scroll-into-view still gets the
+  // slow elegant reveal.
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const handleRangeChange = (next: Range) => {
+    setHasInteracted(true);
+    setRange(next);
+  };
+  const animateAreas = !reduceMotion;
+  const areaAnimationDuration = hasInteracted ? 400 : 1100;
+
+  // Sliding underline indicator for the range tabs. Measured from the active
+  // button so labels can be any width; null until first measure to avoid a
+  // flash at (0,0) on hydrate.
+  const rangeBtnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(
+    null,
+  );
+  useEffect(() => {
+    const activeIdx = RANGE_LABELS.indexOf(range);
+    const btn = rangeBtnRefs.current[activeIdx];
+    if (!btn) return;
+    setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth });
+  }, [range]);
 
   // Phones get a sparser x-axis so the date labels never collide.
   const [isNarrow, setIsNarrow] = useState(false);
@@ -128,7 +170,6 @@ export function TrendChart({ trend }: TrendChartProps) {
   // sweep animation plays exactly when the reader reaches it.
   const chartRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
-  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const el = chartRef.current;
@@ -155,31 +196,6 @@ export function TrendChart({ trend }: TrendChartProps) {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const el = chartRef.current;
-    if (!el) return;
-
-    const updateSize = () => {
-      const rect = el.getBoundingClientRect();
-      const width = Math.floor(rect.width);
-      const height = Math.floor(rect.height);
-      setChartSize((current) => {
-        if (current.width === width && current.height === height) return current;
-        return { width, height };
-      });
-    };
-
-    updateSize();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", updateSize);
-      return () => window.removeEventListener("resize", updateSize);
-    }
-
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   const slice = useMemo(() => getSlice(trend, range), [trend, range]);
   const data = useMemo<CompositionPoint[]>(
     () => slice.map(toCompositionPoint),
@@ -188,26 +204,40 @@ export function TrendChart({ trend }: TrendChartProps) {
   // Recompute headline stats from whatever range is selected so NOW / PEAK /
   // TROUGH reflect the visible window, not the full series. Inlined (rather
   // than importing `summarise` from `@/lib/queries`) so this client component
-  // doesn't pull the server-only db layer into the browser bundle.
+  // doesn't pull the server-only db layer into the browser bundle. We track
+  // the date alongside each value so the header can show *when* each point
+  // landed, not just the number.
   const rangeStats = useMemo(() => {
-    if (slice.length === 0) return { current: 0, peak: 0, trough: 0 };
-    let peak = slice[0].censorshipPct;
-    let trough = slice[0].censorshipPct;
-    for (const p of slice) {
-      if (p.censorshipPct > peak) peak = p.censorshipPct;
-      if (p.censorshipPct < trough) trough = p.censorshipPct;
+    if (slice.length === 0) {
+      return {
+        current: 0,
+        currentDate: null as string | null,
+        peak: 0,
+        peakDate: null as string | null,
+        trough: 0,
+        troughDate: null as string | null,
+      };
     }
+    let peakIdx = 0;
+    let troughIdx = 0;
+    for (let i = 1; i < slice.length; i++) {
+      if (slice[i].censorshipPct > slice[peakIdx].censorshipPct) peakIdx = i;
+      if (slice[i].censorshipPct < slice[troughIdx].censorshipPct) troughIdx = i;
+    }
+    const last = slice.length - 1;
     return {
-      current: slice[slice.length - 1].censorshipPct,
-      peak,
-      trough,
+      current: slice[last].censorshipPct,
+      currentDate: slice[last].date,
+      peak: slice[peakIdx].censorshipPct,
+      peakDate: slice[peakIdx].date,
+      trough: slice[troughIdx].censorshipPct,
+      troughDate: slice[troughIdx].date,
     };
   }, [slice]);
   const ticks = useMemo(
     () => sparseTickIndices(data, isNarrow ? 3 : 8),
     [data, isNarrow],
   );
-  const chartReady = inView && chartSize.width > 0 && chartSize.height > 0;
 
   return (
     <Section
@@ -225,74 +255,131 @@ export function TrendChart({ trend }: TrendChartProps) {
     >
       {/* Recessed chart well */}
       <div className="border border-border-labrys bg-background">
-        {/* Stat header — headline censorship metric. The "OF MEV-BOOST"
-            banner names the denominator inline so it can't be confused
-            with the share-of-all-blocks bands below. */}
+        {/* Stat header — one continuous block. Title row sits directly
+            above the stat row (no internal divider) so the denominator
+            and the numbers feel like one unit. Each stat inlines its
+            label beside its value to remove the dead space that a wide
+            stacked layout would create on the right of each cell. */}
         <div className="border-b border-border-labrys">
-          <div className="px-3 pt-2.5 pb-1 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-            Of MEV-boost
+          <div className="px-3 pt-2.5 pb-1 flex items-baseline gap-2 font-mono text-[10px] tracking-[0.12em] uppercase">
+            <span className="text-foreground font-semibold">Censorship %</span>
+            <span className="text-fg-muted" aria-hidden="true">·</span>
+            <span className="text-fg-muted">Of MEV-boost payloads</span>
           </div>
           <div className="grid grid-cols-3 font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-            <div className="px-3 pb-3 pt-1 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
-              NOW
-              <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-foreground mt-1 normal-case">
-                <CountUp value={rangeStats.current} decimals={1} suffix="%" />
-              </strong>
+            <div className="px-2 sm:px-3 pt-1 pb-2 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
+                <span>NOW</span>
+                <strong className="font-sans font-bold text-[15px] sm:text-[18px] leading-none tracking-[-0.015em] text-foreground normal-case">
+                  <CountUp value={rangeStats.current} decimals={1} suffix="%" />
+                </strong>
+              </div>
+              {rangeStats.currentDate && <StatDate iso={rangeStats.currentDate} />}
             </div>
-            <div className="px-3 pb-3 pt-1 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
-              PEAK
-              <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-warn mt-1 normal-case">
-                <CountUp value={rangeStats.peak} decimals={1} suffix="%" />
-              </strong>
+            <div className="px-2 sm:px-3 pt-1 pb-2 border-r border-border-labrys transition-colors duration-200 hover:bg-panel-alt">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
+                <span>PEAK</span>
+                <strong className="font-sans font-bold text-[15px] sm:text-[18px] leading-none tracking-[-0.015em] text-warn normal-case">
+                  <CountUp value={rangeStats.peak} decimals={1} suffix="%" />
+                </strong>
+              </div>
+              {rangeStats.peakDate && <StatDate iso={rangeStats.peakDate} />}
             </div>
-            <div className="px-3 pb-3 pt-1 transition-colors duration-200 hover:bg-panel-alt">
-              TROUGH
-              <strong className="block font-sans font-bold text-[18px] tracking-[-0.015em] text-good mt-1 normal-case">
-                <CountUp value={rangeStats.trough} decimals={1} suffix="%" />
-              </strong>
+            <div className="px-2 sm:px-3 pt-1 pb-2 transition-colors duration-200 hover:bg-panel-alt">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
+                <span>TROUGH</span>
+                <strong className="font-sans font-bold text-[15px] sm:text-[18px] leading-none tracking-[-0.015em] text-good normal-case">
+                  <CountUp value={rangeStats.trough} decimals={1} suffix="%" />
+                </strong>
+              </div>
+              {rangeStats.troughDate && <StatDate iso={rangeStats.troughDate} />}
             </div>
           </div>
         </div>
 
         {/* Range toggle + legend + chart */}
         <div className="p-0">
-          <div className="flex items-center justify-between gap-3 flex-wrap px-4 pt-4 pb-0">
-            {/* Segment control toolbar */}
-            <div className="inline-flex border border-border-labrys">
+          <div className="flex flex-col items-center gap-3 px-4 pt-4 pb-0 sm:flex-row sm:flex-wrap sm:justify-between">
+            {/* Range tabs — sliding brand-accent underline tracks the
+                active button. Hairline rail below keeps the inactive labels
+                anchored visually without boxing the whole control. */}
+            <div
+              className="relative inline-flex border-b border-border-labrys"
+              role="tablist"
+              aria-label="Time range"
+            >
               {RANGE_LABELS.map((r, i) => (
                 <button
                   key={r}
-                  onClick={() => setRange(r)}
+                  ref={(el) => {
+                    rangeBtnRefs.current[i] = el;
+                  }}
+                  onClick={() => handleRangeChange(r)}
+                  role="tab"
+                  aria-selected={range === r}
                   className={[
-                    "font-mono font-semibold text-[10.5px] tracking-[0.12em] uppercase px-3 py-1.5 border-0 cursor-pointer transition-all duration-200 active:translate-y-px focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
-                    i < RANGE_LABELS.length - 1 ? "border-r border-border-labrys" : "",
+                    "font-mono font-semibold text-[10.5px] tracking-[0.12em] uppercase px-3.5 py-2 border-0 bg-transparent cursor-pointer transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand focus-visible:ring-inset",
                     range === r
-                      ? "bg-accent-brand text-panel"
-                      : "bg-transparent text-fg-muted hover:text-foreground hover:bg-panel-alt",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  aria-pressed={range === r}
+                      ? "text-foreground"
+                      : "text-fg-muted hover:text-foreground",
+                  ].join(" ")}
                 >
                   {r}
                 </button>
               ))}
+              {indicator && (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -bottom-px h-[2px] bg-accent-brand transition-[left,width] duration-300 ease-out"
+                  style={{ left: indicator.left, width: indicator.width }}
+                />
+              )}
             </div>
-            {/* Legend */}
-            <div className="flex items-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted">
-              <LegendSwatch className="bg-non-boost" label="Non-boosted" />
-              <LegendSwatch className="bg-ofac" label="Censored" />
-              <LegendSwatch className="bg-neutral-relay" label="Non-censoring" />
+            {/* Legend — labels & order mirror the composition/epoch ledger
+                key so a reader sees the same names across both sections. */}
+            <div className="flex items-center justify-center gap-x-3 gap-y-1 flex-wrap font-mono text-[10px] tracking-[0.12em] uppercase text-fg-muted sm:justify-end">
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="inline-block w-2.5 h-2.5 shrink-0 bg-ofac"
+                  aria-hidden="true"
+                />
+                <span className="sm:hidden">Censoring</span>
+                <span className="hidden sm:inline">OFAC Censoring</span>
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="inline-block w-2.5 h-2.5 shrink-0 bg-neutral-relay"
+                  aria-hidden="true"
+                />
+                Neutral
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="inline-block w-2.5 h-2.5 shrink-0 bg-non-boost"
+                  aria-hidden="true"
+                />
+                <span className="sm:hidden">Unknown</span>
+                <span className="hidden sm:inline">Relay Unknown / Non-MEV-Boost</span>
+              </span>
             </div>
           </div>
 
           {/* Chart */}
-          <div className="h-[260px] min-w-0 w-full px-2 pb-2 pt-4 sm:h-[300px]">
-            <div ref={chartRef} className="h-full min-w-0 w-full">
-              {chartReady ? (
+          <div
+            ref={chartRef}
+            className="relative w-full h-[260px] sm:h-[300px] px-2 pt-4 pb-2"
+          >
+            {data.length === 0 && (
+              <div
+                aria-live="polite"
+                className="pointer-events-none absolute inset-0 flex items-center justify-center font-mono text-[11px] tracking-[0.12em] uppercase text-fg-muted"
+              >
+                Awaiting first daily snapshot
+              </div>
+            )}
+            {inView ? (
+              <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
-                  width={chartSize.width}
-                  height={chartSize.height}
                   data={data}
                   margin={{ top: 12, right: 8, left: 0, bottom: 4 }}
                 >
@@ -350,7 +437,7 @@ export function TrendChart({ trend }: TrendChartProps) {
                     content={<ChartTooltip />}
                     cursor={{ stroke: "var(--fg-muted)", strokeWidth: 1 }}
                   />
-                  {/* Declared bottom-to-top: non-censoring, censoring, non-boosted */}
+                  {/* Declared bottom-to-top: non-censored, censored, non-boosted */}
                   <Area
                     type="monotone"
                     dataKey="nonCensored"
@@ -366,8 +453,8 @@ export function TrendChart({ trend }: TrendChartProps) {
                       stroke: "var(--background)",
                       fill: "var(--neutral)",
                     }}
-                    isAnimationActive={!reduceMotion}
-                    animationDuration={1100}
+                    isAnimationActive={animateAreas}
+                    animationDuration={areaAnimationDuration}
                     animationEasing="ease-out"
                   />
                   <Area
@@ -385,8 +472,8 @@ export function TrendChart({ trend }: TrendChartProps) {
                       stroke: "var(--background)",
                       fill: "var(--ofac)",
                     }}
-                    isAnimationActive={!reduceMotion}
-                    animationDuration={1100}
+                    isAnimationActive={animateAreas}
+                    animationDuration={areaAnimationDuration}
                     animationEasing="ease-out"
                   />
                   <Area
@@ -404,18 +491,18 @@ export function TrendChart({ trend }: TrendChartProps) {
                       stroke: "var(--background)",
                       fill: "var(--non-boost)",
                     }}
-                    isAnimationActive={!reduceMotion}
-                    animationDuration={1100}
+                    isAnimationActive={animateAreas}
+                    animationDuration={areaAnimationDuration}
                     animationEasing="ease-out"
                   />
                 </AreaChart>
-              ) : (
-                <div
-                  className="h-full w-full animate-pulse bg-foreground/5"
-                  aria-hidden="true"
-                />
-              )}
-            </div>
+              </ResponsiveContainer>
+            ) : (
+              <div
+                className="h-full w-full animate-pulse bg-foreground/5"
+                aria-hidden="true"
+              />
+            )}
           </div>
         </div>
       </div>

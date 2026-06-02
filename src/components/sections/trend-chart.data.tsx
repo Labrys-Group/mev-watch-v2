@@ -1,25 +1,10 @@
 import { TrendChart } from "@/components/sections/trend-chart";
-import { getTrend, summarise } from "@/lib/queries";
-import { Section } from "@/components/section";
+import { getTrend } from "@/lib/queries";
 
 export async function TrendChartData() {
+  // <TrendChart trend={[]} /> renders the real shell — NOW/PEAK/TROUGH all
+  // at 0.0%, range buttons, legend, axes, plus an in-chart "Awaiting first
+  // daily snapshot" caption — so we don't need a special CLI empty state.
   const trend = await getTrend();
-  const summary = summarise(trend);
-
-  if (trend.length === 0 || !summary) {
-    return (
-      <Section
-        label="02 / CENSORSHIP OVER TIME"
-        title="Censorship % since the Merge."
-      >
-        <p className="font-mono text-[13px] leading-snug text-fg-muted">
-          No daily snapshots yet — run{" "}
-          <code className="font-mono text-foreground">pnpm update-data</code>{" "}
-          to generate the local data snapshot, then reload.
-        </p>
-      </Section>
-    );
-  }
-
   return <TrendChart trend={trend} />;
 }

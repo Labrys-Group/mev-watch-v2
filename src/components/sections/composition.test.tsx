@@ -37,20 +37,36 @@ const freshness: DataFreshness = {
 };
 
 describe("Composition", () => {
-  it("labels daily relay totals as deliveries and separates live ledger context", () => {
+  it("renders the 2-tile epoch-grid layout with correct labels", () => {
     render(<Composition latest={latest} ledger={ledger} freshness={freshness} />);
 
-    expect(screen.getAllByText("Daily snapshot through 2023-10-24").length).toBeGreaterThan(0);
-    expect(screen.getByText(/11,869 DELIVERIES/)).toBeInTheDocument();
-    expect(screen.getAllByText("MEV-boost deliveries")).toHaveLength(2);
-    expect(screen.getByText("Censoring vs. non-censoring relays.")).toBeInTheDocument();
+    // Section title
+    expect(screen.getByText("Censoring vs. neutral relays.")).toBeInTheDocument();
+
+    // Aside block count (not DELIVERIES)
+    expect(screen.getByText(/11,869 BLOCKS/)).toBeInTheDocument();
+
+    // Live epoch ledger wired via prop
     expect(screen.getByLabelText("Live epoch ledger")).toBeInTheDocument();
+
+    // Legend strip
+    expect(screen.getByText("OFAC Censoring")).toBeInTheDocument();
+    expect(screen.getByText("Neutral")).toBeInTheDocument();
     expect(
-      screen.getByText("Recent slots, independent of the daily snapshot"),
+      screen.getByText("Relay Unknown / Non-MEV-Boost"),
     ).toBeInTheDocument();
+
+    // 2-tile labels
     expect(screen.getAllByText("Censoring relays").length).toBeGreaterThan(0);
-    expect(screen.getByText("Non-censoring + unknown")).toBeInTheDocument();
-    expect(screen.getByText("Non-censoring relays")).toBeInTheDocument();
-    expect(screen.queryByText(/OFAC/i)).not.toBeInTheDocument();
+    expect(screen.getByText("Neutral relays")).toBeInTheDocument();
+
+    // Tile sub-labels use "MEV-boost deliveries"
+    expect(screen.getAllByText("MEV-boost deliveries")).toHaveLength(2);
+
+    // 3-band composition view should NOT appear
+    expect(screen.queryByText("Non-censoring + unknown")).not.toBeInTheDocument();
+    expect(screen.queryByText("Non-censoring relays")).not.toBeInTheDocument();
+    // The old aside had "{N} DELIVERIES" as the block-count label; it is now "BLOCKS"
+    expect(screen.queryByText(/\d+,?\d* DELIVERIES/)).not.toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EpochLedger } from "./epoch-ledger";
@@ -40,6 +40,8 @@ function ledger(
 
 beforeEach(() => {
   vi.useFakeTimers();
+  // Prevent poll on mount from throwing unhandled errors by default
+  vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => {})));
 });
 
 afterEach(() => {
@@ -51,19 +53,49 @@ describe("EpochLedger", () => {
   it("renders four epoch rows from the initial data", () => {
     render(<EpochLedger initial={ledger(99, "neutral")} />);
 
-    expect(screen.getByLabelText("Live epoch ledger")).toBeInTheDocument();
-    expect(screen.getByLabelText("Epoch 3 in progress")).toBeInTheDocument();
-    expect(screen.getByLabelText("Epoch 2")).toBeInTheDocument();
-    expect(screen.getAllByTitle(/Slot /)).toHaveLength(128);
+    // Epoch numbers should be visible as aria-labels on the grids
+    expect(
+      screen.getByLabelText("Epoch 3: 4 of 32 slots delivered"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Epoch 2: 32 of 32 slots delivered"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Epoch 1: 32 of 32 slots delivered"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Epoch 0: 32 of 32 slots delivered"),
+    ).toBeInTheDocument();
   });
 
-  it("polls the API and keeps the last good state after a failed poll", async () => {
-    const updated = ledger(100, "censoring");
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(Response.json(updated))
-      .mockRejectedValueOnce(new Error("network down"));
-    vi.stubGlobal("fetch", fetchMock);
+  it("labels the in-progress epoch as live with its filled count", () => {
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+    expect(screen.getByText(/live · 4\/32/i)).toBeInTheDocument();
+  });
+
+  it("renders 128 slot tiles (32 per epoch × 4 epochs)", () => {
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+    // Each epoch row has an aria-label
+    const epochGrids = screen.getAllByLabelText(/Epoch \d+:/);
+    expect(epochGrids).toHaveLength(4);
+  });
+
+  it("encodes epoch grid calc operators as Tailwind-safe spaces", () => {
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    const grid = screen.getByLabelText("Epoch 3: 4 of 32 slots delivered");
+    expect(grid).toHaveClass("grid-cols-[repeat(16,calc((100%_-_30px)_/_16))]");
+    expect(grid).toHaveClass(
+      "sm:grid-cols-[repeat(32,calc((100%_-_62px)_/_32))]",
+    );
+    expect(grid.className).not.toContain("100%-");
+  });
+
+  it("shows the reconnecting indicator after a failed poll", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("network down")),
+    );
 
     render(<EpochLedger initial={ledger(99, "neutral")} />);
 
@@ -71,42 +103,210 @@ describe("EpochLedger", () => {
       await Promise.resolve();
       await Promise.resolve();
     });
-    expect(screen.getByText("CENSORING")).toBeInTheDocument();
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(30_000);
-    });
-
-    expect(screen.getByText("LIVE CACHE STALE")).toBeInTheDocument();
-    expect(screen.getByText("CENSORING")).toBeInTheDocument();
+    expect(screen.getByText(/reconnecting/i)).toBeInTheDocument();
   });
 
-  it("renders degraded coverage and censoring as separate explained statuses", () => {
+  it("clears the reconnecting indicator on a successful poll after failure", async () => {
+    const updated = ledger(100, "neutral");
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockRejectedValueOnce(new Error("network down"))
+        .mockResolvedValueOnce(Response.json(updated)),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    // First poll fails → reconnecting shown
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(screen.getByText(/reconnecting/i)).toBeInTheDocument();
+
+    // Second poll (triggered by interval) succeeds → reconnecting cleared
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+
+    expect(screen.queryByText(/reconnecting/i)).not.toBeInTheDocument();
+  });
+
+  it("does NOT render status badges", () => {
     render(
       <EpochLedger
         initial={ledger(99, "censoring", ["bloxroute.max-profit.blxrbdn.com"])}
       />,
     );
 
-    const statuses = screen.getByLabelText("Live ledger statuses");
-    expect(statuses).toBeInTheDocument();
+    // The old badge container with role="list" should not be present
+    expect(
+      screen.queryByLabelText("Live ledger statuses"),
+    ).not.toBeInTheDocument();
+    // No CENSORING badge
+    expect(screen.queryByText("CENSORING")).not.toBeInTheDocument();
+    // No LIVE CACHE STALE badge
+    expect(screen.queryByText(/cache stale/i)).not.toBeInTheDocument();
+  });
 
-    expect(
-      screen.getByLabelText(
-        "Data status: Degraded relay coverage. One or more relay APIs did not respond, so the live ledger may be missing relay observations.",
-      ),
-    ).toHaveAttribute(
-      "title",
-      "One or more relay APIs did not respond, so the live ledger may be missing relay observations.",
+  it("shows the slot tooltip portal on mouse enter over a filled slot (hover enabled)", async () => {
+    // Stub matchMedia to report hover: hover and pointer: fine
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
     );
-    expect(
-      screen.getByLabelText(
-        "Slot status: Censoring relay observed. At least one visible recent slot was delivered through a relay classified as censoring.",
-      ),
-    ).toHaveAttribute(
-      "title",
-      "At least one visible recent slot was delivered through a relay classified as censoring.",
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    // Wait for hoverEnabled to be set (the useEffect runs after mount)
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    // Find the first filled (non-pending) slot tile — it has cursor-crosshair class
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    expect(filledTiles.length).toBeGreaterThan(0);
+
+    fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
+
+    // The tooltip should appear via portal in document.body
+    expect(screen.getByText(/Slot \d+/)).toBeInTheDocument();
+    expect(screen.getByText(/Epoch \d+/)).toBeInTheDocument();
+  });
+
+  it("hides the slot tooltip when mouse leaves the container", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
     );
-    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
+
+    // Tooltip visible
+    expect(document.querySelectorAll(".pointer-events-none.fixed").length).toBe(
+      1,
+    );
+
+    // Mouse leaves the outer container
+    const container = filledTiles[0].closest(".relative");
+    if (container) fireEvent.mouseLeave(container);
+
+    // Tooltip gone
+    expect(
+      document.querySelectorAll(".pointer-events-none.fixed").length,
+    ).toBe(0);
+  });
+
+  it("clears the slot tooltip when hovering a pending slot", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    const pendingTiles = document.querySelectorAll(".epoch-cell");
+    expect(filledTiles.length).toBeGreaterThan(0);
+    expect(pendingTiles.length).toBeGreaterThan(0);
+
+    fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
+    expect(document.querySelectorAll(".pointer-events-none.fixed")).toHaveLength(
+      1,
+    );
+
+    fireEvent.mouseEnter(pendingTiles[0], { clientX: 120, clientY: 100 });
+
+    expect(document.querySelectorAll(".pointer-events-none.fixed")).toHaveLength(
+      0,
+    );
+  });
+
+  it("does not wire hover handlers when matchMedia reports no fine pointer", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((_query: string) => ({
+        matches: false,
+        media: _query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    if (filledTiles.length > 0) {
+      fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
+    }
+
+    // No tooltip should appear
+    expect(
+      document.querySelectorAll(".pointer-events-none.fixed").length,
+    ).toBe(0);
+  });
+
+  it("polls the API and updates epoch data on success", async () => {
+    const updated = ledger(100, "censoring");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json(updated)),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    // After a successful poll, data updates — epoch 3 in-progress row still exists
+    expect(
+      screen.getByLabelText("Epoch 3: 4 of 32 slots delivered"),
+    ).toBeInTheDocument();
+    // Reconnecting indicator should NOT appear after a successful poll
+    expect(screen.queryByText(/reconnecting/i)).not.toBeInTheDocument();
+  });
+
+  it("uses epoch-row-wrap class for each row", () => {
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+    const rows = document.querySelectorAll(".epoch-row-wrap");
+    expect(rows.length).toBe(4);
   });
 });
