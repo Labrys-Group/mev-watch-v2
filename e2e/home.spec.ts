@@ -63,5 +63,32 @@ test("the composition section renders and polls the live epoch API", async ({ pa
   await expect(
     page.getByLabel(/Epoch \d+: \d+ of 32 slots delivered/).first(),
   ).toBeVisible();
+  const firstEpochGrid = page
+    .getByLabel(/Epoch \d+: \d+ of 32 slots delivered/)
+    .first();
+  await expect
+    .poll(async () =>
+      firstEpochGrid.evaluate(
+        (el) =>
+          getComputedStyle(el)
+            .gridTemplateColumns.trim()
+            .split(/\s+/)
+            .filter(Boolean).length,
+      ),
+    )
+    .toBe(32);
+
+  await page.setViewportSize({ width: 390, height: 900 });
+  await expect
+    .poll(async () =>
+      firstEpochGrid.evaluate(
+        (el) =>
+          getComputedStyle(el)
+            .gridTemplateColumns.trim()
+            .split(/\s+/)
+            .filter(Boolean).length,
+      ),
+    )
+    .toBe(16);
   expect(epochRequests.length).toBeGreaterThan(0);
 });

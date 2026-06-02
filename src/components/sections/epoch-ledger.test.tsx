@@ -80,6 +80,17 @@ describe("EpochLedger", () => {
     expect(epochGrids).toHaveLength(4);
   });
 
+  it("encodes epoch grid calc operators as Tailwind-safe spaces", () => {
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    const grid = screen.getByLabelText("Epoch 3: 4 of 32 slots delivered");
+    expect(grid).toHaveClass("grid-cols-[repeat(16,calc((100%_-_30px)_/_16))]");
+    expect(grid).toHaveClass(
+      "sm:grid-cols-[repeat(32,calc((100%_-_62px)_/_32))]",
+    );
+    expect(grid.className).not.toContain("100%-");
+  });
+
   it("shows the reconnecting indicator after a failed poll", async () => {
     vi.stubGlobal(
       "fetch",

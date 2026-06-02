@@ -252,7 +252,7 @@ function EpochRowView({
           rounds inconsistently per track and made tiles look uneven on
           phones, where the rounding is a larger share of each tile. */}
       <div
-        className="grid gap-[2px] grid-cols-[repeat(16,calc((100%-30px)/16))] sm:flex-1 sm:grid-cols-[repeat(32,calc((100%-62px)/32))]"
+        className="grid gap-[2px] grid-cols-[repeat(16,calc((100%_-_30px)_/_16))] sm:flex-1 sm:grid-cols-[repeat(32,calc((100%_-_62px)_/_32))]"
         aria-label={`Epoch ${row.epoch}: ${filled} of 32 slots delivered`}
       >
         {row.slots.map((cell, col) => (
