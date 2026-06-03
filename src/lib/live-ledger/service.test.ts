@@ -65,7 +65,7 @@ describe("refreshLiveLedger", () => {
     expect(result.data.headSlot).toBe(previousSnapshot.headSlot);
   });
 
-  it("serves a fresh legacy degraded snapshot without losing unknown slots", async () => {
+  it("serves a fresh legacy degraded snapshot without inferring unknown slots", async () => {
     const legacySnapshot: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 99,
@@ -98,7 +98,7 @@ describe("refreshLiveLedger", () => {
     expect(store.written).toEqual([]);
     expect(result.snapshot).toEqual(legacySnapshot);
     expect(result.data.epochs[0].slots).toContainEqual(
-      expect.objectContaining({ slot: 97, category: "unknown" }),
+      expect.objectContaining({ slot: 97, category: "nonboost" }),
     );
   });
 

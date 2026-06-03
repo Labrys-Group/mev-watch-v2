@@ -250,59 +250,9 @@ function pruneDegradedSlotRanges(
 }
 
 function effectiveDegradedSlotRanges(
-  snapshot: Pick<
-    LiveLedgerSnapshot,
-    "blocks" | "degradedRelays" | "degradedSlotRanges" | "headSlot"
-  >,
+  snapshot: Pick<LiveLedgerSnapshot, "degradedSlotRanges">,
 ): DegradedSlotRange[] {
-  if (snapshot.degradedSlotRanges) return snapshot.degradedSlotRanges;
-  if (snapshot.degradedRelays.length === 0) return [];
-  return inferLegacyDegradedSlotRanges(snapshot);
-}
-
-function inferLegacyDegradedSlotRanges(
-  snapshot: Pick<LiveLedgerSnapshot, "blocks" | "headSlot">,
-): DegradedSlotRange[] {
-  const retainedFirstSlot = retainedFirstSlotFor(snapshot.headSlot);
-  // Legacy degraded snapshots did not store the previous head slot, so use
-  // retained delivered blocks as anchors and preserve every missing run after
-  // the first anchor instead of collapsing the outage to one suffix.
-  const blockSlots = [
-    ...new Set(
-      snapshot.blocks
-        .map((block) => block.slot)
-        .filter(
-          (slot) => slot >= retainedFirstSlot && slot <= snapshot.headSlot,
-        ),
-    ),
-  ].sort((a, b) => a - b);
-
-  if (blockSlots.length === 0) {
-    return [{ firstSlot: retainedFirstSlot, lastSlot: snapshot.headSlot }];
-  }
-
-  const ranges: DegradedSlotRange[] = [];
-  let nextMissingSlot = blockSlots[0] + 1;
-
-  for (const blockSlot of blockSlots.slice(1)) {
-    const lastMissingSlot = blockSlot - 1;
-    if (nextMissingSlot <= lastMissingSlot) {
-      ranges.push({
-        firstSlot: nextMissingSlot,
-        lastSlot: lastMissingSlot,
-      });
-    }
-    nextMissingSlot = blockSlot + 1;
-  }
-
-  if (nextMissingSlot <= snapshot.headSlot) {
-    ranges.push({
-      firstSlot: nextMissingSlot,
-      lastSlot: snapshot.headSlot,
-    });
-  }
-
-  return ranges;
+  return snapshot.degradedSlotRanges ?? [];
 }
 
 function retainedFirstSlotFor(headSlot: number): number {

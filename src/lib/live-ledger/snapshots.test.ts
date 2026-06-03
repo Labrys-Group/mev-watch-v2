@@ -184,7 +184,7 @@ describe("live ledger snapshots", () => {
     expect(snapshot.degradedSlotRanges).toBeUndefined();
   });
 
-  it("marks missing past slots in legacy degraded snapshots as unknown", () => {
+  it("treats missing past slots in legacy degraded snapshots as unverifiable", () => {
     const snapshot: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 99,
@@ -212,11 +212,11 @@ describe("live ledger snapshots", () => {
     });
     expect(ledger.epochs[0].slots[1]).toMatchObject({
       slot: 97,
-      category: "unknown",
+      category: "nonboost",
     });
   });
 
-  it("preserves legacy degraded gaps before later delivered blocks", () => {
+  it("does not infer legacy degraded gaps before later delivered blocks", () => {
     const snapshot: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 101,
@@ -244,16 +244,16 @@ describe("live ledger snapshots", () => {
       expect.objectContaining({ slot: 96, category: "censoring" }),
     );
     expect(ledger.epochs[0].slots).toContainEqual(
-      expect.objectContaining({ slot: 97, category: "unknown" }),
+      expect.objectContaining({ slot: 97, category: "nonboost" }),
     );
     expect(ledger.epochs[0].slots).toContainEqual(
-      expect.objectContaining({ slot: 99, category: "unknown" }),
+      expect.objectContaining({ slot: 99, category: "nonboost" }),
     );
     expect(ledger.epochs[0].slots).toContainEqual(
       expect.objectContaining({ slot: 100, category: "censoring" }),
     );
     expect(ledger.epochs[0].slots).toContainEqual(
-      expect.objectContaining({ slot: 101, category: "unknown" }),
+      expect.objectContaining({ slot: 101, category: "nonboost" }),
     );
   });
 
@@ -335,7 +335,7 @@ describe("live ledger snapshots", () => {
     ]);
   });
 
-  it("carries legacy degraded gaps before later delivered blocks when building snapshots", () => {
+  it("does not carry inferred legacy degraded gaps when building snapshots", () => {
     const previous: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 101,
@@ -365,12 +365,11 @@ describe("live ledger snapshots", () => {
     });
 
     expect(snapshot.degradedSlotRanges).toEqual([
-      { firstSlot: 97, lastSlot: 99 },
-      { firstSlot: 101, lastSlot: 105 },
+      { firstSlot: 102, lastSlot: 105 },
     ]);
   });
 
-  it("carries the legacy degraded tail when building snapshots", () => {
+  it("does not carry a legacy degraded tail when building snapshots", () => {
     const previous: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 299,
@@ -394,7 +393,7 @@ describe("live ledger snapshots", () => {
     });
 
     expect(snapshot.degradedSlotRanges).toEqual([
-      { firstSlot: 297, lastSlot: 305 },
+      { firstSlot: 300, lastSlot: 305 },
     ]);
   });
 });
