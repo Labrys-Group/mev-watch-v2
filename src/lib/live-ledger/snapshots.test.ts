@@ -202,6 +202,10 @@ describe("live ledger snapshots", () => {
 
     const ledger = ledgerFromSnapshot(snapshot);
 
+    expect(ledger.epochs[1].slots[31]).toMatchObject({
+      slot: 95,
+      category: "nonboost",
+    });
     expect(ledger.epochs[0].slots[0]).toMatchObject({
       slot: 96,
       category: "censoring",
@@ -290,13 +294,20 @@ describe("live ledger snapshots", () => {
     ]);
   });
 
-  it("carries legacy degraded history when building snapshots", () => {
+  it("carries only the legacy degraded suffix when building snapshots", () => {
     const previous: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 299,
       fetchedAt: "2026-05-26T00:00:00.000Z",
       degradedRelays: ["relay.ultrasound.money"],
-      blocks: [],
+      blocks: [
+        {
+          slot: 296,
+          blockNumber: 1,
+          blockHash: "0x296",
+          relays: ["relay.ultrasound.money"],
+        },
+      ],
     };
 
     const snapshot = buildSnapshot({
@@ -307,7 +318,7 @@ describe("live ledger snapshots", () => {
     });
 
     expect(snapshot.degradedSlotRanges).toEqual([
-      { firstSlot: 49, lastSlot: 305 },
+      { firstSlot: 297, lastSlot: 305 },
     ]);
   });
 });

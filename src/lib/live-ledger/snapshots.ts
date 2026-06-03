@@ -252,14 +252,24 @@ function pruneDegradedSlotRanges(
 function effectiveDegradedSlotRanges(
   snapshot: Pick<
     LiveLedgerSnapshot,
-    "degradedRelays" | "degradedSlotRanges" | "headSlot"
+    "blocks" | "degradedRelays" | "degradedSlotRanges" | "headSlot"
   >,
 ): DegradedSlotRange[] {
   if (snapshot.degradedSlotRanges) return snapshot.degradedSlotRanges;
   if (snapshot.degradedRelays.length === 0) return [];
+  const latestBlockSlot = snapshot.blocks.reduce<number | undefined>(
+    (latest, block) =>
+      latest === undefined ? block.slot : Math.max(latest, block.slot),
+    undefined,
+  );
+  const firstSlot =
+    latestBlockSlot === undefined
+      ? retainedFirstSlotFor(snapshot.headSlot)
+      : Math.max(retainedFirstSlotFor(snapshot.headSlot), latestBlockSlot + 1);
+  if (firstSlot > snapshot.headSlot) return [];
   return [
     {
-      firstSlot: retainedFirstSlotFor(snapshot.headSlot),
+      firstSlot,
       lastSlot: snapshot.headSlot,
     },
   ];
