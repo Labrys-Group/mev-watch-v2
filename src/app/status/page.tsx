@@ -58,6 +58,9 @@ export default async function StatusPage() {
   const generatedLabel = snapshot
     ? freshness.generatedAgeLabel ?? "Clock skew detected"
     : null;
+  const sourceAgeLabel = latestStats
+    ? getSourceDayAgeLabel(latestStats.date)
+    : null;
 
   return (
     <div className="min-h-screen">
@@ -91,7 +94,7 @@ export default async function StatusPage() {
                     {latestStats.date}
                   </span>
                   <span className="font-mono text-xs text-fg-muted">
-                    {formatRelativeTime(new Date(`${latestStats.date}T00:00:00Z`))}
+                    {sourceAgeLabel}
                   </span>
                   <span
                     className={`font-mono text-xs uppercase tracking-[0.12em] ${
@@ -130,6 +133,13 @@ export default async function StatusPage() {
       <SiteFooter />
     </div>
   );
+}
+
+function getSourceDayAgeLabel(sourceDate: string, now = new Date()): string {
+  const sourceDay = new Date(`${sourceDate}T00:00:00Z`);
+  return sourceDay.getTime() > now.getTime()
+    ? "Clock skew detected"
+    : formatRelativeTime(sourceDay, now);
 }
 
 function getFreshnessVerdict(freshness: ReturnType<typeof getDataFreshness>): {

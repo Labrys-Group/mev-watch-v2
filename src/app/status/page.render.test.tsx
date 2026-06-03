@@ -96,4 +96,22 @@ describe("StatusPage", () => {
     expect(screen.getByText("Clock skew detected")).toBeInTheDocument();
     expect(screen.queryByText("0s ago")).not.toBeInTheDocument();
   });
+
+  it("ignores future source days when rendering the source age", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T10:30:00Z"));
+    getLatestStatsMock.mockResolvedValueOnce({
+      date: "2026-05-27",
+      censorshipPct: 33.4,
+      neutralPct: 66.6,
+      nonBoostPct: 10,
+      totalBlocks: 11869,
+    });
+
+    render(await StatusPage());
+
+    expect(screen.getByText("2026-05-27")).toBeInTheDocument();
+    expect(screen.getByText("Clock skew detected")).toBeInTheDocument();
+    expect(screen.queryByText("-48600s ago")).not.toBeInTheDocument();
+  });
 });
