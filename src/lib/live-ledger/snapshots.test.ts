@@ -128,4 +128,36 @@ describe("live ledger snapshots", () => {
       category: "pending",
     });
   });
+
+  it("marks missing past slots as unknown when relays are degraded", () => {
+    const snapshot: LiveLedgerSnapshot = {
+      schemaVersion: 1,
+      headSlot: 99,
+      fetchedAt: "2026-05-26T00:00:00.000Z",
+      degradedRelays: ["relay.ultrasound.money"],
+      blocks: [
+        {
+          slot: 96,
+          blockNumber: 1,
+          blockHash: "0x96",
+          relays: ["boost-relay.flashbots.net"],
+        },
+      ],
+    };
+
+    const ledger = ledgerFromSnapshot(snapshot);
+
+    expect(ledger.epochs[0].slots[0]).toMatchObject({
+      slot: 96,
+      category: "censoring",
+    });
+    expect(ledger.epochs[0].slots[1]).toMatchObject({
+      slot: 97,
+      category: "unknown",
+    });
+    expect(ledger.epochs[0].slots[4]).toMatchObject({
+      slot: 100,
+      category: "pending",
+    });
+  });
 });

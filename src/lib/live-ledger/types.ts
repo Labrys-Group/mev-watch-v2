@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-export type SlotCategory = "censoring" | "neutral" | "nonboost" | "pending";
+export type SlotCategory =
+  | "censoring"
+  | "neutral"
+  | "nonboost"
+  | "unknown"
+  | "pending";
 
 export interface RelayPayload {
   relayId: string;

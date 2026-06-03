@@ -43,6 +43,7 @@ const RelayscanDaySchema = z.object({
 interface FetchRelayscanDayOpts {
   attempts?: number;
   retryDelayMs?: number;
+  timeoutMs?: number;
 }
 
 const PUBLIC_RPCS = [
@@ -166,15 +167,17 @@ export async function fetchRelayscanDay(
 ): Promise<Omit<MevWatchDay, "totalChainBlocks">> {
   const attempts = opts.attempts ?? 3;
   const retryDelayMs = opts.retryDelayMs ?? 1000;
+  const timeoutMs = positiveIntegerOrFallback(opts.timeoutMs, 8000);
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       const response = await fetch(`https://www.relayscan.io/stats/day/${date}/json`, {
         headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(timeoutMs),
       });
       if (!response.ok) {
-        const retryable = response.status >= 500 && response.status < 600;
+        const retryable = isRetryableRelayscanStatus(response.status);
         if (retryable && attempt < attempts) {
           lastError = new Error(`HTTP ${response.status}`);
           await sleep(retryDelayMs);
@@ -183,6 +186,9 @@ export async function fetchRelayscanDay(
         throw new Error(`relayscan request failed for ${date}: HTTP ${response.status}`);
       }
       const parsed = RelayscanDaySchema.parse(await response.json());
+      if (parsed.date !== date) {
+        throw new Error(`relayscan returned ${parsed.date} for ${date}`);
+      }
       return {
         date: parsed.date,
         relays: parsed.relays.map((relay) => ({
@@ -205,6 +211,10 @@ export async function fetchRelayscanDay(
 
   const message = lastError instanceof Error ? lastError.message : String(lastError);
   throw new Error(`relayscan request failed for ${date}: ${message}`);
+}
+
+function isRetryableRelayscanStatus(status: number): boolean {
+  return status === 408 || status === 429 || (status >= 500 && status < 600);
 }
 
 interface JsonRpcResponse<T> {

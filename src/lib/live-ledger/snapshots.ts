@@ -140,6 +140,8 @@ export function isNewerSnapshot(
 export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
   const currentEpoch = epochOf(snapshot.headSlot);
   const bySlot = new Map(snapshot.blocks.map((block) => [block.slot, block]));
+  const missingPastCategory: SlotCategory =
+    snapshot.degradedRelays.length > 0 ? "unknown" : "nonboost";
   const epochs = Array.from({ length: LIVE_LEDGER_EPOCH_ROWS }, (_, rowIndex) => {
     const epoch = currentEpoch - rowIndex;
     const range = epochSlotRange(epoch);
@@ -155,7 +157,7 @@ export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
             ? "pending"
             : block
               ? classifySlot(block.relays)
-              : "nonboost";
+              : missingPastCategory;
 
         return {
           slot,
@@ -180,7 +182,9 @@ export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
   };
 }
 
-export function classifySlot(relays: string[]): Exclude<SlotCategory, "pending"> {
+export function classifySlot(
+  relays: string[],
+): Exclude<SlotCategory, "pending" | "unknown"> {
   if (relays.length === 0) return "nonboost";
   return relays.some((relayId) => classifyRelay(relayId).posture === "censoring")
     ? "censoring"

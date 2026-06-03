@@ -80,7 +80,7 @@ export function createBlobSnapshotStore(
   }
 
   async function readNewestTimestampedSnapshot(): Promise<LiveLedgerSnapshot | null> {
-    const latestBlob = (await listSnapshotBlobs())
+    const snapshotBlobs = (await listSnapshotBlobs())
       .map((blob) => {
         const parsed = parseTimestampedSnapshotName(blob.name);
         return parsed ? { ...blob, ...parsed } : null;
@@ -92,9 +92,13 @@ export function createBlobSnapshotStore(
         }
         if (a.headSlot !== b.headSlot) return b.headSlot - a.headSlot;
         return a.name.localeCompare(b.name);
-      })[0];
+      });
 
-    return latestBlob ? readSnapshot(latestBlob.pathname) : null;
+    for (const blob of snapshotBlobs) {
+      const snapshot = await readSnapshot(blob.pathname).catch(() => null);
+      if (snapshot) return snapshot;
+    }
+    return null;
   }
 
   async function pruneOldSnapshots(): Promise<{ deletedSnapshots: number }> {

@@ -2,11 +2,11 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EpochLedger } from "./epoch-ledger";
-import type { LedgerData } from "@/lib/live-ledger/types";
+import type { LedgerData, SlotCategory } from "@/lib/live-ledger/types";
 
 function ledger(
   headSlot: number,
-  category: "neutral" | "censoring",
+  category: Extract<SlotCategory, "neutral" | "censoring" | "unknown">,
   degradedRelays: string[] = [],
 ): LedgerData {
   return {
@@ -149,6 +149,13 @@ describe("EpochLedger", () => {
     expect(screen.queryByText("CENSORING")).not.toBeInTheDocument();
     // No LIVE CACHE STALE badge
     expect(screen.queryByText(/cache stale/i)).not.toBeInTheDocument();
+  });
+
+  it("renders unknown slots as degraded relay data", () => {
+    render(<EpochLedger initial={ledger(99, "unknown", ["relay.ultrasound.money"])} />);
+
+    expect(screen.getByText(/live · 4\/32/i)).toBeInTheDocument();
+    expect(document.querySelectorAll(".epoch-tile").length).toBeGreaterThan(0);
   });
 
   it("shows the slot tooltip portal on mouse enter over a filled slot (hover enabled)", async () => {

@@ -198,6 +198,55 @@ describe("fetchRelayscanDay", () => {
 
     vi.unstubAllGlobals();
   });
+
+  it("rejects a relayscan response for a different day", async () => {
+    const fetch = vi.fn().mockResolvedValue(
+      Response.json({
+        date: "2026-05-19",
+        relays: [],
+        builders: [],
+      }),
+    );
+    vi.stubGlobal("fetch", fetch);
+
+    await expect(
+      fetchRelayscanDay("2026-05-20", { attempts: 1, retryDelayMs: 0 }),
+    ).rejects.toThrow("relayscan returned 2026-05-19 for 2026-05-20");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("retries rate-limited relayscan responses and sends a timeout signal", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("rate limited", { status: 429 }))
+      .mockResolvedValueOnce(
+        Response.json({
+          date: "2026-05-20",
+          relays: [{ relay: "relay.ultrasound.money", num_payloads: 10 }],
+          builders: [
+            { info: { extra_data: "builder-a", num_blocks: 9 } },
+          ],
+        }),
+      );
+    vi.stubGlobal("fetch", fetch);
+
+    await expect(
+      fetchRelayscanDay("2026-05-20", { retryDelayMs: 0, timeoutMs: 1234 }),
+    ).resolves.toMatchObject({
+      date: "2026-05-20",
+      relays: [{ relayId: "relay.ultrasound.money", numPayloads: 10 }],
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch.mock.calls[0]?.[1]).toEqual(
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      }),
+    );
+
+    vi.unstubAllGlobals();
+  });
 });
 
 describe("updateDataFile", () => {

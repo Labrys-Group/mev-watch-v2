@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { GENESIS_TIME } from "./chain-time";
+import { currentSlot, GENESIS_TIME } from "./chain-time";
 import { refreshLiveLedger } from "./service";
 import type { SnapshotStore } from "./store";
 import { LIVE_LEDGER_REFRESH_INTERVAL_MS } from "./timing";
@@ -94,12 +94,13 @@ describe("refreshLiveLedger", () => {
     );
   });
 
-  it("serves the previous snapshot unchanged when every relay fails", async () => {
+  it("writes a fresh degraded snapshot when every relay fails", async () => {
     const store = memoryStore(previousSnapshot);
+    const now = (GENESIS_TIME + 101 * 12) * 1000;
 
     const result = await refreshLiveLedger({
       store,
-      now: (GENESIS_TIME + 101 * 12) * 1000,
+      now,
       fetchPayloads: vi.fn(async () => ({
         successfulRelays: [],
         degradedRelays: ["relay.ultrasound.money"],
@@ -107,10 +108,17 @@ describe("refreshLiveLedger", () => {
       })),
     });
 
-    expect(result.wroteSnapshot).toBe(false);
-    expect(store.written).toEqual([]);
-    expect(result.snapshot).toEqual(previousSnapshot);
-    expect(result.data.headSlot).toBe(previousSnapshot.headSlot);
-    expect(result.data.fetchedAt).toBe(previousSnapshot.fetchedAt);
+    expect(result.wroteSnapshot).toBe(true);
+    expect(store.written).toHaveLength(1);
+    expect(result.snapshot).toEqual(store.written[0]);
+    expect(result.snapshot.fetchedAt).toBe(new Date(now).toISOString());
+    expect(result.snapshot.headSlot).toBe(currentSlot(now));
+    expect(result.snapshot.degradedRelays).toEqual(["relay.ultrasound.money"]);
+    expect(result.snapshot.blocks).toEqual(previousSnapshot.blocks);
+    expect(result.data.headSlot).toBe(currentSlot(now));
+    expect(result.data.fetchedAt).toBe(new Date(now).toISOString());
+    expect(result.data.epochs[0].slots).toContainEqual(
+      expect.objectContaining({ slot: 97, category: "unknown" }),
+    );
   });
 });
