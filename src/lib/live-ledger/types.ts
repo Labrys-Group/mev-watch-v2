@@ -90,6 +90,6 @@ export const LiveLedgerSnapshotSchema = z.object({
   headSlot: z.number().int().nonnegative(),
   fetchedAt: z.string(),
   degradedRelays: z.array(z.string()),
-  degradedSlotRanges: z.array(DegradedSlotRangeSchema).default([]),
+  degradedSlotRanges: z.array(DegradedSlotRangeSchema).optional(),
   blocks: z.array(StoredRecentBlockSchema),
 });

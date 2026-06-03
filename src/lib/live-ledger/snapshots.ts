@@ -148,7 +148,7 @@ export function isNewerSnapshot(
 export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
   const currentEpoch = epochOf(snapshot.headSlot);
   const bySlot = new Map(snapshot.blocks.map((block) => [block.slot, block]));
-  const degradedSlotRanges = snapshot.degradedSlotRanges ?? [];
+  const degradedSlotRanges = effectiveDegradedSlotRanges(snapshot);
   const epochs = Array.from({ length: LIVE_LEDGER_EPOCH_ROWS }, (_, rowIndex) => {
     const epoch = currentEpoch - rowIndex;
     const range = epochSlotRange(epoch);
@@ -213,9 +213,9 @@ function buildDegradedSlotRanges({
   degradedRelays: string[];
   headSlot: number;
 }): DegradedSlotRange[] {
-  const retainedFirstSlot = Math.max(0, headSlot - LIVE_LEDGER_PRUNE_SLOTS);
+  const retainedFirstSlot = retainedFirstSlotFor(headSlot);
   const ranges = pruneDegradedSlotRanges(
-    previous?.degradedSlotRanges ?? [],
+    previous ? effectiveDegradedSlotRanges(previous) : [],
     headSlot,
   );
 
@@ -240,13 +240,33 @@ function pruneDegradedSlotRanges(
   ranges: DegradedSlotRange[],
   headSlot: number,
 ): DegradedSlotRange[] {
-  const retainedFirstSlot = Math.max(0, headSlot - LIVE_LEDGER_PRUNE_SLOTS);
+  const retainedFirstSlot = retainedFirstSlotFor(headSlot);
   return ranges
     .map((range) => ({
       firstSlot: Math.max(range.firstSlot, retainedFirstSlot),
       lastSlot: Math.min(range.lastSlot, headSlot),
     }))
     .filter((range) => range.firstSlot <= range.lastSlot);
+}
+
+function effectiveDegradedSlotRanges(
+  snapshot: Pick<
+    LiveLedgerSnapshot,
+    "degradedRelays" | "degradedSlotRanges" | "headSlot"
+  >,
+): DegradedSlotRange[] {
+  if (snapshot.degradedSlotRanges) return snapshot.degradedSlotRanges;
+  if (snapshot.degradedRelays.length === 0) return [];
+  return [
+    {
+      firstSlot: retainedFirstSlotFor(snapshot.headSlot),
+      lastSlot: snapshot.headSlot,
+    },
+  ];
+}
+
+function retainedFirstSlotFor(headSlot: number): number {
+  return Math.max(0, headSlot - LIVE_LEDGER_PRUNE_SLOTS);
 }
 
 function mergeDegradedSlotRanges(

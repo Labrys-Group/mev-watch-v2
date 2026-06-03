@@ -65,6 +65,43 @@ describe("refreshLiveLedger", () => {
     expect(result.data.headSlot).toBe(previousSnapshot.headSlot);
   });
 
+  it("serves a fresh legacy degraded snapshot without losing unknown slots", async () => {
+    const legacySnapshot: LiveLedgerSnapshot = {
+      schemaVersion: 1,
+      headSlot: 99,
+      fetchedAt: new Date((GENESIS_TIME + 99 * 12) * 1000).toISOString(),
+      degradedRelays: ["relay.ultrasound.money"],
+      blocks: [
+        {
+          slot: 96,
+          blockNumber: 1,
+          blockHash: "0xprev",
+          relays: ["boost-relay.flashbots.net"],
+        },
+      ],
+    };
+    const store = memoryStore(legacySnapshot);
+    const fetchPayloads = vi.fn(async () => ({
+      successfulRelays: ["boost-relay.flashbots.net"],
+      degradedRelays: [],
+      payloads: [],
+    }));
+
+    const result = await refreshLiveLedger({
+      store,
+      now: Date.parse(legacySnapshot.fetchedAt) + LIVE_LEDGER_REFRESH_INTERVAL_MS - 1,
+      fetchPayloads,
+    });
+
+    expect(fetchPayloads).not.toHaveBeenCalled();
+    expect(result.wroteSnapshot).toBe(false);
+    expect(store.written).toEqual([]);
+    expect(result.snapshot).toEqual(legacySnapshot);
+    expect(result.data.epochs[0].slots).toContainEqual(
+      expect.objectContaining({ slot: 97, category: "unknown" }),
+    );
+  });
+
   it("writes a merged snapshot when at least one relay succeeds", async () => {
     const store = memoryStore(previousSnapshot);
 

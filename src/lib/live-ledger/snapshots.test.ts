@@ -6,6 +6,7 @@ import {
   foldPayloadsBySlot,
   ledgerFromSnapshot,
   mergeSnapshotBlocks,
+  parseLiveLedgerSnapshot,
   pruneSnapshotBlocks,
 } from "./snapshots";
 import { GENESIS_TIME } from "./chain-time";
@@ -170,6 +171,47 @@ describe("live ledger snapshots", () => {
     });
   });
 
+  it("preserves missing degraded ranges when parsing legacy degraded snapshots", () => {
+    const snapshot = parseLiveLedgerSnapshot({
+      schemaVersion: 1,
+      headSlot: 99,
+      fetchedAt: "2026-05-26T00:00:00.000Z",
+      degradedRelays: ["relay.ultrasound.money"],
+      blocks: [],
+    });
+
+    expect("degradedSlotRanges" in snapshot).toBe(false);
+    expect(snapshot.degradedSlotRanges).toBeUndefined();
+  });
+
+  it("marks missing past slots in legacy degraded snapshots as unknown", () => {
+    const snapshot: LiveLedgerSnapshot = {
+      schemaVersion: 1,
+      headSlot: 99,
+      fetchedAt: "2026-05-26T00:00:00.000Z",
+      degradedRelays: ["relay.ultrasound.money"],
+      blocks: [
+        {
+          slot: 96,
+          blockNumber: 1,
+          blockHash: "0x96",
+          relays: ["boost-relay.flashbots.net"],
+        },
+      ],
+    };
+
+    const ledger = ledgerFromSnapshot(snapshot);
+
+    expect(ledger.epochs[0].slots[0]).toMatchObject({
+      slot: 96,
+      category: "censoring",
+    });
+    expect(ledger.epochs[0].slots[1]).toMatchObject({
+      slot: 97,
+      category: "unknown",
+    });
+  });
+
   it("records degraded ranges for newly elapsed slots without repainting older gaps", () => {
     const previous: LiveLedgerSnapshot = {
       schemaVersion: 1,
@@ -245,6 +287,27 @@ describe("live ledger snapshots", () => {
     ).toEqual([
       { firstSlot: 250, lastSlot: 260 },
       { firstSlot: 295, lastSlot: 305 },
+    ]);
+  });
+
+  it("carries legacy degraded history when building snapshots", () => {
+    const previous: LiveLedgerSnapshot = {
+      schemaVersion: 1,
+      headSlot: 299,
+      fetchedAt: "2026-05-26T00:00:00.000Z",
+      degradedRelays: ["relay.ultrasound.money"],
+      blocks: [],
+    };
+
+    const snapshot = buildSnapshot({
+      previous,
+      incoming: [],
+      degradedRelays: ["relay.ultrasound.money"],
+      now: (GENESIS_TIME + 305 * 12) * 1000,
+    });
+
+    expect(snapshot.degradedSlotRanges).toEqual([
+      { firstSlot: 49, lastSlot: 305 },
     ]);
   });
 });
