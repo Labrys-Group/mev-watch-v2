@@ -151,11 +151,36 @@ describe("EpochLedger", () => {
     expect(screen.queryByText(/cache stale/i)).not.toBeInTheDocument();
   });
 
-  it("renders unknown slots as degraded relay data", () => {
-    render(<EpochLedger initial={ledger(99, "unknown", ["relay.ultrasound.money"])} />);
+  it("renders unknown slots with the existing relay unknown status", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+
+    render(
+      <EpochLedger
+        initial={ledger(99, "unknown", ["relay.ultrasound.money"])}
+      />,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
 
     expect(screen.getByText(/live · 4\/32/i)).toBeInTheDocument();
-    expect(document.querySelectorAll(".epoch-tile").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText("Relay Unknown / Non-MEV-Boost"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Relay Data Degraded")).not.toBeInTheDocument();
   });
 
   it("shows the slot tooltip portal on mouse enter over a filled slot (hover enabled)", async () => {
