@@ -31,17 +31,17 @@ afterEach(() => {
 });
 
 describe("root metadata", () => {
-  it("uses the deployed Vercel production URL as the canonical metadata host", async () => {
+  it("uses the public mevwatch.info URL as the canonical metadata host", async () => {
     const { metadata } = await import("./layout");
 
     expect(metadata.metadataBase?.toString()).toBe(
-      "https://mev-watch-v2.vercel.app/",
+      "https://www.mevwatch.info/",
     );
     expect(metadata.alternates?.canonical).toBe(
-      "https://mev-watch-v2.vercel.app/",
+      "https://www.mevwatch.info/",
     );
     expect(JSON.stringify(metadata.openGraph)).toContain(
-      "https://mev-watch-v2.vercel.app",
+      "https://www.mevwatch.info",
     );
   });
 
