@@ -10,7 +10,7 @@ import { classifyRelay } from "@/config/relays";
 /** Client poll interval. A slot is 12s; 10s keeps the pulse close to real-time. */
 export const POLL_MS = 10_000;
 
-type FilledCategory = "censoring" | "neutral" | "nonboost";
+type FilledCategory = "censoring" | "neutral" | "nonboost" | "unknown";
 
 const CAT_META: Record<
   FilledCategory,
@@ -23,6 +23,11 @@ const CAT_META: Record<
   nonboost: {
     label: "Relay Unknown / Non-MEV-Boost",
     bg: "bg-non-boost",
+    text: "text-fg-muted",
+  },
+  unknown: {
+    label: "Relay Data Degraded",
+    bg: "bg-panel-alt",
     text: "text-fg-muted",
   },
 };
@@ -293,6 +298,11 @@ function SlotTile({
 }: SlotTileProps) {
   const pending = cell.category === "pending";
   const meta = pending ? null : CAT_META[cell.category as FilledCategory];
+  const indexTextClass = pending
+    ? "text-fg-muted"
+    : cell.category === "unknown"
+      ? "text-fg-muted"
+      : "text-[#0D0E16]";
 
   const className = pending
     ? `epoch-cell flex aspect-square items-center justify-center border ${
@@ -338,9 +348,7 @@ function SlotTile({
       onMouseMove={showDetail}
     >
       <span
-        className={`hidden font-mono text-[8px] leading-none sm:block ${
-          pending ? "text-fg-muted" : "text-[#0D0E16]"
-        }`}
+        className={`hidden font-mono text-[8px] leading-none sm:block ${indexTextClass}`}
       >
         {cell.indexInEpoch}
       </span>

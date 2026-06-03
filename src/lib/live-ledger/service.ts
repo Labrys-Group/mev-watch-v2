@@ -46,15 +46,17 @@ export async function refreshLiveLedger({
   const result = await fetchPayloads();
 
   if (result.successfulRelays.length === 0) {
-    const fallback = previous ?? emptySnapshot(now);
+    const snapshot = buildSnapshot({
+      previous,
+      incoming: [],
+      degradedRelays: result.degradedRelays,
+      now,
+    });
+    await snapshotStore.writeSnapshot(snapshot);
     return {
-      data: ledgerFromSnapshot({
-        ...fallback,
-        degradedRelays:
-          previous === null ? result.degradedRelays : fallback.degradedRelays,
-      }),
-      snapshot: fallback,
-      wroteSnapshot: false,
+      data: ledgerFromSnapshot(snapshot),
+      snapshot,
+      wroteSnapshot: true,
     };
   }
 

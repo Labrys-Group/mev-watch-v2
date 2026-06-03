@@ -3,6 +3,7 @@ import { classifyRelay } from "@/config/relays";
 import { currentSlot, epochOf, epochSlotRange } from "./chain-time";
 import {
   LiveLedgerSnapshotSchema,
+  type DegradedSlotRange,
   type LedgerData,
   type LiveLedgerSnapshot,
   type RelayPayload,
@@ -25,6 +26,7 @@ export function emptySnapshot(now = Date.now()): LiveLedgerSnapshot {
     headSlot: currentSlot(now),
     fetchedAt,
     degradedRelays: [],
+    degradedSlotRanges: [],
     blocks: [],
   };
 }
@@ -114,12 +116,18 @@ export function buildSnapshot({
     incoming.at(-1)?.slot ?? 0,
   );
   const merged = mergeSnapshotBlocks(previous?.blocks ?? [], incoming);
+  const degradedSlotRanges = buildDegradedSlotRanges({
+    previous,
+    degradedRelays,
+    headSlot,
+  });
 
   return {
     schemaVersion: LIVE_LEDGER_SCHEMA_VERSION,
     headSlot,
     fetchedAt: new Date(now).toISOString(),
     degradedRelays: [...degradedRelays].sort(),
+    degradedSlotRanges,
     blocks: pruneSnapshotBlocks(merged, headSlot),
   };
 }
@@ -140,6 +148,7 @@ export function isNewerSnapshot(
 export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
   const currentEpoch = epochOf(snapshot.headSlot);
   const bySlot = new Map(snapshot.blocks.map((block) => [block.slot, block]));
+  const degradedSlotRanges = effectiveDegradedSlotRanges(snapshot);
   const epochs = Array.from({ length: LIVE_LEDGER_EPOCH_ROWS }, (_, rowIndex) => {
     const epoch = currentEpoch - rowIndex;
     const range = epochSlotRange(epoch);
@@ -155,7 +164,9 @@ export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
             ? "pending"
             : block
               ? classifySlot(block.relays)
-              : "nonboost";
+              : isSlotInRanges(slot, degradedSlotRanges)
+                ? "unknown"
+                : "nonboost";
 
         return {
           slot,
@@ -180,7 +191,9 @@ export function ledgerFromSnapshot(snapshot: LiveLedgerSnapshot): LedgerData {
   };
 }
 
-export function classifySlot(relays: string[]): Exclude<SlotCategory, "pending"> {
+export function classifySlot(
+  relays: string[],
+): Exclude<SlotCategory, "pending" | "unknown"> {
   if (relays.length === 0) return "nonboost";
   return relays.some((relayId) => classifyRelay(relayId).posture === "censoring")
     ? "censoring"
@@ -189,4 +202,85 @@ export function classifySlot(relays: string[]): Exclude<SlotCategory, "pending">
 
 function sortedUnique(values: string[]): string[] {
   return [...new Set(values)].sort();
+}
+
+function buildDegradedSlotRanges({
+  previous,
+  degradedRelays,
+  headSlot,
+}: {
+  previous: LiveLedgerSnapshot | null;
+  degradedRelays: string[];
+  headSlot: number;
+}): DegradedSlotRange[] {
+  const retainedFirstSlot = retainedFirstSlotFor(headSlot);
+  const ranges = pruneDegradedSlotRanges(
+    previous ? effectiveDegradedSlotRanges(previous) : [],
+    headSlot,
+  );
+
+  if (degradedRelays.length > 0) {
+    const firstSlot = previous
+      ? previous.headSlot + 1
+      : retainedFirstSlot;
+    if (firstSlot <= headSlot) {
+      ranges.push({ firstSlot, lastSlot: headSlot });
+    }
+  }
+
+  return mergeDegradedSlotRanges(
+    ranges.map((range) => ({
+      firstSlot: Math.max(range.firstSlot, retainedFirstSlot),
+      lastSlot: Math.min(range.lastSlot, headSlot),
+    })),
+  );
+}
+
+function pruneDegradedSlotRanges(
+  ranges: DegradedSlotRange[],
+  headSlot: number,
+): DegradedSlotRange[] {
+  const retainedFirstSlot = retainedFirstSlotFor(headSlot);
+  return ranges
+    .map((range) => ({
+      firstSlot: Math.max(range.firstSlot, retainedFirstSlot),
+      lastSlot: Math.min(range.lastSlot, headSlot),
+    }))
+    .filter((range) => range.firstSlot <= range.lastSlot);
+}
+
+function effectiveDegradedSlotRanges(
+  snapshot: Pick<LiveLedgerSnapshot, "degradedSlotRanges">,
+): DegradedSlotRange[] {
+  return snapshot.degradedSlotRanges ?? [];
+}
+
+function retainedFirstSlotFor(headSlot: number): number {
+  return Math.max(0, headSlot - LIVE_LEDGER_PRUNE_SLOTS);
+}
+
+function mergeDegradedSlotRanges(
+  ranges: DegradedSlotRange[],
+): DegradedSlotRange[] {
+  const sorted = ranges
+    .filter((range) => range.firstSlot <= range.lastSlot)
+    .sort((a, b) => a.firstSlot - b.firstSlot || a.lastSlot - b.lastSlot);
+  const merged: DegradedSlotRange[] = [];
+
+  for (const range of sorted) {
+    const current = merged.at(-1);
+    if (!current || range.firstSlot > current.lastSlot + 1) {
+      merged.push({ ...range });
+      continue;
+    }
+    current.lastSlot = Math.max(current.lastSlot, range.lastSlot);
+  }
+
+  return merged;
+}
+
+function isSlotInRanges(slot: number, ranges: DegradedSlotRange[]): boolean {
+  return ranges.some(
+    (range) => slot >= range.firstSlot && slot <= range.lastSlot,
+  );
 }

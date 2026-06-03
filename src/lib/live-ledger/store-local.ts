@@ -2,7 +2,6 @@ import { promises as fs } from "node:fs";
 
 import {
   isTimestampedSnapshotName,
-  LATEST_SNAPSHOT_NAME,
   newestSnapshotFile,
   SNAPSHOT_RETENTION_COUNT,
   sortNewestFirst,
@@ -28,14 +27,7 @@ export function createLocalSnapshotStore(
     async readLatestSnapshot() {
       const latest = newestSnapshotFile(await readTimestampedSnapshots(dir));
       if (latest) return latest.snapshot;
-
-      try {
-        const raw = await fs.readFile(filePath(dir, LATEST_SNAPSHOT_NAME), "utf8");
-        return parseLiveLedgerSnapshot(JSON.parse(raw));
-      } catch (error) {
-        if (isNotFoundError(error)) return null;
-        throw error;
-      }
+      return null;
     },
     async writeSnapshot(snapshot) {
       await fs.mkdir(dir, { recursive: true });

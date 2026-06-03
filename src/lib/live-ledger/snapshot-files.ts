@@ -3,7 +3,6 @@ import { randomUUID } from "node:crypto";
 import { isNewerSnapshot } from "./snapshots";
 import type { LiveLedgerSnapshot } from "./types";
 
-export const LATEST_SNAPSHOT_NAME = "latest.json";
 export const SNAPSHOT_RETENTION_COUNT = 10;
 
 export interface SnapshotFile {
@@ -25,11 +24,7 @@ export function timestampedSnapshotName(snapshot: LiveLedgerSnapshot): string {
 }
 
 export function isTimestampedSnapshotName(name: string): boolean {
-  return (
-    name.endsWith(".json") &&
-    name !== LATEST_SNAPSHOT_NAME &&
-    !name.endsWith(".tmp")
-  );
+  return TIMESTAMPED_SNAPSHOT_NAME_PATTERN.test(name);
 }
 
 export function parseTimestampedSnapshotName(
