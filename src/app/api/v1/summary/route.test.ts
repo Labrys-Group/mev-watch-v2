@@ -14,4 +14,18 @@ describe("OPTIONS /api/v1/summary", () => {
       "Authorization, Content-Type",
     );
   });
+
+  it("echoes requested non-simple headers for browser preflight requests", async () => {
+    const request = new Request("https://www.mevwatch.info/api/v1/summary", {
+      method: "OPTIONS",
+      headers: {
+        "Access-Control-Request-Headers": "X-Requested-With, X-Api-Key",
+      },
+    });
+    const response = await (OPTIONS as (request: Request) => Response)(request);
+
+    expect(response.headers.get("access-control-allow-headers")).toBe(
+      "X-Requested-With, X-Api-Key",
+    );
+  });
 });

@@ -6,6 +6,17 @@ export const apiCorsHeaders = {
   "access-control-allow-headers": "Authorization, Content-Type",
 } as const;
 
+function getApiCorsHeaders(request?: Request): HeadersInit {
+  const requestedHeaders = request?.headers.get("access-control-request-headers");
+
+  return {
+    ...apiCorsHeaders,
+    ...(requestedHeaders
+      ? { "access-control-allow-headers": requestedHeaders }
+      : null),
+  };
+}
+
 /**
  * Builds a JSON response for the public API: permissive CORS so third parties
  * can fetch it, and an hourly shared cache (the underlying data updates daily).
@@ -19,9 +30,9 @@ export function apiJson(data: unknown): NextResponse {
   });
 }
 
-export function apiOptions(): NextResponse {
+export function apiOptions(request?: Request): NextResponse {
   return new NextResponse(null, {
     status: 204,
-    headers: apiCorsHeaders,
+    headers: getApiCorsHeaders(request),
   });
 }

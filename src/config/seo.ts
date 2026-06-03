@@ -98,6 +98,7 @@ export const baseJsonLd = {
 
 export function getFaqJsonLd() {
   return {
+    "@context": "https://schema.org",
     "@type": "FAQPage",
     "@id": `${SITE_URL}/#faq`,
     mainEntity: FAQ_ITEMS.map((item) => ({

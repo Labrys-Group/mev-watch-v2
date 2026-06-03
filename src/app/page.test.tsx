@@ -46,6 +46,7 @@ describe("Home", () => {
     const jsonLd = JSON.parse(script?.textContent ?? "{}");
 
     expect(jsonLd).toMatchObject({
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       "@id": "https://www.mevwatch.info/#faq",
     });
