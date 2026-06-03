@@ -114,6 +114,9 @@ describe("refreshLiveLedger", () => {
     expect(result.snapshot.fetchedAt).toBe(new Date(now).toISOString());
     expect(result.snapshot.headSlot).toBe(currentSlot(now));
     expect(result.snapshot.degradedRelays).toEqual(["relay.ultrasound.money"]);
+    expect(result.snapshot.degradedSlotRanges).toEqual([
+      { firstSlot: 97, lastSlot: currentSlot(now) },
+    ]);
     expect(result.snapshot.blocks).toEqual(previousSnapshot.blocks);
     expect(result.data.headSlot).toBe(currentSlot(now));
     expect(result.data.fetchedAt).toBe(new Date(now).toISOString());

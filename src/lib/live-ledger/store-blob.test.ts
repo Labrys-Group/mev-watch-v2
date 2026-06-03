@@ -28,6 +28,7 @@ describe("Blob live-ledger snapshot store", () => {
       headSlot: 101,
       fetchedAt: "2026-05-26T00:01:00.000Z",
       degradedRelays: [],
+      degradedSlotRanges: [],
       blocks: [],
     };
     const getBlob = vi.fn(async (pathname: string) => {

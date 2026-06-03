@@ -27,11 +27,17 @@ export interface StoredRecentBlock {
   numTx?: number;
 }
 
+export interface DegradedSlotRange {
+  firstSlot: number;
+  lastSlot: number;
+}
+
 export interface LiveLedgerSnapshot {
   schemaVersion: 1;
   headSlot: number;
   fetchedAt: string;
   degradedRelays: string[];
+  degradedSlotRanges?: DegradedSlotRange[];
   blocks: StoredRecentBlock[];
 }
 
@@ -70,10 +76,20 @@ export const StoredRecentBlockSchema = z.object({
   numTx: z.number().int().nonnegative().optional(),
 });
 
+export const DegradedSlotRangeSchema = z
+  .object({
+    firstSlot: z.number().int().nonnegative(),
+    lastSlot: z.number().int().nonnegative(),
+  })
+  .refine((range) => range.firstSlot <= range.lastSlot, {
+    message: "firstSlot must be before or equal to lastSlot",
+  });
+
 export const LiveLedgerSnapshotSchema = z.object({
   schemaVersion: z.literal(1),
   headSlot: z.number().int().nonnegative(),
   fetchedAt: z.string(),
   degradedRelays: z.array(z.string()),
+  degradedSlotRanges: z.array(DegradedSlotRangeSchema).default([]),
   blocks: z.array(StoredRecentBlockSchema),
 });
