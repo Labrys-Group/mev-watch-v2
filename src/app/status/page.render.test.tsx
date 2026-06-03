@@ -72,4 +72,28 @@ describe("StatusPage", () => {
 
     expect(screen.getByText("Daily refresh lagging (2d ago)")).toBeInTheDocument();
   });
+
+  it("reports clock skew for future generated metadata", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T10:30:00Z"));
+    getLastRefreshMock.mockResolvedValueOnce({
+      ranAt: new Date("2026-05-26T11:30:00Z"),
+      status: "ok",
+      source: "src/data/mev-watch.sqlite",
+      message: "Data through 2026-05-25",
+    });
+    getLatestStatsMock.mockResolvedValueOnce({
+      date: "2026-05-25",
+      censorshipPct: 33.4,
+      neutralPct: 66.6,
+      nonBoostPct: 10,
+      totalBlocks: 11869,
+    });
+
+    render(await StatusPage());
+
+    expect(screen.getByText("Daily refresh lagging")).toBeInTheDocument();
+    expect(screen.getByText("Clock skew detected")).toBeInTheDocument();
+    expect(screen.queryByText("0s ago")).not.toBeInTheDocument();
+  });
 });

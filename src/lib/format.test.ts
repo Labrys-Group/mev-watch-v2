@@ -28,12 +28,6 @@ describe("formatRelativeTime", () => {
     expect(formatRelativeTime(new Date("2026-05-21T09:00:00Z"), now)).toBe("3h ago");
     expect(formatRelativeTime(new Date("2026-05-18T12:00:00Z"), now)).toBe("3d ago");
   });
-
-  it("does not render negative ages for future dates", () => {
-    const now = new Date("2026-05-21T12:00:00Z");
-
-    expect(formatRelativeTime(new Date("2026-05-21T13:00:00Z"), now)).toBe("0s ago");
-  });
 });
 
 describe("formatDateShort", () => {

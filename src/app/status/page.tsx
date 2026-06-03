@@ -55,6 +55,9 @@ export default async function StatusPage() {
     generatedAt: snapshot?.ranAt ?? null,
   });
   const freshnessVerdict = getFreshnessVerdict(freshness);
+  const generatedLabel = snapshot
+    ? freshness.generatedAgeLabel ?? "Clock skew detected"
+    : null;
 
   return (
     <div className="min-h-screen">
@@ -109,7 +112,7 @@ export default async function StatusPage() {
               {snapshot ? (
                 <div className="flex flex-wrap items-center gap-4">
                   <span className="font-mono text-sm text-foreground">
-                    {formatRelativeTime(snapshot.ranAt)}
+                    {generatedLabel}
                   </span>
                   <span className="font-mono text-xs text-fg-muted">
                     {snapshot.source}

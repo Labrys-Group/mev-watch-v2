@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { DataFreshness } from "@/lib/data-freshness";
 import { StatusBar } from "./status-bar";
@@ -14,6 +14,10 @@ const freshness: DataFreshness = {
 };
 
 describe("StatusBar", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("renders DAILY FRESH from the freshness verdict and shows latest date + censorship pct", () => {
     render(
       <StatusBar
@@ -85,5 +89,30 @@ describe("StatusBar", () => {
 
     expect(screen.getByText("DISCONNECTED")).toBeInTheDocument();
     expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+  });
+
+  it("reports clock skew instead of treating future refresh metadata as current", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T10:30:00Z"));
+
+    render(
+      <StatusBar
+        latestDate="2026-05-25"
+        censorshipPct={33.4}
+        lastRefresh={new Date("2026-05-26T11:30:00Z")}
+        freshness={{
+          ...freshness,
+          status: "lagging",
+          sourceDate: "2026-05-25",
+          sourceAgeDays: 1,
+          generatedAt: new Date("2026-05-26T11:30:00Z"),
+          generatedAgeLabel: null,
+          sourceLabel: "Daily snapshot through 2026-05-25",
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Clock skew")).toBeInTheDocument();
+    expect(screen.queryByText("0s ago")).not.toBeInTheDocument();
   });
 });

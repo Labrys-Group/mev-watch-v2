@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { formatPercent, formatRelativeTime } from "@/lib/format";
+import { formatPercent } from "@/lib/format";
 import type { DataFreshness } from "@/lib/data-freshness";
 
 interface StatusBarProps {
@@ -18,7 +18,9 @@ export function StatusBar({
   freshness,
   connected = true,
 }: StatusBarProps) {
-  const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
+  const updatedText = lastRefresh
+    ? freshness.generatedAgeLabel ?? "Clock skew"
+    : "—";
   const statusPill = connected || freshness.status === "empty"
     ? getDailyStatusPill(freshness.status)
     : {
