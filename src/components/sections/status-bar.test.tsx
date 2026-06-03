@@ -50,4 +50,40 @@ describe("StatusBar", () => {
     expect(status).toHaveClass("text-warn");
     expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
   });
+
+  it("renders NO DATA for empty freshness even when disconnected", () => {
+    render(
+      <StatusBar
+        connected={false}
+        latestDate="—"
+        censorshipPct={0}
+        lastRefresh={null}
+        freshness={{
+          status: "empty",
+          sourceDate: null,
+          sourceAgeDays: null,
+          generatedAt: null,
+          generatedAgeLabel: null,
+          sourceLabel: "No daily snapshot available",
+        }}
+      />,
+    );
+
+    expect(screen.getByText("NO DATA")).toBeInTheDocument();
+    expect(screen.queryByText("DISCONNECTED")).not.toBeInTheDocument();
+  });
+
+  it("keeps DISCONNECTED for non-empty disconnected freshness", () => {
+    render(
+      <StatusBar
+        connected={false}
+        latestDate="2023-10-24"
+        censorshipPct={33.4}
+        freshness={freshness}
+      />,
+    );
+
+    expect(screen.getByText("DISCONNECTED")).toBeInTheDocument();
+    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+  });
 });

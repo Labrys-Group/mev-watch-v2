@@ -19,7 +19,7 @@ export function StatusBar({
   connected = true,
 }: StatusBarProps) {
   const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
-  const statusPill = connected
+  const statusPill = connected || freshness.status === "empty"
     ? getDailyStatusPill(freshness.status)
     : {
         label: "DISCONNECTED",

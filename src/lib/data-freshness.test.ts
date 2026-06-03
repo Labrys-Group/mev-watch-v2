@@ -59,6 +59,18 @@ describe("getDataFreshness", () => {
     expect(freshness.generatedAgeLabel).toBe("2d ago");
   });
 
+  it("classifies future refresh timestamps as lagging without a negative age label", () => {
+    const freshness = getDataFreshness({
+      latestDate: "2026-05-25",
+      generatedAt: new Date("2026-05-26T11:30:00Z"),
+      now: NOW,
+    });
+
+    expect(freshness.status).toBe("lagging");
+    expect(freshness.sourceAgeDays).toBe(1);
+    expect(freshness.generatedAgeLabel).toBeNull();
+  });
+
   it("uses complete UTC day boundaries for source age", () => {
     const freshness = getDataFreshness({
       latestDate: "2026-05-25",

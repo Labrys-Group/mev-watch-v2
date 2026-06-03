@@ -36,7 +36,11 @@ export function getDataFreshness({
   generatedAt,
   now = new Date(),
 }: DataFreshnessInput): DataFreshness {
-  const generatedAgeLabel = generatedAt ? formatRelativeTime(generatedAt, now) : null;
+  const generatedAgeMs = generatedAt ? now.getTime() - generatedAt.getTime() : null;
+  const generatedAgeLabel =
+    generatedAt && generatedAgeMs !== null && generatedAgeMs >= 0
+      ? formatRelativeTime(generatedAt, now)
+      : null;
 
   if (!latestDate) {
     return {
@@ -53,13 +57,13 @@ export function getDataFreshness({
     0,
     Math.floor((utcDayStart(now) - parseSourceDay(latestDate)) / MS_PER_DAY),
   );
-  const generatedAgeHours = generatedAt
-    ? Math.max(0, (now.getTime() - generatedAt.getTime()) / MS_PER_HOUR)
-    : null;
+  const generatedAgeHours =
+    generatedAgeMs === null ? null : generatedAgeMs / MS_PER_HOUR;
   const status =
     sourceAgeDays > STALE_SOURCE_DAY_THRESHOLD_DAYS
       ? "stale"
       : generatedAgeHours === null ||
+          generatedAgeHours < 0 ||
           generatedAgeHours > LAGGING_REFRESH_THRESHOLD_HOURS
         ? "lagging"
         : "fresh";
