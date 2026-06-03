@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   // Methodology is editorial; pin it to a known revision date so search engines
   // don't see a constantly-bumping lastmod on a page whose copy hasn't changed.
-  const methodologyLastModified = new Date("2026-05-01T00:00:00Z");
+  const methodologyLastModified = new Date("2026-06-03T00:00:00Z");
 
   return [
     {

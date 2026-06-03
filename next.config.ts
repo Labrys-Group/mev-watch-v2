@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
           { key: "Access-Control-Allow-Origin", value: "*" },
           { key: "Access-Control-Allow-Methods", value: "GET, OPTIONS" },
           {
+            key: "Access-Control-Allow-Headers",
+            value: "Authorization, Content-Type",
+          },
+          {
             key: "Cache-Control",
             value: "public, s-maxage=300, stale-while-revalidate=3600",
           },

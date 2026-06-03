@@ -29,7 +29,16 @@ const splineSansMono = Spline_Sans_Mono({
   display: "swap",
 });
 
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+export function getValidatedGtmId(value: string | undefined): string | null {
+  return value && /^GTM-[A-Z0-9]+$/.test(value) ? value : null;
+}
+
+export function getGtmInitScript(gtmId: string): string {
+  const serializedGtmId = JSON.stringify(gtmId);
+  return `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',${serializedGtmId});`;
+}
+
+const GTM_ID = getValidatedGtmId(process.env.NEXT_PUBLIC_GTM_ID);
 
 // `metadataBase` resolves every relative metadata URL (og:image, twitter:image,
 // favicons). On Vercel preview deployments we point it at the deployment
@@ -100,7 +109,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: { url: "/favicon.ico", sizes: "256x256" },
+    apple: { url: "/apple-icon", sizes: "180x180", type: "image/png" },
   },
   robots: {
     index: true,
@@ -142,7 +151,7 @@ export default function RootLayout({
         />
         {GTM_ID ? (
           <Script id="gtm-init" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`}
+            {getGtmInitScript(GTM_ID)}
           </Script>
         ) : null}
       </head>
