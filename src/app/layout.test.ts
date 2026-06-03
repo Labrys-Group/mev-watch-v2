@@ -31,6 +31,20 @@ afterEach(() => {
 });
 
 describe("root metadata", () => {
+  it("uses the deployed Vercel production URL as the canonical metadata host", async () => {
+    const { metadata } = await import("./layout");
+
+    expect(metadata.metadataBase?.toString()).toBe(
+      "https://mev-watch-v2.vercel.app/",
+    );
+    expect(metadata.alternates?.canonical).toBe(
+      "https://mev-watch-v2.vercel.app/",
+    );
+    expect(JSON.stringify(metadata.openGraph)).toContain(
+      "https://mev-watch-v2.vercel.app",
+    );
+  });
+
   it("uses censoring language without mentioning OFAC", async () => {
     const { metadata } = await import("./layout");
     const serialized = JSON.stringify(metadata);

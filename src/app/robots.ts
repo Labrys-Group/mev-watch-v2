@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = "https://www.mevwatch.info";
+import { SITE_URL } from "@/config/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {

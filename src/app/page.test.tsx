@@ -48,7 +48,7 @@ describe("Home", () => {
     expect(jsonLd).toMatchObject({
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "@id": "https://www.mevwatch.info/#faq",
+      "@id": "https://mev-watch-v2.vercel.app/#faq",
     });
     expect(jsonLd.mainEntity).toHaveLength(FAQ_ITEMS.length);
     expect(jsonLd.mainEntity[0]).toMatchObject({

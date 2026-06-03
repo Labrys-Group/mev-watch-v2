@@ -1,6 +1,6 @@
 import { FAQ_ITEMS } from "@/config/faq";
 
-export const SITE_URL = "https://www.mevwatch.info";
+export const SITE_URL = "https://mev-watch-v2.vercel.app";
 export const SITE_NAME = "MEV Watch";
 export const SITE_TITLE = `${SITE_NAME} — censoring relay share on Ethereum MEV-boost`;
 export const SITE_DESCRIPTION =
