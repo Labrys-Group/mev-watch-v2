@@ -103,7 +103,7 @@ export function StatusBar({
           }
         />
 
-        <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
+        <StatusCell label="SOURCE DAY (UTC)" value={latestDate} mdOnly />
 
         <StatusCell
           label="CENSORSHIP"
@@ -121,7 +121,7 @@ function getDailyStatusPill(status: DataFreshness["status"]) {
   switch (status) {
     case "fresh":
       return {
-        label: "DAILY FRESH",
+        label: "ON SCHEDULE",
         colorClassName: "text-good",
         dotClassName: "bg-good",
         glowColor: "var(--good)",
