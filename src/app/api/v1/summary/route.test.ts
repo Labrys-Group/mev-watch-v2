@@ -27,5 +27,8 @@ describe("OPTIONS /api/v1/summary", () => {
     expect(response.headers.get("access-control-allow-headers")).toBe(
       "X-Requested-With, X-Api-Key",
     );
+    expect(response.headers.get("vary")).toBe(
+      "Access-Control-Request-Headers",
+    );
   });
 });

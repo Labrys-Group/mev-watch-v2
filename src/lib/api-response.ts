@@ -12,6 +12,9 @@ function getApiCorsHeaders(request?: Request): HeadersInit {
   return {
     ...apiCorsHeaders,
     ...(requestedHeaders
+      ? { vary: "Access-Control-Request-Headers" }
+      : null),
+    ...(requestedHeaders
       ? { "access-control-allow-headers": requestedHeaders }
       : null),
   };
