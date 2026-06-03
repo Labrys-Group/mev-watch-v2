@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { formatPercent, formatRelativeTime } from "@/lib/format";
+import { formatPercent } from "@/lib/format";
 import type { DataFreshness } from "@/lib/data-freshness";
 
 interface StatusBarProps {
@@ -15,11 +15,20 @@ export function StatusBar({
   latestDate,
   censorshipPct,
   lastRefresh,
-  // Preserved in props for the data wrapper to pass; not rendered after the 37aefe1 revert.
-  freshness: _freshness,
+  freshness,
   connected = true,
 }: StatusBarProps) {
-  const updatedText = lastRefresh ? formatRelativeTime(lastRefresh) : "—";
+  const updatedText = lastRefresh
+    ? freshness.generatedAgeLabel ?? "Clock skew"
+    : "—";
+  const statusPill = connected || freshness.status === "empty"
+    ? getDailyStatusPill(freshness.status)
+    : {
+        label: "DISCONNECTED",
+        colorClassName: "text-warn",
+        dotClassName: "bg-warn",
+        glowColor: "var(--warn)",
+      };
 
   return (
     <div className="relative overflow-hidden bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
@@ -80,35 +89,19 @@ export function StatusBar({
 
         <StatusCell label="NETWORK" value="ETH MAINNET" mdOnly />
 
-        {connected ? (
-          <StatusCell
-            label="STATUS"
-            valueClassName="text-good flex items-center gap-1.5"
-            value={
-              <>
-                <span
-                  className="inline-block w-1.5 h-1.5 rounded-full bg-good mr-1 animate-pulse"
-                  style={{ boxShadow: "0 0 6px var(--good)" }}
-                />
-                LIVE
-              </>
-            }
-          />
-        ) : (
-          <StatusCell
-            label="STATUS"
-            valueClassName="text-warn flex items-center gap-1.5"
-            value={
-              <>
-                <span
-                  className="inline-block w-1.5 h-1.5 rounded-full bg-warn mr-1 animate-pulse"
-                  style={{ boxShadow: "0 0 6px var(--warn)" }}
-                />
-                DISCONNECTED
-              </>
-            }
-          />
-        )}
+        <StatusCell
+          label="STATUS"
+          valueClassName={`${statusPill.colorClassName} flex items-center gap-1.5`}
+          value={
+            <>
+              <span
+                className={`inline-block w-1.5 h-1.5 rounded-full ${statusPill.dotClassName} mr-1 animate-pulse`}
+                style={{ boxShadow: `0 0 6px ${statusPill.glowColor}` }}
+              />
+              {statusPill.label}
+            </>
+          }
+        />
 
         <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
 
@@ -122,6 +115,39 @@ export function StatusBar({
       </div>
     </div>
   );
+}
+
+function getDailyStatusPill(status: DataFreshness["status"]) {
+  switch (status) {
+    case "fresh":
+      return {
+        label: "DAILY FRESH",
+        colorClassName: "text-good",
+        dotClassName: "bg-good",
+        glowColor: "var(--good)",
+      };
+    case "stale":
+      return {
+        label: "DAILY STALE",
+        colorClassName: "text-warn",
+        dotClassName: "bg-warn",
+        glowColor: "var(--warn)",
+      };
+    case "lagging":
+      return {
+        label: "DAILY LAGGING",
+        colorClassName: "text-warn",
+        dotClassName: "bg-warn",
+        glowColor: "var(--warn)",
+      };
+    case "empty":
+      return {
+        label: "NO DATA",
+        colorClassName: "text-warn",
+        dotClassName: "bg-warn",
+        glowColor: "var(--warn)",
+      };
+  }
 }
 
 interface StatusCellProps {
