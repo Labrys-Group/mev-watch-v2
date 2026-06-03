@@ -26,8 +26,8 @@ const CAT_META: Record<
     text: "text-fg-muted",
   },
   unknown: {
-    label: "Relay Data Degraded",
-    bg: "bg-panel-alt",
+    label: "Relay Unknown / Non-MEV-Boost",
+    bg: "bg-non-boost",
     text: "text-fg-muted",
   },
 };
@@ -300,9 +300,7 @@ function SlotTile({
   const meta = pending ? null : CAT_META[cell.category as FilledCategory];
   const indexTextClass = pending
     ? "text-fg-muted"
-    : cell.category === "unknown"
-      ? "text-fg-muted"
-      : "text-[#0D0E16]";
+    : "text-[#0D0E16]";
 
   const className = pending
     ? `epoch-cell flex aspect-square items-center justify-center border ${

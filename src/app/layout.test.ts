@@ -31,6 +31,20 @@ afterEach(() => {
 });
 
 describe("root metadata", () => {
+  it("uses the public mevwatch.info URL as the canonical metadata host", async () => {
+    const { metadata } = await import("./layout");
+
+    expect(metadata.metadataBase?.toString()).toBe(
+      "https://www.mevwatch.info/",
+    );
+    expect(metadata.alternates?.canonical).toBe(
+      "https://www.mevwatch.info/",
+    );
+    expect(JSON.stringify(metadata.openGraph)).toContain(
+      "https://www.mevwatch.info",
+    );
+  });
+
   it("uses censoring language without mentioning OFAC", async () => {
     const { metadata } = await import("./layout");
     const serialized = JSON.stringify(metadata);
