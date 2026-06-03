@@ -54,7 +54,7 @@ export default async function StatusPage() {
     latestDate: latestStats?.date ?? null,
     generatedAt: snapshot?.ranAt ?? null,
   });
-  const isStale = freshness.status === "stale";
+  const freshnessVerdict = getFreshnessVerdict(freshness);
 
   return (
     <div className="min-h-screen">
@@ -70,8 +70,8 @@ export default async function StatusPage() {
           <p className="mt-4 max-w-2xl font-mono text-sm leading-relaxed text-fg-muted">
             MEV Watch serves a SQLite data artifact. A scheduled Vercel Cron
             job refreshes the artifact and publishes the latest copy to Vercel
-            Blob. Daily aggregate freshness is based on the latest source day,
-            not the time this artifact was generated.
+            Blob. Daily aggregate freshness is based on the latest source day
+            and the time this artifact was generated.
           </p>
         </Reveal>
 
@@ -92,12 +92,10 @@ export default async function StatusPage() {
                   </span>
                   <span
                     className={`font-mono text-xs uppercase tracking-[0.12em] ${
-                      isStale ? "text-warn" : "text-good"
+                      freshnessVerdict.isHealthy ? "text-good" : "text-warn"
                     }`}
                   >
-                    {isStale
-                      ? `Daily data stale (${freshness.sourceAgeDays}d old)`
-                      : "Daily data fresh"}
+                    {freshnessVerdict.label}
                   </span>
                 </div>
               ) : (
@@ -129,6 +127,30 @@ export default async function StatusPage() {
       <SiteFooter />
     </div>
   );
+}
+
+function getFreshnessVerdict(freshness: ReturnType<typeof getDataFreshness>): {
+  isHealthy: boolean;
+  label: string;
+} {
+  switch (freshness.status) {
+    case "fresh":
+      return { isHealthy: true, label: "Daily data fresh" };
+    case "stale":
+      return {
+        isHealthy: false,
+        label: `Daily data stale (${freshness.sourceAgeDays}d old)`,
+      };
+    case "lagging":
+      return {
+        isHealthy: false,
+        label: freshness.generatedAgeLabel
+          ? `Daily refresh lagging (${freshness.generatedAgeLabel})`
+          : "Daily refresh lagging",
+      };
+    case "empty":
+      return { isHealthy: false, label: "No daily snapshot available" };
+  }
 }
 
 function StatusRow({

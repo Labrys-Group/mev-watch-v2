@@ -23,34 +23,46 @@ describe("getDataFreshness", () => {
 
   it("classifies source days inside the threshold as fresh", () => {
     const freshness = getDataFreshness({
-      latestDate: "2026-05-23",
+      latestDate: "2026-05-25",
       generatedAt: new Date("2026-05-26T07:00:00Z"),
       now: NOW,
     });
 
-    expect(STALE_SOURCE_DAY_THRESHOLD_DAYS).toBe(3);
+    expect(STALE_SOURCE_DAY_THRESHOLD_DAYS).toBe(1);
     expect(freshness.status).toBe("fresh");
-    expect(freshness.sourceAgeDays).toBe(3);
-    expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-23");
+    expect(freshness.sourceAgeDays).toBe(1);
+    expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-25");
     expect(freshness.generatedAgeLabel).toBe("3h ago");
   });
 
   it("classifies source days older than the threshold as stale", () => {
     const freshness = getDataFreshness({
-      latestDate: "2026-05-22",
+      latestDate: "2026-05-24",
       generatedAt: new Date("2026-05-25T07:07:43.521Z"),
       now: NOW,
     });
 
     expect(freshness.status).toBe("stale");
-    expect(freshness.sourceAgeDays).toBe(4);
-    expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-22");
+    expect(freshness.sourceAgeDays).toBe(2);
+    expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-24");
+  });
+
+  it("classifies stale refresh runs as lagging even when the source day is current", () => {
+    const freshness = getDataFreshness({
+      latestDate: "2026-05-25",
+      generatedAt: new Date("2026-05-24T07:00:00Z"),
+      now: NOW,
+    });
+
+    expect(freshness.status).toBe("lagging");
+    expect(freshness.sourceAgeDays).toBe(1);
+    expect(freshness.generatedAgeLabel).toBe("2d ago");
   });
 
   it("uses complete UTC day boundaries for source age", () => {
     const freshness = getDataFreshness({
       latestDate: "2026-05-25",
-      generatedAt: null,
+      generatedAt: new Date("2026-05-25T23:00:00Z"),
       now: new Date("2026-05-26T00:01:00Z"),
     });
 

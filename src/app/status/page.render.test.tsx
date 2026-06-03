@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import StatusPage from "./page";
+import { getLastRefresh, getLatestStats } from "@/lib/queries";
 
 vi.mock("@/components/sections/site-header", () => ({
   SiteHeader: () => <header>Header</header>,
@@ -29,6 +30,9 @@ vi.mock("@/lib/queries", () => ({
   })),
 }));
 
+const getLastRefreshMock = vi.mocked(getLastRefresh);
+const getLatestStatsMock = vi.mocked(getLatestStats);
+
 describe("StatusPage", () => {
   afterEach(() => {
     vi.useRealTimers();
@@ -45,5 +49,27 @@ describe("StatusPage", () => {
     expect(
       screen.getByText(/freshness is based on the latest source day/i),
     ).toBeInTheDocument();
+  });
+
+  it("reports lagging when the refresh run is outside the tolerance", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T10:30:00Z"));
+    getLastRefreshMock.mockResolvedValueOnce({
+      ranAt: new Date("2026-05-24T07:00:00Z"),
+      status: "ok",
+      source: "src/data/mev-watch.sqlite",
+      message: "Data through 2026-05-25",
+    });
+    getLatestStatsMock.mockResolvedValueOnce({
+      date: "2026-05-25",
+      censorshipPct: 33.4,
+      neutralPct: 66.6,
+      nonBoostPct: 10,
+      totalBlocks: 11869,
+    });
+
+    render(await StatusPage());
+
+    expect(screen.getByText("Daily refresh lagging (2d ago)")).toBeInTheDocument();
   });
 });
