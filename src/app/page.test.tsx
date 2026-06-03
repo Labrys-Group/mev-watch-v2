@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import Home from "./page";
+import { FAQ_ITEMS } from "@/config/faq";
 
 vi.mock("@/components/sections/status-bar.data", () => ({
   StatusBarData: () => <div>Status bar</div>,
@@ -35,6 +36,31 @@ vi.mock("@/components/sections/site-footer", () => ({
 }));
 
 describe("Home", () => {
+  it("emits FAQ structured data where the FAQ content is visible", () => {
+    const { container } = render(<Home />);
+    const script = container.querySelector(
+      'script[type="application/ld+json"]',
+    );
+
+    expect(script).not.toBeNull();
+    const jsonLd = JSON.parse(script?.textContent ?? "{}");
+
+    expect(jsonLd).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "@id": "https://www.mevwatch.info/#faq",
+    });
+    expect(jsonLd.mainEntity).toHaveLength(FAQ_ITEMS.length);
+    expect(jsonLd.mainEntity[0]).toMatchObject({
+      "@type": "Question",
+      name: FAQ_ITEMS[0].q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: FAQ_ITEMS[0].a,
+      },
+    });
+  });
+
   it("renders visible section labels in increasing order", () => {
     render(<Home />);
 

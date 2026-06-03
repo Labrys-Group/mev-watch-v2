@@ -6,6 +6,17 @@ export const metadata: Metadata = {
   title: "Embed",
   description:
     "Live OFAC censorship rate for Ethereum MEV-boost blocks — embeddable metric card.",
+  alternates: {
+    canonical: "/embed",
+  },
+  robots: {
+    index: false,
+    follow: true,
+    googleBot: {
+      index: false,
+      follow: true,
+    },
+  },
 };
 
 export const revalidate = 3600;

@@ -11,6 +11,7 @@ import { CompositionData } from "@/components/sections/composition.data";
 import { TrendChartData } from "@/components/sections/trend-chart.data";
 import { LeaderboardData } from "@/components/sections/leaderboard.data";
 import { BuilderLeaderboardData } from "@/components/sections/builder-leaderboard.data";
+import { getFaqJsonLd } from "@/config/seo";
 
 import { StatusBarSkeleton } from "@/components/skeletons/status-bar.skeleton";
 import { HeroSkeleton } from "@/components/skeletons/hero.skeleton";
@@ -22,9 +23,15 @@ import { BuilderLeaderboardSkeleton } from "@/components/skeletons/builder-leade
 // Re-rendered hourly; the refresh job updates the underlying data.
 export const revalidate = 3600;
 
+const faqJsonLd = getFaqJsonLd();
+
 export default function Home() {
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Status bar + nav stay pinned together as you scroll */}
       <div className="sticky top-0 z-50">
         <Suspense fallback={<StatusBarSkeleton />}>

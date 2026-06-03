@@ -8,12 +8,41 @@ import { StatusBarSkeleton } from "@/components/skeletons/status-bar.skeleton";
 import { Reveal } from "@/components/reveal";
 import { Section } from "@/components/section";
 import { RELAYS } from "@/config/relays";
+import {
+  OPEN_GRAPH_IMAGE,
+  SITE_NAME,
+  TWITTER_HANDLE,
+  TWITTER_IMAGE,
+} from "@/config/seo";
 import type { CSSVars } from "@/lib/css";
 
+const METHODOLOGY_TITLE = "Methodology";
+const METHODOLOGY_DESCRIPTION =
+  "How MEV Watch measures OFAC censorship on Ethereum: data source, metric definition, relay classification, and known limitations.";
+
 export const metadata: Metadata = {
-  title: "Methodology | MEV Watch",
-  description:
-    "How MEV Watch measures OFAC censorship on Ethereum: data source, metric definition, relay classification, and known limitations.",
+  title: METHODOLOGY_TITLE,
+  description: METHODOLOGY_DESCRIPTION,
+  alternates: {
+    canonical: "/methodology",
+  },
+  openGraph: {
+    type: "article",
+    url: "/methodology",
+    siteName: SITE_NAME,
+    title: `${METHODOLOGY_TITLE} — MEV Watch`,
+    description: METHODOLOGY_DESCRIPTION,
+    locale: "en_US",
+    images: [OPEN_GRAPH_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
+    title: `${METHODOLOGY_TITLE} — MEV Watch`,
+    description: METHODOLOGY_DESCRIPTION,
+    images: [TWITTER_IMAGE],
+  },
 };
 
 interface Limitation {
