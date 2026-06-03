@@ -33,6 +33,7 @@ const previousSnapshot: LiveLedgerSnapshot = {
   headSlot: 96,
   fetchedAt: new Date((GENESIS_TIME + 96 * 12) * 1000).toISOString(),
   degradedRelays: [],
+  degradedSlotRanges: [],
   blocks: [
     {
       slot: 96,
@@ -65,12 +66,13 @@ describe("refreshLiveLedger", () => {
     expect(result.data.headSlot).toBe(previousSnapshot.headSlot);
   });
 
-  it("serves a fresh legacy degraded snapshot without inferring unknown slots", async () => {
-    const legacySnapshot: LiveLedgerSnapshot = {
+  it("serves a fresh previous snapshot with explicit empty degraded ranges", async () => {
+    const freshSnapshot: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 99,
       fetchedAt: new Date((GENESIS_TIME + 99 * 12) * 1000).toISOString(),
       degradedRelays: ["relay.ultrasound.money"],
+      degradedSlotRanges: [],
       blocks: [
         {
           slot: 96,
@@ -80,7 +82,7 @@ describe("refreshLiveLedger", () => {
         },
       ],
     };
-    const store = memoryStore(legacySnapshot);
+    const store = memoryStore(freshSnapshot);
     const fetchPayloads = vi.fn(async () => ({
       successfulRelays: ["boost-relay.flashbots.net"],
       degradedRelays: [],
@@ -89,14 +91,14 @@ describe("refreshLiveLedger", () => {
 
     const result = await refreshLiveLedger({
       store,
-      now: Date.parse(legacySnapshot.fetchedAt) + LIVE_LEDGER_REFRESH_INTERVAL_MS - 1,
+      now: Date.parse(freshSnapshot.fetchedAt) + LIVE_LEDGER_REFRESH_INTERVAL_MS - 1,
       fetchPayloads,
     });
 
     expect(fetchPayloads).not.toHaveBeenCalled();
     expect(result.wroteSnapshot).toBe(false);
     expect(store.written).toEqual([]);
-    expect(result.snapshot).toEqual(legacySnapshot);
+    expect(result.snapshot).toEqual(freshSnapshot);
     expect(result.data.epochs[0].slots).toContainEqual(
       expect.objectContaining({ slot: 97, category: "nonboost" }),
     );

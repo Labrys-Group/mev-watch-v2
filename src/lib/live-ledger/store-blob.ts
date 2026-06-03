@@ -2,7 +2,6 @@ import { del, get, list, put } from "@vercel/blob";
 
 import {
   isTimestampedSnapshotName,
-  LATEST_SNAPSHOT_NAME,
   parseTimestampedSnapshotName,
   SNAPSHOT_RETENTION_COUNT,
   sortNewestFirst,
@@ -27,7 +26,6 @@ export function createBlobSnapshotStore(
   opts: BlobSnapshotStoreOptions = {},
 ): SnapshotStore {
   const prefix = ensureTrailingSlash(opts.prefix ?? DEFAULT_BLOB_PREFIX);
-  const legacyLatestPathname = `${prefix}${LATEST_SNAPSHOT_NAME}`;
   const getBlob = opts.getBlob ?? get;
   const putBlob = opts.putBlob ?? put;
   const listBlob = opts.listBlob ?? list;
@@ -112,9 +110,7 @@ export function createBlobSnapshotStore(
 
   return {
     async readLatestSnapshot() {
-      const latest = await readNewestTimestampedSnapshot();
-      if (latest) return latest;
-      return readSnapshot(legacyLatestPathname);
+      return readNewestTimestampedSnapshot();
     },
     async writeSnapshot(snapshot) {
       const name = timestampedSnapshotName(snapshot);

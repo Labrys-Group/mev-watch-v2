@@ -37,7 +37,7 @@ export interface LiveLedgerSnapshot {
   headSlot: number;
   fetchedAt: string;
   degradedRelays: string[];
-  degradedSlotRanges?: DegradedSlotRange[];
+  degradedSlotRanges: DegradedSlotRange[];
   blocks: StoredRecentBlock[];
 }
 
@@ -90,6 +90,6 @@ export const LiveLedgerSnapshotSchema = z.object({
   headSlot: z.number().int().nonnegative(),
   fetchedAt: z.string(),
   degradedRelays: z.array(z.string()),
-  degradedSlotRanges: z.array(DegradedSlotRangeSchema).optional(),
+  degradedSlotRanges: z.array(DegradedSlotRangeSchema),
   blocks: z.array(StoredRecentBlockSchema),
 });

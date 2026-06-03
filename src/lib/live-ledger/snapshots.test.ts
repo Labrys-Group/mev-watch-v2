@@ -96,6 +96,7 @@ describe("live ledger snapshots", () => {
       headSlot: 99,
       fetchedAt: "2026-05-26T00:00:00.000Z",
       degradedRelays: [],
+      degradedSlotRanges: [],
       blocks: [
         {
           slot: 96,
@@ -171,25 +172,25 @@ describe("live ledger snapshots", () => {
     });
   });
 
-  it("preserves missing degraded ranges when parsing legacy degraded snapshots", () => {
-    const snapshot = parseLiveLedgerSnapshot({
-      schemaVersion: 1,
-      headSlot: 99,
-      fetchedAt: "2026-05-26T00:00:00.000Z",
-      degradedRelays: ["relay.ultrasound.money"],
-      blocks: [],
-    });
-
-    expect("degradedSlotRanges" in snapshot).toBe(false);
-    expect(snapshot.degradedSlotRanges).toBeUndefined();
+  it("rejects snapshots without explicit degraded ranges", () => {
+    expect(() =>
+      parseLiveLedgerSnapshot({
+        schemaVersion: 1,
+        headSlot: 99,
+        fetchedAt: "2026-05-26T00:00:00.000Z",
+        degradedRelays: ["relay.ultrasound.money"],
+        blocks: [],
+      }),
+    ).toThrow();
   });
 
-  it("treats missing past slots in legacy degraded snapshots as unverifiable", () => {
+  it("treats missing past slots outside degraded ranges as nonboost", () => {
     const snapshot: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 99,
       fetchedAt: "2026-05-26T00:00:00.000Z",
       degradedRelays: ["relay.ultrasound.money"],
+      degradedSlotRanges: [],
       blocks: [
         {
           slot: 96,
@@ -216,12 +217,13 @@ describe("live ledger snapshots", () => {
     });
   });
 
-  it("does not infer legacy degraded gaps before later delivered blocks", () => {
+  it("does not mark gaps before later delivered blocks without explicit ranges", () => {
     const snapshot: LiveLedgerSnapshot = {
       schemaVersion: 1,
       headSlot: 101,
       fetchedAt: "2026-05-26T00:00:00.000Z",
       degradedRelays: ["relay.ultrasound.money"],
+      degradedSlotRanges: [{ firstSlot: 101, lastSlot: 101 }],
       blocks: [
         {
           slot: 96,
@@ -253,7 +255,7 @@ describe("live ledger snapshots", () => {
       expect.objectContaining({ slot: 100, category: "censoring" }),
     );
     expect(ledger.epochs[0].slots).toContainEqual(
-      expect.objectContaining({ slot: 101, category: "nonboost" }),
+      expect.objectContaining({ slot: 101, category: "unknown" }),
     );
   });
 
@@ -263,6 +265,7 @@ describe("live ledger snapshots", () => {
       headSlot: 96,
       fetchedAt: "2026-05-26T00:00:00.000Z",
       degradedRelays: [],
+      degradedSlotRanges: [],
       blocks: [
         {
           slot: 96,
@@ -281,13 +284,9 @@ describe("live ledger snapshots", () => {
     });
     const ledger = ledgerFromSnapshot(snapshot);
 
-    expect(
-      (
-        snapshot as LiveLedgerSnapshot & {
-          degradedSlotRanges?: Array<{ firstSlot: number; lastSlot: number }>;
-        }
-      ).degradedSlotRanges,
-    ).toEqual([{ firstSlot: 97, lastSlot: 101 }]);
+    expect(snapshot.degradedSlotRanges).toEqual([
+      { firstSlot: 97, lastSlot: 101 },
+    ]);
     expect(ledger.epochs[1].slots[31]).toMatchObject({
       slot: 95,
       category: "nonboost",
@@ -323,77 +322,9 @@ describe("live ledger snapshots", () => {
       now: (GENESIS_TIME + 305 * 12) * 1000,
     });
 
-    expect(
-      (
-        snapshot as LiveLedgerSnapshot & {
-          degradedSlotRanges?: Array<{ firstSlot: number; lastSlot: number }>;
-        }
-      ).degradedSlotRanges,
-    ).toEqual([
+    expect(snapshot.degradedSlotRanges).toEqual([
       { firstSlot: 250, lastSlot: 260 },
       { firstSlot: 295, lastSlot: 305 },
-    ]);
-  });
-
-  it("does not carry inferred legacy degraded gaps when building snapshots", () => {
-    const previous: LiveLedgerSnapshot = {
-      schemaVersion: 1,
-      headSlot: 101,
-      fetchedAt: "2026-05-26T00:00:00.000Z",
-      degradedRelays: ["relay.ultrasound.money"],
-      blocks: [
-        {
-          slot: 96,
-          blockNumber: 1,
-          blockHash: "0x96",
-          relays: ["boost-relay.flashbots.net"],
-        },
-        {
-          slot: 100,
-          blockNumber: 2,
-          blockHash: "0x100",
-          relays: ["boost-relay.flashbots.net"],
-        },
-      ],
-    };
-
-    const snapshot = buildSnapshot({
-      previous,
-      incoming: [],
-      degradedRelays: ["relay.ultrasound.money"],
-      now: (GENESIS_TIME + 105 * 12) * 1000,
-    });
-
-    expect(snapshot.degradedSlotRanges).toEqual([
-      { firstSlot: 102, lastSlot: 105 },
-    ]);
-  });
-
-  it("does not carry a legacy degraded tail when building snapshots", () => {
-    const previous: LiveLedgerSnapshot = {
-      schemaVersion: 1,
-      headSlot: 299,
-      fetchedAt: "2026-05-26T00:00:00.000Z",
-      degradedRelays: ["relay.ultrasound.money"],
-      blocks: [
-        {
-          slot: 296,
-          blockNumber: 1,
-          blockHash: "0x296",
-          relays: ["relay.ultrasound.money"],
-        },
-      ],
-    };
-
-    const snapshot = buildSnapshot({
-      previous,
-      incoming: [],
-      degradedRelays: ["relay.ultrasound.money"],
-      now: (GENESIS_TIME + 305 * 12) * 1000,
-    });
-
-    expect(snapshot.degradedSlotRanges).toEqual([
-      { firstSlot: 300, lastSlot: 305 },
     ]);
   });
 });
