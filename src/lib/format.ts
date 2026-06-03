@@ -10,7 +10,7 @@ export function formatPercent(value: number, fractionDigits = 1): string {
 
 /** Human-readable "N{unit} ago" from a past date. `now` is injectable for testing. */
 export function formatRelativeTime(then: Date, now: Date = new Date()): string {
-  const secs = Math.floor((now.getTime() - then.getTime()) / 1000);
+  const secs = Math.max(0, Math.floor((now.getTime() - then.getTime()) / 1000));
   if (secs < 60) return `${secs}s ago`;
   const mins = Math.floor(secs / 60);
   if (mins < 60) return `${mins}m ago`;
