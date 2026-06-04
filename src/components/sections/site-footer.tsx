@@ -110,7 +110,7 @@ const SITE_LINKS: ReadonlyArray<FooterLink> = [
 const CONNECT_LINKS: ReadonlyArray<FooterLink> = [
   {
     label: "GitHub",
-    href: "https://github.com/joshroyLabrys/mev-watch-v2",
+    href: "https://github.com/Labrys-Group/mev-watch-v2",
     external: true,
     Icon: GithubMark,
   },

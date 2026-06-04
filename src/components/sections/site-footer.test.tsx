@@ -9,7 +9,7 @@ describe("SiteFooter", () => {
 
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
       "href",
-      "https://github.com/joshroyLabrys/mev-watch-v2",
+      "https://github.com/Labrys-Group/mev-watch-v2",
     );
     expect(screen.getByRole("link", { name: "X (Twitter)" })).toHaveAttribute(
       "href",
