@@ -51,11 +51,11 @@ describe("StatusPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("reports lagging when the refresh run is outside the tolerance", async () => {
+  it("reports lagging when the source day is between one and one-and-a-half UTC days old", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-05-26T10:30:00Z"));
     getLastRefreshMock.mockResolvedValueOnce({
-      ranAt: new Date("2026-05-24T07:00:00Z"),
+      ranAt: new Date("2026-05-26T09:00:00Z"),
       status: "ok",
       source: "src/data/mev-watch.sqlite",
       message: "Data through 2026-05-25",
@@ -70,7 +70,7 @@ describe("StatusPage", () => {
 
     render(await StatusPage());
 
-    expect(screen.getByText("Daily refresh lagging (2d ago)")).toBeInTheDocument();
+    expect(screen.getByText("Daily data lagging (1.4d old)")).toBeInTheDocument();
   });
 
   it("reports clock skew for future generated metadata", async () => {
@@ -92,7 +92,7 @@ describe("StatusPage", () => {
 
     render(await StatusPage());
 
-    expect(screen.getByText("Daily refresh lagging")).toBeInTheDocument();
+    expect(screen.getByText("Daily data lagging (1.4d old)")).toBeInTheDocument();
     expect(screen.getByText("Clock skew detected")).toBeInTheDocument();
     expect(screen.queryByText("0s ago")).not.toBeInTheDocument();
   });

@@ -20,7 +20,7 @@ describe("StatusBar", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders ON SCHEDULE from the freshness verdict and labels the UTC source day", () => {
+  it("renders DAILY FRESH from the freshness verdict and labels the UTC source day", () => {
     render(
       <StatusBar
         latestDate="2023-10-24"
@@ -29,12 +29,12 @@ describe("StatusBar", () => {
       />,
     );
 
-    expect(screen.getByText("ON SCHEDULE")).toBeInTheDocument();
+    expect(screen.getByText("DAILY FRESH")).toBeInTheDocument();
     expect(screen.getByText("SOURCE DAY (UTC)")).toBeInTheDocument();
     expect(screen.getByText("2023-10-24")).toBeInTheDocument();
     expect(screen.getByText("33.4%")).toBeInTheDocument();
     expect(screen.queryByText(/DAILY STALE/i)).not.toBeInTheDocument();
-    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+    expect(screen.queryByText("ON SCHEDULE")).not.toBeInTheDocument();
   });
 
   it("computes the updated age from the raw refresh timestamp at view time", () => {
@@ -119,7 +119,7 @@ describe("StatusBar", () => {
     const status = screen.getByText("DAILY STALE");
     expect(status).toBeInTheDocument();
     expect(status).toHaveClass("text-warn");
-    expect(screen.queryByText("ON SCHEDULE")).not.toBeInTheDocument();
+    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
   });
 
   it("renders NO DATA for empty freshness even when disconnected", () => {
@@ -155,7 +155,7 @@ describe("StatusBar", () => {
     );
 
     expect(screen.getByText("DISCONNECTED")).toBeInTheDocument();
-    expect(screen.queryByText("ON SCHEDULE")).not.toBeInTheDocument();
+    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
   });
 
   it("reports clock skew instead of treating future refresh metadata as current", () => {
