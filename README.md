@@ -1,6 +1,6 @@
 # MEV Watch
 
-A public transparency tool tracking OFAC censorship of Ethereum MEV-boost
+An MIT-licensed public good tracking OFAC censorship of Ethereum MEV-boost
 blocks.
 
 Live at **[mevwatch.info](https://mevwatch.info)**.
@@ -11,6 +11,9 @@ through OFAC-censoring relays. Relay posture metadata lives in
 `src/data/mev-watch.sqlite` and ignored by Git. Production reads the latest copy
 from Vercel Blob.
 
+MEV Watch is maintained by [Labrys](https://labrys.io) as public-good
+infrastructure.
+
 ## Stack
 
 Next.js 16 App Router · React 19 · Tailwind v4 + shadcn/ui · Node SQLite data
@@ -19,7 +22,8 @@ deployed on Vercel.
 
 ## Quick Start
 
-Requires Node 24+ and pnpm.
+Requires Node 24+ and pnpm. Start from `.env.example` for optional local and
+production variables.
 
 ```bash
 pnpm install
@@ -29,17 +33,18 @@ pnpm dev                     # http://localhost:3000
 
 ## Common Commands
 
-| Command | What it does |
-|---|---|
-| `pnpm dev` | start the dev server |
-| `pnpm build` | production build |
-| `pnpm lint` | ESLint |
-| `pnpm test` | Vitest unit tests |
-| `pnpm test:watch` | Vitest in watch mode |
-| `pnpm test:e2e` | Playwright e2e tests; auto-starts the dev server |
-| `pnpm update-data` | fetch missing complete UTC days and rewrite the local SQLite artifact |
+| Command                      | What it does                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| `pnpm dev`                   | start the dev server                                                           |
+| `pnpm build`                 | production build                                                               |
+| `pnpm lint`                  | ESLint                                                                         |
+| `pnpm test`                  | Vitest unit tests                                                              |
+| `pnpm test:watch`            | Vitest in watch mode                                                           |
+| `pnpm test:e2e`              | Playwright e2e tests; auto-starts the dev server                               |
+| `pnpm update-data`           | fetch missing complete UTC days and rewrite the local SQLite artifact          |
 | `pnpm update-data --dry-run` | validate the snapshot and print the missing date range without network fetches |
-| `pnpm backfill-and-upload` | create a resumable backfill copy under `data/` and upload it to Vercel Blob |
+| `pnpm backfill-and-upload`   | create a resumable backfill copy under `data/` and upload it to Vercel Blob    |
+| `pnpm capture-preview`       | capture the homepage preview image to `public/preview.png`                     |
 
 ## App Surfaces
 
@@ -81,15 +86,32 @@ pnpm dev                     # http://localhost:3000
   hours at `00:45 UTC` and `12:45 UTC`; `/api/cron/live-ledger-cleanup` runs
   hourly.
 
+## Environment
+
+Start with `.env.example`. Important production variables:
+
+- `BLOB_READ_WRITE_TOKEN` — enables Vercel Blob-backed artifact reads and
+  writes.
+- `CRON_SECRET` — authorizes the Vercel Cron routes.
+- `ETH_RPC_URL` — optional Ethereum JSON-RPC endpoint for daily block counts;
+  public fallbacks are used when unset.
+- `MEV_WATCH_BLOB_PATH` and `MEV_WATCH_LIVE_BLOB_PREFIX` — optional Blob path
+  overrides for the daily artifact and live-ledger snapshots.
+- `NEXT_PUBLIC_GTM_ID` — optional Google Tag Manager container ID. GA4 and any
+  other tags should be configured inside GTM.
+
+Vercel Analytics and Speed Insights are wired in `src/app/layout.tsx` and do
+not require environment variables.
+
 ## Docs
 
 - Production deploy + ops: `docs/DEPLOYMENT.md`
 - Working-with-the-codebase guide for AI tools: `CLAUDE.md`
 - Methodology source: `src/app/methodology/page.tsx`
-- Historical design records: `docs/superpowers/specs/`
-- Historical implementation plans: `docs/superpowers/plans/`
+- Environment template: `.env.example`
 
 ## License
 
-UNLICENSED — public-good transparency tool by [Labrys](https://labrys.io);
-contributions welcome via issue or PR.
+MIT License — MEV Watch is published as a public good by
+[Labrys](https://labrys.io) so the community can use, inspect, modify, and
+redistribute it. See [LICENSE.md](LICENSE.md) for the full license terms.
