@@ -142,7 +142,7 @@ function getDailyStatusPill(status: DataFreshness["status"]) {
   switch (status) {
     case "fresh":
       return {
-        label: "DAILY FRESH",
+        label: "ON SCHEDULE",
         colorClassName: "text-good",
         dotClassName: "bg-good",
         glowColor: "var(--good)",

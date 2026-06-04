@@ -152,32 +152,18 @@ function getFreshnessVerdict(freshness: ReturnType<typeof getDataFreshness>): {
     case "stale":
       return {
         isHealthy: false,
-        label: `Daily data stale (${
-          formatSourceAgeDays(freshness.sourceAgeDays)
-        } old)`,
+        label: `Daily data stale (${freshness.sourceAgeDays}d old)`,
       };
     case "lagging":
       return {
         isHealthy: false,
-        label: `Daily data lagging (${
-          formatSourceAgeDays(freshness.sourceAgeDays)
-        } old)`,
+        label: freshness.generatedAgeLabel
+          ? `Daily refresh lagging (${freshness.generatedAgeLabel})`
+          : "Daily refresh lagging",
       };
     case "empty":
       return { isHealthy: false, label: "No daily snapshot available" };
   }
-}
-
-function formatSourceAgeDays(sourceAgeDays: number | null): string {
-  if (sourceAgeDays === null) {
-    return "unknown";
-  }
-
-  const displayDays =
-    sourceAgeDays >= 10
-      ? Math.floor(sourceAgeDays)
-      : Math.round(sourceAgeDays * 10) / 10;
-  return `${displayDays}d`;
 }
 
 function StatusRow({
