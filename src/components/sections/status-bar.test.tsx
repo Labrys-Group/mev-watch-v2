@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { DataFreshness } from "@/lib/data-freshness";
 import { StatusBar } from "./status-bar";
+import { UpdatedAge } from "./status-bar-live-values";
 
 const freshness: DataFreshness = {
   status: "fresh",
@@ -16,6 +17,7 @@ const freshness: DataFreshness = {
 describe("StatusBar", () => {
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it("renders ON SCHEDULE from the freshness verdict and labels the UTC source day", () => {
@@ -54,6 +56,64 @@ describe("StatusBar", () => {
 
     expect(screen.getByText("20h ago")).toBeInTheDocument();
     expect(screen.queryByText("3h ago")).not.toBeInTheDocument();
+  });
+
+  it("falls back when refresh metadata is an invalid date", () => {
+    render(
+      <StatusBar
+        latestDate="2026-05-25"
+        censorshipPct={33.4}
+        lastRefresh={new Date("bad timestamp")}
+        freshness={{
+          ...freshness,
+          status: "lagging",
+          sourceDate: "2026-05-25",
+          sourceAgeDays: 1,
+          generatedAt: new Date("bad timestamp"),
+          generatedAgeLabel: null,
+          sourceLabel: "Daily snapshot through 2026-05-25",
+        }}
+      />,
+    );
+
+    expect(screen.getByText("—")).toBeInTheDocument();
+  });
+
+  it("refreshes the updated age immediately after mounting", () => {
+    const RealDate = Date;
+    let currentTimeCalls = 0;
+
+    class MockDate extends RealDate {
+      constructor(value?: string | number | Date) {
+        if (arguments.length === 0) {
+          currentTimeCalls += 1;
+          super(
+            currentTimeCalls === 1
+              ? "2026-05-26T03:00:00Z"
+              : "2026-05-26T04:00:00Z",
+          );
+          return;
+        }
+
+        super(value);
+      }
+
+      static now() {
+        return new MockDate().getTime();
+      }
+    }
+
+    vi.stubGlobal("Date", MockDate);
+
+    render(
+      <UpdatedAge
+        generatedAt="2026-05-25T07:00:00Z"
+        fallback="fallback"
+      />,
+    );
+
+    expect(screen.getByText("21h ago")).toBeInTheDocument();
+    expect(screen.queryByText("20h ago")).not.toBeInTheDocument();
   });
 
   it("renders DAILY STALE with warning treatment when the source day is stale", () => {

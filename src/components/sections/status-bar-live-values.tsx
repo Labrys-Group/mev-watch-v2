@@ -12,6 +12,8 @@ export function UpdatedAge({ generatedAt, fallback }: UpdatedAgeProps) {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
+    setNow(new Date());
+
     const id = window.setInterval(() => {
       setNow(new Date());
     }, 60 * 1000);
