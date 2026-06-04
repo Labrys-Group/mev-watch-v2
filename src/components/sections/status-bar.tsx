@@ -19,23 +19,23 @@ export function StatusBar({
   freshness,
   connected = true,
 }: StatusBarProps) {
-  const validLastRefresh = lastRefresh && !Number.isNaN(lastRefresh.getTime())
-    ? lastRefresh
-    : null;
+  const validLastRefresh =
+    lastRefresh && !Number.isNaN(lastRefresh.getTime()) ? lastRefresh : null;
   const updatedFallback = validLastRefresh
-    ? freshness.generatedAgeLabel ?? "Clock skew"
+    ? (freshness.generatedAgeLabel ?? "Clock skew")
     : "—";
   const lastRefreshIso = validLastRefresh
     ? validLastRefresh.toISOString()
     : null;
-  const statusPill = connected || freshness.status === "empty"
-    ? getDailyStatusPill(freshness.status)
-    : {
-        label: "DISCONNECTED",
-        colorClassName: "text-warn",
-        dotClassName: "bg-warn",
-        glowColor: "var(--warn)",
-      };
+  const statusPill =
+    connected || freshness.status === "empty"
+      ? getDailyStatusPill(freshness.status)
+      : {
+          label: "DISCONNECTED",
+          colorClassName: "text-warn",
+          dotClassName: "bg-warn",
+          glowColor: "var(--warn)",
+        };
 
   return (
     <div className="relative overflow-hidden bg-panel-alt border-b border-border-labrys font-mono text-fg-muted">
@@ -110,11 +110,7 @@ export function StatusBar({
           }
         />
 
-        <StatusCell
-          label="SOURCE DAY (UTC)"
-          value={latestDate}
-          mdOnly
-        />
+        <StatusCell label="SOURCE DAY (UTC)" value={latestDate} mdOnly />
 
         <StatusCell
           label="CENSORSHIP"
@@ -142,7 +138,7 @@ function getDailyStatusPill(status: DataFreshness["status"]) {
   switch (status) {
     case "fresh":
       return {
-        label: "ON SCHEDULE",
+        label: "DAILY FRESH",
         colorClassName: "text-good",
         dotClassName: "bg-good",
         glowColor: "var(--good)",
@@ -184,7 +180,13 @@ interface StatusCellProps {
   mdOnly?: boolean;
 }
 
-function StatusCell({ label, value, valueClassName, isLast, mdOnly }: StatusCellProps) {
+function StatusCell({
+  label,
+  value,
+  valueClassName,
+  isLast,
+  mdOnly,
+}: StatusCellProps) {
   const visibility = mdOnly ? "hidden md:flex" : "flex";
   const divider = isLast ? "" : " border-r border-border-labrys";
   return (
