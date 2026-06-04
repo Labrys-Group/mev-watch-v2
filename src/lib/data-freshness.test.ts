@@ -37,6 +37,17 @@ describe("getDataFreshness", () => {
     expect(freshness.generatedAgeLabel).toBe("16h ago");
   });
 
+  it("classifies the expected source day as stale at the stale threshold", () => {
+    const freshness = getDataFreshness({
+      latestDate: "2026-05-25",
+      generatedAt: new Date("2026-05-26T09:00:00Z"),
+      now: new Date("2026-05-26T12:00:00Z"),
+    });
+
+    expect(freshness.status).toBe("stale");
+    expect(freshness.sourceAgeDays).toBe(1.5);
+  });
+
   it("classifies a missing expected source day as stale after the lag window", () => {
     const freshness = getDataFreshness({
       latestDate: "2026-05-24",
@@ -49,16 +60,16 @@ describe("getDataFreshness", () => {
     expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-24");
   });
 
-  it("classifies a missing expected source day as lagging during the lag window", () => {
+  it("classifies old source data as stale even during the lag window", () => {
     const freshness = getDataFreshness({
       latestDate: "2026-05-24",
       generatedAt: new Date("2026-05-26T09:00:00Z"),
-      now: NOW,
+      now: new Date("2026-05-26T00:01:00Z"),
     });
 
-    expect(freshness.status).toBe("lagging");
-    expect(freshness.sourceAgeDays).toBe(2.4375);
-    expect(freshness.generatedAgeLabel).toBe("1h ago");
+    expect(freshness.status).toBe("stale");
+    expect(freshness.sourceAgeDays).toBeCloseTo(2.0006944444);
+    expect(freshness.generatedAgeLabel).toBeNull();
   });
 
   it("keeps status source-date based when refresh metadata is stale", () => {

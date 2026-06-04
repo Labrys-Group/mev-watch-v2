@@ -61,7 +61,9 @@ export function getDataFreshness({
     (expectedSourceDay - parseSourceDay(latestDate)) / MS_PER_DAY;
   const expectedSourceAgeDays = (now.getTime() - expectedSourceDay) / MS_PER_DAY;
   const status =
-    sourceLagDays <= 0
+    sourceAgeDays >= STALE_SOURCE_DAY_THRESHOLD_DAYS
+      ? "stale"
+      : sourceLagDays <= 0
       ? "fresh"
       : sourceLagDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS &&
           expectedSourceAgeDays < STALE_SOURCE_DAY_THRESHOLD_DAYS

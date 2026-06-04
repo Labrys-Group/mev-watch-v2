@@ -51,7 +51,7 @@ describe("StatusPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("reports lagging when the expected source day is missing inside the lag window", async () => {
+  it("reports stale when the expected source day is older than the stale threshold", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-05-26T10:30:00Z"));
     getLastRefreshMock.mockResolvedValueOnce({
@@ -70,7 +70,7 @@ describe("StatusPage", () => {
 
     render(await StatusPage());
 
-    expect(screen.getByText("Daily data lagging (2.4d old)")).toBeInTheDocument();
+    expect(screen.getByText("Daily data stale (2.4d old)")).toBeInTheDocument();
   });
 
   it("reports clock skew for future generated metadata", async () => {
