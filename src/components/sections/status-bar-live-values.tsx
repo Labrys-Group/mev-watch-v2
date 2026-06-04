@@ -12,13 +12,16 @@ export function UpdatedAge({ generatedAt, fallback }: UpdatedAgeProps) {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    setNow(new Date());
-
-    const id = window.setInterval(() => {
+    const updateNow = () => {
       setNow(new Date());
-    }, 60 * 1000);
+    };
+    const timeoutId = window.setTimeout(updateNow, 0);
+    const intervalId = window.setInterval(updateNow, 60 * 1000);
 
-    return () => window.clearInterval(id);
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   const value = getUpdatedAgeLabel(generatedAt, now, fallback);

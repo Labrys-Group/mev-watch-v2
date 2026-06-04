@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { DataFreshness } from "@/lib/data-freshness";
@@ -80,30 +80,8 @@ describe("StatusBar", () => {
   });
 
   it("refreshes the updated age immediately after mounting", () => {
-    const RealDate = Date;
-    let currentTimeCalls = 0;
-
-    class MockDate extends RealDate {
-      constructor(value?: string | number | Date) {
-        if (arguments.length === 0) {
-          currentTimeCalls += 1;
-          super(
-            currentTimeCalls === 1
-              ? "2026-05-26T03:00:00Z"
-              : "2026-05-26T04:00:00Z",
-          );
-          return;
-        }
-
-        super(value);
-      }
-
-      static now() {
-        return new MockDate().getTime();
-      }
-    }
-
-    vi.stubGlobal("Date", MockDate);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T03:00:00Z"));
 
     render(
       <UpdatedAge
@@ -111,6 +89,13 @@ describe("StatusBar", () => {
         fallback="fallback"
       />,
     );
+
+    expect(screen.getByText("20h ago")).toBeInTheDocument();
+
+    vi.setSystemTime(new Date("2026-05-26T04:00:00Z"));
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
 
     expect(screen.getByText("21h ago")).toBeInTheDocument();
     expect(screen.queryByText("20h ago")).not.toBeInTheDocument();

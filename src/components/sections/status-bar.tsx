@@ -19,14 +19,14 @@ export function StatusBar({
   freshness,
   connected = true,
 }: StatusBarProps) {
-  const hasValidLastRefresh = lastRefresh
-    ? !Number.isNaN(lastRefresh.getTime())
-    : false;
-  const updatedFallback = hasValidLastRefresh
+  const validLastRefresh = lastRefresh && !Number.isNaN(lastRefresh.getTime())
+    ? lastRefresh
+    : null;
+  const updatedFallback = validLastRefresh
     ? freshness.generatedAgeLabel ?? "Clock skew"
     : "—";
-  const lastRefreshIso = hasValidLastRefresh
-    ? lastRefresh.toISOString()
+  const lastRefreshIso = validLastRefresh
+    ? validLastRefresh.toISOString()
     : null;
   const statusPill = connected || freshness.status === "empty"
     ? getDailyStatusPill(freshness.status)
