@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { formatPercent } from "@/lib/format";
 import type { DataFreshness } from "@/lib/data-freshness";
-import { SourceDay, UpdatedAge } from "./status-bar-live-values";
+import { UpdatedAge } from "./status-bar-live-values";
 
 interface StatusBarProps {
   latestDate: string;
@@ -106,8 +106,8 @@ export function StatusBar({
         />
 
         <StatusCell
-          label="SOURCE DAY"
-          value={<SourceDay value={latestDate} />}
+          label="SOURCE DAY (UTC)"
+          value={latestDate}
           mdOnly
         />
 

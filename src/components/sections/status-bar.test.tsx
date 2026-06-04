@@ -18,7 +18,7 @@ describe("StatusBar", () => {
     vi.useRealTimers();
   });
 
-  it("renders ON SCHEDULE from the freshness verdict and localizes the source day", () => {
+  it("renders ON SCHEDULE from the freshness verdict and labels the UTC source day", () => {
     render(
       <StatusBar
         latestDate="2023-10-24"
@@ -27,16 +27,9 @@ describe("StatusBar", () => {
       />,
     );
 
-    const localizedSourceDay = new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeZone: "UTC",
-    }).format(new Date("2023-10-24T00:00:00Z"));
-
     expect(screen.getByText("ON SCHEDULE")).toBeInTheDocument();
-    expect(screen.getByText("SOURCE DAY")).toBeInTheDocument();
-    expect(screen.getByText(localizedSourceDay)).toBeInTheDocument();
-    expect(screen.queryByText("SOURCE DAY (UTC)")).not.toBeInTheDocument();
-    expect(screen.queryByText("2023-10-24")).not.toBeInTheDocument();
+    expect(screen.getByText("SOURCE DAY (UTC)")).toBeInTheDocument();
+    expect(screen.getByText("2023-10-24")).toBeInTheDocument();
     expect(screen.getByText("33.4%")).toBeInTheDocument();
     expect(screen.queryByText(/DAILY STALE/i)).not.toBeInTheDocument();
     expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();

@@ -24,14 +24,6 @@ export function UpdatedAge({ generatedAt, fallback }: UpdatedAgeProps) {
   return <span suppressHydrationWarning>{value}</span>;
 }
 
-interface SourceDayProps {
-  value: string;
-}
-
-export function SourceDay({ value }: SourceDayProps) {
-  return <span suppressHydrationWarning>{formatSourceDay(value)}</span>;
-}
-
 function getUpdatedAgeLabel(
   generatedAt: string | null,
   now: Date,
@@ -44,16 +36,4 @@ function getUpdatedAgeLabel(
   if (generatedAtDate.getTime() > now.getTime()) return "Clock skew";
 
   return formatRelativeTime(generatedAtDate, now);
-}
-
-function formatSourceDay(value: string): string {
-  if (value === "—") return value;
-
-  const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeZone: "UTC",
-  }).format(date);
 }
