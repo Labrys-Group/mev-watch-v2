@@ -1,5 +1,6 @@
 import packageJson from "../../package.json";
 import nextConfig from "../../next.config";
+import vercelConfig from "../../vercel.json";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -17,6 +18,13 @@ describe("production build path", () => {
 
   it("does not override Vercel's build command with data generation", () => {
     expect(packageJson.scripts["vercel-build"]).toBeUndefined();
+  });
+
+  it("runs the daily data cron shortly after relayscan's UTC day closes", () => {
+    expect(vercelConfig.crons).toContainEqual({
+      path: "/api/cron/update-data",
+      schedule: "45 0 * * *",
+    });
   });
 
   it("bootstraps the local SQLite artifact before build and test commands", () => {

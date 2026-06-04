@@ -79,7 +79,7 @@ Two paths feed the UI:
 - `/api/cron/update-data` — secret-protected daily artifact refresh
 - `/api/cron/live-ledger-cleanup` — secret-protected cleanup for old live-ledger snapshots
 
-`vercel.json` schedules `/api/cron/update-data` daily at `03:30 UTC` and
+`vercel.json` schedules `/api/cron/update-data` daily at `00:45 UTC` and
 `/api/cron/live-ledger-cleanup` hourly.
 
 ## Environment

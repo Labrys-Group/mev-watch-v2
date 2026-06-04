@@ -78,7 +78,7 @@ pnpm dev                     # http://localhost:3000
   `/proposer_payload_delivered` endpoints and stores rolling snapshots locally
   under `data/live-ledger/` or in Blob under `MEV_WATCH_LIVE_BLOB_PREFIX`.
 - **Cron routes** — `vercel.json` schedules `/api/cron/update-data` daily at
-  `03:30 UTC` and `/api/cron/live-ledger-cleanup` hourly.
+  `00:45 UTC` and `/api/cron/live-ledger-cleanup` hourly.
 
 ## Docs
 
