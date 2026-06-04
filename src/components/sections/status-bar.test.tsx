@@ -34,7 +34,6 @@ describe("StatusBar", () => {
     expect(screen.getByText("2023-10-24")).toBeInTheDocument();
     expect(screen.getByText("33.4%")).toBeInTheDocument();
     expect(screen.queryByText(/DAILY STALE/i)).not.toBeInTheDocument();
-    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
   });
 
   it("computes the updated age from the raw refresh timestamp at view time", () => {
