@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { formatPercent } from "@/lib/format";
 import type { DataFreshness } from "@/lib/data-freshness";
+import { UpdatedAge } from "./status-bar-live-values";
 
 interface StatusBarProps {
   latestDate: string;
@@ -18,9 +19,15 @@ export function StatusBar({
   freshness,
   connected = true,
 }: StatusBarProps) {
-  const updatedText = lastRefresh
+  const validLastRefresh = lastRefresh && !Number.isNaN(lastRefresh.getTime())
+    ? lastRefresh
+    : null;
+  const updatedFallback = validLastRefresh
     ? freshness.generatedAgeLabel ?? "Clock skew"
     : "—";
+  const lastRefreshIso = validLastRefresh
+    ? validLastRefresh.toISOString()
+    : null;
   const statusPill = connected || freshness.status === "empty"
     ? getDailyStatusPill(freshness.status)
     : {
@@ -103,7 +110,11 @@ export function StatusBar({
           }
         />
 
-        <StatusCell label="DATA THROUGH" value={latestDate} mdOnly />
+        <StatusCell
+          label="SOURCE DAY (UTC)"
+          value={latestDate}
+          mdOnly
+        />
 
         <StatusCell
           label="CENSORSHIP"
@@ -111,7 +122,17 @@ export function StatusBar({
           valueClassName={connected ? "text-warn" : "text-fg-muted"}
         />
 
-        <StatusCell label="UPDATED" value={updatedText} mdOnly isLast />
+        <StatusCell
+          label="UPDATED"
+          value={
+            <UpdatedAge
+              generatedAt={lastRefreshIso}
+              fallback={updatedFallback}
+            />
+          }
+          mdOnly
+          isLast
+        />
       </div>
     </div>
   );
@@ -121,7 +142,7 @@ function getDailyStatusPill(status: DataFreshness["status"]) {
   switch (status) {
     case "fresh":
       return {
-        label: "DAILY FRESH",
+        label: "ON SCHEDULE",
         colorClassName: "text-good",
         dotClassName: "bg-good",
         glowColor: "var(--good)",

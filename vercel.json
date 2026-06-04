@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/cron/update-data",
-      "schedule": "30 3 * * *"
+      "schedule": "45 */12 * * *"
     },
     {
       "path": "/api/cron/live-ledger-cleanup",

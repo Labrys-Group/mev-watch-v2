@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { DataFreshness } from "@/lib/data-freshness";
 import { StatusBar } from "./status-bar";
+import { UpdatedAge } from "./status-bar-live-values";
 
 const freshness: DataFreshness = {
   status: "fresh",
@@ -16,9 +17,10 @@ const freshness: DataFreshness = {
 describe("StatusBar", () => {
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
-  it("renders DAILY FRESH from the freshness verdict and shows latest date + censorship pct", () => {
+  it("renders ON SCHEDULE from the freshness verdict and labels the UTC source day", () => {
     render(
       <StatusBar
         latestDate="2023-10-24"
@@ -27,11 +29,76 @@ describe("StatusBar", () => {
       />,
     );
 
-    expect(screen.getByText("DAILY FRESH")).toBeInTheDocument();
-    expect(screen.getByText("DATA THROUGH")).toBeInTheDocument();
+    expect(screen.getByText("ON SCHEDULE")).toBeInTheDocument();
+    expect(screen.getByText("SOURCE DAY (UTC)")).toBeInTheDocument();
     expect(screen.getByText("2023-10-24")).toBeInTheDocument();
     expect(screen.getByText("33.4%")).toBeInTheDocument();
     expect(screen.queryByText(/DAILY STALE/i)).not.toBeInTheDocument();
+    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+  });
+
+  it("computes the updated age from the raw refresh timestamp at view time", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T03:00:00Z"));
+
+    render(
+      <StatusBar
+        latestDate="2026-05-25"
+        censorshipPct={33.4}
+        lastRefresh={new Date("2026-05-25T07:00:00Z")}
+        freshness={{
+          ...freshness,
+          generatedAt: new Date("2026-05-25T07:00:00Z"),
+          generatedAgeLabel: "3h ago",
+        }}
+      />,
+    );
+
+    expect(screen.getByText("20h ago")).toBeInTheDocument();
+    expect(screen.queryByText("3h ago")).not.toBeInTheDocument();
+  });
+
+  it("falls back when refresh metadata is an invalid date", () => {
+    render(
+      <StatusBar
+        latestDate="2026-05-25"
+        censorshipPct={33.4}
+        lastRefresh={new Date("bad timestamp")}
+        freshness={{
+          ...freshness,
+          status: "lagging",
+          sourceDate: "2026-05-25",
+          sourceAgeDays: 1,
+          generatedAt: new Date("bad timestamp"),
+          generatedAgeLabel: null,
+          sourceLabel: "Daily snapshot through 2026-05-25",
+        }}
+      />,
+    );
+
+    expect(screen.getByText("—")).toBeInTheDocument();
+  });
+
+  it("refreshes the updated age immediately after mounting", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T03:00:00Z"));
+
+    render(
+      <UpdatedAge
+        generatedAt="2026-05-25T07:00:00Z"
+        fallback="fallback"
+      />,
+    );
+
+    expect(screen.getByText("20h ago")).toBeInTheDocument();
+
+    vi.setSystemTime(new Date("2026-05-26T04:00:00Z"));
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
+
+    expect(screen.getByText("21h ago")).toBeInTheDocument();
+    expect(screen.queryByText("20h ago")).not.toBeInTheDocument();
   });
 
   it("renders DAILY STALE with warning treatment when the source day is stale", () => {
@@ -52,7 +119,7 @@ describe("StatusBar", () => {
     const status = screen.getByText("DAILY STALE");
     expect(status).toBeInTheDocument();
     expect(status).toHaveClass("text-warn");
-    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+    expect(screen.queryByText("ON SCHEDULE")).not.toBeInTheDocument();
   });
 
   it("renders NO DATA for empty freshness even when disconnected", () => {
@@ -88,7 +155,7 @@ describe("StatusBar", () => {
     );
 
     expect(screen.getByText("DISCONNECTED")).toBeInTheDocument();
-    expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+    expect(screen.queryByText("ON SCHEDULE")).not.toBeInTheDocument();
   });
 
   it("reports clock skew instead of treating future refresh metadata as current", () => {
