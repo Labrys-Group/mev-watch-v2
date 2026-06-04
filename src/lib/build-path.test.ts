@@ -20,10 +20,10 @@ describe("production build path", () => {
     expect(packageJson.scripts["vercel-build"]).toBeUndefined();
   });
 
-  it("runs the daily data cron shortly after relayscan's UTC day closes", () => {
+  it("runs the data cron every 12 hours to catch relayscan updates", () => {
     expect(vercelConfig.crons).toContainEqual({
       path: "/api/cron/update-data",
-      schedule: "45 0 * * *",
+      schedule: "45 */12 * * *",
     });
   });
 

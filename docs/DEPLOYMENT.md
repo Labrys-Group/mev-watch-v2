@@ -47,13 +47,14 @@ Local-only overrides are documented in `.env.example`, including
 
 | Route | Schedule | Purpose |
 |---|---:|---|
-| `/api/cron/update-data` | `45 0 * * *` | refresh the daily SQLite artifact and upload persisted progress to Blob |
+| `/api/cron/update-data` | `45 */12 * * *` | refresh the daily SQLite artifact and upload persisted progress to Blob |
 | `/api/cron/live-ledger-cleanup` | `0 * * * *` | prune old live-ledger snapshots from the configured snapshot store |
 
 ## Daily Data Refresh
 
-`/api/cron/update-data` runs daily at `00:45 UTC`, shortly after relayscan's
-UTC-day aggregation window closes. The route:
+`/api/cron/update-data` runs every 12 hours, at `00:45 UTC` and `12:45 UTC`,
+so the artifact can catch late or rolling relayscan updates without waiting a
+full day. The route:
 
 1. Validates the cron `Authorization` header.
 2. Acquires `data/mev-watch.sqlite.lock` in Vercel Blob, or the configured
