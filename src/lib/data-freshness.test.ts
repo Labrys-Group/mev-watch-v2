@@ -26,38 +26,38 @@ describe("getDataFreshness", () => {
     const freshness = getDataFreshness({
       latestDate: "2026-05-25",
       generatedAt: new Date("2026-05-25T18:00:00Z"),
-      now: new Date("2026-05-26T00:00:00Z"),
+      now: NOW,
     });
 
     expect(FRESH_SOURCE_DAY_THRESHOLD_DAYS).toBe(1);
     expect(STALE_SOURCE_DAY_THRESHOLD_DAYS).toBe(1.5);
     expect(freshness.status).toBe("fresh");
-    expect(freshness.sourceAgeDays).toBe(1);
+    expect(freshness.sourceAgeDays).toBe(1.4375);
     expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-25");
-    expect(freshness.generatedAgeLabel).toBe("6h ago");
+    expect(freshness.generatedAgeLabel).toBe("16h ago");
   });
 
-  it("classifies source days at least one-and-a-half UTC days old as stale", () => {
+  it("classifies a missing expected source day as stale after the lag window", () => {
     const freshness = getDataFreshness({
-      latestDate: "2026-05-25",
+      latestDate: "2026-05-24",
       generatedAt: new Date("2026-05-26T09:00:00Z"),
       now: new Date("2026-05-26T12:00:00Z"),
     });
 
     expect(freshness.status).toBe("stale");
-    expect(freshness.sourceAgeDays).toBe(1.5);
-    expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-25");
+    expect(freshness.sourceAgeDays).toBe(2.5);
+    expect(freshness.sourceLabel).toBe("Daily snapshot through 2026-05-24");
   });
 
-  it("classifies source days between one and one-and-a-half UTC days old as lagging", () => {
+  it("classifies a missing expected source day as lagging during the lag window", () => {
     const freshness = getDataFreshness({
-      latestDate: "2026-05-25",
+      latestDate: "2026-05-24",
       generatedAt: new Date("2026-05-26T09:00:00Z"),
       now: NOW,
     });
 
     expect(freshness.status).toBe("lagging");
-    expect(freshness.sourceAgeDays).toBe(1.4375);
+    expect(freshness.sourceAgeDays).toBe(2.4375);
     expect(freshness.generatedAgeLabel).toBe("1h ago");
   });
 
@@ -93,6 +93,6 @@ describe("getDataFreshness", () => {
     });
 
     expect(freshness.sourceAgeDays).toBeCloseTo(1.0006944444);
-    expect(freshness.status).toBe("lagging");
+    expect(freshness.status).toBe("fresh");
   });
 });

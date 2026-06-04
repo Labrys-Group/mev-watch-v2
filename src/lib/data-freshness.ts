@@ -22,6 +22,10 @@ interface DataFreshnessInput {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
+function utcDayStart(date: Date): number {
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
 function parseSourceDay(sourceDate: string): number {
   return new Date(`${sourceDate}T00:00:00Z`).getTime();
 }
@@ -52,10 +56,15 @@ export function getDataFreshness({
     0,
     (now.getTime() - parseSourceDay(latestDate)) / MS_PER_DAY,
   );
+  const expectedSourceDay = utcDayStart(now) - MS_PER_DAY;
+  const sourceLagDays =
+    (expectedSourceDay - parseSourceDay(latestDate)) / MS_PER_DAY;
+  const expectedSourceAgeDays = (now.getTime() - expectedSourceDay) / MS_PER_DAY;
   const status =
-    sourceAgeDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS
+    sourceLagDays <= 0
       ? "fresh"
-      : sourceAgeDays < STALE_SOURCE_DAY_THRESHOLD_DAYS
+      : sourceLagDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS &&
+          expectedSourceAgeDays < STALE_SOURCE_DAY_THRESHOLD_DAYS
         ? "lagging"
         : "stale";
 
