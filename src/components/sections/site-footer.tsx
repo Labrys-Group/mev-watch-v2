@@ -232,7 +232,7 @@ export function SiteFooter() {
             <h5 className="font-mono text-[10px] tracking-[0.18em] uppercase text-fg-muted/50 m-0 mb-4">
               CONNECT
             </h5>
-            <ul className="list-none m-0 p-0 flex items-center gap-4 mb-2">
+            <ul className="list-none m-0 p-0 flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
               {CONNECT_LINKS.map(({ label, href, Icon }) => (
                 <li key={href}>
                   <a
@@ -242,9 +242,7 @@ export function SiteFooter() {
                     aria-label={label}
                     className="inline-flex items-center justify-center text-fg-muted hover:text-accent-brand transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-brand rounded-sm"
                   >
-                    {Icon ? (
-                      <Icon className="h-4 w-4 shrink-0" />
-                    ) : null}
+                    {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
                   </a>
                 </li>
               ))}

@@ -28,4 +28,14 @@ describe("SiteFooter", () => {
       "https://www.instagram.com/labrys.io/?hl=en",
     );
   });
+
+  it("allows the social icon row to wrap on narrow footers", () => {
+    render(<SiteFooter />);
+
+    const socialList = screen.getByRole("link", { name: "GitHub" }).closest("ul");
+
+    expect(socialList).not.toBeNull();
+    expect(socialList).toHaveClass("flex-wrap");
+    expect(socialList).toHaveClass("gap-3");
+  });
 });
