@@ -92,7 +92,7 @@ describe("StatusPage", () => {
 
     render(await StatusPage());
 
-    expect(screen.getByText("Daily data fresh")).toBeInTheDocument();
+    expect(screen.getByText("Daily data lagging (1.4d old)")).toBeInTheDocument();
     expect(screen.getByText("Clock skew detected")).toBeInTheDocument();
     expect(screen.queryByText("0s ago")).not.toBeInTheDocument();
   });

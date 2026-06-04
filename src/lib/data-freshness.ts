@@ -63,7 +63,7 @@ export function getDataFreshness({
   const status =
     sourceAgeDays >= STALE_SOURCE_DAY_THRESHOLD_DAYS
       ? "stale"
-      : sourceLagDays <= 0
+      : sourceAgeDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS
       ? "fresh"
       : sourceLagDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS &&
           expectedSourceAgeDays < STALE_SOURCE_DAY_THRESHOLD_DAYS
