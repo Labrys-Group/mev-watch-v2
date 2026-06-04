@@ -12,8 +12,7 @@ through OFAC-censoring relays. Relay posture metadata lives in
 from Vercel Blob.
 
 MEV Watch is maintained by [Labrys](https://labrys.io) as public-good
-infrastructure. The explicit MIT license is part of that goal: downstream
-projects can use, fork, inspect, and build on the code without ambiguity.
+infrastructure.
 
 ## Stack
 
@@ -34,18 +33,18 @@ pnpm dev                     # http://localhost:3000
 
 ## Common Commands
 
-| Command | What it does |
-|---|---|
-| `pnpm dev` | start the dev server |
-| `pnpm build` | production build |
-| `pnpm lint` | ESLint |
-| `pnpm test` | Vitest unit tests |
-| `pnpm test:watch` | Vitest in watch mode |
-| `pnpm test:e2e` | Playwright e2e tests; auto-starts the dev server |
-| `pnpm update-data` | fetch missing complete UTC days and rewrite the local SQLite artifact |
+| Command                      | What it does                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| `pnpm dev`                   | start the dev server                                                           |
+| `pnpm build`                 | production build                                                               |
+| `pnpm lint`                  | ESLint                                                                         |
+| `pnpm test`                  | Vitest unit tests                                                              |
+| `pnpm test:watch`            | Vitest in watch mode                                                           |
+| `pnpm test:e2e`              | Playwright e2e tests; auto-starts the dev server                               |
+| `pnpm update-data`           | fetch missing complete UTC days and rewrite the local SQLite artifact          |
 | `pnpm update-data --dry-run` | validate the snapshot and print the missing date range without network fetches |
-| `pnpm backfill-and-upload` | create a resumable backfill copy under `data/` and upload it to Vercel Blob |
-| `pnpm capture-preview` | capture the homepage preview image to `public/preview.png` |
+| `pnpm backfill-and-upload`   | create a resumable backfill copy under `data/` and upload it to Vercel Blob    |
+| `pnpm capture-preview`       | capture the homepage preview image to `public/preview.png`                     |
 
 ## App Surfaces
 
@@ -116,6 +115,3 @@ not require environment variables.
 MIT License — MEV Watch is published as a public good by
 [Labrys](https://labrys.io) so the community can use, inspect, modify, and
 redistribute it. See [LICENSE.md](LICENSE.md) for the full license terms.
-
-This explicit license is intentional: unlicensed work cannot be reliably used,
-forked, or built upon by others.
