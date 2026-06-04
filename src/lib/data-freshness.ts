@@ -1,7 +1,7 @@
 import { formatRelativeTime } from "./format";
 
-export const FRESH_SOURCE_DAY_THRESHOLD_DAYS = 1;
-export const STALE_SOURCE_DAY_THRESHOLD_DAYS = 1.5;
+export const STALE_SOURCE_DAY_THRESHOLD_DAYS = 1;
+export const LAGGING_REFRESH_THRESHOLD_HOURS = 36;
 
 export type DataFreshnessStatus = "fresh" | "stale" | "lagging" | "empty";
 
@@ -21,6 +21,7 @@ interface DataFreshnessInput {
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const MS_PER_HOUR = 60 * 60 * 1000;
 
 function utcDayStart(date: Date): number {
   return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
@@ -54,21 +55,18 @@ export function getDataFreshness({
 
   const sourceAgeDays = Math.max(
     0,
-    (now.getTime() - parseSourceDay(latestDate)) / MS_PER_DAY,
+    Math.floor((utcDayStart(now) - parseSourceDay(latestDate)) / MS_PER_DAY),
   );
-  const expectedSourceDay = utcDayStart(now) - MS_PER_DAY;
-  const sourceLagDays =
-    (expectedSourceDay - parseSourceDay(latestDate)) / MS_PER_DAY;
-  const expectedSourceAgeDays = (now.getTime() - expectedSourceDay) / MS_PER_DAY;
+  const generatedAgeHours =
+    generatedAgeMs === null ? null : generatedAgeMs / MS_PER_HOUR;
   const status =
-    sourceAgeDays >= STALE_SOURCE_DAY_THRESHOLD_DAYS
+    sourceAgeDays > STALE_SOURCE_DAY_THRESHOLD_DAYS
       ? "stale"
-      : sourceAgeDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS
-      ? "fresh"
-      : sourceLagDays <= FRESH_SOURCE_DAY_THRESHOLD_DAYS &&
-          expectedSourceAgeDays < STALE_SOURCE_DAY_THRESHOLD_DAYS
+      : generatedAgeHours === null ||
+          generatedAgeHours < 0 ||
+          generatedAgeHours > LAGGING_REFRESH_THRESHOLD_HOURS
         ? "lagging"
-        : "stale";
+        : "fresh";
 
   return {
     status,
