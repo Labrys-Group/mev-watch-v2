@@ -1,6 +1,6 @@
 # MEV Watch
 
-A public transparency tool tracking OFAC censorship of Ethereum MEV-boost
+An MIT-licensed public good tracking OFAC censorship of Ethereum MEV-boost
 blocks.
 
 Live at **[mevwatch.info](https://mevwatch.info)**.
@@ -91,5 +91,9 @@ pnpm dev                     # http://localhost:3000
 
 ## License
 
-UNLICENSED — public-good transparency tool by [Labrys](https://labrys.io);
-contributions welcome via issue or PR.
+MIT License — MEV Watch is published as a public good by
+[Labrys](https://labrys.io) so the community can use, inspect, modify, and
+redistribute it. See [LICENSE.md](LICENSE.md) for the full license terms.
+
+This explicit license is intentional: unlicensed work cannot be reliably used,
+forked, or built upon by others.
