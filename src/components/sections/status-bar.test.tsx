@@ -18,7 +18,7 @@ describe("StatusBar", () => {
     vi.useRealTimers();
   });
 
-  it("renders ON SCHEDULE from the freshness verdict and labels the source day as UTC", () => {
+  it("renders ON SCHEDULE from the freshness verdict and localizes the source day", () => {
     render(
       <StatusBar
         latestDate="2023-10-24"
@@ -27,12 +27,40 @@ describe("StatusBar", () => {
       />,
     );
 
+    const localizedSourceDay = new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    }).format(new Date("2023-10-24T00:00:00Z"));
+
     expect(screen.getByText("ON SCHEDULE")).toBeInTheDocument();
-    expect(screen.getByText("SOURCE DAY (UTC)")).toBeInTheDocument();
-    expect(screen.getByText("2023-10-24")).toBeInTheDocument();
+    expect(screen.getByText("SOURCE DAY")).toBeInTheDocument();
+    expect(screen.getByText(localizedSourceDay)).toBeInTheDocument();
+    expect(screen.queryByText("SOURCE DAY (UTC)")).not.toBeInTheDocument();
+    expect(screen.queryByText("2023-10-24")).not.toBeInTheDocument();
     expect(screen.getByText("33.4%")).toBeInTheDocument();
     expect(screen.queryByText(/DAILY STALE/i)).not.toBeInTheDocument();
     expect(screen.queryByText("DAILY FRESH")).not.toBeInTheDocument();
+  });
+
+  it("computes the updated age from the raw refresh timestamp at view time", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-26T03:00:00Z"));
+
+    render(
+      <StatusBar
+        latestDate="2026-05-25"
+        censorshipPct={33.4}
+        lastRefresh={new Date("2026-05-25T07:00:00Z")}
+        freshness={{
+          ...freshness,
+          generatedAt: new Date("2026-05-25T07:00:00Z"),
+          generatedAgeLabel: "3h ago",
+        }}
+      />,
+    );
+
+    expect(screen.getByText("20h ago")).toBeInTheDocument();
+    expect(screen.queryByText("3h ago")).not.toBeInTheDocument();
   });
 
   it("renders DAILY STALE with warning treatment when the source day is stale", () => {

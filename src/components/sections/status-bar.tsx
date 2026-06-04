@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { formatPercent } from "@/lib/format";
 import type { DataFreshness } from "@/lib/data-freshness";
+import { SourceDay, UpdatedAge } from "./status-bar-live-values";
 
 interface StatusBarProps {
   latestDate: string;
@@ -18,9 +19,10 @@ export function StatusBar({
   freshness,
   connected = true,
 }: StatusBarProps) {
-  const updatedText = lastRefresh
+  const updatedFallback = lastRefresh
     ? freshness.generatedAgeLabel ?? "Clock skew"
     : "—";
+  const lastRefreshIso = lastRefresh?.toISOString() ?? null;
   const statusPill = connected || freshness.status === "empty"
     ? getDailyStatusPill(freshness.status)
     : {
@@ -103,7 +105,11 @@ export function StatusBar({
           }
         />
 
-        <StatusCell label="SOURCE DAY (UTC)" value={latestDate} mdOnly />
+        <StatusCell
+          label="SOURCE DAY"
+          value={<SourceDay value={latestDate} />}
+          mdOnly
+        />
 
         <StatusCell
           label="CENSORSHIP"
@@ -111,7 +117,17 @@ export function StatusBar({
           valueClassName={connected ? "text-warn" : "text-fg-muted"}
         />
 
-        <StatusCell label="UPDATED" value={updatedText} mdOnly isLast />
+        <StatusCell
+          label="UPDATED"
+          value={
+            <UpdatedAge
+              generatedAt={lastRefreshIso}
+              fallback={updatedFallback}
+            />
+          }
+          mdOnly
+          isLast
+        />
       </div>
     </div>
   );
