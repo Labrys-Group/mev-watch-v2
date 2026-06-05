@@ -2,6 +2,7 @@ import type { LiveLedgerSnapshot } from "./types";
 
 export interface SnapshotStore {
   readLatestSnapshot(): Promise<LiveLedgerSnapshot | null>;
+  readNewestArchivedSnapshot(): Promise<LiveLedgerSnapshot | null>;
   writeSnapshot(snapshot: LiveLedgerSnapshot): Promise<string>;
   cleanupOldSnapshots(): Promise<{ deletedSnapshots: number }>;
 }

@@ -42,6 +42,7 @@ describe("Vercel live ledger cleanup cron route", () => {
     const cleanupOldSnapshots = vi.fn(async () => ({ deletedSnapshots: 2 }));
     createSnapshotStoreMock.mockResolvedValue({
       readLatestSnapshot: vi.fn(),
+      readNewestArchivedSnapshot: vi.fn(),
       writeSnapshot: vi.fn(),
       cleanupOldSnapshots,
     });

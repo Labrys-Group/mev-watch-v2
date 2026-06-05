@@ -2,13 +2,13 @@ import { del, get, list, put } from "@vercel/blob";
 
 import {
   isTimestampedSnapshotName,
-  parseTimestampedSnapshotName,
+  newestSnapshotFile,
   SNAPSHOT_RETENTION_COUNT,
   sortNewestFirst,
   timestampedSnapshotName,
   type SnapshotFile,
 } from "./snapshot-files";
-import { isNewerSnapshot, parseLiveLedgerSnapshot } from "./snapshots";
+import { parseLiveLedgerSnapshot } from "./snapshots";
 import type { SnapshotStore } from "./store";
 import type { LiveLedgerSnapshot } from "./types";
 
@@ -79,25 +79,7 @@ export function createBlobSnapshotStore(
   }
 
   async function readNewestTimestampedSnapshot(): Promise<LiveLedgerSnapshot | null> {
-    const snapshotBlobs = (await listSnapshotBlobs())
-      .map((blob) => {
-        const parsed = parseTimestampedSnapshotName(blob.name);
-        return parsed ? { ...blob, ...parsed } : null;
-      })
-      .filter((blob): blob is NonNullable<typeof blob> => blob !== null)
-      .sort((a, b) => {
-        if (a.fetchedAtMs !== b.fetchedAtMs) {
-          return b.fetchedAtMs - a.fetchedAtMs;
-        }
-        if (a.headSlot !== b.headSlot) return b.headSlot - a.headSlot;
-        return a.name.localeCompare(b.name);
-      });
-
-    for (const blob of snapshotBlobs) {
-      const snapshot = await readSnapshot(blob.pathname).catch(() => null);
-      if (snapshot) return snapshot;
-    }
-    return null;
+    return newestSnapshotFile(await readTimestampedSnapshots())?.snapshot ?? null;
   }
 
   async function pruneOldSnapshots(): Promise<{ deletedSnapshots: number }> {
@@ -114,11 +96,10 @@ export function createBlobSnapshotStore(
       const latest = await readSnapshot(`${prefix}${LATEST_SNAPSHOT_NAME}`).catch(
         () => null,
       );
-      const fallback = await readNewestTimestampedSnapshot();
-
-      if (!latest) return fallback;
-      if (!fallback) return latest;
-      return isNewerSnapshot(fallback, latest) ? fallback : latest;
+      return latest ?? readNewestTimestampedSnapshot();
+    },
+    readNewestArchivedSnapshot() {
+      return readNewestTimestampedSnapshot();
     },
     async writeSnapshot(snapshot) {
       const name = timestampedSnapshotName(snapshot);
@@ -134,7 +115,7 @@ export function createBlobSnapshotStore(
         allowOverwrite: true,
         contentType: "application/json",
         cacheControlMaxAge: 60,
-      });
+      }).catch(() => undefined);
       return name;
     },
     cleanupOldSnapshots() {
