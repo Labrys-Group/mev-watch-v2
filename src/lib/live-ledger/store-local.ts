@@ -13,6 +13,7 @@ import type { SnapshotStore } from "./store";
 import type { LiveLedgerSnapshot } from "./types";
 
 const DEFAULT_LOCAL_DIR = "data/live-ledger";
+const LATEST_SNAPSHOT_NAME = "latest.json";
 
 export interface LocalSnapshotStoreOptions {
   dir?: string;
@@ -25,20 +26,32 @@ export function createLocalSnapshotStore(
 
   return {
     async readLatestSnapshot() {
-      const latest = newestSnapshotFile(await readTimestampedSnapshots(dir));
-      if (latest) return latest.snapshot;
+      const latest = await readSnapshotFile(dir, LATEST_SNAPSHOT_NAME).catch(
+        () => null,
+      );
+      if (latest) return latest;
+
+      const fallback = newestSnapshotFile(await readTimestampedSnapshots(dir));
+      if (fallback) return fallback.snapshot;
       return null;
     },
     async writeSnapshot(snapshot) {
       await fs.mkdir(dir, { recursive: true });
       const name = timestampedSnapshotName(snapshot);
       const tempName = `${name}.tmp`;
+      const latestTempName = `${LATEST_SNAPSHOT_NAME}.${name}.tmp`;
+      const body = `${JSON.stringify(snapshot, null, 2)}\n`;
       await fs.writeFile(
         filePath(dir, tempName),
-        `${JSON.stringify(snapshot, null, 2)}\n`,
+        body,
         "utf8",
       );
       await fs.rename(filePath(dir, tempName), filePath(dir, name));
+      await fs.writeFile(filePath(dir, latestTempName), body, "utf8");
+      await fs.rename(
+        filePath(dir, latestTempName),
+        filePath(dir, LATEST_SNAPSHOT_NAME),
+      );
       return name;
     },
     cleanupOldSnapshots() {

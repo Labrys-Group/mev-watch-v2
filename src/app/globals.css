@@ -286,10 +286,8 @@ details[open]::details-content {
    `${slot}:${pending|filled}`, so a tile remounts only when its slot
    newly fills — that single tile then pops in with `--delay: 0`,
    bouncing into place as it arrives.
-   Rows shift via two layers: the wrapper transitions `grid-template-rows`
-   from `1fr ↔ 0fr` so the layout reflows without measuring pixels, and
-   the inner child slides + fades so the visible motion reads as a
-   vertical scroll (new row drops in from above; old row slides up + out).
+   Row height stays stable on refresh so the ledger does not force layout work
+   through the chart sections below it.
    ────────────────────────────────────────────────────────────── */
 .epoch-tile {
   animation: mw-tile-pop var(--pop-duration, 0.52s)
@@ -297,32 +295,11 @@ details[open]::details-content {
   animation-delay: var(--delay, 0ms);
 }
 .epoch-row-wrap {
-  display: grid;
-  grid-template-rows: 1fr;
-  transition: grid-template-rows 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.epoch-row-wrap--collapsed {
-  grid-template-rows: 0fr;
+  display: block;
 }
 .epoch-row-wrap > * {
-  min-height: 0;
   transform: translateY(0);
   opacity: 1;
-  transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease-out;
-}
-.epoch-row-wrap--collapsed > * {
-  /* Clip only while the wrapper is collapsing so the slide-out doesn't
-     spill past the shrinking grid row. Steady-state rows stay overflow-
-     visible so a hovered tile's scale-up isn't chopped off vertically. */
-  overflow: hidden;
-  /* Translate up so the row slides out the top of the stack as it
-     collapses, matching the "scroll up" feel for the exiting bottom row.
-     The entering top row starts here too — opacity:0 + translated up — and
-     drops down into place when the wrapper expands. */
-  transform: translateY(-100%);
-  opacity: 0;
 }
 
 /* Poll progress bar — fills left→right over POLL_MS. Restarted by

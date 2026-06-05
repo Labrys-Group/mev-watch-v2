@@ -8,23 +8,25 @@ function ledger(
   headSlot: number,
   category: Extract<SlotCategory, "neutral" | "censoring" | "unknown">,
   degradedRelays: string[] = [],
+  fetchedAt = "2026-05-26T00:00:00.000Z",
+  currentEpoch = 3,
 ): LedgerData {
   return {
     headSlot,
-    fetchedAt: "2026-05-26T00:00:00.000Z",
+    fetchedAt,
     degradedRelays,
     epochs: [
       {
-        epoch: 3,
+        epoch: currentEpoch,
         inProgress: true,
         slots: Array.from({ length: 32 }, (_, index) => ({
-          slot: 96 + index,
+          slot: currentEpoch * 32 + index,
           indexInEpoch: index,
           category: index === 0 ? category : index > 3 ? "pending" : "nonboost",
           relays: index === 0 ? ["relay.ultrasound.money"] : [],
         })),
       },
-      ...[2, 1, 0].map((epoch) => ({
+      ...[currentEpoch - 1, currentEpoch - 2, currentEpoch - 3].map((epoch) => ({
         epoch,
         inProgress: false,
         slots: Array.from({ length: 32 }, (_, index) => ({
@@ -126,7 +128,7 @@ describe("EpochLedger", () => {
     });
     expect(screen.getByText(/reconnecting/i)).toBeInTheDocument();
 
-    // Second poll (triggered by interval) succeeds → reconnecting cleared
+    // Second poll is scheduled only after the failed request settles.
     await act(async () => {
       await vi.advanceTimersByTimeAsync(10_000);
     });
@@ -340,5 +342,93 @@ describe("EpochLedger", () => {
     render(<EpochLedger initial={ledger(99, "neutral")} />);
     const rows = document.querySelectorAll(".epoch-row-wrap");
     expect(rows.length).toBe(4);
+  });
+
+  it("does not start another poll while the previous poll is pending", async () => {
+    let resolvePoll!: (response: Response) => void;
+    const fetchMock = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolvePoll = resolve;
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30_000);
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolvePoll(
+        Response.json(
+          ledger(100, "neutral", [], "2026-05-26T00:00:12.000Z"),
+        ),
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps exactly four rows after an epoch rollover poll", async () => {
+    const updated = ledger(
+      128,
+      "censoring",
+      [],
+      "2026-05-26T00:00:12.000Z",
+      4,
+    );
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(updated)));
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(document.querySelectorAll(".epoch-row-wrap")).toHaveLength(4);
+    expect(
+      screen.getByLabelText("Epoch 4: 4 of 32 slots delivered"),
+    ).toBeInTheDocument();
+  });
+
+  it("does not replace visible data for a duplicate ledger version", async () => {
+    const duplicateVersionWithDifferentRows = ledger(
+      99,
+      "censoring",
+      [],
+      "2026-05-26T00:00:00.000Z",
+      9,
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json(duplicateVersionWithDifferentRows)),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(
+      screen.getByLabelText("Epoch 3: 4 of 32 slots delivered"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Epoch 9: 4 of 32 slots delivered"),
+    ).not.toBeInTheDocument();
   });
 });

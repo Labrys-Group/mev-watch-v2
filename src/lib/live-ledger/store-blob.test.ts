@@ -32,6 +32,9 @@ describe("Blob live-ledger snapshot store", () => {
       blocks: [],
     };
     const getBlob = vi.fn(async (pathname: string) => {
+      if (pathname.endsWith("latest.json")) {
+        return null;
+      }
       if (pathname.endsWith(newerName)) {
         return {
           statusCode: 200,
@@ -59,6 +62,10 @@ describe("Blob live-ledger snapshot store", () => {
     });
 
     await expect(store.readLatestSnapshot()).resolves.toEqual(validSnapshot);
+    expect(getBlob).toHaveBeenCalledWith(
+      "data/live-ledger/latest.json",
+      expect.objectContaining({ useCache: false }),
+    );
     expect(getBlob).toHaveBeenCalledWith(
       `data/live-ledger/${newerName}`,
       expect.objectContaining({ useCache: false }),

@@ -39,19 +39,6 @@ interface HoverState {
   y: number;
 }
 
-/** What changed between two ledger snapshots. */
-interface LedgerDiff {
-  /** How many epochs the in-progress epoch advanced (0 = none). */
-  epochShift: number;
-}
-
-/** Compare two ledger snapshots for epoch-shift animation purposes. */
-function diffLedger(prev: LedgerData | null, next: LedgerData): LedgerDiff {
-  if (!prev) return { epochShift: 0 };
-  const epochShift = next.epochs[0].epoch - prev.epochs[0].epoch;
-  return { epochShift };
-}
-
 interface EpochLedgerProps {
   initial: LedgerData;
 }
@@ -65,11 +52,8 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
   const [data, setData] = useState<LedgerData>(initial);
   const [hover, setHover] = useState<HoverState | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
-  const [exiting, setExiting] = useState<EpochRow | null>(null);
-  const [entering, setEntering] = useState<number | null>(null);
-  const [exitCollapsed, setExitCollapsed] = useState(false);
-  // Bumped on every successful poll; used as a React key to restart the
-  // top-of-panel progress bar so it scrubs the gap between fetches.
+  // Bumped whenever the next poll is scheduled; used as a React key to restart
+  // the top-of-panel progress bar so it scrubs the wait between fetches.
   const [pollTick, setPollTick] = useState(0);
   // Tap-to-detail on phones produced a tiny floating tooltip on tile-sized
   // tap targets — readers couldn't dismiss it. Gate the interaction behind
@@ -88,82 +72,58 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Poll the API immediately on mount, then every POLL_MS.
+  // Poll the API immediately on mount, then schedule the next poll only after
+  // the current request settles. This prevents slow refreshes from stacking up
+  // and competing for the browser main thread when responses land together.
   useEffect(() => {
     let alive = true;
-    const timeouts = new Set<number>();
+    let timeoutId: number | null = null;
+    let controller: AbortController | null = null;
+
+    const scheduleNextPoll = () => {
+      if (!alive) return;
+      setPollTick((t) => t + 1);
+      timeoutId = window.setTimeout(poll, POLL_MS);
+    };
 
     async function poll() {
-      // Restart the progress bar the moment a fetch fires so the bar's
-      // animation tracks poll cadence — when the bar finishes, the next
-      // request is going out.
-      setPollTick((t) => t + 1);
+      controller = new AbortController();
       try {
-        const res = await fetch("/api/epochs", { cache: "no-store" });
+        const res = await fetch("/api/epochs", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const next = (await res.json()) as LedgerData;
         if (!alive) return;
         setReconnecting(false);
 
-        const changes = diffLedger(prevRef.current, next);
-        if (changes.epochShift === 1) {
-          const dropped =
-            prevRef.current.epochs[prevRef.current.epochs.length - 1];
-          setExiting(dropped);
-          setExitCollapsed(false);
-          setEntering(next.epochs[0].epoch);
-          const t = window.setTimeout(() => {
-            timeouts.delete(t);
-            if (!alive) return;
-            setExiting(null);
-            setEntering(null);
-          }, 650);
-          timeouts.add(t);
-        } else if (changes.epochShift !== 0) {
-          // A multi-epoch jump (e.g. a stale tab): re-enter with the stagger
-          // rather than animate a single shift.
-          staggerNext.current = true;
+        if (!isSameLedgerVersion(prevRef.current, next)) {
+          prevRef.current = next;
+          setData(next);
         }
-
-        prevRef.current = next;
-        setData(next);
-      } catch {
-        if (alive) setReconnecting(true);
+      } catch (error) {
+        if (alive && !isAbortError(error)) setReconnecting(true);
+      } finally {
+        controller = null;
+        scheduleNextPoll();
       }
     }
 
     void poll();
-    const id = window.setInterval(poll, POLL_MS);
     return () => {
       alive = false;
-      window.clearInterval(id);
-      for (const t of timeouts) window.clearTimeout(t);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      controller?.abort();
     };
   }, []);
-
-  // After the collapsed/expanded first frame paints, flip to the target state
-  // so the grid-template-rows transition runs.
-  useEffect(() => {
-    if (entering === null && exiting === null) return;
-    let raf2 = 0;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        setEntering(null);
-        setExitCollapsed(true);
-      });
-    });
-    return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-    };
-  }, [entering, exiting]);
 
   const stagger = staggerNext.current;
   useEffect(() => {
     staggerNext.current = false;
   });
 
-  const rows = exiting ? [...data.epochs, exiting] : data.epochs;
+  const rows = data.epochs;
 
   return (
     <div
@@ -171,8 +131,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       onMouseLeave={() => setHover(null)}
     >
       {/* Browser-style poll progress bar — fills over one poll cycle
-          (POLL_MS). Restarts at the start of every fetch so that the
-          moment the bar finishes, the next request is going out. */}
+          (POLL_MS). Restarts when the next request is scheduled. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-[2px] overflow-hidden"
@@ -187,16 +146,14 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       <div className="space-y-1">
         {/* eslint-disable-next-line react-hooks/refs -- stagger flows from the intentional render-time ref read above */}
         {rows.map((row, rowIdx) => {
-          const isExiting = exiting !== null && row === exiting;
-          const collapsed = isExiting ? exitCollapsed : entering === row.epoch;
           return (
             <div
               key={row.epoch}
-              className={`epoch-row-wrap${collapsed ? " epoch-row-wrap--collapsed" : ""}`}
+              className="epoch-row-wrap"
             >
               <EpochRowView
                 row={row}
-                rowIdx={isExiting ? data.epochs.length : rowIdx}
+                rowIdx={rowIdx}
                 stagger={stagger}
                 onHover={setHover}
                 hoverEnabled={hoverEnabled}
@@ -215,6 +172,14 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       {hover && <SlotTooltip hover={hover} />}
     </div>
   );
+}
+
+function isSameLedgerVersion(prev: LedgerData, next: LedgerData): boolean {
+  return prev.headSlot === next.headSlot && prev.fetchedAt === next.fetchedAt;
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
 }
 
 interface EpochRowViewProps {

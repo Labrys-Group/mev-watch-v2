@@ -13,6 +13,7 @@ import type { SnapshotStore } from "./store";
 import type { LiveLedgerSnapshot } from "./types";
 
 const DEFAULT_BLOB_PREFIX = "data/live-ledger/";
+const LATEST_SNAPSHOT_NAME = "latest.json";
 
 export interface BlobSnapshotStoreOptions {
   prefix?: string;
@@ -110,13 +111,23 @@ export function createBlobSnapshotStore(
 
   return {
     async readLatestSnapshot() {
-      return readNewestTimestampedSnapshot();
+      const latest = await readSnapshot(`${prefix}${LATEST_SNAPSHOT_NAME}`).catch(
+        () => null,
+      );
+      return latest ?? readNewestTimestampedSnapshot();
     },
     async writeSnapshot(snapshot) {
       const name = timestampedSnapshotName(snapshot);
-      await putBlob(`${prefix}${name}`, JSON.stringify(snapshot), {
+      const body = JSON.stringify(snapshot);
+      await putBlob(`${prefix}${name}`, body, {
         access: "private",
         allowOverwrite: false,
+        contentType: "application/json",
+        cacheControlMaxAge: 60,
+      });
+      await putBlob(`${prefix}${LATEST_SNAPSHOT_NAME}`, body, {
+        access: "private",
+        allowOverwrite: true,
         contentType: "application/json",
         cacheControlMaxAge: 60,
       });
