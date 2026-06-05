@@ -338,10 +338,11 @@ describe("EpochLedger", () => {
     expect(screen.queryByText(/reconnecting/i)).not.toBeInTheDocument();
   });
 
-  it("uses epoch-row-wrap class for each row", () => {
+  it("renders the four rows inside the clipped-scroll stack", () => {
     render(<EpochLedger initial={ledger(99, "neutral")} />);
-    const rows = document.querySelectorAll(".epoch-row-wrap");
-    expect(rows.length).toBe(4);
+    const stack = document.querySelector(".epoch-ledger-stack");
+    expect(stack).not.toBeNull();
+    expect(stack?.children.length).toBe(4);
   });
 
   it("does not start another poll while the previous poll is pending", async () => {
@@ -398,7 +399,9 @@ describe("EpochLedger", () => {
       await Promise.resolve();
     });
 
-    expect(document.querySelectorAll(".epoch-row-wrap")).toHaveLength(4);
+    expect(
+      document.querySelector(".epoch-ledger-stack")?.children.length,
+    ).toBe(4);
     expect(
       screen.getByLabelText("Epoch 4: 4 of 32 slots delivered"),
     ).toBeInTheDocument();
