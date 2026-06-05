@@ -2,13 +2,13 @@ import { promises as fs } from "node:fs";
 
 import {
   isTimestampedSnapshotName,
-  newestSnapshotFile,
+  parseTimestampedSnapshotName,
   SNAPSHOT_RETENTION_COUNT,
   sortNewestFirst,
   timestampedSnapshotName,
   type SnapshotFile,
 } from "./snapshot-files";
-import { parseLiveLedgerSnapshot } from "./snapshots";
+import { isNewerSnapshot, parseLiveLedgerSnapshot } from "./snapshots";
 import type { SnapshotStore } from "./store";
 import type { LiveLedgerSnapshot } from "./types";
 
@@ -29,11 +29,11 @@ export function createLocalSnapshotStore(
       const latest = await readSnapshotFile(dir, LATEST_SNAPSHOT_NAME).catch(
         () => null,
       );
-      if (latest) return latest;
+      const fallback = await readNewestTimestampedSnapshot(dir);
 
-      const fallback = newestSnapshotFile(await readTimestampedSnapshots(dir));
-      if (fallback) return fallback.snapshot;
-      return null;
+      if (!latest) return fallback;
+      if (!fallback) return latest;
+      return isNewerSnapshot(fallback, latest) ? fallback : latest;
     },
     async writeSnapshot(snapshot) {
       await fs.mkdir(dir, { recursive: true });
@@ -58,6 +58,35 @@ export function createLocalSnapshotStore(
       return pruneOldSnapshots(dir);
     },
   };
+}
+
+async function readNewestTimestampedSnapshot(
+  dir: string,
+): Promise<LiveLedgerSnapshot | null> {
+  let names: string[];
+  try {
+    names = await fs.readdir(dir);
+  } catch (error) {
+    if (isNotFoundError(error)) return null;
+    throw error;
+  }
+
+  const snapshotNames = names
+    .map((name) => parseTimestampedSnapshotName(name))
+    .filter((file): file is NonNullable<typeof file> => file !== null)
+    .sort((a, b) => {
+      if (a.fetchedAtMs !== b.fetchedAtMs) {
+        return b.fetchedAtMs - a.fetchedAtMs;
+      }
+      if (a.headSlot !== b.headSlot) return b.headSlot - a.headSlot;
+      return a.name.localeCompare(b.name);
+    });
+
+  for (const file of snapshotNames) {
+    const snapshot = await readSnapshotFile(dir, file.name).catch(() => null);
+    if (snapshot) return snapshot;
+  }
+  return null;
 }
 
 async function readTimestampedSnapshots(dir: string): Promise<SnapshotFile[]> {

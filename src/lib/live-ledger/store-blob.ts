@@ -8,7 +8,7 @@ import {
   timestampedSnapshotName,
   type SnapshotFile,
 } from "./snapshot-files";
-import { parseLiveLedgerSnapshot } from "./snapshots";
+import { isNewerSnapshot, parseLiveLedgerSnapshot } from "./snapshots";
 import type { SnapshotStore } from "./store";
 import type { LiveLedgerSnapshot } from "./types";
 
@@ -114,7 +114,11 @@ export function createBlobSnapshotStore(
       const latest = await readSnapshot(`${prefix}${LATEST_SNAPSHOT_NAME}`).catch(
         () => null,
       );
-      return latest ?? readNewestTimestampedSnapshot();
+      const fallback = await readNewestTimestampedSnapshot();
+
+      if (!latest) return fallback;
+      if (!fallback) return latest;
+      return isNewerSnapshot(fallback, latest) ? fallback : latest;
     },
     async writeSnapshot(snapshot) {
       const name = timestampedSnapshotName(snapshot);
