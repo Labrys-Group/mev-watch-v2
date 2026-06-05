@@ -286,43 +286,23 @@ details[open]::details-content {
    `${slot}:${pending|filled}`, so a tile remounts only when its slot
    newly fills — that single tile then pops in with `--delay: 0`,
    bouncing into place as it arrives.
-   Rows shift via two layers: the wrapper transitions `grid-template-rows`
-   from `1fr ↔ 0fr` so the layout reflows without measuring pixels, and
-   the inner child slides + fades so the visible motion reads as a
-   vertical scroll (new row drops in from above; old row slides up + out).
+   On an epoch shift the whole stack scrolls down one row inside a
+   height-locked, overflow-hidden viewport: the stack renders a fifth
+   (exiting) row, starts offset up one row (`translateY(-step)`, no
+   transition) so it looks identical to "before", then transitions to
+   `translateY(0)` — the new row slides in at the top while the oldest
+   clips out the bottom. The viewport height is pinned to the steady
+   four-row height for the duration, so nothing pulses and the chart
+   sections below never reflow. JS measures `step`/height; CSS only owns
+   the transition.
    ────────────────────────────────────────────────────────────── */
 .epoch-tile {
   animation: mw-tile-pop var(--pop-duration, 0.52s)
     cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
   animation-delay: var(--delay, 0ms);
 }
-.epoch-row-wrap {
-  display: grid;
-  grid-template-rows: 1fr;
-  transition: grid-template-rows 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.epoch-row-wrap--collapsed {
-  grid-template-rows: 0fr;
-}
-.epoch-row-wrap > * {
-  min-height: 0;
-  transform: translateY(0);
-  opacity: 1;
-  transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease-out;
-}
-.epoch-row-wrap--collapsed > * {
-  /* Clip only while the wrapper is collapsing so the slide-out doesn't
-     spill past the shrinking grid row. Steady-state rows stay overflow-
-     visible so a hovered tile's scale-up isn't chopped off vertically. */
-  overflow: hidden;
-  /* Translate up so the row slides out the top of the stack as it
-     collapses, matching the "scroll up" feel for the exiting bottom row.
-     The entering top row starts here too — opacity:0 + translated up — and
-     drops down into place when the wrapper expands. */
-  transform: translateY(-100%);
-  opacity: 0;
+.epoch-ledger-stack--animate {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Poll progress bar — fills left→right over POLL_MS. Restarted by
@@ -343,6 +323,22 @@ details[open]::details-content {
 @keyframes epoch-poll-fill {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
+}
+/* Reconnecting: stop filling, hold the bar full and breathe amber so the
+   stalled poll reads at the top edge without adding a height-changing row.
+   Declared after `.epoch-poll-bar` so it overrides the fill transform/animation. */
+.epoch-poll-bar--stalled {
+  background: var(--warn);
+  transform: scaleX(1);
+  animation-name: epoch-poll-stall;
+  animation-duration: 1.4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes epoch-poll-stall {
+  0%,
+  100% { opacity: 0.3; }
+  50%  { opacity: 0.85; }
 }
 
 /* Page-wide blueprint grid — fixed behind all content, radially
@@ -430,8 +426,7 @@ details[open]::details-content {
     opacity: 0.4 !important;
   }
   .epoch-tile,
-  .epoch-row-wrap,
-  .epoch-row-wrap > * {
+  .epoch-ledger-stack {
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;

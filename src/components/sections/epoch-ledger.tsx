@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+} from "react";
 import { createPortal } from "react-dom";
 
 import type { CSSVars } from "@/lib/css";
@@ -39,17 +46,36 @@ interface HoverState {
   y: number;
 }
 
-/** What changed between two ledger snapshots. */
-interface LedgerDiff {
-  /** How many epochs the in-progress epoch advanced (0 = none). */
-  epochShift: number;
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
-/** Compare two ledger snapshots for epoch-shift animation purposes. */
-function diffLedger(prev: LedgerData | null, next: LedgerData): LedgerDiff {
-  if (!prev) return { epochShift: 0 };
-  const epochShift = next.epochs[0].epoch - prev.epochs[0].epoch;
-  return { epochShift };
+/** Locked geometry for one clipped-scroll shift. */
+interface ScrollMetrics {
+  /** Viewport height to lock during the slide (px) — the steady 4-row height. */
+  height: number;
+  /** Distance to translate: one row height + the inter-row gap (px). */
+  step: number;
+}
+
+/**
+ * Measure the steady stack for a clipped scroll, reading live DOM. Returns null
+ * when there's no layout (jsdom) or motion is disabled — the caller then swaps
+ * instantly instead of animating.
+ */
+function measureScroll(stack: HTMLDivElement | null): ScrollMetrics | null {
+  if (prefersReducedMotion() || !stack) return null;
+  const first = stack.children[0] as HTMLElement | undefined;
+  const second = stack.children[1] as HTMLElement | undefined;
+  const height = stack.offsetHeight;
+  const rowH = first?.offsetHeight ?? 0;
+  if (height === 0 || rowH === 0) return null;
+  const gap = second ? parseFloat(getComputedStyle(second).marginTop) || 0 : 0;
+  return { height, step: rowH + gap };
 }
 
 interface EpochLedgerProps {
@@ -59,17 +85,25 @@ interface EpochLedgerProps {
 /**
  * The live epoch ledger — the latest 4 epochs as rows of 32 real slots. The
  * top row is the in-progress epoch; it fills slot by slot and, on completion,
- * the rows shift down and a fresh row enters at the top. Polls `/api/epochs`.
+ * the whole stack scrolls down one row in a height-locked viewport: a fresh
+ * row enters at the top while the oldest clips out the bottom, with the panel
+ * height held constant so nothing pulses. Polls `/api/epochs`.
  */
 export function EpochLedger({ initial }: EpochLedgerProps) {
   const [data, setData] = useState<LedgerData>(initial);
   const [hover, setHover] = useState<HoverState | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
+  // Clipped-scroll shift state. `exiting` is the dropped bottom row, appended
+  // to the stack during the slide; `scrollMetrics` locks the viewport height
+  // so the layout can't pulse; `scrollRun` flips false→true to start the
+  // transition (false = armed/offset up one row, true = sliding into place).
   const [exiting, setExiting] = useState<EpochRow | null>(null);
-  const [entering, setEntering] = useState<number | null>(null);
-  const [exitCollapsed, setExitCollapsed] = useState(false);
-  // Bumped on every successful poll; used as a React key to restart the
-  // top-of-panel progress bar so it scrubs the gap between fetches.
+  const [scrollMetrics, setScrollMetrics] = useState<ScrollMetrics | null>(
+    null,
+  );
+  const [scrollRun, setScrollRun] = useState(false);
+  // Bumped whenever the next poll is scheduled; used as a React key to restart
+  // the top-of-panel progress bar so it scrubs the wait between fetches.
   const [pollTick, setPollTick] = useState(0);
   // Tap-to-detail on phones produced a tiny floating tooltip on tile-sized
   // tap targets — readers couldn't dismiss it. Gate the interaction behind
@@ -78,6 +112,8 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
 
   const prevRef = useRef<LedgerData>(initial);
   const staggerNext = useRef(true);
+  // Measured to drive the clipped scroll; reads live DOM, never stale state.
+  const stackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -88,75 +124,95 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Poll the API immediately on mount, then every POLL_MS.
+  // Poll the API immediately on mount, then schedule the next poll only after
+  // the current request settles. This prevents slow refreshes from stacking up
+  // and competing for the browser main thread when responses land together.
   useEffect(() => {
     let alive = true;
-    const timeouts = new Set<number>();
+    let timeoutId: number | null = null;
+    let controller: AbortController | null = null;
+    // Pending clipped-scroll completion timers, cleared on unmount.
+    const scrollTimers = new Set<number>();
+
+    const scheduleNextPoll = () => {
+      if (!alive) return;
+      setPollTick((t) => t + 1);
+      timeoutId = window.setTimeout(poll, POLL_MS);
+    };
 
     async function poll() {
-      // Restart the progress bar the moment a fetch fires so the bar's
-      // animation tracks poll cadence — when the bar finishes, the next
-      // request is going out.
-      setPollTick((t) => t + 1);
+      controller = new AbortController();
       try {
-        const res = await fetch("/api/epochs", { cache: "no-store" });
+        const res = await fetch("/api/epochs", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const next = (await res.json()) as LedgerData;
         if (!alive) return;
         setReconnecting(false);
 
-        const changes = diffLedger(prevRef.current, next);
-        if (changes.epochShift === 1) {
-          const dropped =
-            prevRef.current.epochs[prevRef.current.epochs.length - 1];
-          setExiting(dropped);
-          setExitCollapsed(false);
-          setEntering(next.epochs[0].epoch);
-          const t = window.setTimeout(() => {
-            timeouts.delete(t);
-            if (!alive) return;
-            setExiting(null);
-            setEntering(null);
-          }, 650);
-          timeouts.add(t);
-        } else if (changes.epochShift !== 0) {
-          // A multi-epoch jump (e.g. a stale tab): re-enter with the stagger
-          // rather than animate a single shift.
-          staggerNext.current = true;
+        if (!isSameLedgerVersion(prevRef.current, next)) {
+          // A single-epoch rollover drives the clipped scroll; a multi-epoch
+          // jump (e.g. a stale tab) re-staggers the grid instead.
+          const epochShift =
+            next.epochs[0].epoch - prevRef.current.epochs[0].epoch;
+          if (epochShift === 1) {
+            // Measure the steady 4-row stack BEFORE it re-renders to 5 rows.
+            // Null means no layout (jsdom) or reduced motion → swap instantly.
+            const metrics = measureScroll(stackRef.current);
+            if (metrics) {
+              const dropped =
+                prevRef.current.epochs[prevRef.current.epochs.length - 1];
+              setScrollMetrics(metrics);
+              setScrollRun(false);
+              setExiting(dropped);
+              // Clear once the 550ms slide finishes (+ buffer).
+              const t = window.setTimeout(() => {
+                scrollTimers.delete(t);
+                if (!alive) return;
+                setExiting(null);
+                setScrollMetrics(null);
+                setScrollRun(false);
+              }, 700);
+              scrollTimers.add(t);
+            }
+          } else if (epochShift !== 0) {
+            staggerNext.current = true;
+          }
+          prevRef.current = next;
+          setData(next);
         }
-
-        prevRef.current = next;
-        setData(next);
-      } catch {
-        if (alive) setReconnecting(true);
+      } catch (error) {
+        if (alive && !isAbortError(error)) setReconnecting(true);
+      } finally {
+        controller = null;
+        scheduleNextPoll();
       }
     }
 
     void poll();
-    const id = window.setInterval(poll, POLL_MS);
     return () => {
       alive = false;
-      window.clearInterval(id);
-      for (const t of timeouts) window.clearTimeout(t);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      for (const t of scrollTimers) window.clearTimeout(t);
+      controller?.abort();
     };
   }, []);
 
-  // After the collapsed/expanded first frame paints, flip to the target state
-  // so the grid-template-rows transition runs.
+  // After the armed frame paints (stack offset up one row, no transition),
+  // flip to the run state so the transform transition slides it into place.
   useEffect(() => {
-    if (entering === null && exiting === null) return;
+    if (exiting === null || scrollMetrics === null) return;
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        setEntering(null);
-        setExitCollapsed(true);
-      });
+      raf2 = requestAnimationFrame(() => setScrollRun(true));
     });
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  }, [entering, exiting]);
+  }, [exiting, scrollMetrics]);
 
   const stagger = staggerNext.current;
   useEffect(() => {
@@ -164,6 +220,21 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
   });
 
   const rows = exiting ? [...data.epochs, exiting] : data.epochs;
+  const scrolling = exiting !== null && scrollMetrics !== null;
+  // Lock the viewport to the steady height + clip while the stack slides, so
+  // the extra fifth row never changes the panel's measured height.
+  const viewportStyle: CSSProperties = scrolling
+    ? { height: scrollMetrics.height, overflow: "hidden" }
+    : {};
+  // Armed: offset up one row (no transition). Run: slide back to 0 with the
+  // transition applied via the --animate class.
+  const stackStyle: CSSProperties = scrolling
+    ? {
+        transform: scrollRun
+          ? "translateY(0)"
+          : `translateY(-${scrollMetrics.step}px)`,
+      }
+    : {};
 
   return (
     <div
@@ -171,50 +242,67 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
       onMouseLeave={() => setHover(null)}
     >
       {/* Browser-style poll progress bar — fills over one poll cycle
-          (POLL_MS). Restarts at the start of every fetch so that the
-          moment the bar finishes, the next request is going out. */}
+          (POLL_MS). Restarts when the next request is scheduled. While
+          reconnecting it holds full and pulses amber — a stalled-poll signal
+          that lives in the existing top edge, so it never changes the panel
+          height. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-[2px] overflow-hidden"
       >
         <div
           key={pollTick}
-          className="epoch-poll-bar h-full w-full"
-          style={{ animationDuration: `${POLL_MS}ms` } as CSSVars}
+          className={`epoch-poll-bar h-full w-full${
+            reconnecting ? " epoch-poll-bar--stalled" : ""
+          }`}
+          style={
+            reconnecting
+              ? undefined
+              : ({ animationDuration: `${POLL_MS}ms` } as CSSVars)
+          }
         />
       </div>
+      {/* Layout-neutral live region so the stall is still announced. */}
+      <span role="status" className="sr-only">
+        {reconnecting ? "Reconnecting to live data…" : ""}
+      </span>
 
-      <div className="space-y-1">
-        {/* eslint-disable-next-line react-hooks/refs -- stagger flows from the intentional render-time ref read above */}
-        {rows.map((row, rowIdx) => {
-          const isExiting = exiting !== null && row === exiting;
-          const collapsed = isExiting ? exitCollapsed : entering === row.epoch;
-          return (
-            <div
-              key={row.epoch}
-              className={`epoch-row-wrap${collapsed ? " epoch-row-wrap--collapsed" : ""}`}
-            >
+      <div className="epoch-ledger-viewport" style={viewportStyle}>
+        <div
+          ref={stackRef}
+          className={`epoch-ledger-stack space-y-1${
+            scrolling && scrollRun ? " epoch-ledger-stack--animate" : ""
+          }`}
+          style={stackStyle}
+        >
+          {/* eslint-disable-next-line react-hooks/refs -- stagger flows from the intentional render-time ref read above */}
+          {rows.map((row, rowIdx) => {
+            const isExiting = exiting !== null && row === exiting;
+            return (
               <EpochRowView
+                key={row.epoch}
                 row={row}
                 rowIdx={isExiting ? data.epochs.length : rowIdx}
                 stagger={stagger}
                 onHover={setHover}
                 hoverEnabled={hoverEnabled}
               />
-            </div>
-          );
-        })}
-      </div>
-
-      {reconnecting && (
-        <div className="mt-2 font-mono text-[9.5px] uppercase tracking-[0.12em] text-fg-muted">
-          ● Reconnecting…
+            );
+          })}
         </div>
-      )}
+      </div>
 
       {hover && <SlotTooltip hover={hover} />}
     </div>
   );
+}
+
+function isSameLedgerVersion(prev: LedgerData, next: LedgerData): boolean {
+  return prev.headSlot === next.headSlot && prev.fetchedAt === next.fetchedAt;
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
 }
 
 interface EpochRowViewProps {

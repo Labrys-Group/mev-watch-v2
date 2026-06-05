@@ -1,4 +1,11 @@
-import { mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readdir,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -42,7 +49,7 @@ function timestampedBlobPath(slot: number): string {
 }
 
 describe("local live ledger snapshot store", () => {
-  it("writes timestamped snapshots instead of latest.json", async () => {
+  it("writes latest.json plus a timestamped archive snapshot", async () => {
     await withTempDir(async (dir) => {
       const store = createLocalSnapshotStore({ dir });
 
@@ -54,14 +61,19 @@ describe("local live ledger snapshot store", () => {
         /^2026-05-26T00-00-00-123Z-head-1-[a-f0-9-]+\.json$/,
       );
       expect(name).not.toBe("latest.json");
-      await expect(readdir(dir)).resolves.toEqual([name]);
+      await expect(readdir(dir)).resolves.toEqual(
+        expect.arrayContaining(["latest.json", name]),
+      );
+      await expect(
+        readFile(path.join(dir, "latest.json"), "utf8").then(JSON.parse),
+      ).resolves.toMatchObject({ headSlot: 1 });
       await expect(store.readLatestSnapshot()).resolves.toMatchObject({
         headSlot: 1,
       });
     });
   });
 
-  it("reads the newest timestamped snapshot by fetchedAt with head slot as a tie-breaker", async () => {
+  it("keeps archived reads monotonic when latest.json regresses behind timestamped snapshots", async () => {
     await withTempDir(async (dir) => {
       const store = createLocalSnapshotStore({ dir });
 
@@ -69,8 +81,114 @@ describe("local live ledger snapshot store", () => {
       await store.writeSnapshot(snapshot(30, "2026-05-26T00:00:20.000Z"));
       await store.writeSnapshot(snapshot(10, "2026-05-26T00:00:10.000Z"));
 
-      await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+      await expect(store.readNewestArchivedSnapshot()).resolves.toMatchObject({
         headSlot: 30,
+        fetchedAt: "2026-05-26T00:00:20.000Z",
+      });
+    });
+  });
+
+  it("falls back to newest timestamped snapshot when latest.json is absent", async () => {
+    await withTempDir(async (dir) => {
+      const archiveOnlyStore = createLocalSnapshotStore({ dir });
+
+      await writeFile(
+        path.join(
+          dir,
+          "2026-05-26T00-00-20-000Z-head-20-00000000-0000-4000-8000-000000000020.json",
+        ),
+        JSON.stringify(snapshot(20, "2026-05-26T00:00:20.000Z")),
+        "utf8",
+      );
+      await writeFile(
+        path.join(
+          dir,
+          "2026-05-26T00-00-20-000Z-head-30-00000000-0000-4000-8000-000000000030.json",
+        ),
+        JSON.stringify(snapshot(30, "2026-05-26T00:00:20.000Z")),
+        "utf8",
+      );
+
+      await expect(archiveOnlyStore.readLatestSnapshot()).resolves.toMatchObject({
+        headSlot: 30,
+        fetchedAt: "2026-05-26T00:00:20.000Z",
+      });
+    });
+  });
+
+  it("chooses the newest archived snapshot by parsed contents when filenames disagree", async () => {
+    await withTempDir(async (dir) => {
+      const store = createLocalSnapshotStore({ dir });
+
+      await writeFile(
+        path.join(
+          dir,
+          "2026-05-26T00-00-30-000Z-head-30-00000000-0000-4000-8000-000000000030.json",
+        ),
+        JSON.stringify(snapshot(10, "2026-05-26T00:00:10.000Z")),
+        "utf8",
+      );
+      await writeFile(
+        path.join(
+          dir,
+          "2026-05-26T00-00-20-000Z-head-20-00000000-0000-4000-8000-000000000020.json",
+        ),
+        JSON.stringify(snapshot(20, "2026-05-26T00:00:20.000Z")),
+        "utf8",
+      );
+
+      await expect(store.readNewestArchivedSnapshot()).resolves.toMatchObject({
+        headSlot: 20,
+        fetchedAt: "2026-05-26T00:00:20.000Z",
+      });
+    });
+  });
+
+  it("keeps the archive write successful when latest.json update fails", async () => {
+    await withTempDir(async (dir) => {
+      const store = createLocalSnapshotStore({ dir });
+      await mkdir(path.join(dir, "latest.json"));
+
+      const name = await store.writeSnapshot(
+        snapshot(40, "2026-05-26T00:00:40.000Z"),
+      );
+
+      expect(name).toMatch(
+        /^2026-05-26T00-00-40-000Z-head-40-[a-f0-9-]+\.json$/,
+      );
+      await expect(readFile(path.join(dir, name), "utf8")).resolves.toContain(
+        '"headSlot": 40',
+      );
+      await expect(readdir(dir)).resolves.not.toEqual(
+        expect.arrayContaining([`latest.json.${name}.tmp`]),
+      );
+    });
+  });
+
+  it("reads archived snapshots separately when latest.json is stale", async () => {
+    await withTempDir(async (dir) => {
+      const store = createLocalSnapshotStore({ dir });
+
+      await writeFile(
+        path.join(dir, "latest.json"),
+        JSON.stringify(snapshot(10, "2026-05-26T00:00:10.000Z")),
+        "utf8",
+      );
+      await writeFile(
+        path.join(
+          dir,
+          "2026-05-26T00-00-20-000Z-head-20-00000000-0000-4000-8000-000000000020.json",
+        ),
+        JSON.stringify(snapshot(20, "2026-05-26T00:00:20.000Z")),
+        "utf8",
+      );
+
+      await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+        headSlot: 10,
+        fetchedAt: "2026-05-26T00:00:10.000Z",
+      });
+      await expect(store.readNewestArchivedSnapshot()).resolves.toMatchObject({
+        headSlot: 20,
         fetchedAt: "2026-05-26T00:00:20.000Z",
       });
     });
@@ -90,13 +208,13 @@ describe("local live ledger snapshot store", () => {
       expect(new Set(names).size).toBe(2);
       expect(names).not.toContain("latest.json");
       await expect(readdir(dir)).resolves.toEqual(expect.arrayContaining(names));
-      await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+      await expect(store.readNewestArchivedSnapshot()).resolves.toMatchObject({
         headSlot: 11,
       });
     });
   });
 
-  it("ignores latest.json when no timestamped snapshots exist", async () => {
+  it("reads latest.json when no timestamped snapshots exist", async () => {
     await withTempDir(async (dir) => {
       const store = createLocalSnapshotStore({ dir });
       await writeFile(
@@ -105,7 +223,9 @@ describe("local live ledger snapshot store", () => {
         "utf8",
       );
 
-      await expect(store.readLatestSnapshot()).resolves.toBeNull();
+      await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+        headSlot: 99,
+      });
 
       await store.writeSnapshot(snapshot(100, "2026-05-26T00:01:00.000Z"));
 
@@ -127,7 +247,7 @@ describe("local live ledger snapshot store", () => {
       }
 
       const files = await readdir(dir);
-      expect(files).toHaveLength(12);
+      expect(files).toHaveLength(13);
       await expect(store.readLatestSnapshot()).resolves.toMatchObject({
         headSlot: 11,
       });
@@ -149,7 +269,8 @@ describe("local live ledger snapshot store", () => {
       });
 
       const files = await readdir(dir);
-      expect(files).toHaveLength(10);
+      expect(files).toHaveLength(11);
+      expect(files).toContain("latest.json");
       await expect(store.readLatestSnapshot()).resolves.toMatchObject({
         headSlot: 11,
       });
@@ -158,7 +279,7 @@ describe("local live ledger snapshot store", () => {
 });
 
 describe("blob live ledger snapshot store", () => {
-  it("writes timestamped blob paths without conditional latest.json options", async () => {
+  it("writes latest.json plus a timestamped blob archive", async () => {
     const listBlob = vi.fn(async () => ({ blobs: [], hasMore: false }));
     const getBlob = vi.fn(async () => null);
     const putBlob = vi.fn(async () => ({ pathname: "unused" }));
@@ -180,12 +301,12 @@ describe("blob live ledger snapshot store", () => {
     expect(putBlob).toHaveBeenCalledWith(
       `data/live-ledger/${name}`,
       expect.any(String),
-      expect.not.objectContaining({ ifMatch: expect.any(String) }),
+      expect.objectContaining({ allowOverwrite: false }),
     );
     expect(putBlob).toHaveBeenCalledWith(
-      expect.not.stringContaining("latest.json"),
+      "data/live-ledger/latest.json",
       expect.any(String),
-      expect.objectContaining({ allowOverwrite: false }),
+      expect.objectContaining({ allowOverwrite: true }),
     );
   });
 
@@ -207,17 +328,47 @@ describe("blob live ledger snapshot store", () => {
 
     expect(new Set(names).size).toBe(2);
     expect(names).not.toContain("latest.json");
-    expect(putBlob).toHaveBeenCalledTimes(2);
+    expect(putBlob).toHaveBeenCalledTimes(4);
     const putBlobCalls = putBlob.mock.calls as unknown as Array<
       [string, unknown, Record<string, unknown>]
     >;
-    for (const call of putBlobCalls) {
-      expect(call[0]).not.toContain("latest.json");
-      expect(call[2]).not.toHaveProperty("ifMatch");
-    }
+    expect(putBlobCalls.filter((call) => call[0].endsWith("latest.json"))).toHaveLength(
+      2,
+    );
+    expect(
+      putBlobCalls
+        .filter((call) => !call[0].endsWith("latest.json"))
+        .map((call) => call[0]),
+    ).toHaveLength(2);
   });
 
-  it("reads only the newest timestamped blob selected by timestamp and numeric head slot", async () => {
+  it("reads latest.json when no timestamped blobs are newer", async () => {
+    const listBlob = vi.fn(async () => ({ blobs: [], hasMore: false }));
+    const getBlob = vi.fn(async (pathname: string) => {
+      if (pathname === "data/live-ledger/latest.json") {
+        return blobResult(snapshot(100, "2026-05-26T00:00:10.000Z"));
+      }
+      return null;
+    });
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob: vi.fn(),
+      listBlob,
+      delBlob: vi.fn(),
+    } as never);
+
+    await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+      headSlot: 100,
+    });
+
+    expect(getBlob).toHaveBeenCalledWith("data/live-ledger/latest.json", {
+      access: "private",
+      useCache: false,
+    });
+    expect(listBlob).not.toHaveBeenCalled();
+  });
+
+  it("falls back to newest timestamped blob selected by timestamp and numeric head slot", async () => {
     const olderPath =
       "data/live-ledger/2026-05-26T00-00-09-000Z-head-999-aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.json";
     const lexicalHeadSlotTrapPath =
@@ -255,26 +406,39 @@ describe("blob live ledger snapshot store", () => {
       headSlot: 100,
     });
 
+    expect(getBlob).toHaveBeenCalledWith("data/live-ledger/latest.json", {
+      access: "private",
+      useCache: false,
+    });
     expect(listBlob).toHaveBeenCalledWith({
       prefix: "data/live-ledger/",
       limit: 1000,
     });
-    expect(getBlob).toHaveBeenCalledTimes(1);
+    expect(getBlob).toHaveBeenCalledTimes(4);
     expect(getBlob).toHaveBeenCalledWith(newerPath, {
       access: "private",
       useCache: false,
     });
-    expect(getBlob).not.toHaveBeenCalledWith(
-      "data/live-ledger/latest.json",
-      expect.anything(),
-    );
   });
 
-  it("ignores latest.json when no timestamped blobs exist", async () => {
-    const listBlob = vi.fn(async () => ({ blobs: [], hasMore: false }));
+  it("chooses the newest archived blob by parsed contents when filenames disagree", async () => {
+    const higherNamedPath =
+      "data/live-ledger/2026-05-26T00-00-30-000Z-head-30-00000000-0000-4000-8000-000000000030.json";
+    const newerContentsPath =
+      "data/live-ledger/2026-05-26T00-00-20-000Z-head-20-00000000-0000-4000-8000-000000000020.json";
+    const listBlob = vi.fn(async () => ({
+      blobs: [
+        { pathname: higherNamedPath, uploadedAt: new Date(), size: 1 },
+        { pathname: newerContentsPath, uploadedAt: new Date(), size: 1 },
+      ],
+      hasMore: false,
+    }));
     const getBlob = vi.fn(async (pathname: string) => {
-      if (pathname === "data/live-ledger/latest.json") {
-        return blobResult(snapshot(99, "2026-05-26T00:00:99.000Z"));
+      if (pathname === higherNamedPath) {
+        return blobResult(snapshot(10, "2026-05-26T00:00:10.000Z"));
+      }
+      if (pathname === newerContentsPath) {
+        return blobResult(snapshot(20, "2026-05-26T00:00:20.000Z"));
       }
       return null;
     });
@@ -285,8 +449,90 @@ describe("blob live ledger snapshot store", () => {
       delBlob: vi.fn(),
     } as never);
 
+    await expect(store.readNewestArchivedSnapshot()).resolves.toMatchObject({
+      headSlot: 20,
+      fetchedAt: "2026-05-26T00:00:20.000Z",
+    });
+  });
+
+  it("keeps the archive blob write successful when latest.json put fails", async () => {
+    const putBlob = vi
+      .fn()
+      .mockResolvedValueOnce({ pathname: "archive" })
+      .mockRejectedValueOnce(new Error("latest unavailable"));
+    const store = createBlobSnapshotStore({
+      getBlob: vi.fn(async () => null),
+      putBlob,
+      listBlob: vi.fn(async () => ({ blobs: [], hasMore: false })),
+      delBlob: vi.fn(),
+    } as never);
+
+    const name = await store.writeSnapshot(
+      snapshot(40, "2026-05-26T00:00:40.000Z"),
+    );
+
+    expect(name).toMatch(
+      /^2026-05-26T00-00-40-000Z-head-40-[a-f0-9-]+\.json$/,
+    );
+    expect(putBlob).toHaveBeenCalledTimes(2);
+  });
+
+  it("reads archived blobs separately when latest.json is stale", async () => {
+    const latest = snapshot(10, "2026-05-26T00:00:10.000Z");
+    const newer = snapshot(20, "2026-05-26T00:00:20.000Z");
+    const newerPath =
+      "data/live-ledger/2026-05-26T00-00-20-000Z-head-20-00000000-0000-4000-8000-000000000020.json";
+    const listBlob = vi.fn(async () => ({
+      blobs: [{ pathname: newerPath, uploadedAt: new Date(), size: 1 }],
+      hasMore: false,
+    }));
+    const getBlob = vi.fn(async (pathname: string) => {
+      if (pathname === "data/live-ledger/latest.json") {
+        return blobResult(latest);
+      }
+      if (pathname === newerPath) {
+        return blobResult(newer);
+      }
+      return null;
+    });
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob: vi.fn(),
+      listBlob,
+      delBlob: vi.fn(),
+    } as never);
+
+    await expect(store.readLatestSnapshot()).resolves.toMatchObject({
+      headSlot: 10,
+      fetchedAt: "2026-05-26T00:00:10.000Z",
+    });
+    await expect(store.readNewestArchivedSnapshot()).resolves.toMatchObject({
+      headSlot: 20,
+      fetchedAt: "2026-05-26T00:00:20.000Z",
+    });
+  });
+
+  it("returns null when latest.json and timestamped blobs are absent", async () => {
+    const listBlob = vi.fn(async () => ({ blobs: [], hasMore: false }));
+    const getBlob = vi.fn(async (pathname: string) => {
+      return null;
+    });
+    const store = createBlobSnapshotStore({
+      getBlob,
+      putBlob: vi.fn(),
+      listBlob,
+      delBlob: vi.fn(),
+    } as never);
+
     await expect(store.readLatestSnapshot()).resolves.toBeNull();
-    expect(getBlob).not.toHaveBeenCalled();
+    expect(getBlob).toHaveBeenCalledWith("data/live-ledger/latest.json", {
+      access: "private",
+      useCache: false,
+    });
+    expect(listBlob).toHaveBeenCalledWith({
+      prefix: "data/live-ledger/",
+      limit: 1000,
+    });
   });
 
   it("does not prune old blobs during request-time writes", async () => {

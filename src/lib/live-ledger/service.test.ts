@@ -8,6 +8,7 @@ import type { LiveLedgerSnapshot } from "./types";
 
 function memoryStore(initial: LiveLedgerSnapshot | null = null): SnapshotStore & {
   written: LiveLedgerSnapshot[];
+  readNewestArchivedSnapshot: ReturnType<typeof vi.fn>;
 } {
   let latest = initial;
   const written: LiveLedgerSnapshot[] = [];
@@ -17,6 +18,7 @@ function memoryStore(initial: LiveLedgerSnapshot | null = null): SnapshotStore &
     async readLatestSnapshot() {
       return latest;
     },
+    readNewestArchivedSnapshot: vi.fn(async () => null),
     async writeSnapshot(snapshot) {
       latest = snapshot;
       written.push(snapshot);
@@ -64,6 +66,35 @@ describe("refreshLiveLedger", () => {
     expect(store.written).toEqual([]);
     expect(result.snapshot).toEqual(previousSnapshot);
     expect(result.data.headSlot).toBe(previousSnapshot.headSlot);
+  });
+
+  it("recovers a fresh newer archive before fetching relays when latest is stale", async () => {
+    const stalePointer: LiveLedgerSnapshot = {
+      ...previousSnapshot,
+      headSlot: 95,
+      fetchedAt: new Date(
+        Date.parse(previousSnapshot.fetchedAt) - LIVE_LEDGER_REFRESH_INTERVAL_MS,
+      ).toISOString(),
+      blocks: [],
+    };
+    const store = memoryStore(stalePointer);
+    store.readNewestArchivedSnapshot.mockResolvedValue(previousSnapshot);
+    const fetchPayloads = vi.fn(async () => ({
+      successfulRelays: ["boost-relay.flashbots.net"],
+      degradedRelays: [],
+      payloads: [],
+    }));
+
+    const result = await refreshLiveLedger({
+      store,
+      now: Date.parse(previousSnapshot.fetchedAt) + LIVE_LEDGER_REFRESH_INTERVAL_MS - 1,
+      fetchPayloads,
+    });
+
+    expect(store.readNewestArchivedSnapshot).toHaveBeenCalledTimes(1);
+    expect(fetchPayloads).not.toHaveBeenCalled();
+    expect(result.wroteSnapshot).toBe(false);
+    expect(result.snapshot).toEqual(previousSnapshot);
   });
 
   it("serves a fresh previous snapshot with explicit empty degraded ranges", async () => {

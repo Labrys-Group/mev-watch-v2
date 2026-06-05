@@ -3,6 +3,7 @@ import {
   buildSnapshot,
   emptySnapshot,
   foldPayloadsBySlot,
+  isNewerSnapshot,
   ledgerFromSnapshot,
 } from "./snapshots";
 import { createSnapshotStore, type SnapshotStore } from "./store";
@@ -33,7 +34,14 @@ export async function refreshLiveLedger({
   wroteSnapshot: boolean;
 }> {
   const snapshotStore = store ?? (await createSnapshotStore());
-  const previous = await snapshotStore.readLatestSnapshot();
+  let previous = await snapshotStore.readLatestSnapshot();
+
+  if (!previous || !isFreshSnapshot(previous, now)) {
+    const archived = await snapshotStore.readNewestArchivedSnapshot();
+    if (archived && (!previous || isNewerSnapshot(archived, previous))) {
+      previous = archived;
+    }
+  }
 
   if (previous && isFreshSnapshot(previous, now)) {
     return {
