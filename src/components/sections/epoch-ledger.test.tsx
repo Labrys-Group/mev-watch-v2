@@ -9,22 +9,25 @@ function ledger(
   category: Extract<SlotCategory, "neutral" | "censoring" | "unknown">,
   degradedRelays: string[] = [],
 ): LedgerData {
+  const currentEpoch = Math.floor(headSlot / 32);
+  const currentEpochFirstSlot = currentEpoch * 32;
+
   return {
     headSlot,
     fetchedAt: "2026-05-26T00:00:00.000Z",
     degradedRelays,
     epochs: [
       {
-        epoch: 3,
+        epoch: currentEpoch,
         inProgress: true,
         slots: Array.from({ length: 32 }, (_, index) => ({
-          slot: 96 + index,
+          slot: currentEpochFirstSlot + index,
           indexInEpoch: index,
           category: index === 0 ? category : index > 3 ? "pending" : "nonboost",
           relays: index === 0 ? ["relay.ultrasound.money"] : [],
         })),
       },
-      ...[2, 1, 0].map((epoch) => ({
+      ...[currentEpoch - 1, currentEpoch - 2, currentEpoch - 3].map((epoch) => ({
         epoch,
         inProgress: false,
         slots: Array.from({ length: 32 }, (_, index) => ({
@@ -334,6 +337,29 @@ describe("EpochLedger", () => {
     ).toBeInTheDocument();
     // Reconnecting indicator should NOT appear after a successful poll
     expect(screen.queryByText(/reconnecting/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps epoch rollover constrained to four flow rows", async () => {
+    const updated = ledger(128, "neutral");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json(updated)),
+    );
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(document.querySelectorAll(".epoch-row-wrap")).toHaveLength(4);
+    expect(
+      screen.getByLabelText("Epoch 4: 4 of 32 slots delivered"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Epoch 0: 32 of 32 slots delivered"),
+    ).not.toBeInTheDocument();
   });
 
   it("uses epoch-row-wrap class for each row", () => {
