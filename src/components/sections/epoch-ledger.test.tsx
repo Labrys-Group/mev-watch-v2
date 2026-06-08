@@ -217,6 +217,47 @@ describe("EpochLedger", () => {
     expect(screen.getByText(/Epoch \d+/)).toBeInTheDocument();
   });
 
+  it("clears a visible slot tooltip when fresh ledger data arrives", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+
+    let resolveFetch!: (response: Response) => void;
+    const fetchPromise = new Promise<Response>((resolve) => {
+      resolveFetch = resolve;
+    });
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(fetchPromise));
+
+    render(<EpochLedger initial={ledger(99, "neutral")} />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const filledTiles = document.querySelectorAll(".epoch-tile");
+    fireEvent.mouseEnter(filledTiles[0], { clientX: 100, clientY: 100 });
+    expect(document.querySelectorAll(".pointer-events-none.fixed")).toHaveLength(
+      1,
+    );
+
+    await act(async () => {
+      resolveFetch(Response.json(ledger(128, "neutral")));
+      await fetchPromise;
+      await Promise.resolve();
+    });
+
+    expect(document.querySelectorAll(".pointer-events-none.fixed")).toHaveLength(
+      0,
+    );
+  });
+
   it("hides the slot tooltip when mouse leaves the container", async () => {
     vi.stubGlobal(
       "matchMedia",

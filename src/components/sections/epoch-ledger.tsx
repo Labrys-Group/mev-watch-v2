@@ -87,6 +87,7 @@ export function EpochLedger({ initial }: EpochLedgerProps) {
         const next = (await res.json()) as LedgerData;
         if (!alive) return;
         setReconnecting(false);
+        setHover(null);
         setData(next);
       } catch {
         if (alive) setReconnecting(true);
